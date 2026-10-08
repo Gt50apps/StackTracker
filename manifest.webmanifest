@@ -1,9 +1,9 @@
 {
-  "id": "stack-tracker-app",
+  "id": "StackTracker/app",
   "name": "Stack Tracker",
   "short_name": "Stack Tracker",
   "description": "Track the books you read and the audiobooks you listen to, on a 3D bookshelf.",
-  "start_url": "./",
+  "start_url": "./index.html?app=1",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
