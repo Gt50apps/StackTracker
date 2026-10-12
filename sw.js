@@ -1,6 +1,6 @@
 // Stack Tracker service worker: keeps the app's files so it works fully offline.
 // Bump VERSION whenever you upload a new index.html so phones pick up the update.
-const VERSION = 'stack-tracker-v320';
+const VERSION = 'stack-tracker-v366';
 const FILES = ['./', './index.html', './three.min.js', './app.webmanifest',
                './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 

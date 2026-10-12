@@ -34,7 +34,7 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    padding:calc(var(--header-h, 50px) + 16px) 20px calc(var(--footer-h, 56px) + 16px);
+    padding:calc(var(--header-h, 50px) + 16px) 4px calc(var(--footer-h, 56px) + 16px);   /* shelves sit 4px from the sides, like the cards */
   }
   /* frozen footer: Add Book, 4px from the window on every side */
   #app-footer{
@@ -93,8 +93,12 @@
   #sort-name{overflow:hidden; text-overflow:ellipsis;}
 
   /* list view: one GT50 card per book */
-  #list-container{display:none; flex-direction:column; gap:4px; margin:-12px -16px 0;}
+  #list-container{display:none; flex-direction:column; gap:4px; margin:-12px 0 0;}   /* list cards: 4px from the sides */
   #all-books-view.list #list-container{display:flex;}
+  /* Collections as a list: the same cards, a divider for each collection */
+  #coll-list{display:none; flex-direction:column; gap:4px; margin:-12px 0 0;}
+  #library-view.list #coll-list{display:flex;}
+  #library-view.list #library-container{display:none;}
   #all-books-view.list #shelves-container{display:none;}
   .book-row{
     position:relative; display:flex; align-items:center; gap:8px; height:45px; box-sizing:border-box;
@@ -138,8 +142,8 @@
   .list-divider::before, .list-divider::after{
     content:''; flex:1; height:3px; background:#000; border-radius:2px;
   }
-  .shelf-divider{margin:4px 0 -18px;}   /* shelves have 30px headroom above the spines; this leaves ~12px */
-  .shelf-divider:not(:first-child){margin-top:26px;}
+  .shelf-divider{height:24px; margin:4px 0 -8px;}   /* a slim divider, its line ~18px over the spines below so bookmark tips clear it */
+  .shelf-divider:not(:first-child){margin-top:2px;}   /* right under the shelf above it */
   .ld-name{
     flex:none; max-width:75%; font-family:Georgia, serif; font-size:.9rem; font-weight:600; color:var(--ink);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-transform:uppercase; letter-spacing:.5px;
@@ -593,7 +597,7 @@
     align-items:flex-end;
     gap:0;   /* books stand flush against each other */
     min-height:125px;
-    padding:0 10px;
+    padding:0 4px;
     border-bottom:14px solid var(--wood);
     border-radius:2px 2px 0 0;
     position:relative;
@@ -606,27 +610,27 @@
     background:var(--wood-dark);
     border-radius:0 0 3px 3px;
   }
-  #shelves-container .shelf{margin-bottom:22px;}
+  #shelves-container .shelf{margin-bottom:6px;}   /* shelves stack close: the books above stand just over the board below */
   /* 3D bookcase mode: taller bays (room for name holders), HTML boards hidden
      behind the 3D case, room above for the crown and below for the plinth */
   #shelves-container.live3d{padding:0 0 16px; margin-top:-12px;}
   /* books and tapes on separate shelves, side by side */
-  .shelf-cols{display:flex; align-items:flex-start; gap:24px; margin-bottom:22px;}   /* spaced like a lone shelf, so sections line up evenly */
+  .shelf-cols{display:flex; align-items:flex-start; gap:24px; margin-bottom:6px;}   /* spaced like a lone shelf, so sections line up evenly */
   #shelves-container .shelf-col > .shelf:last-child{margin-bottom:0 !important;}
   .shelf-col{min-width:0;}
   .col-books{flex:2 1 0;}
   .col-tapes{flex:1 1 0;}
   .spine.tape{border-radius:0;}
   #library-container.live3d .library-shelf-block:first-child{margin-top:-12px;}   /* same gap under the header in both views */
-  #shelves-container.live3d .shelf{border-bottom-color:transparent; padding:0 14px;}   /* board runs past the books at both ends */
+  #shelves-container.live3d .shelf{border-bottom-color:transparent; padding:0 6px;}   /* books start 6px in from each end of the board, as in Collections */
   #shelves-container.live3d .shelf[data-group]{min-height:150px;}   /* only shelves with a name holder are taller */
   /* My Collections in 3D: thick boards carry a metal name plate instead of the hanging sign */
   #library-container.live3d .overlay-sign{display:none;}
   #library-container.live3d .shelf{border-bottom-color:transparent;}
   #library-container.live3d .shelf::after{background:transparent;}
-  #library-container.live3d .library-shelf-block{margin-bottom:48px;}
+  #library-container.live3d .library-shelf-block{margin-bottom:22px;}
   #library-container.live3d .library-shelf-block .shelf-wrap{filter:none;}
-  #library-container.live3d .library-shelf-block .shelf{justify-content:flex-start; padding:0 14px;}   /* books start at the left, a little in from the end */
+  #library-container.live3d .library-shelf-block .shelf{justify-content:flex-start; padding:0 6px;}   /* books start at the left, just in from the end */
   #shelves-container.live3d .shelf::after{background:transparent;}
   /* per-shelf book count, set into the wooden board */
   .shelf-count{
@@ -1039,6 +1043,13 @@
     opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;   /* quick fade, like every full-window page */
   }
   #data-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  /* Timeline and Data are tabs: their page sits under the tab strip, without its own Back / Done bar,
+     and the Add Book footer steps aside */
+  body.tab-timeline #timeline-page, body.tab-data #data-page{top:var(--header-h, 45px); z-index:8;}
+  /* tabs switch at once: no fade, so the page being left can't linger as its old full-window self */
+  body #timeline-page, body #timeline-page.open, body #data-page, body #data-page.open{transition:none;}
+  body.tab-timeline #timeline-page > .lg-head, body.tab-data #data-page > .lg-head{display:none;}
+  body.tab-timeline #app-footer, body.tab-data #app-footer{display:none;}
   /* ---- timeline page: same full-window page as Data ---- */
   #timeline-page{
     position:fixed; inset:0; z-index:40; background:var(--bg);
@@ -1055,6 +1066,7 @@
     font-family:Arial, sans-serif; font-size:.78rem; font-weight:400; letter-spacing:.5px; text-transform:none; cursor:pointer;}
   .tl-views button:hover{background:#fff; box-shadow:none;}
   .tl-views button.on, .tl-views button.on:hover{background:var(--ink); color:#fff;}
+  .tl-views button{transition:none;}   /* switch instantly: no fade from the last choice when the tab reopens */
   .tl-page{flex:1; min-height:0; display:flex; padding:4px;}
   .tl-card{flex:1; position:relative; border:3px solid #000; border-radius:8px; background:#fff; overflow:hidden;}
   #tl-canvas{position:absolute; inset:0; overflow:hidden; -webkit-user-select:none; user-select:none;}
@@ -1074,6 +1086,17 @@
   #tl-info .hint{flex:1; text-align:center;}
   #tl-info b{color:var(--ink);}
   #tl-info .t{font:600 .85rem Georgia, serif; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  /* This Month, nothing picked: ◀ | the month's totals + hint | ▶ */
+  #tl-info.nav{padding:0; gap:0; align-items:stretch;}
+  #tl-info .tl-nav{flex:0 0 42px; box-sizing:border-box; height:auto; border:none; margin:0; padding:0; box-shadow:none; transform:none; background:#fff; color:var(--ink); font:900 15px/1 Arial, sans-serif; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  #tl-info .tl-nav:first-child{border-right:3px solid #000; border-radius:5px 0 0 5px;}
+  #tl-info .tl-nav:last-child{border-left:3px solid #000; border-radius:0 5px 5px 0;}
+  #tl-info .tl-nav:disabled{color:#d6d0c4; cursor:default;}
+  #tl-info .tl-mid{flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:0 6px; text-align:center; line-height:1.05;}
+  #tl-info .tl-mid > *{max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  #tl-info .tl-mid .t{font-size:.78rem;}
+  #tl-info .tl-mid .tot{font-size:.66rem;}
+  #tl-info .tl-mid .hint{flex:none; font-size:.54rem; letter-spacing:.2px;}
   #data-done{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
   #data-done:hover{background:var(--ink); box-shadow:none;}
   .dt-tabbar{padding:4px 4px 0;}
@@ -1082,6 +1105,9 @@
     padding:4px 4px calc(4px + env(safe-area-inset-bottom));
   }
   .dt-view.active{display:flex;}
+  /* each Data tab's action card sits in a footer bar at the bottom, like the app's other footers */
+  .dt-foot{flex:none; margin:auto -4px calc(-4px - env(safe-area-inset-bottom)); padding:4px 4px calc(4px + env(safe-area-inset-bottom));
+    background:var(--bg); border-top:3px solid #000; border-bottom:3px solid #000;}
   .dt-view.dt-stats.active{display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); grid-auto-rows:auto; align-content:start; overflow-y:auto;}
   .dt-stats .dt-card{padding:0 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .dt-stats .dt-card.wide{grid-column:span 2;}
@@ -1202,6 +1228,48 @@
   .coll-block.selected .spine-blank{opacity:0;}
   .coll-block .bookmark-tab{transition:opacity .4s ease;}
   .coll-empty{font-family:Arial, sans-serif; font-size:.8rem; color:var(--muted); text-align:center; padding:40px 12px; line-height:1.5;}
+  /* choice tabs drawn as cards: 21px tall, text size unchanged */
+  .tl-views, #format-tabs, .dt-tabs, #view-tabs{height:21px; box-sizing:border-box; flex:none;}
+  .tl-views button, #format-tabs .tab, .dt-tabs .tab, #view-tabs .tab{padding:0; line-height:1; height:auto;}
+  /* My Library: Shelf | List on its own row, Sort & Filter full width below it */
+  #shelf-controls, #timeline-controls, #data-controls{flex-direction:column; gap:4px;}
+  #timeline-controls .tl-views{margin:0;}
+  #shelf-controls #sort-card .sort-k, #shelf-controls #sort-name{font-size:.78rem; letter-spacing:.5px; text-transform:uppercase;}
+  #shelf-controls #sort-card .sort-k::after{content:':';}
+  #shelf-controls #sort-card{flex:none; height:21px; box-sizing:border-box; flex-direction:row; align-items:baseline; justify-content:center; gap:5px; line-height:15px;}   /* one line: label then the sort */
+  /* every tab, strip or card, reads in capitals */
+  #tabs .tab, .tabs .tab, .tl-views button{text-transform:uppercase; font-weight:700;}
+  #shelf-controls #sort-card .sort-k, #shelf-controls #sort-name{font-weight:700;}
+  #tabs .tab{letter-spacing:0; font-size:min(.74rem, 2.95vw);}
+  #tabs{background:#000;}   /* behind the tabs: where a tab's edge falls between pixels, the seam blends into the black line, not a pale sliver */
+  #tabs .tab, .tabs .tab, .tl-views button{background-clip:padding-box;}   /* fill stops at the dividing line, no pale fringe under it */   /* equal quarters; on narrow phones the text eases down just enough for COLLECTIONS to fit */
+  /* Collections: small raised wooden buttons on each end of a full collection's board.
+     A press sinks one into the board, the shelf turns over, and it rises back out */
+  .shelf .wbtn{position:absolute; z-index:3; bottom:-23px; width:18px; height:18px; margin:0; padding:0; border:0; border-radius:3px; cursor:pointer;
+    background:linear-gradient(180deg, #b07a4b 0, #996439 45%, #845530 100%);
+    box-shadow:inset 0 1px 0 rgba(255,228,195,.55), inset 0 -1px 0 rgba(50,28,12,.35), 0 0 0 1px #4a2e18, 0 2px 0 1px #3d2513, 0 3px 4px rgba(0,0,0,.35);
+    display:flex; align-items:center; justify-content:center;}
+  #library-container:not(.live3d) .shelf .wbtn{bottom:-21px;}
+  .shelf .wbtn:hover{background:linear-gradient(180deg, #b07a4b 0, #996439 45%, #845530 100%);}
+  .shelf .wbtn.prev{left:6px;} .shelf .wbtn.next{right:6px;}
+  .shelf .wbtn::after{content:''; width:0; height:0; border-top:4px solid transparent; border-bottom:4px solid transparent; filter:drop-shadow(0 1px 0 rgba(255,228,195,.45));}
+  .shelf .wbtn.prev::after{border-right:6px solid #3a2213; margin-right:1px;}
+  .shelf .wbtn.next::after{border-left:6px solid #3a2213; margin-left:1px;}
+  .shelf .wbtn:disabled{cursor:default; background:linear-gradient(180deg, #9a6a42, #865a34 50%, #77502e);}
+  .shelf .wbtn:disabled::after{opacity:.28;}
+  .shelf .wbtn.down{transition:transform .11s ease-in, box-shadow .11s ease-in, background .11s;
+    transform:translateY(1px); background:linear-gradient(180deg, #4f3019 0, #63401f 55%, #6e4724 100%);
+    box-shadow:inset 0 2px 3px rgba(20,10,4,.75), inset 0 -1px 0 rgba(255,215,170,.18), 0 0 0 0 #4a2e18, 0 0 0 0 #3d2513, 0 1px 0 rgba(255,215,170,.28);}
+  .shelf .wbtn.down::after{transform:translateY(1px);}
+  .shelf .wbtn.up{animation:wbtn-rise .2s ease-out;}
+  @keyframes wbtn-rise{
+    from{transform:translateY(1px); background:linear-gradient(180deg, #4f3019 0, #63401f 55%, #6e4724 100%);
+      box-shadow:inset 0 2px 3px rgba(20,10,4,.75), inset 0 -1px 0 rgba(255,215,170,.18), 0 0 0 0 #4a2e18, 0 0 0 0 #3d2513, 0 1px 0 rgba(255,215,170,.28);}
+    to{transform:none;}
+  }
+  /* every header and footer bar is boxed: 3px black at its top and its bottom */
+  #app-header, #book-toolbar, .lg-head, .customize-header{border-top:3px solid #000;}
+  #app-footer, #page-panel, .tl-foot{border-bottom:3px solid #000;}
 </style>
 <style>
   /* ---------- splash: STACK drops onto the top shelf, TRACKER slides in one book at a time ---------- */
@@ -1279,8 +1347,8 @@
 <div id="app-header">
  <!-- pages: the top of the header itself, split in three; Data opens its own window -->
  <div id="tabs">
-   <div class="tab active" data-view="all">My Library</div>
-   <div class="tab" data-view="library">My Collections</div>
+   <div class="tab active" data-view="all">Library</div>
+   <div class="tab" data-view="library">Collections</div>
    <div class="tab" data-view="timeline">Timeline</div>
    <div class="tab" data-view="data">Data</div>
  </div>
@@ -1290,7 +1358,17 @@
     <div class="tab active" data-mode="shelf">Shelf</div>
     <div class="tab" data-mode="list">List</div>
   </div>
-  <div id="sort-card" class="shelf-ctl"><span class="sort-k" id="sort-k">Sort &amp; Filter</span><span id="sort-name">Date added</span></div>
+  <div id="sort-card" class="shelf-ctl"><span class="sort-k" id="sort-k">Sort and Filter</span><span id="sort-name">Date added</span></div>
+ </div>
+ <!-- Timeline: what to chart, and over what span -->
+ <div class="hdr-row hidden" id="timeline-controls">
+  <div class="tl-views" id="tl-modes"><button type="button" data-m="graph" class="on">Pages &amp; Listening</button><button type="button" data-m="timeline">Timeline</button></div>
+  <div class="tl-views" id="tl-ranges"><button type="button" data-v="all">All Time</button><button type="button" data-v="year">This Year</button><button type="button" data-v="month" class="on">This Month</button></div>
+ </div>
+ <!-- Data: Export | Import, then Stats | Backup -->
+ <div class="hdr-row hidden" id="data-controls">
+  <div class="tabs dt-tabs"><div class="tab active" data-dt="export">Export</div><div class="tab" data-dt="import">Import</div></div>
+  <div class="tabs dt-tabs"><div class="tab" data-dt="stats">Stats</div><div class="tab" data-dt="backup">Backup</div></div>
  </div>
  </div>
 <!-- footer: Add Book, full width -->
@@ -1314,6 +1392,7 @@
 
 <div class="view" id="library-view">
   <div id="library-container"></div>
+  <div id="coll-list"></div>
 </div>
 
 <div id="customize-page">
@@ -1496,8 +1575,6 @@
     <span></span>
   </div>
   <div id="timeline-body">
-    <div class="tl-views" id="tl-modes"><button type="button" data-m="timeline" class="on">Timeline</button><button type="button" data-m="graph">Pages &amp; Listening</button></div>
-    <div class="tl-views" id="tl-ranges"><button type="button" data-v="all">All Time</button><button type="button" data-v="year" class="on">This Year</button><button type="button" data-v="month">This Month</button></div>
     <div class="tl-page"><div class="tl-card"><div id="tl-canvas"></div></div></div>
     <div class="tl-foot"><div id="tl-info"><span class="hint">Tap a book to see it here</span></div></div>
   </div>
@@ -1509,29 +1586,21 @@
     <h2>Data</h2>
     <span></span>
   </div>
-  <div class="dt-tabbar">
-    <div class="tabs" id="dt-tabs">
-      <div class="tab active" data-dt="export">Export</div>
-      <div class="tab" data-dt="import">Import</div>
-      <div class="tab" data-dt="stats">Stats</div>
-      <div class="tab" data-dt="backup">Backup</div>
-    </div>
-  </div>
   <div class="dt-view active" id="dt-view-export">
     <textarea class="dt-text" id="dt-export-text" readonly spellcheck="false"></textarea>
-    <div class="dt-split">
+    <div class="dt-foot"><div class="dt-split">
       <button type="button" id="dt-copy">Copy</button>
       <button type="button" id="dt-download">Download</button>
-    </div>
+    </div></div>
   </div>
   <div class="dt-view" id="dt-view-import">
     <textarea class="dt-text" id="dt-import-text" spellcheck="false" placeholder="Paste exported JSON here, or load a file below"></textarea>
     <div class="dt-card" id="dt-status">Import<b>Waiting for JSON</b></div>
-    <div class="dt-split">
+    <div class="dt-foot"><div class="dt-split">
       <button type="button" id="dt-load">Load File</button>
       <button type="button" id="dt-merge">Merge</button>
       <button type="button" id="dt-replace">Replace</button>
-    </div>
+    </div></div>
     <input type="file" id="dt-file" accept=".json,application/json,text/plain" hidden>
   </div>
   <div class="dt-view dt-stats" id="dt-view-stats"></div>
@@ -1543,8 +1612,8 @@
       <button type="button" data-every="week"><span class="wk-label">Weekly</span><span class="wk-days"><i data-wd="0">S</i><i data-wd="1">M</i><i data-wd="2">T</i><i data-wd="3">W</i><i data-wd="4">T</i><i data-wd="5">F</i><i data-wd="6">S</i></span></button>
       <button type="button" data-every="never">Never</button>
     </div>
-    <div class="dt-split"><button type="button" id="bk-now">Back Up Now</button></div>
     <div class="dt-note">Backing up saves a file of your whole library (share sheet or download). Copy on the Export tab counts too.</div>
+    <div class="dt-foot"><div class="dt-split"><button type="button" id="bk-now">Back Up Now</button></div></div>
   </div>
 </div>
 
@@ -1753,7 +1822,9 @@
     } catch(e){ /* corrupted or inaccessible storage — fall through to empty */ }
     return [];
   }
+  let collEdited = false;
   function saveBooks(){
+    if(document.getElementById('library-view') && document.getElementById('library-view').classList.contains('active')) collEdited = true;
     try{
       localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
     } catch(e){ /* storage full or unavailable — fail silently, app still works */ }
@@ -2010,7 +2081,7 @@
     const case3d = shelf3dOK();
     shelvesContainer.classList.toggle('live3d', case3d);
     resetCaseKeys();              // rebuild the 3D boards on the next paint
-    const full = estimateShelfWidth() - (case3d ? 8 : 0);
+    const full = estimateShelfWidth() - (case3d ? 4 : 0);   // room inside 6px at each end
     // fill one column with shelves of spines, wrapping when a shelf is full
     function fillShelves(parent, list, avail){
       let shelfDiv = null, used = 0;
@@ -2051,7 +2122,7 @@
         const left = document.createElement('div'); left.className = 'shelf-col col-books';
         const right = document.createElement('div'); right.className = 'shelf-col col-tapes';
         cols.append(left, right); shelvesContainer.appendChild(cols);
-        const inner = full - SHELF_COL_GAP - 28;
+        const inner = full - SHELF_COL_GAP - 12;   // two shelves, 6px in at each of their ends
         fillShelves(left, paper, inner*2/3);
         fillShelves(right, tapes, inner/3);
       } else {
@@ -2077,13 +2148,13 @@
   const SHELF_COL_GAP = 24;
   function estimateShelfWidth(){
     // shelf-wrap is capped at 900px and centered in the body, which has
-    // 20px horizontal padding; the shelf itself adds 10px padding each side
+    // 4px horizontal padding; the shelf itself adds 4px padding each side
     // layout width, not window.innerWidth: on a phone innerWidth can still be the
     // 980px desktop default while the page first loads, which built shelves too
     // wide for the screen until the next re-render
     const vw = document.documentElement.clientWidth || window.innerWidth;
-    const outer = Math.min(900, vw - 40);
-    return Math.max(160, outer - 20);
+    const outer = Math.min(900, vw - 8);
+    return Math.max(160, outer - 8);
   }
 
   function buildLibraryShelves(){
@@ -2470,8 +2541,8 @@
     refreshRowChart(row);
   }
   function repaintTapeRows(){
-    listContainer.querySelectorAll('.tape-row').forEach(r => { r._shown = null; paintTapeRow(r, r._book); });
-    listContainer.querySelectorAll('.tape-simple').forEach(r => paintListRow(r, r._book));
+    document.querySelectorAll('#list-container .tape-row, #coll-list .tape-row').forEach(r => { r._shown = null; paintTapeRow(r, r._book); });
+    document.querySelectorAll('#list-container .tape-simple, #coll-list .tape-simple').forEach(r => paintListRow(r, r._book));
   }
   window.addEventListener('resize', ()=>{ if(prefs.view === 'list') repaintTapeRows(); });
   // sets how far into the tape you are; same rules as the open book's bar
@@ -2794,7 +2865,7 @@
     const dd = row._dd; if(!dd) return;
     const open = force != null ? force : !dd.classList.contains('open');
     if(!open){ closeRowDD(dd); return; }
-    listContainer.querySelectorAll('.row-dd.open').forEach(o=>{ if(o !== dd) closeRowDD(o); });
+    (row.parentElement || listContainer).querySelectorAll('.row-dd.open').forEach(o=>{ if(o !== dd) closeRowDD(o); });
     dd.classList.add('open'); row.classList.add('open');
     if(row._wheels){ if(row._staged != null) row._staged = null; row._wheels.sync(true); }
     if(row._paintConfirm) row._paintConfirm();
@@ -2943,14 +3014,16 @@
     return dd;
   }
 
-  function renderList(ordered){
+  // target: Library's list, or Collections' list; groups: one name per book (Collections), else the sort's own groups
+  function renderList(ordered, target = listContainer, groups = null){
+    const listContainer = target;
     listContainer.innerHTML = '';
     // author / status sorts get a divider card at the start of each group
-    const groupOf = currentSort().group;
+    const groupOf = groups ? null : currentSort().group;
     let lastGroup = null;
-    ordered.forEach(b=>{
-      if(groupOf){
-        const g = groupOf(b);
+    ordered.forEach((b, bi)=>{
+      if(groupOf || groups){
+        const g = groups ? groups[bi] : groupOf(b);
         if(g !== lastGroup){
           lastGroup = g;
           const d = document.createElement('div');
@@ -3013,12 +3086,13 @@
   const viewTabs = [...document.querySelectorAll('#view-tabs .tab')];
   function applyView(){
     allBooksView.classList.toggle('list', prefs.view === 'list');
+    document.getElementById('library-view').classList.toggle('list', prefs.view === 'list');
     if(prefs.view === 'list') repaintTapeRows();          // drawn to their width, which is 0 while hidden
     else if(shelfStale){ shelfStale = false; render(); }   // a tape was wound from the list
     viewTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === prefs.view));
     document.getElementById('sort-name').textContent = currentSort().name;
     const flt = currentFilter();
-    document.getElementById('sort-k').textContent = flt.id === 'all' ? 'Sort & Filter' : flt.name + ' only';
+    document.getElementById('sort-k').textContent = flt.id === 'all' ? 'Sort and Filter' : flt.name + ' only';
   }
   viewTabs.forEach(t => t.addEventListener('click', ()=>{
     prefs.view = t.dataset.mode; savePrefs(); applyView();
@@ -3034,7 +3108,7 @@
       o.className = 'so-opt' + (s.id === prefs.sort ? ' on' : '');
       o.innerHTML = `<b>${s.name}</b><span>${s.desc}</span>`;
       o.addEventListener('click', ()=>{
-        prefs.sort = s.id; savePrefs(); applyView(); render();
+        prefs.sort = s.id; savePrefs(); applyView(); render(); renderCollections();
         renderSortOptions();
         setTimeout(()=> sortPage.classList.remove('open'), 180);
       });
@@ -3057,7 +3131,9 @@
     books.forEach(b => bookTags(b).forEach(t => set.add(t)));
     return [...set].sort((a,b)=> a.toLowerCase().localeCompare(b.toLowerCase()));
   }
-  let selectedCollShelf = null;   // "name#index" of the one opened shelf
+  let selectedCollShelf = null;
+  const collPage = {};          // which shelf of each collection is showing
+  let collPress = null;         // the button just pressed, so its replacement rises back out   // "name#index" of the one opened shelf
   function renderCollections(){
     const container = document.getElementById('library-container');
     container.innerHTML = '';
@@ -3065,9 +3141,17 @@
     resetCaseKeys();
     requestShelfRender();
     const names = allCollections();
+    const collList = document.getElementById('coll-list');
     if(!names.length){
-      container.innerHTML = '<div class="coll-empty">No collections yet.<br>Add a book to a collection from Add Book or a book\'s Edit.</div>';
+      container.innerHTML = collList.innerHTML = '<div class="coll-empty">No collections yet.<br>Add a book to a collection from Add Book or a book\'s Edit.</div>';
       return;
+    }
+    { // the list: every collection's books, in the chosen sort, under a divider with its name
+      const items = [], groups = [];
+      names.forEach(name => sortedBooks().filter(b => bookTags(b).includes(name)).forEach(b => { items.push(b); groups.push(name); }));
+      if(items.length) renderList(items, collList, groups);
+      else collList.innerHTML = `<div class="so-empty">No ${currentFilter().name.toLowerCase()} books.</div>`;
+      if(prefs.view === 'list') requestAnimationFrame(repaintTapeRows);
     }
     const avail = estimateShelfWidth() - 20;
     const GAP = 0;
@@ -3083,7 +3167,10 @@
         used += shelves[shelves.length-1].length ? w + GAP : w;
         shelves[shelves.length-1].push(b);
       });
-      shelves.forEach((group, i)=>{
+      // one shelf at a time: wooden ◀ ▶ buttons on the board step through a full collection's shelves
+      const n = shelves.length, i = Math.min(collPage[name] || 0, n - 1);
+      collPage[name] = i;
+      [shelves[i]].forEach(group=>{
         const key = name + '#' + i;
         const block = document.createElement('div');
         // every shelf is open: titles show and books can be picked straight away
@@ -3106,9 +3193,27 @@
         wrap.appendChild(shelf);
         const sign = document.createElement('div');
         sign.className = 'overlay-sign';
-        sign.textContent = shelves.length > 1 ? `${name} · Shelf #${i+1}` : name;
+        sign.textContent = n > 1 ? `${name} · ${i+1} of ${n}` : name;   // no shelf number when it all fits on one
         shelf.dataset.plate = sign.textContent;   // the 3D board's name plate
         wrap.appendChild(sign);
+        if(n > 1) [-1, 1].forEach(d=>{
+          const bt = document.createElement('button');
+          const rising = collPress && collPress.name === name && collPress.d === d;
+          bt.type = 'button';
+          bt.className = 'wbtn ' + (d < 0 ? 'prev' : 'next') + (rising ? ' up' : '');
+          bt.setAttribute('aria-label', d < 0 ? 'Previous shelf' : 'Next shelf');
+          bt.disabled = d < 0 ? i === 0 : i === n - 1;
+          bt.addEventListener('click', e=>{
+            e.stopPropagation();
+            if(bt.disabled || bt.classList.contains('down')) return;
+            bt.classList.add('down');                     // sinks into the board…
+            setTimeout(()=>{                              // …the shelf turns over while it's down, and the new button rises back out
+              collPage[name] = i + d; collPress = { name, d };
+              renderCollections(); collPress = null;
+            }, 130);
+          });
+          shelf.appendChild(bt);
+        });
         block.appendChild(wrap);
         container.appendChild(block);
       });
@@ -3132,18 +3237,25 @@
 
   document.querySelectorAll('#tabs .tab').forEach(tab=>{
     tab.addEventListener('click', ()=>{
-      // Data opens its own full-window page; the shelf tab underneath stays as-is
-      if(tab.dataset.view === 'data'){ openDataPage(); return; }
-      if(tab.dataset.view === 'timeline'){ openTimeline(); return; }
+      // every top tab is a page under the tab strip: My Library, My Collections, Timeline and Data
       document.querySelectorAll('#tabs .tab').forEach(t=>t.classList.remove('active'));
       tab.classList.add('active');
       const view = tab.dataset.view;
+      document.body.classList.toggle('tab-timeline', view === 'timeline');
+      document.body.classList.toggle('tab-data', view === 'data');
+      if(view !== 'timeline' && document.getElementById('timeline-page').classList.contains('open')){ tlReset(); document.getElementById('timeline-page').classList.remove('open'); }
+      if(view !== 'data') dataPage.classList.remove('open');
       document.getElementById('all-books-view').classList.toggle('active', view==='all');
       document.getElementById('library-view').classList.toggle('active', view==='library');
-      document.getElementById('shelf-controls').classList.toggle('hidden', view !== 'all');
+      document.getElementById('shelf-controls').classList.toggle('hidden', view !== 'all' && view !== 'library');
+      document.getElementById('timeline-controls').classList.toggle('hidden', view !== 'timeline');
+      document.getElementById('data-controls').classList.toggle('hidden', view !== 'data');
       window.scrollTo(0, 0);                              // each page opens at its top
       if(view === 'library') renderCollections();
+      if(view === 'all' && collEdited){ collEdited = false; render(); }
       syncHeaderHeight();
+      if(view === 'timeline') openTimeline();
+      if(view === 'data') openDataPage();
     });
   });
 
@@ -3177,8 +3289,8 @@
     renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
     renderer.setPixelRatio(window.devicePixelRatio || 1);
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    camera.position.set(0, 0, 9);
+    camera = new THREE.PerspectiveCamera(45.2, 1, 0.1, 100);   // eye 1.2 screen-heights back, like holding the book
+    camera.position.set(0, 0, 8.16);
 
     const amb = new THREE.AmbientLight(0xffffff, 0.65);
     const key = new THREE.DirectionalLight(0xffffff, 0.7);
@@ -4937,8 +5049,29 @@
   function faceCamQ(p){
     _faceDummy.position.copy(p);
     _faceDummy.up.set(0, 1, 0);
-    _faceDummy.lookAt(shelfCam.position);
+    _faceDummy.lookAt(heldEyePos());
     return _faceDummy.quaternion.clone();
+  }
+  // the book in your hand is seen by its own eye: the shelf eye (middle of the
+  // screen) while it leaves the shelf, sliding to straight in front of the book
+  // as it arrives, so it turns about its own centre instead of skewing off-axis.
+  // A lens shift keeps the screen plane mapped exactly as before.
+  // The shelf eye is far back (almost flat); in your hand the eye comes in to a
+  // real reading distance, so the book foreshortens as it turns like a real one.
+  const heldEye = { x: 0, y: 0, mix: 0 };
+  const HELD_DIST = () => 1.2 * window.innerHeight;     // px: about arm's length for a book this size on screen
+  function heldEyePos(){
+    const vw = document.documentElement.clientWidth, vh = window.innerHeight, m = heldEye.mix;
+    return new THREE.Vector3(vw/2 + (heldEye.x - vw/2)*m, -vh/2 + (heldEye.y + vh/2)*m, SHELF_DIST + (HELD_DIST() - SHELF_DIST)*m);
+  }
+  function heldCamWindow(){
+    const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+    const e = heldEyePos(), dz = e.z, n = Math.max(20, dz - 1500), f = dz + 800, k = n / dz;
+    shelfCam.position.copy(e);
+    shelfCam.near = n; shelfCam.far = f;
+    shelfCam.projectionMatrix.makePerspective((0 - e.x)*k, (vw - e.x)*k, (0 - e.y)*k, (-vh - e.y)*k, n, f);
+    shelfCam.projectionMatrixInverse.copy(shelfCam.projectionMatrix).invert();
+    shelfCam.updateMatrixWorld();
   }
   function setShelfLayer(g, n){ g.traverse(o=> o.layers.set(n)); }
   // give the book in your hand its full cover art (the shelf copy skips it);
@@ -5002,7 +5135,7 @@
       if(size.x !== vw || size.y !== vh) shelfTopR.setSize(vw, vh, false);
       en.group.traverse(o=> o.layers.enable(SHELF_HELD_LAYER));
       shelfCam.layers.set(SHELF_HELD_LAYER);
-      shelfCamWindow(0, window.innerHeight);
+      heldCamWindow();
       shelfTopR.render(shelfScene, shelfCam);
     } catch(e){}
     shelfCam.layers.set(0);
@@ -5452,7 +5585,7 @@
       { const pr = shelfPixelRatio(vw, vh); if(shelfTopR.getPixelRatio() !== pr) shelfTopR.setPixelRatio(pr); }
       if(size.x !== vw || size.y !== vh) shelfTopR.setSize(vw, vh, false);
       shelfCam.layers.set(SHELF_HELD_LAYER);
-      shelfCamWindow(0, window.innerHeight);
+      heldCamWindow();
       shelfTopR.render(shelfScene, shelfCam);
       shelfCam.layers.set(0);
       return false;
@@ -5497,7 +5630,7 @@
       { const pr = shelfPixelRatio(vw, vh); if(shelfTopR.getPixelRatio() !== pr) shelfTopR.setPixelRatio(pr); }
       if(size.x !== vw || size.y !== vh) shelfTopR.setSize(vw, vh, false);
       shelfCam.layers.set(SHELF_HELD_LAYER);
-      shelfCamWindow(0, window.innerHeight);
+      heldCamWindow();
       shelfTopR.render(shelfScene, shelfCam);
       shelfCam.layers.set(0);
     }
@@ -5543,7 +5676,7 @@
     if(liveEntry){
       // the separate book viewer isn't used: just measure, no extra WebGL context
       measureViewport();
-      if(!camera){ camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100); camera.position.set(0, 0, 9); }
+      if(!camera){ camera = new THREE.PerspectiveCamera(45.2, 1, 0.1, 100); camera.position.set(0, 0, 8.16); }
       camera.aspect = viewW / viewH; camera.updateProjectionMatrix();
     } else {
       if(!renderer){ initThree(); }
@@ -5809,6 +5942,13 @@
     const gapBottom = window.innerHeight - (parseFloat(getComputedStyle(pagePanel).bottom) || 0) - pagePanel.offsetHeight;
     const gapH = Math.max(1, gapBottom - gapTop);
     const endPos = screenToWorld(viewOX + viewW/2, (gapTop + gapBottom)/2, worldPerPx);
+    if(!liveEntry){
+      // eye straight in front of where the book rests (not the window's centre), so it
+      // turns square-on; the view offset keeps the z=4 plane exactly where it was
+      camera.position.set(endPos.x, endPos.y, camera.position.z);
+      camera.setViewOffset(viewW, viewH, -endPos.x/worldPerPx, endPos.y/worldPerPx, viewW, viewH);
+      camera.updateMatrixWorld(true);
+    }
     // live shelf book: match how the shelf camera sees it (top showing,
     // slight side angle) and pull it straight out before it flies
     const liveStart = !!spineEl._live;
@@ -5816,7 +5956,7 @@
     if(liveStart){
       const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
       const a = shelfAngles(cx, cy);
-      const dMain = 5 / worldPerPx;   // main camera sits 5 units in front of the book plane
+      const dMain = (camera.position.z - 4) / worldPerPx;   // main camera's distance to the book plane
       const bx = Math.atan((cx - viewOX - viewW/2) / dMain), by = Math.atan((cy - viewOY - viewH/2) / dMain);
       startTilt = a.ay - by;
       startYawAdj = bx - a.ax;
@@ -5941,6 +6081,11 @@
       const g = bookMesh;
       updateShelfCam();
       const open = tapeOpenPose();
+      heldEye.x = open.p.x; heldEye.y = open.p.y;
+      if(phase==='opening'){ const q0 = Math.min((ts-phaseT0)/TAPE_OPEN, 1); heldEye.mix = smooth(0.45, 1, q0); }
+      else if(phase==='open') heldEye.mix = 1;
+      else if(phase==='closing'){ const q0 = Math.min((ts-phaseT0)/TAPE_CLOSE, 1); heldEye.mix = 1 - smooth(0, 0.55, q0); }
+      open.face = faceCamQ(open.p);
       const restQ = (tilt, yaw) => open.face.clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(tilt, yaw, 0)));
       const door = tapeCase.door;
       const putAt = pose => { g.position.copy(pose.p); g.quaternion.copy(pose.q); g.scale.copy(pose.s); };
@@ -6002,7 +6147,12 @@
       const g = bookMesh;
       updateShelfCam();
       const home = shelfHomePose(liveEntry);
-      const open = liveOpenPose();
+      const open = liveOpenPose();   // (placed before the eye moves; face recomputed below)
+      heldEye.x = open.p.x; heldEye.y = open.p.y;
+      if(phase==='opening'){ const u0 = easeInOutSine(Math.min((ts-phaseT0)/DUR, 1)); heldEye.mix = smooth(0.25, 1, u0); }
+      else if(phase==='open') heldEye.mix = 1;
+      else if(phase==='closing'){ const u0 = 1 - Math.pow(1 - easeInOutSine(Math.min((ts-phaseT0)/CLOSE_DUR, 1)), 1.6); heldEye.mix = 1 - smooth(0, 0.74, u0); }
+      open.face = faceCamQ(open.p);
       const restQ = (tilt, yaw) => open.face.clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(tilt, yaw, 0)));
       if(phase==='opening'){
         // one continuous move, in an order that can't touch the neighbours:
@@ -6150,6 +6300,7 @@
     }
 
     function cleanup(){
+      heldEye.mix = 0;
       cancelAnimationFrame(animId);
       [bookToolbar, pagePanel].forEach(el=> el.style.transitionDuration = '');
       if(listMode) setBlur(false, 300);
@@ -6296,6 +6447,19 @@
   const customizePage = document.getElementById('customize-page');
   const customizeBackBtn = document.getElementById('customize-back-btn');
   const customizePageTitle = document.getElementById('customize-page-title');
+  // Author / Title / Subtitle: once the keyboard is up, ask the browser to bring the Pages card into view —
+  // the same move it makes on its own when you tap Pages, so every field leaves the cards in the same place
+  ['author-input', 'title-input', 'subtitle-input'].forEach(id=>{
+    const inp = document.getElementById(id);
+    inp.addEventListener('focus', ()=>{
+      const show = ()=> { if(document.activeElement === inp) document.getElementById('pages-card').scrollIntoView({block: 'nearest', inline: 'nearest'}); };
+      if(window.visualViewport){
+        const once = ()=>{ visualViewport.removeEventListener('resize', once); setTimeout(show, 50); };
+        visualViewport.addEventListener('resize', once);
+        setTimeout(()=>{ visualViewport.removeEventListener('resize', once); show(); }, 450);   // keyboard already up: no resize comes
+      } else setTimeout(show, 300);
+    });
+  });
   const customizeColorPreview = document.getElementById('customize-color-preview');
   const customizeColorSubtitle = document.getElementById('customize-color-subtitle');
   const customizeBookmarkPreview = document.getElementById('customize-bookmark-preview');
@@ -6665,8 +6829,8 @@
     custRenderer = new THREE.WebGLRenderer({canvas: customizeCanvas, alpha:true, antialias:true});
     custRenderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
     custScene = new THREE.Scene();
-    custCamera = new THREE.PerspectiveCamera(34, 1, 0.1, 20);
-    custCamera.position.set(0, 0, 7.4);
+    custCamera = new THREE.PerspectiveCamera(16, 1, 0.1, 40);   // long lens, same framing as before
+    custCamera.position.set(0, 0, 16.1);
     custScene.add(new THREE.AmbientLight(0xffffff, 0.6));
     const key = new THREE.DirectionalLight(0xffffff, 0.8);
     key.position.set(3, 5, 7); custScene.add(key);
@@ -7089,7 +7253,7 @@
     if(!activeBookCtx && listRereadBook){
       const lb = listRereadBook; listRereadBook = null;
       startReread(lb); saveBooks(); shelfStale = true;
-      listContainer.querySelectorAll('.book-row').forEach(r => { if(r._book === lb){ paintListRow(r, lb); refreshRowChart(r); } });
+      document.querySelectorAll('#list-container .book-row, #coll-list .book-row').forEach(r => { if(r._book === lb){ paintListRow(r, lb); refreshRowChart(r); } });
       return;
     }
     if(!activeBookCtx) return;
@@ -7329,13 +7493,13 @@
     return JSON.stringify({ app:'stack-tracker', version:3, exported:new Date().toISOString(), books: books.map(packBook) }, null, 2);
   }
   function showDataTab(name){
-    document.querySelectorAll('#dt-tabs .tab').forEach(t=> t.classList.toggle('active', t.dataset.dt === name));
+    document.querySelectorAll('.dt-tabs .tab').forEach(t=> t.classList.toggle('active', t.dataset.dt === name));
     ['export','import','stats','backup'].forEach(n=> document.getElementById('dt-view-'+n).classList.toggle('active', n === name));
     if(name === 'backup') paintBackupTab();
     if(name === 'export') dtExportText.value = exportJSON();
     if(name === 'stats') renderDataStats();
   }
-  document.querySelectorAll('#dt-tabs .tab').forEach(t=> t.addEventListener('click', ()=> showDataTab(t.dataset.dt)));
+  document.querySelectorAll('.dt-tabs .tab').forEach(t=> t.addEventListener('click', ()=> showDataTab(t.dataset.dt)));
 
   function openDataPage(){
     dtImportText.value = '';
@@ -7353,10 +7517,32 @@
   //  · Pages & Listening: pages read on the left and hours listened on the right (page / tape textures; All Time in plain black), per
   //    day (This Month) or month; All Time gives one total per year.
   // Tap a bar and the footer shows it.
-  const TL = { view: 'year', mode: 'timeline', reads: [], tex: {}, picked: '', pickedK: '' };
+  const TL = { view: 'month', mode: 'graph', reads: [], tex: {}, picked: '', pickedK: '', off: 0 };   // off: months (This Month) or years (This Year) back from the current one
   const tlCanvas = document.getElementById('tl-canvas'), tlInfo = document.getElementById('tl-info');
   const TL_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const TL_HINT = '<span class="hint">Tap a book to see it here</span>', TL_GHINT = '<span class="hint">Tap a bar to see that period here</span>';
+  const TL_MONTH = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  // the footer when nothing is picked: the span's name, its totals and a hint, with ◀ ▶ to step
+  // to earlier months (This Month) or years (This Year); All Time has nowhere to step, so they rest greyed
+  function tlIdle(){
+    const R = tlRange(tlDay(new Date())); let pages = 0, secs = 0;
+    TL.reads.forEach(r => r.daily.forEach((v, j) => { if(!v) return; const d = tlAdd(r.s, j); if(d >= R.t0 && d < R.t1){ if(r.kind === 'audio') secs += v; else pages += v; } }));
+    const tot = [pages ? `<b>${tlN(pages)}</b> pages` : '', secs ? `<b>${tlHM(secs)}</b>` : ''].filter(Boolean).join(' · ') || 'Nothing read';
+    const first = TL.reads.length ? new Date(Math.min(...TL.reads.map(r => +r.s))) : new Date(), now = new Date();
+    const minOff = TL.view === 'month' ? (first.getFullYear() - now.getFullYear()) * 12 + first.getMonth() - now.getMonth()
+                 : TL.view === 'year' ? first.getFullYear() - now.getFullYear() : 0;
+    const title = TL.view === 'month' ? `${TL_MONTH[R.t0.getMonth()]} ${R.t0.getFullYear()}` : TL.view === 'year' ? String(R.t0.getFullYear()) : 'All Time';
+    const unit = TL.view === 'month' ? 'month' : 'year';
+    const hint = TL.mode === 'timeline' ? 'Tap a book to see it here' : TL.view === 'month' ? 'Tap a bar to see that day' : 'Tap a bar to see that month';
+    tlInfo.classList.add('nav');
+    tlInfo.innerHTML = `<button type="button" class="tl-nav" data-d="-1" aria-label="Previous ${unit}"${TL.off <= minOff ? ' disabled' : ''}>◀</button>` +
+      `<div class="tl-mid"><div class="t">${title}</div><div class="tot">${tot}</div><div class="hint">${hint}</div></div>` +
+      `<button type="button" class="tl-nav" data-d="1" aria-label="Next ${unit}"${TL.off >= 0 ? ' disabled' : ''}>▶</button>`;
+  }
+  tlInfo.addEventListener('click', e => {
+    const b = e.target.closest('.tl-nav'); if(!b || b.disabled) return;
+    TL.off = Math.min(0, TL.off + Number(b.dataset.d)); TL.picked = ''; TL.pickedK = ''; tlDraw();
+  });
   const tlFmt = d => `${TL_MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
   const tlN = n => Math.round(n).toLocaleString(), tlHM = sec => { const m = Math.round(sec / 60); return `${Math.floor(m / 60)}H ${m % 60}M`; };
   const tlEsc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -7384,20 +7570,22 @@
   function tlRange(today){
     const Y = today.getFullYear(), M = today.getMonth();
     if(TL.view === 'month'){
-      const t0 = new Date(Y, M, 1), t1 = new Date(Y, M + 1, 1), n = Math.round((t1 - t0) / 864e5);
-      return { t0, t1, marks: [1, 5, 10, 15, 20, 25, n].filter((d, k, a) => a.indexOf(d) === k).map(d => ({ mid: new Date(Y, M, d, 12), text: String(d) })),
-               lines: Array.from({length: n - 1}, (_, k) => ({ at: new Date(Y, M, k + 2) })) };
+      const t0 = new Date(Y, M + TL.off, 1), t1 = new Date(Y, M + TL.off + 1, 1), n = Math.round((t1 - t0) / 864e5);
+      const y0 = t0.getFullYear(), m0 = t0.getMonth();
+      return { t0, t1, marks: Array.from({length: n}, (_, k) => ({ mid: new Date(y0, m0, k + 1, 12), text: String(k + 1) })),   // every date
+               lines: Array.from({length: n - 1}, (_, k) => ({ at: new Date(y0, m0, k + 2) })) };
     }
     if(TL.view === 'year'){
-      const t0 = new Date(Y, 0, 1), t1 = new Date(Y + 1, 0, 1);
-      return { t0, t1, marks: TL_MON.map((m, k) => ({ mid: new Date(Y, k, 16), text: m })), lines: TL_MON.slice(1).map((m, k) => ({ at: new Date(Y, k + 1, 1) })) };
+      const y0 = Y + TL.off, t0 = new Date(y0, 0, 1), t1 = new Date(y0 + 1, 0, 1);
+      return { t0, t1, marks: TL_MON.map((m, k) => ({ mid: new Date(y0, k, 16), text: m })), lines: TL_MON.slice(1).map((m, k) => ({ at: new Date(y0, k + 1, 1) })) };
     }
     const first = TL.reads.length ? Math.min(...TL.reads.map(r => r.s.getFullYear())) : Y;
+    TL.allStep = tlCanvas.clientHeight / ((Y - first + 1) * 12) >= 4 ? 1 : 3;   // a line every month, or every quarter if months get too thin
     const t0 = new Date(first, 0, 1), t1 = new Date(Y + 1, 0, 1), marks = [], lines = [];
     for(let yr = first; yr <= Y; yr++){
       marks.push({ mid: new Date(yr, 6, 1), text: String(yr) });
       if(yr > first) lines.push({ at: new Date(yr, 0, 1), strong: true });
-      for(let m = 3; m < 12; m += 3) lines.push({ at: new Date(yr, m, 1) });
+      for(let m = TL.allStep; m < 12; m += TL.allStep) lines.push({ at: new Date(yr, m, 1) });
     }
     return { t0, t1, marks, lines };
   }
@@ -7448,16 +7636,19 @@
   }
   function tlFrame(today){
     tlCanvas.innerHTML = '';
-    const R = tlRange(today), W = tlCanvas.clientWidth, H = tlCanvas.clientHeight, LW = TL.view === 'all' ? 34 : 26;
+    const R = tlRange(today), W = tlCanvas.clientWidth, H = tlCanvas.getBoundingClientRect().height, LW = 39;   // a 45px square with the card's edge and the 3px rule, lined up with the footer card's ◀ section
     const y = d => (R.t1 - d) / (R.t1 - R.t0) * H;
     const el = (css, cls, txt) => { const e = document.createElement('div'); e.style.cssText = css; if(cls) e.className = cls; if(txt != null) e.textContent = txt; tlCanvas.appendChild(e); return e; };
+    // This Month: a 1px line between every date in the date column
+    // This Month / This Year: a 1px line between every date / month in the label column too
+    if(TL.view !== 'all') R.lines.forEach(l => el(`left:0;width:${LW}px;top:${(y(l.at) - .5).toFixed(1)}px;height:1px;background:#d9d2c4;z-index:2`));
     return { R, W, H, LW, y, el };
   }
   function tlDrawTimeline(){
     const today = tlDay(new Date()), { R, W, H, LW, y, el } = tlFrame(today), { t0, t1 } = R;
     R.lines.forEach(l => el(`left:${l.strong ? 0 : LW + 3}px;right:0;top:${(y(l.at) - (l.strong ? 1.5 : 0)).toFixed(1)}px;height:${l.strong ? 3 : 1}px;background:${l.strong ? '#000' : '#efeae0'};z-index:${l.strong ? 2 : 1}`));
     R.marks.forEach(m => el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:2`, 'tl-lbl', m.text));
-    el(`left:${LW}px;top:0;height:${H}px;width:3px;background:#000;z-index:2`);
+    el(`left:${LW}px;top:0;bottom:0;width:3px;background:#000;z-index:2`);
     if(today >= t0 && today < t1) el(`left:${LW+3}px;right:0;top:${(y(tlAdd(today, 1)) - .5).toFixed(1)}px;height:1px;background:#b5342a;z-index:4`);
     const list = TL.reads.filter(r => r.s < t1 && (r.e ? tlAdd(r.e, 1) : tlAdd(today, 1)) > t0).sort((a, b) => a.s - b.s);
     if(!list.length){ el(`left:${LW+3}px;right:0;top:${H/2}px;transform:translateY(-50%);text-align:center;z-index:2`, 'tl-empty', 'Nothing read here yet'); return; }
@@ -7480,9 +7671,10 @@
       const bar = el(`left:${bx}px;top:${bt.toFixed(1)}px;width:${BW}px;height:${bh.toFixed(1)}px;${look}`, 'tl-bar' + (r.e ? '' : ' now') + (TL.picked === r.key ? ' on' : ''));
       bar.addEventListener('click', () => {
         tlCanvas.querySelectorAll('.tl-bar.on').forEach(t => t.classList.remove('on'));
-        if(TL.picked === r.key){ TL.picked = ''; tlInfo.innerHTML = TL_HINT; return; }
+        if(TL.picked === r.key){ TL.picked = ''; tlIdle(); return; }
         bar.classList.add('on'); TL.picked = r.key;
         const days = Math.round(((r.e || today) - r.s) / 864e5) + 1;
+        tlInfo.classList.remove('nav');
         tlInfo.innerHTML = `<span class="t">${r.kind === 'audio' ? '○ ' : ''}${tlEsc(r.title)}${r.reread ? ' ↺' : ''}</span>` +
           `<span>${tlFmt(r.s)} – ${r.e ? tlFmt(r.e) : '<b>now</b>'}<br><b>${days}</b> ${days === 1 ? 'day' : 'days'}${r.kind === 'audio' ? ' · audiobook' : ''}</span>`;
       });
@@ -7491,10 +7683,10 @@
   function tlDrawGraph(){
     const today = tlDay(new Date()), { R, W, H, LW, y, el } = tlFrame(today), { t0, t1 } = R, all = TL.view === 'all';
     R.lines.filter(l => l.strong).forEach(l => el(`left:0;right:0;top:${(y(l.at) - 1.5).toFixed(1)}px;height:3px;background:#000;z-index:2`));
+    if(all) R.lines.filter(l => !l.strong).forEach(l => el(`left:${LW + 3}px;right:0;top:${(y(l.at) - .5).toFixed(1)}px;height:1px;background:#efeae0;z-index:1`));   // month lines
     R.marks.forEach(m => el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:2`, 'tl-lbl', m.text));
-    el(`left:${LW}px;top:0;height:${H}px;width:3px;background:#000;z-index:2`);
-    const x0 = LW + 3, half = (W - x0) / 2, xm = Math.round(x0 + half);
-    el(`left:${xm - 1}px;top:0;height:${H}px;width:3px;background:#000;z-index:2`);
+    el(`left:${LW}px;top:0;bottom:0;width:3px;background:#000;z-index:2`);
+    const x0 = LW + 3;
     const buckets = [];
     if(TL.view === 'month') for(let d = new Date(t0); d < t1; d = tlAdd(d, 1)) buckets.push({ a: d, b: tlAdd(d, 1) });
     else for(let d = new Date(t0); d < t1; d = new Date(d.getFullYear(), d.getMonth() + 1, 1)) buckets.push({ a: d, b: new Date(d.getFullYear(), d.getMonth() + 1, 1) });
@@ -7504,23 +7696,47 @@
       if(!v) return; const d = tlAdd(r.s, j);
       const k = buckets[idx.get(TL.view === 'month' ? +d : d.getFullYear() * 12 + d.getMonth())]; if(k) k[r.kind === 'audio' ? 'secs' : 'pages'] += v;
     }));
-    const cols = [
-      { key: 'pages', x: x0, max: Math.max(1, ...buckets.map(k => k.pages)), text: v => `${tlN(v)} pages`,
+    // one column per kind read in this span: pages, listening, or both side by side
+    let cols = [
+      { key: 'pages', max: Math.max(1, ...buckets.map(k => k.pages)), text: v => `${tlN(v)} pages`,
         look: all ? '' : `background:#e7dfc9 ${tlFillLines('page')} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
-      { key: 'secs', x: xm + 2, max: Math.max(1, ...buckets.map(k => k.secs)), text: v => tlHM(v),
+      { key: 'secs', max: Math.max(1, ...buckets.map(k => k.secs)), text: v => tlHM(v),
         look: all ? '' : `background:#8c5229 ${tlFillLines('tape')} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
     ];
+    const used = cols.filter(c => buckets.some(k => k[c.key] > 0));
+    if(used.length) cols = used;
+    const half = (W - x0) / cols.length, xm = Math.round(x0 + half);
+    cols.forEach((c, j) => { c.x = j ? xm + 2 : x0; c.r = j || cols.length === 1 ? 4 : W - xm + 5; c.end = j || cols.length === 1 ? W : xm - 1; });
+    if(cols.length > 1) el(`left:${xm - 1}px;top:0;bottom:0;width:3px;background:#000;z-index:2`);
     const show = k => {
       tlCanvas.querySelectorAll('.tl-gbar.on').forEach(t => t.classList.remove('on'));
-      if(TL.pickedK === String(+k.a)){ TL.pickedK = ''; tlInfo.innerHTML = TL_GHINT; return; }
+      if(TL.pickedK === String(+k.a)){ TL.pickedK = ''; tlIdle(); return; }
       tlCanvas.querySelectorAll(`.tl-gbar[data-k="${+k.a}"]`).forEach(t => t.classList.add('on')); TL.pickedK = String(+k.a);
       const when = TL.view === 'month' ? tlFmt(k.a) : `${TL_MON[k.a.getMonth()]} ${k.a.getFullYear()}`, n = Math.max(1, k.n);
       // pages on one line, time listened below it (just the one if only one happened); monthly views add the daily average
       const perDay = v => TL.view === 'month' ? '' : ` · ${v} a day`, rows = [];
       if(k.pages) rows.push(`<b>${tlN(k.pages)}</b> pages${perDay(`<b>${tlN(k.pages / n)}</b>`)}`);
       if(k.secs) rows.push(`<b>${tlHM(k.secs)}</b>${perDay(`<b>${tlHM(k.secs / n)}</b>`)}`);
+      tlInfo.classList.remove('nav');
       tlInfo.innerHTML = `<span class="t">${when}</span><span style="text-align:right">${rows.join('<br>')}</span>`;
     };
+    // bar geometry per period, then a scale per column so the longest bar's
+    // readout ends 10px short of the column's edge
+    const geo = k => { const top = y(k.b), h = y(k.a) - top, pad = all ? Math.min(4.5, h * .3) : Math.min(3, h * .15), bh = Math.max(2, h - pad * 2);
+      return { top, h, pad, bh, size: bh >= 12 ? 9 : Math.max(6.5, bh * .7) }; };
+    const tlCtx = tlDrawGraph.ctx || (tlDrawGraph.ctx = document.createElement('canvas').getContext('2d'));
+    cols.forEach(c => {
+      const room = c.end - 10 - c.x;
+      if(all){ c.scale = room - 84; return; }    // All Time: yearly totals sit at the right instead
+      c.scale = Infinity;
+      buckets.forEach(k => {
+        const v = k[c.key]; if(!v || k.a > today) return;
+        tlCtx.font = `800 ${geo(k).size.toFixed(1)}px Arial, sans-serif`;
+        const lw = tlCtx.measureText(c.text(v)).width;
+        c.scale = Math.min(c.scale, (room - 3 - lw) * c.max / v);
+      });
+      if(!isFinite(c.scale)) c.scale = room - 84;
+    });
     buckets.forEach(k => {
       const top = y(k.b), h = y(k.a) - top, pad = all ? Math.min(4.5, h * .3) : Math.min(3, h * .15), bh = Math.max(2, h - pad * 2);
       if(!all) el(`left:${x0}px;right:0;top:${(top + h - .5).toFixed(1)}px;height:1px;background:#efeae0;z-index:1`);
@@ -7528,7 +7744,7 @@
       const size = bh >= 12 ? 9 : Math.max(6.5, bh * .7);
       cols.forEach(c => {
         const v = k[c.key]; if(!v) return;
-        const w = Math.max(4, v / c.max * (half - 84));
+        const w = Math.max(4, v / c.max * c.scale);
         const bar = el(`left:${c.x}px;top:${(top + pad).toFixed(1)}px;width:${w.toFixed(1)}px;height:${bh.toFixed(1)}px;${c.look}`, 'tl-gbar' + (all ? ' plain' : '') + (TL.pickedK === String(+k.a) ? ' on' : ''));
         bar.dataset.k = +k.a;
         if(!all) el(`left:${(c.x + w + 3).toFixed(1)}px;top:${(top + h / 2).toFixed(1)}px;font-size:${size.toFixed(1)}px`, 'tl-gval', c.text(v));
@@ -7539,31 +7755,40 @@
       const years = new Map();
       buckets.forEach(k => { const Y = k.a.getFullYear(), t = years.get(Y) || { pages: 0, secs: 0 }; t.pages += k.pages; t.secs += k.secs; years.set(Y, t); });
       years.forEach((t, Y) => { const mid = y(new Date(Y, 6, 1));
-        cols.forEach((c, j) => el(`right:${j ? 4 : W - xm + 5}px;top:${mid.toFixed(1)}px;font-size:10px;background:#fff;padding:1px 3px;border-radius:3px`, 'tl-gval', c.text(t[c.key]))); });
+        cols.forEach(c => t[c.key] && el(`right:${c.r}px;top:${mid.toFixed(1)}px;font-size:10px;background:#fff;padding:1px 3px;border-radius:3px`, 'tl-gval', c.text(t[c.key]))); });
     }
     if(today >= t0 && today < t1){
       const ty = (y(tlAdd(today, 1)) - .5).toFixed(1);
-      el(`left:${x0}px;width:${xm - 1 - x0}px;top:${ty}px;height:1px;background:#b5342a;z-index:2`);
-      el(`left:${xm + 2}px;right:0;top:${ty}px;height:1px;background:#b5342a;z-index:2`);
+      cols.forEach(c => el(`left:${c.x}px;width:${c.end - c.x}px;top:${ty}px;height:1px;background:#b5342a;z-index:2`));
     }
   }
   function tlDraw(){
     TL.reads = tlCollect();
     TL.reads.forEach(r => r.key = r.title + '|' + (+r.s));
+    // name the chart for what's ever been logged: just Pages, just Listening, or both
+    const hasB = TL.reads.some(r => r.kind !== 'audio'), hasA = TL.reads.some(r => r.kind === 'audio');
+    document.querySelector('#tl-modes button[data-m="graph"]').textContent = hasB && !hasA ? 'Pages' : hasA && !hasB ? 'Listening' : 'Pages & Listening';
     if(TL.mode === 'timeline') tlDrawTimeline(); else tlDrawGraph();
+    if(!TL.picked && !TL.pickedK) tlIdle();
+  }
+  // every visit opens on Pages & Listening, This Month — set when leaving too, so it's waiting there
+  function tlReset(){
+    TL.picked = ''; TL.pickedK = ''; TL.off = 0;
+    TL.mode = 'graph'; TL.view = 'month';
+    document.querySelectorAll('#tl-modes button').forEach(x => x.classList.toggle('on', x.dataset.m === 'graph'));
+    document.querySelectorAll('#tl-ranges button').forEach(x => x.classList.toggle('on', x.dataset.v === 'month'));
   }
   function openTimeline(){
-    TL.picked = ''; TL.pickedK = '';
-    tlInfo.innerHTML = TL.mode === 'timeline' ? TL_HINT : TL_GHINT;
+    tlReset();
     document.getElementById('timeline-page').classList.add('open');
-    requestAnimationFrame(tlDraw);                        // drawn once the page has its size
+    tlDraw();                                             // the page is showing already, so it has its size
   }
   document.querySelectorAll('#tl-ranges button').forEach(btn => btn.addEventListener('click', () => {
-    TL.view = btn.dataset.v; document.querySelectorAll('#tl-ranges button').forEach(x => x.classList.toggle('on', x === btn)); tlDraw();
+    TL.view = btn.dataset.v; TL.off = 0; TL.picked = ''; TL.pickedK = ''; document.querySelectorAll('#tl-ranges button').forEach(x => x.classList.toggle('on', x === btn)); tlDraw();
   }));
   document.querySelectorAll('#tl-modes button').forEach(btn => btn.addEventListener('click', () => {
     TL.mode = btn.dataset.m; document.querySelectorAll('#tl-modes button').forEach(x => x.classList.toggle('on', x === btn));
-    TL.picked = ''; TL.pickedK = ''; tlInfo.innerHTML = TL.mode === 'timeline' ? TL_HINT : TL_GHINT; tlDraw();
+    TL.picked = ''; TL.pickedK = ''; tlDraw();
   }));
   window.addEventListener('resize', () => { if(document.getElementById('timeline-page').classList.contains('open')) tlDraw(); });
 
