@@ -34,10 +34,27 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    padding:calc(var(--header-h, 50px) + 16px) 20px 60px;
+    padding:calc(var(--header-h, 50px) + 16px) 20px calc(var(--footer-h, 56px) + 16px);
   }
+  /* frozen footer: Add Book, 4px from the window on every side */
+  #app-footer{
+    position:fixed; left:0; right:0; bottom:0; z-index:9;
+    padding:4px 4px calc(4px + env(safe-area-inset-bottom));
+    background:var(--bg); border-top:3px solid #000; box-shadow:0 -4px 12px rgba(0,0,0,.06);
+  }
+  #app-footer{display:flex; flex-direction:column; gap:4px;}
+  #app-footer #add-card{height:45px;}
+  /* page tabs: the header's own top strip, edge to edge, split by black lines */
+  body #app-header{padding:0 0 4px;}
+  #app-header > .hdr-row{margin:0 4px;}
+  #tabs{display:flex; margin:0; padding-top:env(safe-area-inset-top); background:var(--bg); border-bottom:3px solid #000;}
+  #tabs .tab{flex:1 1 0; min-width:0; height:42px; padding:0 2px; border-radius:0; background:var(--bg); font-size:.74rem; letter-spacing:.2px; line-height:1.1; text-align:center;}
+  #tabs .tab + .tab{border-left:3px solid #000;}
+  #tabs .tab.active{background:var(--ink); color:#fff;}
+  body #app-header:not(:has(.hdr-row:not(.hidden))){padding-bottom:0; border-bottom:none;}   /* My Collections: just the tabs, one line under them */
 
   /* frozen header: tabs + Add Book, 4px from the window on every side */
+  .coll-split{flex:1 1 auto; align-self:stretch;}   /* My Collections: books left, audiobooks right */
   #app-header{
     position:fixed;
     top:0; left:0; right:0;
@@ -164,6 +181,21 @@
   .dd-acts .dd-del{color:#a33;}
   .dd-chart{height:45px; box-sizing:border-box; overflow:hidden; background:#fff; border:3px solid #000; border-radius:8px; padding:0;}
   .dd-chart svg{display:block; width:100%; overflow:visible;}
+  /* top row: square − / + cards either side of the graph, 4px apart */
+  .dd-pm-row{display:flex; gap:4px;}
+  .dd-pm-row .dd-chart{flex:1 1 0; min-width:0; -webkit-user-select:none; user-select:none;}
+  .g-pm{grid-column:auto; flex:none; width:45px; height:45px; margin:0; padding:0; box-sizing:border-box;
+    border:3px solid #000; border-radius:8px; box-shadow:none; font:400 1.4rem/1 Arial, sans-serif; letter-spacing:0;
+    cursor:pointer; touch-action:manipulation; user-select:none; -webkit-tap-highlight-color:transparent;}
+  .g-pm:hover{box-shadow:none;}
+  .g-pm:active{filter:brightness(.9);}
+  /* days read and the dates they span, above Edit / Log / Delete */
+  .dd-stats{display:flex; flex-direction:column; justify-content:center; gap:2px; height:45px; box-sizing:border-box; padding:0 10px;
+    border:3px solid #000; border-radius:8px; background:#fff; font-family:Arial, sans-serif; font-size:.7rem; line-height:1.15; color:var(--muted);}
+  /* two lines in the one card: days + dates, then per day | streak | best day */
+  .ds-row{display:flex; justify-content:space-between; gap:8px; white-space:nowrap;}
+  .ds-row > span{min-width:0; overflow:hidden; text-overflow:ellipsis;}
+  .dd-stats b{color:var(--ink);}
   /* book: just − and + */
   .dd-pm{display:flex; height:45px; box-sizing:border-box; border:3px solid #000; border-radius:8px; overflow:hidden;}
   .dd-pm button{grid-column:auto; flex:1; margin:0; padding:0; border:none; border-radius:0; box-shadow:none;
@@ -852,18 +884,19 @@
 
   /* ---- line(s) under the chart: fixed two-line height in every state so
      finishing a book never changes the panel's size ---- */
-  #reading-readout{
+  #reading-readout{margin-top:4px;}   /* holds the same stats card as the list dropdowns */
+  #reading-readout.old{
     margin-top:4px; height:45px; box-sizing:border-box; padding:0 8px;
     background:#fff; border:3px solid #000; border-radius:10px;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
     font-family:Georgia, serif; font-size:.78rem; color:var(--ink); line-height:1.15;
     white-space:nowrap; overflow:hidden;
   }
-  #reading-readout > div{max-width:100%; overflow:hidden; text-overflow:ellipsis;}
-  #reading-readout .rd-stats{display:flex; width:100%; font-size:.64rem;}
-  #reading-readout .rd-stats span{flex:1; min-width:0; text-align:center; overflow:hidden; text-overflow:ellipsis;}
-  #reading-readout .rd-stats span + span{border-left:1.5px solid var(--line);}   /* light dividers, like the graph's */
-  #reading-readout b{font-weight:600;}
+  #reading-readout.old > div{max-width:100%; overflow:hidden; text-overflow:ellipsis;}
+  #reading-readout.old .rd-stats{display:flex; width:100%; font-size:.64rem;}
+  #reading-readout.old .rd-stats span{flex:1; min-width:0; text-align:center; overflow:hidden; text-overflow:ellipsis;}
+  #reading-readout.old .rd-stats span + span{border-left:1.5px solid var(--line);}   /* light dividers, like the graph's */
+  #reading-readout.old b{font-weight:600;}
 
   /* finished: bar locks — tapping it asks about a reread */
   #combined-card.locked #combined-bar{cursor:pointer;}
@@ -1006,6 +1039,41 @@
     opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;   /* quick fade, like every full-window page */
   }
   #data-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  /* ---- timeline page: same full-window page as Data ---- */
+  #timeline-page{
+    position:fixed; inset:0; z-index:40; background:var(--bg);
+    display:flex; flex-direction:column;
+    opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;
+  }
+  #timeline-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  #timeline-back{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
+  #timeline-back:hover{background:var(--ink); box-shadow:none;}
+  #timeline-body{flex:1; min-height:0; display:flex; flex-direction:column;}
+  /* two one-card choosers (what, and over what span), then the timeline card, then a fixed footer */
+  .tl-views{flex:none; display:flex; gap:3px; margin:4px 4px 0; height:45px; background:#000; border:3px solid #000; border-radius:8px; overflow:hidden;}
+  .tl-views button{grid-column:auto; flex:1 1 0; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:#fff; color:var(--muted);
+    font-family:Arial, sans-serif; font-size:.78rem; font-weight:400; letter-spacing:.5px; text-transform:none; cursor:pointer;}
+  .tl-views button:hover{background:#fff; box-shadow:none;}
+  .tl-views button.on, .tl-views button.on:hover{background:var(--ink); color:#fff;}
+  .tl-page{flex:1; min-height:0; display:flex; padding:4px;}
+  .tl-card{flex:1; position:relative; border:3px solid #000; border-radius:8px; background:#fff; overflow:hidden;}
+  #tl-canvas{position:absolute; inset:0; overflow:hidden; -webkit-user-select:none; user-select:none;}
+  #tl-canvas > div{position:absolute;}
+  .tl-lbl{font:800 8px Arial, sans-serif; letter-spacing:-.2px; color:var(--muted); text-transform:uppercase; text-align:center;}
+  .tl-empty{font:.78rem Arial, sans-serif; color:var(--muted);}
+  .tl-bar{border:2px solid #000; border-radius:4px; z-index:3; cursor:pointer; box-sizing:border-box;}
+  .tl-bar.now{border-top-style:dashed;}
+  .tl-bar.on{filter:brightness(.72);}   /* picked: the fill goes darker, no extra border */
+  .tl-gbar{background:#000; border-radius:0 4px 4px 0; z-index:3; cursor:pointer;}
+  .tl-gbar.on{filter:brightness(.72);}
+  .tl-gbar.on.plain{background:#6b6560 !important; filter:none;}   /* All Time's black bars can't go darker: they go grey */
+  .tl-gval{font:800 9px/1 Arial, sans-serif; color:var(--ink); white-space:nowrap; transform:translateY(-50%); z-index:4; pointer-events:none;}
+  .tl-foot{flex:none; padding:4px 4px calc(4px + env(safe-area-inset-bottom)); background:var(--bg); border-top:3px solid #000;}
+  #tl-info{height:45px; box-sizing:border-box; border:3px solid #000; border-radius:8px; background:#fff;
+    display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 10px; font-family:Arial, sans-serif; font-size:.72rem; color:var(--muted); line-height:1.2;}
+  #tl-info .hint{flex:1; text-align:center;}
+  #tl-info b{color:var(--ink);}
+  #tl-info .t{font:600 .85rem Georgia, serif; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   #data-done{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
   #data-done:hover{background:var(--ink); box-shadow:none;}
   .dt-tabbar{padding:4px 4px 0;}
@@ -1209,15 +1277,12 @@
 <canvas id="shelf-top"></canvas>
 
 <div id="app-header">
- <!-- row 1: pages + Data -->
- <div class="hdr-row">
-  <div class="tabs" id="tabs">
-    <div class="tab active" data-view="all">My Library</div>
-    <div class="tab" data-view="library">My Collections</div>
-    <!-- data is a button (opens its own window); tab entry kept for the handler -->
-    <div class="tab" data-view="data" hidden>Data</div>
-  </div>
-  <div id="data-card">Data</div>
+ <!-- pages: the top of the header itself, split in three; Data opens its own window -->
+ <div id="tabs">
+   <div class="tab active" data-view="all">My Library</div>
+   <div class="tab" data-view="library">My Collections</div>
+   <div class="tab" data-view="timeline">Timeline</div>
+   <div class="tab" data-view="data">Data</div>
  </div>
  <!-- row 2 (My Library only): shelf/list view and sort -->
  <div class="hdr-row" id="shelf-controls">
@@ -1227,7 +1292,9 @@
   </div>
   <div id="sort-card" class="shelf-ctl"><span class="sort-k" id="sort-k">Sort &amp; Filter</span><span id="sort-name">Date added</span></div>
  </div>
- <!-- row 3: Add Book, full width -->
+ </div>
+<!-- footer: Add Book, full width -->
+<div id="app-footer">
  <div class="hdr-row">
   <div id="add-card">
     <span class="plus">+</span>
@@ -1333,7 +1400,12 @@
     <button type="button" class="pm-btn" id="page-plus">+</button>
   </div>
   <div id="play-row" class="hidden">
-  <!-- time played (3/8) | Update (1/4) | time left (3/8), then the percent slider below -->
+  <!-- the percent slider with − / + first, then time played (3/8) | Update (1/4) | time left (3/8) -->
+  <div id="play-pct">
+    <button type="button" class="pp-btn" data-d="-1" aria-label="Back one percent">−</button>
+    <div id="play-pct-bar"><canvas id="play-pct-fill"></canvas><span id="play-pct-text" data-v="0%"></span></div>
+    <button type="button" class="pp-btn" data-d="1" aria-label="Forward one percent">+</button>
+  </div>
   <div id="play-line">
   <div id="play-wheels" class="play-set" aria-label="Time played">
     <div class="lw-wheel" data-k="0"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
@@ -1346,11 +1418,6 @@
     <div class="lw-wheel" data-k="1"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">REMAINING</span></div>
     <div class="lw-wheel" data-k="2"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
   </div>
-  </div>
-  <div id="play-pct">
-    <button type="button" class="pp-btn" data-d="-1" aria-label="Back one percent">−</button>
-    <div id="play-pct-bar"><canvas id="play-pct-fill"></canvas><span id="play-pct-text" data-v="0%"></span></div>
-    <button type="button" class="pp-btn" data-d="1" aria-label="Forward one percent">+</button>
   </div>
   </div>
   <div id="chart-card">
@@ -1421,6 +1488,21 @@
 </div>
 
 <!-- data: import / export / stats -->
+<!-- timeline: its own full-window page (blank for now) -->
+<div id="timeline-page">
+  <div class="lg-head">
+    <button type="button" id="timeline-back">Back</button>
+    <h2>Timeline</h2>
+    <span></span>
+  </div>
+  <div id="timeline-body">
+    <div class="tl-views" id="tl-modes"><button type="button" data-m="timeline" class="on">Timeline</button><button type="button" data-m="graph">Pages &amp; Listening</button></div>
+    <div class="tl-views" id="tl-ranges"><button type="button" data-v="all">All Time</button><button type="button" data-v="year" class="on">This Year</button><button type="button" data-v="month">This Month</button></div>
+    <div class="tl-page"><div class="tl-card"><div id="tl-canvas"></div></div></div>
+    <div class="tl-foot"><div id="tl-info"><span class="hint">Tap a book to see it here</span></div></div>
+  </div>
+</div>
+
 <div id="data-page">
   <div class="lg-head">
     <button type="button" id="data-done">Done</button>
@@ -1496,6 +1578,10 @@
 </div>
 
 <script src="three.min.js"></script>   <!-- Three.js r128, bundled so the app works offline -->
+<script>
+  // opened on its own (no three.min.js beside it, e.g. a preview or a downloaded copy): load Three.js from the web instead
+  window.THREE || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+</script>
 
 <script>
   const shelvesContainer = document.getElementById('shelves-container');
@@ -1719,6 +1805,8 @@
       delete b.readLog;
     }
     if(!b.days.length) b.days = [0];
+    // pattern seed: a short string of digits, picked once, that always draws this book's own page lines and spots
+    if(!/^\d{8}$/.test(b.seed || '')){ b.seed = String(Math.floor(Math.random() * 1e8)).padStart(8, '0'); normalizeBook.dirty = true; }
     if(!b.lastDayKey) b.lastDayKey = localTodayKey();
     if(!Array.isArray(b.reads)) b.reads = [];
     // calendar rollover
@@ -1901,6 +1989,7 @@
 
   function render(){
     books.forEach(normalizeBook);
+    if(normalizeBook.dirty){ normalizeBook.dirty = false; saveBooks(); }   // new seeds are kept, so patterns never change
     shelvesContainer.innerHTML = '';
     listContainer.innerHTML = '';
     requestShelfRender();
@@ -2241,6 +2330,47 @@
   }
 
   const PAGE_FILL_DARKEN = 0.12;
+  // progress fill drawn like the book's page block: its paper colour with page lines; foxed paper
+  // keeps its age spots; gilt edges show the gilt (gold, or red softened so the numbers stay readable)
+  // a book's page pattern from its seed: the same seed always draws the same lines and spots
+  const pagePatterns = new Map();
+  function pagePattern(seed){
+    let pat = pagePatterns.get(seed);
+    if(pat) return pat;
+    let s = (parseInt(seed, 10) % 2147483646) + 1;
+    const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for(let i = 0; i < 5; i++) rnd();                        // stir, so neighbouring seeds look unalike
+    // page edges: fine vertical lines a few px apart, each a slightly different shade
+    const c = document.createElement('canvas'); c.width = 240; c.height = 4;
+    const x = c.getContext('2d'), gapMin = 2 + Math.floor(rnd()*2), gapVar = 2 + Math.floor(rnd()*3), darkShare = .45 + rnd()*.3;
+    for(let i = Math.floor(rnd()*3); i < c.width; i += gapMin + Math.floor(rnd()*gapVar)){
+      const dark = rnd() < darkShare;
+      x.fillStyle = dark ? `rgba(60,40,20,${0.04 + rnd()*0.09})` : `rgba(255,250,240,${0.07 + rnd()*0.12})`;
+      x.fillRect(i, 0, 1, c.height);
+    }
+    // age spots (used by foxed paper): soft brown dots scattered at random
+    const f = document.createElement('canvas'); f.width = 60; f.height = 40;
+    const fx = f.getContext('2d'), count = 8 + Math.floor(rnd()*10);
+    for(let i = 0; i < count; i++){ const r = .6 + rnd()*1.8, gx = rnd()*60, gy = rnd()*40, g = fx.createRadialGradient(gx, gy, 0, gx, gy, r);
+      g.addColorStop(0, `rgba(140,90,40,${.22 + rnd()*.33})`); g.addColorStop(1, 'rgba(140,90,40,0)');
+      fx.fillStyle = g; fx.beginPath(); fx.arc(gx, gy, r, 0, 7); fx.fill(); }
+    pat = { lines: `url(${c.toDataURL()})`, spots: `url(${f.toDataURL()})` };
+    pagePatterns.set(seed, pat);
+    return pat;
+  }
+  function paintPageFill(el, tone, done, seed){
+    const pat = seed ? pagePattern(seed) : { lines: 'var(--page-lines)', spots: 'var(--fox-spots)' };
+    const gilt = tone.edge === 'gilt';
+    let col = gilt ? tone.base : paperOf(tone);
+    if(gilt && !done && readableTextOn(col) === '#fff') col = mixHex(col, '#ffffff', 0.35);   // finished: the full gilt, darkened
+    el.style.backgroundColor = mixHex(col, '#000000', done ? PAGE_DONE_DARKEN : (gilt ? 0.04 : PAGE_FILL_DARKEN));
+    const layers = [], sizes = [];
+    if(gilt && !done){ layers.push('linear-gradient(180deg, rgba(255,248,220,.38), rgba(255,248,220,0) 45%, rgba(60,30,0,.14))'); sizes.push('100% 100%'); }
+    if(tone.spots){ layers.push(pat.spots); sizes.push('60px 40px'); }
+    layers.push(pat.lines); sizes.push('120px 100%');
+    el.style.backgroundImage = layers.join(', ');
+    el.style.backgroundSize = sizes.join(', ');
+  }
   const PAGE_DONE_DARKEN = 0.55;   // finished: fill this dark, text white   // progress fills: the page colour taken this much toward black
   // fill + numbers of one list card; also called live while the book is open
   function paintListRow(row, b){
@@ -2258,9 +2388,8 @@
     }
     const fill = row.querySelector('.br-fill');
     fill.style.width = `calc(${pct(b)*100}% + ${pct(b) >= 1 ? 6 : 3}px)`;   // +3px for the overhang on the left (+3 more at 100%)
-    const tone = paperOf(styleForBook(b).pageTone);
     // the book's page colour, a shade deeper; finished books go much darker with white text
-    fill.style.backgroundColor = mixHex(tone, '#000000', bookFinished(b) ? PAGE_DONE_DARKEN : PAGE_FILL_DARKEN);
+    paintPageFill(fill, styleForBook(b).pageTone, bookFinished(b), b.seed);
     row.classList.toggle('done', bookFinished(b));
     row.querySelector('.br-pages').textContent = `${Math.min(bookRead(b), b.pages)} / ${b.pages}`;
     row.querySelector('.br-pct').textContent = (pct(b)*100).toFixed(2) + '%';
@@ -2556,9 +2685,9 @@
     // wheels (half, no letters) pick a time; Confirm (half) commits it
     // time played (3/8) | Update (1/4) | time left (3/8): the two sets turn together
     const set3 = tag => `<div class="lw-wheel">${rows7}</div><div class="lw-wheel">${rows7}<span class="tw-tag">${tag}</span></div><div class="lw-wheel">${rows7}</div>`;
-    dd.innerHTML = `<div class="dd-in"><div class="dd-play dual"><div class="pick tw-played">${set3('PLAYED')}</div>` +
+    dd.innerHTML = `<div class="dd-in">` + PM_ROW + `<div class="dd-play dual"><div class="pick tw-played">${set3('PLAYED')}</div>` +
       `<button type="button" class="dd-confirm" disabled>Update</button><div class="pick tw-left">${set3('REMAINING')}</div></div>` +
-      `<div class="dd-chart"><svg></svg></div>` + DD_ACTIONS + `</div>`;
+      DD_STATS + DD_ACTIONS + `</div>`;
     row._dd = dd;
     wireDDActions(dd, row, b);
     const confirmBtn = dd.querySelector('.dd-confirm');
@@ -2577,6 +2706,24 @@
       total: ()=> b.audioSeconds, get: ()=> pct(b) * b.audioSeconds,
       set: T => { row._staged = Math.round(T); row._paintConfirm(); },
       locked: ()=> bookFinished(b), onLocked: ()=> askTapeReread(b), done: ()=>{}
+    });
+    // − / + stage a minute at a time on the wheels; Update commits, same as turning them
+    dd.querySelectorAll('.g-pm').forEach(btn=>{
+      btn.style.background = bodyCol; btn.style.color = readableTextOn(bodyCol);   // the cassette body, like Update
+      const d = +btn.dataset.d; let rt = 0, ri = 0;
+      const stop = ()=>{ clearTimeout(rt); clearInterval(ri); };
+      const nudge = ()=>{
+        if(bookFinished(b)){ stop(); askTapeReread(b); return; }
+        const dayStart = Math.ceil(sumDays(b.days.slice(0, -1)) / b.pages * b.audioSeconds);
+        const from = row._staged != null ? row._staged : Math.round(pct(b) * b.audioSeconds);
+        row._staged = Math.max(dayStart, Math.min(b.audioSeconds, from + d*60));
+        row._wheels.put(row._staged); row._paintConfirm();
+      };
+      btn.addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); nudge(); stop();
+        rt = setTimeout(()=>{ ri = setInterval(nudge, 80); }, 350); });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btn.addEventListener(ev, stop));
+      btn.addEventListener('click', e=> e.stopPropagation());
+      btn.addEventListener('contextmenu', e=> e.preventDefault());
     });
     confirmBtn.addEventListener('click', e=>{
       e.stopPropagation();
@@ -2657,8 +2804,9 @@
   function refreshRowChart(row){
     const dd = row._dd;
     if(!dd || !dd.classList.contains('open')) return;
+    paintDDStats(dd, row._book);
     const svg = dd.querySelector('.dd-chart svg');
-    if(svg) renderReadingChart(svg, row._book, {gap: 14, drawH: 25, bare: true});   // fills the 45px card (39px inside)
+    if(svg) renderDDChart(svg, row._book);
   }
   // a printed book's progress, same rules as the open book's bar
   function setBookPage(b, target){
@@ -2670,15 +2818,114 @@
     clearTimeout(setBookPage._t); setBookPage._t = setTimeout(saveBooks, 250);
     shelfStale = true;
   }
+  // − and + as their own square cards at either end of the graph card
+  const PM_ROW = `<div class="dd-pm-row"><button type="button" class="g-pm" data-d="-1" aria-label="Back">−</button>` +
+    `<div class="dd-chart"><svg></svg></div><button type="button" class="g-pm" data-d="1" aria-label="Forward">+</button></div>`;
+
+  // stats card above Edit / Log / Delete: how many days the read spans on the left, its dates on the right
+  const DD_STATS = '<div class="dd-stats"><div class="ds-row"><span><b class="ds-days">0</b> <span class="ds-word">days</span> <span class="ds-verb">read</span></span><span class="ds-span"></span></div>' +
+    '<div class="ds-row ds-pace"><span class="ds-avg"></span><span class="ds-streak"></span><span class="ds-best"></span></div></div>';
+  const DS_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function paintDDStats(dd, b){
+    const el = dd.querySelector('.dd-stats'); if(!el) return;
+    const read = bookRead(b) ? b.days.length : 0;   // every day of the span, including days with nothing logged
+    el.querySelector('.ds-days').textContent = read;
+    el.querySelector('.ds-word').textContent = read === 1 ? 'day' : 'days';
+    el.querySelector('.ds-verb').textContent = b.format === 'audio' ? 'listened' : 'read';
+    const span = el.querySelector('.ds-span');
+    // average a day over the whole span, longest run of days with reading, biggest day
+    const audio = b.format === 'audio' && b.audioSeconds > 0 && b.pages > 0, spp = audio ? b.audioSeconds / b.pages : 1;
+    const amt = v => audio ? fmtDur(v * spp) : String(Math.round(v));
+    const unit = audio ? '' : ' pages';
+    const n = b.days.length, done = Math.min(bookRead(b), b.pages), best = Math.max(0, ...b.days), streak = longestStreak(b.days);
+    el.querySelector('.ds-avg').innerHTML = `<b>${done ? amt(done / n) : 0}</b>${unit}/day`;
+    el.querySelector('.ds-streak').innerHTML = `<b>${streak}</b>-day streak`;
+    el.querySelector('.ds-best').innerHTML = `best <b>${amt(best)}</b>${unit}`;
+    if(!bookRead(b)){ span.textContent = 'Not started'; return; }
+    // the log runs one entry per calendar day, ending on its newest day
+    const end = keyDate(lastLogKey(b)), start = new Date(end); start.setDate(start.getDate() - (b.days.length - 1));
+    const f = d => `${DS_MON[d.getMonth()]} ${d.getDate()}` + (d.getFullYear() !== new Date().getFullYear() ? `, ${d.getFullYear()}` : '');
+    span.innerHTML = b.days.length === 1 ? `<b>${f(start)}</b>` : `<b>${f(start)}</b> – <b>${f(end)}</b>`;
+  }
+
+  // ---------- graph: fits any number of days; drag along it for a callout ----------
+  // each day gets W/n px; bars are half a slot (1px at the least); past 60 days the
+  // dividers drop out and the bars stand alone
+  function renderDDChart(svg, book){
+    const W = Math.round(svg.getBoundingClientRect().width) || 230, H = 39, GAP = 14, DRAW = H - GAP;
+    const days = book.days || [], n = Math.max(7, days.length), slot = W / n;
+    const max = Math.max(...days, 1), FILL = styleForBook(book).bookmarkColor, SEL = '#2b2620';
+    const barW = Math.max(1, Math.round(slot * 0.5)), dividers = n <= 60;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
+    let g = '';
+    for(let i = 1; i < n && dividers; i++){ const x = Math.round(i * slot); g += `<rect x="${x - (slot >= 6 ? .75 : .5)}" y="0" width="${slot >= 6 ? 1.5 : 1}" height="${H}" fill="var(--line)"/>`; }
+    const bars = [];
+    days.forEach((d, i) => {
+      const h = d > 0 ? Math.max(2, d / max * DRAW) : 0, x = Math.round(i * slot + slot / 2 - barW / 2);
+      bars.push({x, w: barW, top: H - h, d});
+      if(h) g += `<path data-i="${i}" d="${barPath(x, H - h, barW, H + 4)}" fill="${FILL}"/>`;
+    });
+    g += `<text class="co" text-anchor="middle" y="10" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--ink)"
+      stroke="#fff" stroke-width="3" paint-order="stroke" stroke-linejoin="round" opacity="0"></text>`;
+    svg.innerHTML = g;
+    if(svg._ac) svg._ac.abort();                         // redrawn on every change: only the newest drawing listens
+    const ac = svg._ac = new AbortController(), on = {signal: ac.signal};
+    svg.style.touchAction = 'pan-y'; svg.style.cursor = 'pointer';
+    const co = svg.querySelector('.co');
+    let sel = -1;
+    const end = keyDate(lastLogKey(book));
+    const label = i => {
+      const dt = new Date(end); dt.setDate(dt.getDate() - (days.length - 1 - i));
+      const v = days[i], amt = book.format === 'audio' && book.audioSeconds > 0
+        ? secsToLength(v * book.audioSeconds / book.pages) : `${Math.round(v * 100) / 100} ${v === 1 ? 'page' : 'pages'}`;
+      return `${DS_MON[dt.getMonth()]} ${dt.getDate()} · ${amt}`;
+    };
+    const dayAt = clientX => { const r = svg.getBoundingClientRect(); return Math.floor((clientX - r.left) / r.width * n); };
+    function pick(clientX){
+      const i = dayAt(clientX);
+      if(i < 0 || i >= days.length){ return; }
+      if(i === sel) return;
+      if(sel >= 0){ const o = svg.querySelector(`path[data-i="${sel}"]`); if(o) o.setAttribute('fill', FILL); }
+      sel = i;
+      const p = svg.querySelector(`path[data-i="${i}"]`); if(p) p.setAttribute('fill', SEL);
+      co.textContent = label(i); co.setAttribute('opacity', 1);
+      const cx = bars[i].x + bars[i].w / 2, half = co.getComputedTextLength() / 2 + 3;
+      co.setAttribute('x', Math.min(Math.max(cx, half), W - half));
+    }
+    function clear(){ if(sel >= 0){ const o = svg.querySelector(`path[data-i="${sel}"]`); if(o) o.setAttribute('fill', FILL); } sel = -1; co.setAttribute('opacity', 0); }
+    let down = null;
+    // tap a bar to select it, tap it again to deselect; drag along to move the selection
+    svg.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation();
+      const again = sel >= 0 && dayAt(e.clientX) === sel;
+      down = {x: e.clientX, y: e.clientY, id: e.pointerId, live: false, again};
+      if(!again) pick(e.clientX); }, on);
+    svg.addEventListener('pointermove', e => {
+      if(!down) return;
+      if(!down.live){
+        const dx = Math.abs(e.clientX - down.x), dy = Math.abs(e.clientY - down.y);
+        if(dy > 8 && dy > dx){ down = null; clear(); return; }    // a scroll
+        if(dx > 3){ down.live = true; try{ svg.setPointerCapture(down.id); }catch(err){} }
+      }
+      pick(e.clientX);
+    }, on);
+    const up = () => { if(!down) return; if(down.again && !down.live) clear(); down = null; };   // stays until tapped again
+    svg.addEventListener('pointerup', up, on); svg.addEventListener('pointercancel', () => { down = null; clear(); }, on);
+    svg.addEventListener('click', e => e.stopPropagation(), on);
+  }
+  // rounded top corners, square bottom running past the card's edge
+  function barPath(x, top, w, bot){
+    const r = Math.min(2, w / 2, bot - top);
+    return w < 2 ? `M${x},${bot}V${top}H${x + w}V${bot}Z`
+      : `M${x},${bot}L${x},${top + r}Q${x},${top} ${x + r},${top}L${x + w - r},${top}Q${x + w},${top} ${x + w},${top + r}L${x + w},${bot}Z`;
+  }
+
   function buildBookDD(row, b){
     const dd = document.createElement('div');
     dd.className = 'row-dd book-dd';
-    dd.innerHTML = `<div class="dd-in"><div class="dd-pm"><button type="button" data-d="-1" aria-label="Back one page">−</button>` +
-      `<button type="button" data-d="1" aria-label="Forward one page">+</button></div>` +
-      `<div class="dd-chart"><svg></svg></div>` + DD_ACTIONS + `</div>`;
+    dd.innerHTML = `<div class="dd-in">` + PM_ROW + DD_STATS + DD_ACTIONS + `</div>`;
     wireDDActions(dd, row, b);
     const st = styleForBook(b);
-    dd.querySelectorAll('.dd-pm button').forEach(btn=>{
+    dd.querySelectorAll('.g-pm').forEach(btn=>{
       btn.style.background = st.color; btn.style.color = readableTextOn(st.color);   // cover colour
       const d = +btn.dataset.d; let rt = 0, ri = 0;
       const stop = ()=>{ clearTimeout(rt); clearInterval(ri); };
@@ -2794,7 +3041,7 @@
       sortList.appendChild(o);
     });
   }
-  document.getElementById('data-card').addEventListener('click', ()=> openDataPage());
+
   document.getElementById('sort-card').addEventListener('click', ()=>{ renderSortOptions(); sortPage.classList.add('open'); });
   document.getElementById('sort-done').addEventListener('click', ()=> sortPage.classList.remove('open'));
   // picking a filter applies it straight away; the page stays open so a sort can be picked too
@@ -2825,7 +3072,9 @@
     const avail = estimateShelfWidth() - 20;
     const GAP = 0;
     names.forEach(name=>{
-      const list = sortedBooks().filter(b => bookTags(b).includes(name));
+      // books first (they stand on the left), audiobooks after (they sit on the right)
+      const inColl = sortedBooks().filter(b => bookTags(b).includes(name)), isTape = b => b.format === 'audio';
+      const list = inColl.filter(b => !isTape(b)).concat(inColl.filter(isTape));
       // pack into as many shelves as needed
       const shelves = [[]]; let used = 0;
       list.forEach(b=>{
@@ -2843,7 +3092,13 @@
         wrap.className = 'shelf-wrap';
         const shelf = document.createElement('div');
         shelf.className = 'shelf';
-        group.forEach(b=> shelf.appendChild(createSpineWrap(b)));
+        group.forEach((b, j)=>{
+          // first audiobook on a shelf: an empty gap pushes it and the rest to the right end
+          if(b.format === 'audio' && (j === 0 || group[j-1].format !== 'audio')){
+            const gap = document.createElement('div'); gap.className = 'coll-split'; shelf.appendChild(gap);
+          }
+          shelf.appendChild(createSpineWrap(b));
+        });
         const lab = document.createElement('div');
         lab.className = 'shelf-count';
         lab.textContent = plural(group.length, 'book');
@@ -2879,12 +3134,14 @@
     tab.addEventListener('click', ()=>{
       // Data opens its own full-window page; the shelf tab underneath stays as-is
       if(tab.dataset.view === 'data'){ openDataPage(); return; }
+      if(tab.dataset.view === 'timeline'){ openTimeline(); return; }
       document.querySelectorAll('#tabs .tab').forEach(t=>t.classList.remove('active'));
       tab.classList.add('active');
       const view = tab.dataset.view;
       document.getElementById('all-books-view').classList.toggle('active', view==='all');
       document.getElementById('library-view').classList.toggle('active', view==='library');
       document.getElementById('shelf-controls').classList.toggle('hidden', view !== 'all');
+      window.scrollTo(0, 0);                              // each page opens at its top
       if(view === 'library') renderCollections();
       syncHeaderHeight();
     });
@@ -3176,7 +3433,7 @@
     // baseline at the bottom — no horizontal grid lines in between
     const frameTop = 0.75;
     const slotW = chartW / slotCount;
-    const barW = Math.max(slotW * 0.5, 1.5);
+    const barW = Math.max(slotW * 0.5, 1);
     let selectedBar = null, calloutLabel = null;
 
     function selectBar(bar, d){
@@ -3210,7 +3467,7 @@
     // push the count past that
     for(let i=0; i<slotCount; i++){
       const cx = chartLeft + slotW*i + slotW/2;
-      if(bare){ if(i > 0) svg.appendChild(svgEl('line', {x1:slotW*i, y1:-4, x2:slotW*i, y2:H + 4, stroke:'var(--line)', 'stroke-width':1.5})); }
+      if(bare){ if(i > 0 && slotCount <= 60) svg.appendChild(svgEl('line', {x1:slotW*i, y1:-4, x2:slotW*i, y2:H + 4, stroke:'var(--line)', 'stroke-width':1.5})); }
       else svg.appendChild(svgEl('line', {x1:chartLeft+slotW*i, y1:frameTop, x2:chartLeft+slotW*i, y2:chartBottom, stroke:'var(--grid)', 'stroke-width':1}));
 
       const d = days[i];
@@ -5354,7 +5611,7 @@
         btn.style.background = locked ? mixHex(barStyle.color, '#000000', 0.35) : barStyle.color;
         btn.style.color = locked ? 'rgba(255,255,255,.55)' : readableTextOn(barStyle.color);
       });
-      combinedFill.style.backgroundColor = mixHex(paperOf(barStyle.pageTone), '#000000', locked ? PAGE_DONE_DARKEN : PAGE_FILL_DARKEN);
+      paintPageFill(combinedFill, barStyle.pageTone, locked, book.seed);
     }
 
     // true if the bar was already locked when the current tap/drag began
@@ -5385,8 +5642,9 @@
       paintBar();
       // opened from List view: its card behind the blur follows along
       if(spineEl.classList.contains('br-anchor')) paintListRow(spineEl.parentElement, book);
-      renderReadingChart(readingChartSvg, book, {gap: 14, drawH: 25, bare: true});
-      renderReadout(readingReadout, book, projection);
+      renderDDChart(readingChartSvg, book);                       // same graph and stats card as the list dropdowns
+      if(!readingReadout.firstElementChild) readingReadout.innerHTML = DD_STATS;
+      paintDDStats(readingReadout, book);
     }
     // the bar sets the page you're on: the difference goes into Today, and
     // it can't go below what earlier days already logged (fix those in the Log)
@@ -6023,9 +6281,11 @@
 
 
   const appHeader = document.getElementById('app-header');
+  const appFooter = document.getElementById('app-footer');
   function syncHeaderHeight(){
-    const h = appHeader.offsetHeight;
-    if(h > 0) document.documentElement.style.setProperty('--header-h', h + 'px');
+    const h = appHeader.offsetHeight, f = appFooter.offsetHeight;
+    document.documentElement.style.setProperty('--header-h', h + 'px');   // 0 when the header is empty
+    if(f > 0) document.documentElement.style.setProperty('--footer-h', f + 'px');
   }
   syncHeaderHeight();
   window.addEventListener('resize', syncHeaderHeight);
@@ -7012,8 +7272,61 @@
   const dtImportText = document.getElementById('dt-import-text');
   let pendingImport = null, replaceArmed = false, replaceTimer = null;
 
+  // backups (version 3): laid out over lines so they're easy to read, with the daily log packed
+  // into one short line per book — "40,62,0*3,85" is 40, 62, three empty days, then 85. Nothing
+  // that can be worked out again (current page) and nothing empty is saved. Older backups,
+  // including the one-line version 2, still import.
+  const SKIP = { currentPage:1 };
+  const isEmpty = (v, k) => v == null || v === '' || (Array.isArray(v) && !v.length) || (k === 'bookmarkShape' && v === 0);
+  function packDays(days){
+    const out = [];
+    for(let i = 0; i < days.length; ){
+      const v = Math.round(days[i] * 1e4) / 1e4; let n = 1;
+      while(i + n < days.length && Math.round(days[i + n] * 1e4) / 1e4 === v) n++;
+      out.push(n > 2 ? `${v}*${n}` : Array(n).fill(v).join(','));
+      i += n;
+    }
+    return out.join(',');
+  }
+  function unpackDays(v){
+    if(Array.isArray(v)) return v.map(Number);
+    if(typeof v !== 'string' || !v.trim()) return [0];
+    const out = [];
+    v.split(',').forEach(part => { const [n, k] = part.split('*'); const x = Number(n) || 0;
+      for(let i = 0; i < (k ? Math.max(1, parseInt(k, 10)) : 1); i++) out.push(x); });
+    return out;
+  }
+  function packBook(b){
+    const o = {};
+    for(const k in b){
+      const v = b[k];
+      if(SKIP[k] || (isEmpty(v, k) && k !== 'pages' && k !== 'days')) continue;
+      if(k === 'format' && v === 'book') continue;
+      o[k] = k === 'days' ? packDays(v)
+           : k === 'reads' ? v.map(r => ({ days: packDays(r.days || []), finishedOn: r.finishedOn }))
+           : v;
+    }
+    return o;
+  }
+  // version 2 used one-letter names; anything else is already a full name
+  const V2_KEYS = { t:'title', u:'subtitle', a:'author', p:'pages', f:'format', s:'audioSeconds', g:'tags',
+    c:'color', k:'bookmarkColor', b:'borderStyle', n:'pageToneIdx', x:'stickerIdx', v:'cover', h:'bookmarkShape',
+    d:'days', l:'lastDayKey', o:'finishedOn', r:'reads', z:'seed' };
+  function unpackBook(o, version){
+    const b = {};
+    for(const k in o){
+      const name = version === 2 ? (V2_KEYS[k] || k) : k;
+      let v = o[k];
+      if((name === 'color' || name === 'bookmarkColor') && typeof v === 'string' && /^[0-9a-f]{6}$/i.test(v)) v = '#' + v;
+      if(name === 'days') v = unpackDays(v);
+      if(name === 'reads' && Array.isArray(v)) v = v.map(r => ({ days: unpackDays(r.days || r.d), finishedOn: r.finishedOn || r.o || null }));
+      b[name] = v;
+    }
+    if(!Array.isArray(b.tags)) b.tags = [];
+    return b;
+  }
   function exportJSON(){
-    return JSON.stringify({ app:'bookshelf', version:1, exported:new Date().toISOString(), books }, null, 2);
+    return JSON.stringify({ app:'stack-tracker', version:3, exported:new Date().toISOString(), books: books.map(packBook) }, null, 2);
   }
   function showDataTab(name){
     document.querySelectorAll('#dt-tabs .tab').forEach(t=> t.classList.toggle('active', t.dataset.dt === name));
@@ -7031,6 +7344,229 @@
     dataPage.classList.add('open');
   }
   document.getElementById('data-done').addEventListener('click', ()=> dataPage.classList.remove('open'));
+  document.getElementById('timeline-back').addEventListener('click', ()=> document.getElementById('timeline-page').classList.remove('open'));
+  // ---------- Timeline page ----------
+  // Two ways to look at your reading over All Time / This Year / This Month:
+  //  · Timeline: every read is a bar from its first day to its last, newest at the top. Books show their
+  //    page block edge-on (in their page colour), audiobooks wound tape. Overlapping reads stand side by
+  //    side, each in the lane that's been free longest. Reads crossing the span's edge run off the card.
+  //  · Pages & Listening: pages read on the left and hours listened on the right (page / tape textures; All Time in plain black), per
+  //    day (This Month) or month; All Time gives one total per year.
+  // Tap a bar and the footer shows it.
+  const TL = { view: 'year', mode: 'timeline', reads: [], tex: {}, picked: '', pickedK: '' };
+  const tlCanvas = document.getElementById('tl-canvas'), tlInfo = document.getElementById('tl-info');
+  const TL_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const TL_HINT = '<span class="hint">Tap a book to see it here</span>', TL_GHINT = '<span class="hint">Tap a bar to see that period here</span>';
+  const tlFmt = d => `${TL_MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  const tlN = n => Math.round(n).toLocaleString(), tlHM = sec => { const m = Math.round(sec / 60); return `${Math.floor(m / 60)}H ${m % 60}M`; };
+  const tlEsc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const tlDay = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+  const tlAdd = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+
+  // every read of every book (past reads and the current one) as dated spans with their daily amounts
+  function tlCollect(){
+    const out = []; let id = 0;
+    books.forEach(b => {
+      const audio = b.format === 'audio' && b.audioSeconds > 0 && b.pages > 0, spp = audio ? b.audioSeconds / b.pages : 1;
+      const page = paperOf(styleForBook(b).pageTone);
+      const add = (days, endKey, finished, reread) => {
+        if(!Array.isArray(days) || !endKey) return;
+        const first = days.findIndex(v => v > 0); if(first < 0) return;
+        const end = keyDate(endKey), s = tlAdd(end, -(days.length - 1 - first));
+        out.push({ id: id++, title: b.title, kind: audio ? 'audio' : 'book', reread, page, s, e: finished ? end : null,
+          daily: days.slice(first).map(v => audio ? v * spp : v) });
+      };
+      (b.reads || []).forEach((r, k) => add(r.days, r.finishedOn, true, k > 0));
+      add(b.days, lastLogKey(b), bookFinished(b), (b.reads || []).length > 0);
+    });
+    return out;
+  }
+  function tlRange(today){
+    const Y = today.getFullYear(), M = today.getMonth();
+    if(TL.view === 'month'){
+      const t0 = new Date(Y, M, 1), t1 = new Date(Y, M + 1, 1), n = Math.round((t1 - t0) / 864e5);
+      return { t0, t1, marks: [1, 5, 10, 15, 20, 25, n].filter((d, k, a) => a.indexOf(d) === k).map(d => ({ mid: new Date(Y, M, d, 12), text: String(d) })),
+               lines: Array.from({length: n - 1}, (_, k) => ({ at: new Date(Y, M, k + 2) })) };
+    }
+    if(TL.view === 'year'){
+      const t0 = new Date(Y, 0, 1), t1 = new Date(Y + 1, 0, 1);
+      return { t0, t1, marks: TL_MON.map((m, k) => ({ mid: new Date(Y, k, 16), text: m })), lines: TL_MON.slice(1).map((m, k) => ({ at: new Date(Y, k + 1, 1) })) };
+    }
+    const first = TL.reads.length ? Math.min(...TL.reads.map(r => r.s.getFullYear())) : Y;
+    const t0 = new Date(first, 0, 1), t1 = new Date(Y + 1, 0, 1), marks = [], lines = [];
+    for(let yr = first; yr <= Y; yr++){
+      marks.push({ mid: new Date(yr, 6, 1), text: String(yr) });
+      if(yr > first) lines.push({ at: new Date(yr, 0, 1), strong: true });
+      for(let m = 3; m < 12; m += 3) lines.push({ at: new Date(yr, m, 1) });
+    }
+    return { t0, t1, marks, lines };
+  }
+  // textures: page block edge-on (horizontal lines), tape wound curved (This Year / This Month) or straight (All Time)
+  function tlPageLines(){
+    if(TL.tex.page) return TL.tex.page;
+    const c = document.createElement('canvas'); c.width = 4; c.height = 120; const x = c.getContext('2d');
+    let s = 23; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for(let i = 0; i < c.height; i += 2 + Math.floor(rnd() * 2)){ const dark = rnd() < .6;
+      x.fillStyle = dark ? `rgba(60,40,20,${.10 + rnd() * .14})` : `rgba(255,250,240,${.3 + rnd() * .3})`; x.fillRect(0, i, 4, 1); }
+    return TL.tex.page = `url(${c.toDataURL()})`;
+  }
+  function tlTapeStraight(){
+    if(TL.tex.ts) return TL.tex.ts;
+    const c = document.createElement('canvas'); c.width = 4; c.height = 90; const x = c.getContext('2d');
+    x.fillStyle = '#8c5229'; x.fillRect(0, 0, 4, 90);
+    let s = 5; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for(let i = 0; i < 90; i += 1 + Math.floor(rnd() * 2)){ const v = rnd();
+      x.fillStyle = v < .5 ? `rgba(60,26,6,${.15 + v * .3})` : `rgba(225,160,110,${.1 + (v - .5) * .35})`; x.fillRect(0, i, 4, 1); }
+    return TL.tex.ts = `url(${c.toDataURL()})`;
+  }
+  function tlTapeWraps(w){
+    const key = 'tw' + Math.round(w);
+    if(TL.tex[key]) return TL.tex[key];
+    const dpr = 2, h = 90, c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * dpr)); c.height = h * dpr;
+    const x = c.getContext('2d'); x.scale(dpr, dpr); x.fillStyle = '#8c5229'; x.fillRect(0, 0, w, h);
+    let s = 5; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647, bow = 3.5;
+    for(let yy = 0; yy < h + bow; yy += 1.1){ const v = rnd();
+      x.strokeStyle = v < .5 ? `rgba(60,26,6,${.12 + v * .3})` : `rgba(225,160,110,${.08 + (v - .5) * .3})`;
+      x.lineWidth = .35 + v * .35; x.beginPath(); x.moveTo(0, yy); x.quadraticCurveTo(w / 2, yy - bow * 2, w, yy); x.stroke(); }
+    return TL.tex[key] = `url(${c.toDataURL()})`;
+  }
+  // the graph's sideways bars (This Year / This Month): the list's progress-fill textures, vertical lines —
+  // page edges on cream for pages, tape wraps for listening
+  function tlFillLines(kind){
+    if(TL.tex['f' + kind]) return TL.tex['f' + kind];
+    const c = document.createElement('canvas'); c.width = 240; c.height = 4; const x = c.getContext('2d');
+    let s = 11; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    if(kind === 'tape'){
+      x.fillStyle = '#8c5229'; x.fillRect(0, 0, 240, 4);
+      for(let i = 0; i < 240; i += 2 + Math.floor(rnd() * 2)){ const v = rnd();
+        x.fillStyle = v < .55 ? `rgba(90,45,15,${.12 + v * .3})` : `rgba(240,200,160,${.12 + (v - .55) * .5})`; x.fillRect(i, 0, 1, 4); }
+    } else {
+      for(let i = 0; i < 240; i += 3 + Math.floor(rnd() * 3)){ const dark = rnd() < .6;
+        x.fillStyle = dark ? `rgba(60,40,20,${.05 + rnd() * .07})` : `rgba(255,250,240,${.08 + rnd() * .1})`; x.fillRect(i, 0, 1, 4); }
+    }
+    return TL.tex['f' + kind] = `url(${c.toDataURL()})`;
+  }
+  function tlFrame(today){
+    tlCanvas.innerHTML = '';
+    const R = tlRange(today), W = tlCanvas.clientWidth, H = tlCanvas.clientHeight, LW = TL.view === 'all' ? 34 : 26;
+    const y = d => (R.t1 - d) / (R.t1 - R.t0) * H;
+    const el = (css, cls, txt) => { const e = document.createElement('div'); e.style.cssText = css; if(cls) e.className = cls; if(txt != null) e.textContent = txt; tlCanvas.appendChild(e); return e; };
+    return { R, W, H, LW, y, el };
+  }
+  function tlDrawTimeline(){
+    const today = tlDay(new Date()), { R, W, H, LW, y, el } = tlFrame(today), { t0, t1 } = R;
+    R.lines.forEach(l => el(`left:${l.strong ? 0 : LW + 3}px;right:0;top:${(y(l.at) - (l.strong ? 1.5 : 0)).toFixed(1)}px;height:${l.strong ? 3 : 1}px;background:${l.strong ? '#000' : '#efeae0'};z-index:${l.strong ? 2 : 1}`));
+    R.marks.forEach(m => el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:2`, 'tl-lbl', m.text));
+    el(`left:${LW}px;top:0;height:${H}px;width:3px;background:#000;z-index:2`);
+    if(today >= t0 && today < t1) el(`left:${LW+3}px;right:0;top:${(y(tlAdd(today, 1)) - .5).toFixed(1)}px;height:1px;background:#b5342a;z-index:4`);
+    const list = TL.reads.filter(r => r.s < t1 && (r.e ? tlAdd(r.e, 1) : tlAdd(today, 1)) > t0).sort((a, b) => a.s - b.s);
+    if(!list.length){ el(`left:${LW+3}px;right:0;top:${H/2}px;transform:translateY(-50%);text-align:center;z-index:2`, 'tl-empty', 'Nothing read here yet'); return; }
+    const laneEnds = [];
+    list.forEach(r => {
+      r.end = r.e ? tlAdd(r.e, 1) : tlAdd(today, 1);
+      let k = -1; laneEnds.forEach((e, j) => { if(e <= r.s && (k < 0 || e < laneEnds[k])) k = j; });   // free longest
+      if(k < 0){ k = laneEnds.length; laneEnds.push(0); }
+      laneEnds[k] = r.end; r.lane = k;
+    });
+    const N = laneEnds.length, GAP = 10, room = W - LW - 3 - 8;
+    const BW = Math.max(8, Math.min(34, Math.floor((room - (N - 1) * GAP) / N))), groupW = N * BW + (N - 1) * GAP;
+    const x0 = LW + 3 + Math.max(4, Math.round((W - LW - 3 - groupW) / 2));
+    list.forEach(r => {
+      const bt = r.end >= t1 ? -10 : y(r.end), bb = r.s < t0 ? H + 10 : y(r.s);
+      const bh = Math.max(5, bb - bt), bx = x0 + r.lane * (BW + GAP);
+      const look = TL.view === 'all'
+          ? (r.kind === 'audio' ? `background:#8c5229 ${tlTapeStraight()} repeat;background-size:4px 90px` : `background:#e7dfc9 ${tlPageLines()} repeat;background-size:4px 120px`)
+          : (r.kind === 'audio' ? `background:#8c5229 ${tlTapeWraps(BW - 4)} repeat-y;background-size:${BW - 4}px 90px` : `background:${r.page} ${tlPageLines()} repeat;background-size:4px 120px`);
+      const bar = el(`left:${bx}px;top:${bt.toFixed(1)}px;width:${BW}px;height:${bh.toFixed(1)}px;${look}`, 'tl-bar' + (r.e ? '' : ' now') + (TL.picked === r.key ? ' on' : ''));
+      bar.addEventListener('click', () => {
+        tlCanvas.querySelectorAll('.tl-bar.on').forEach(t => t.classList.remove('on'));
+        if(TL.picked === r.key){ TL.picked = ''; tlInfo.innerHTML = TL_HINT; return; }
+        bar.classList.add('on'); TL.picked = r.key;
+        const days = Math.round(((r.e || today) - r.s) / 864e5) + 1;
+        tlInfo.innerHTML = `<span class="t">${r.kind === 'audio' ? '○ ' : ''}${tlEsc(r.title)}${r.reread ? ' ↺' : ''}</span>` +
+          `<span>${tlFmt(r.s)} – ${r.e ? tlFmt(r.e) : '<b>now</b>'}<br><b>${days}</b> ${days === 1 ? 'day' : 'days'}${r.kind === 'audio' ? ' · audiobook' : ''}</span>`;
+      });
+    });
+  }
+  function tlDrawGraph(){
+    const today = tlDay(new Date()), { R, W, H, LW, y, el } = tlFrame(today), { t0, t1 } = R, all = TL.view === 'all';
+    R.lines.filter(l => l.strong).forEach(l => el(`left:0;right:0;top:${(y(l.at) - 1.5).toFixed(1)}px;height:3px;background:#000;z-index:2`));
+    R.marks.forEach(m => el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:2`, 'tl-lbl', m.text));
+    el(`left:${LW}px;top:0;height:${H}px;width:3px;background:#000;z-index:2`);
+    const x0 = LW + 3, half = (W - x0) / 2, xm = Math.round(x0 + half);
+    el(`left:${xm - 1}px;top:0;height:${H}px;width:3px;background:#000;z-index:2`);
+    const buckets = [];
+    if(TL.view === 'month') for(let d = new Date(t0); d < t1; d = tlAdd(d, 1)) buckets.push({ a: d, b: tlAdd(d, 1) });
+    else for(let d = new Date(t0); d < t1; d = new Date(d.getFullYear(), d.getMonth() + 1, 1)) buckets.push({ a: d, b: new Date(d.getFullYear(), d.getMonth() + 1, 1) });
+    buckets.forEach(k => { k.pages = 0; k.secs = 0; k.n = Math.round((Math.min(k.b, tlAdd(today, 1)) - k.a) / 864e5); });
+    const idx = new Map(buckets.map((k, j) => [TL.view === 'month' ? +k.a : k.a.getFullYear() * 12 + k.a.getMonth(), j]));
+    TL.reads.forEach(r => r.daily.forEach((v, j) => {
+      if(!v) return; const d = tlAdd(r.s, j);
+      const k = buckets[idx.get(TL.view === 'month' ? +d : d.getFullYear() * 12 + d.getMonth())]; if(k) k[r.kind === 'audio' ? 'secs' : 'pages'] += v;
+    }));
+    const cols = [
+      { key: 'pages', x: x0, max: Math.max(1, ...buckets.map(k => k.pages)), text: v => `${tlN(v)} pages`,
+        look: all ? '' : `background:#e7dfc9 ${tlFillLines('page')} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
+      { key: 'secs', x: xm + 2, max: Math.max(1, ...buckets.map(k => k.secs)), text: v => tlHM(v),
+        look: all ? '' : `background:#8c5229 ${tlFillLines('tape')} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
+    ];
+    const show = k => {
+      tlCanvas.querySelectorAll('.tl-gbar.on').forEach(t => t.classList.remove('on'));
+      if(TL.pickedK === String(+k.a)){ TL.pickedK = ''; tlInfo.innerHTML = TL_GHINT; return; }
+      tlCanvas.querySelectorAll(`.tl-gbar[data-k="${+k.a}"]`).forEach(t => t.classList.add('on')); TL.pickedK = String(+k.a);
+      const when = TL.view === 'month' ? tlFmt(k.a) : `${TL_MON[k.a.getMonth()]} ${k.a.getFullYear()}`, n = Math.max(1, k.n);
+      // pages on one line, time listened below it (just the one if only one happened); monthly views add the daily average
+      const perDay = v => TL.view === 'month' ? '' : ` · ${v} a day`, rows = [];
+      if(k.pages) rows.push(`<b>${tlN(k.pages)}</b> pages${perDay(`<b>${tlN(k.pages / n)}</b>`)}`);
+      if(k.secs) rows.push(`<b>${tlHM(k.secs)}</b>${perDay(`<b>${tlHM(k.secs / n)}</b>`)}`);
+      tlInfo.innerHTML = `<span class="t">${when}</span><span style="text-align:right">${rows.join('<br>')}</span>`;
+    };
+    buckets.forEach(k => {
+      const top = y(k.b), h = y(k.a) - top, pad = all ? Math.min(4.5, h * .3) : Math.min(3, h * .15), bh = Math.max(2, h - pad * 2);
+      if(!all) el(`left:${x0}px;right:0;top:${(top + h - .5).toFixed(1)}px;height:1px;background:#efeae0;z-index:1`);
+      if(k.a > today) return;
+      const size = bh >= 12 ? 9 : Math.max(6.5, bh * .7);
+      cols.forEach(c => {
+        const v = k[c.key]; if(!v) return;
+        const w = Math.max(4, v / c.max * (half - 84));
+        const bar = el(`left:${c.x}px;top:${(top + pad).toFixed(1)}px;width:${w.toFixed(1)}px;height:${bh.toFixed(1)}px;${c.look}`, 'tl-gbar' + (all ? ' plain' : '') + (TL.pickedK === String(+k.a) ? ' on' : ''));
+        bar.dataset.k = +k.a;
+        if(!all) el(`left:${(c.x + w + 3).toFixed(1)}px;top:${(top + h / 2).toFixed(1)}px;font-size:${size.toFixed(1)}px`, 'tl-gval', c.text(v));
+        bar.addEventListener('click', () => show(k));
+      });
+    });
+    if(all){
+      const years = new Map();
+      buckets.forEach(k => { const Y = k.a.getFullYear(), t = years.get(Y) || { pages: 0, secs: 0 }; t.pages += k.pages; t.secs += k.secs; years.set(Y, t); });
+      years.forEach((t, Y) => { const mid = y(new Date(Y, 6, 1));
+        cols.forEach((c, j) => el(`right:${j ? 4 : W - xm + 5}px;top:${mid.toFixed(1)}px;font-size:10px;background:#fff;padding:1px 3px;border-radius:3px`, 'tl-gval', c.text(t[c.key]))); });
+    }
+    if(today >= t0 && today < t1){
+      const ty = (y(tlAdd(today, 1)) - .5).toFixed(1);
+      el(`left:${x0}px;width:${xm - 1 - x0}px;top:${ty}px;height:1px;background:#b5342a;z-index:2`);
+      el(`left:${xm + 2}px;right:0;top:${ty}px;height:1px;background:#b5342a;z-index:2`);
+    }
+  }
+  function tlDraw(){
+    TL.reads = tlCollect();
+    TL.reads.forEach(r => r.key = r.title + '|' + (+r.s));
+    if(TL.mode === 'timeline') tlDrawTimeline(); else tlDrawGraph();
+  }
+  function openTimeline(){
+    TL.picked = ''; TL.pickedK = '';
+    tlInfo.innerHTML = TL.mode === 'timeline' ? TL_HINT : TL_GHINT;
+    document.getElementById('timeline-page').classList.add('open');
+    requestAnimationFrame(tlDraw);                        // drawn once the page has its size
+  }
+  document.querySelectorAll('#tl-ranges button').forEach(btn => btn.addEventListener('click', () => {
+    TL.view = btn.dataset.v; document.querySelectorAll('#tl-ranges button').forEach(x => x.classList.toggle('on', x === btn)); tlDraw();
+  }));
+  document.querySelectorAll('#tl-modes button').forEach(btn => btn.addEventListener('click', () => {
+    TL.mode = btn.dataset.m; document.querySelectorAll('#tl-modes button').forEach(x => x.classList.toggle('on', x === btn));
+    TL.picked = ''; TL.pickedK = ''; tlInfo.innerHTML = TL.mode === 'timeline' ? TL_HINT : TL_GHINT; tlDraw();
+  }));
+  window.addEventListener('resize', () => { if(document.getElementById('timeline-page').classList.contains('open')) tlDraw(); });
+
 
   function setStatus(label, value, isError){
     dtStatus.innerHTML = '';
@@ -7155,6 +7691,7 @@
     try{
       const data = JSON.parse(txt);
       list = Array.isArray(data) ? data : (data && Array.isArray(data.books) ? data.books : null);
+      if(list && data && data.version >= 2) list = list.map(b => unpackBook(b, data.version));   // packed backup: daily logs back to lists
     }catch(e){ setStatus('Import', 'Not valid JSON', true); return; }
     const valid = (list || []).filter(b => b && typeof b.title === 'string' && b.title.trim() && Number(b.pages) > 0);
     if(!valid.length){ setStatus('Import', 'No books found', true); return; }
@@ -7298,12 +7835,12 @@
 
   renderAll();
 </script>
-
 <script>
   // offline: once visited, the service worker keeps a copy of the app so it opens without a connection
   if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
   }
 </script>
+
 </body>
 </html>
