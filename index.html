@@ -6,7 +6,7 @@
 <title>Stack Tracker</title>
 <!-- installable, works offline: manifest + icons + service worker (sw.js) -->
 <link rel="manifest" href="app.webmanifest">
-<meta name="theme-color" content="#f4f1ea">
+<meta name="theme-color" content="#efeadf">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Stack Tracker">
@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
   :root{
-    --bg:#f4f1ea;
+    --bg:#efeadf;   /* the page: a lighter shade of the unpicked tabs' tan */
     --wood:#8a6a4f;
     --wood-dark:#6e5340;
     --ink:#2b2620;
@@ -200,6 +200,11 @@
   .ds-row{display:flex; justify-content:space-between; gap:8px; white-space:nowrap;}
   .ds-row > span{min-width:0; overflow:hidden; text-overflow:ellipsis;}
   .dd-stats b{color:var(--ink);}
+  /* in the book's cover cloth */
+  .dd-stats.cloth{position:relative; overflow:hidden; background:#000; color:var(--ds-muted);}
+  .dd-stats.cloth > canvas.cloth-bg{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
+  .dd-stats.cloth > .ds-row{position:relative;}
+  .dd-stats.cloth b{color:var(--ds-ink);}
   /* book: just − and + */
   .dd-pm{display:flex; height:45px; box-sizing:border-box; border:3px solid #000; border-radius:8px; overflow:hidden;}
   .dd-pm button{grid-column:auto; flex:1; margin:0; padding:0; border:none; border-radius:0; box-shadow:none;
@@ -1071,6 +1076,7 @@
   .tl-card{flex:1; position:relative; border:3px solid #000; border-radius:8px; background:#fff; overflow:hidden;}
   #tl-canvas{position:absolute; inset:0; overflow:hidden; -webkit-user-select:none; user-select:none;}
   #tl-canvas > div{position:absolute;}
+  #tl-canvas > .tl-pin{translate:var(--sx, 0px) 0;}   /* the date column stays put when the bars scroll sideways */
   .tl-lbl{font:800 8px Arial, sans-serif; letter-spacing:-.2px; color:var(--muted); text-transform:uppercase; text-align:center;}
   .tl-empty{font:.78rem Arial, sans-serif; color:var(--muted);}
   .tl-bar{border:2px solid #000; border-radius:4px; z-index:3; cursor:pointer; box-sizing:border-box;}
@@ -1146,7 +1152,7 @@
   }
   .dt-split button + button{border-left:3px solid #000;}
   .dt-split button:hover, .dt-split button:active{background:var(--bg); box-shadow:none;}
-  #dt-replace{color:#a33;}
+  #dt-replace:not(.cloth-btn){color:#a33;}
 
   .tabs{
     display:flex;
@@ -1234,12 +1240,31 @@
   /* My Library: Shelf | List on its own row, Sort & Filter full width below it */
   #shelf-controls, #timeline-controls, #data-controls{flex-direction:column; gap:4px;}
   #timeline-controls .tl-views{margin:0;}
-  #shelf-controls #sort-card .sort-k, #shelf-controls #sort-name{font-size:.78rem; letter-spacing:.5px; text-transform:uppercase;}
-  #shelf-controls #sort-card .sort-k::after{content:':';}
+  #shelf-controls #sort-card .sort-k, #shelf-controls #sort-card .sort-v{font-size:min(.78rem, 3.05vw); letter-spacing:.3px; text-transform:uppercase; white-space:nowrap;}
+  #shelf-controls #sort-card .sort-v{color:var(--ink); overflow:hidden; text-overflow:ellipsis;}
+  #shelf-controls #sort-card .sort-v + .sort-k{margin-left:2px;}
   #shelf-controls #sort-card{flex:none; height:21px; box-sizing:border-box; flex-direction:row; align-items:baseline; justify-content:center; gap:5px; line-height:15px;}   /* one line: label then the sort */
+  /* search: a section on the left of the card (the text keeps its centre across the whole card). Tapped, it
+     inverts, the card becomes a blank text field, and a brick X on the right closes it. The section fills are
+     painted by the card itself, right out under its border, so nothing pale shows at the corners */
+  #shelf-controls #sort-card{--l:var(--panel); --r:var(--panel); position:relative;
+    background:linear-gradient(to right, var(--l) 0 27px, var(--panel) 27px calc(100% - 27px), var(--r) calc(100% - 27px)) border-box;}
+  #sort-search, #sort-close{position:absolute; top:0; bottom:0; width:24px; display:flex; align-items:center; justify-content:center; background:none;}
+  #sort-search{left:0; border-right:3px solid #000;}
+  #sort-close{right:0; border-left:3px solid #000; display:none;}
+  #sort-search svg, #sort-close svg{width:12px; height:12px; display:block;}
+  #shelf-controls #sort-card:has(#sort-search:active){--l:var(--bg);}
+  #sort-q{position:absolute; left:24px; right:24px; top:0; bottom:0; width:auto; display:none; margin:0; padding:0 6px; border:0; outline:0; border-radius:0; background:transparent; -webkit-appearance:none; appearance:none;
+    font:700 min(.78rem, 3.05vw) Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink); text-align:left;}
+  #shelf-controls #sort-card.searching{--l:var(--ink); --r:#7a2f2b; cursor:text;}
+  #shelf-controls #sort-card.searching:has(#sort-close:active){--r:#5e2421;}
+  #sort-card.searching .sort-k, #sort-card.searching .sort-v{visibility:hidden;}
+  #sort-card.searching #sort-search svg{stroke:var(--panel);}
+  #sort-card.searching #sort-close{display:flex;}
+  #sort-card.searching #sort-q{display:block;}
   /* every tab, strip or card, reads in capitals */
   #tabs .tab, .tabs .tab, .tl-views button{text-transform:uppercase; font-weight:700;}
-  #shelf-controls #sort-card .sort-k, #shelf-controls #sort-name{font-weight:700;}
+  #shelf-controls #sort-card .sort-k, #shelf-controls #sort-card .sort-v{font-weight:700;}
   #tabs .tab{letter-spacing:0; font-size:min(.74rem, 2.95vw);}
   #tabs{background:#000;}   /* behind the tabs: where a tab's edge falls between pixels, the seam blends into the black line, not a pale sliver */
   #tabs .tab, .tabs .tab, .tl-views button{background-clip:padding-box;}   /* fill stops at the dividing line, no pale fringe under it */   /* equal quarters; on narrow phones the text eases down just enough for COLLECTIONS to fit */
@@ -1267,13 +1292,108 @@
       box-shadow:inset 0 2px 3px rgba(20,10,4,.75), inset 0 -1px 0 rgba(255,215,170,.18), 0 0 0 0 #4a2e18, 0 0 0 0 #3d2513, 0 1px 0 rgba(255,215,170,.28);}
     to{transform:none;}
   }
+  /* Add / Edit header: the same strip as the main tabs — 42px cells split by black lines.
+     Back and Add are plain cells of equal width at each end (no button cards); the title sits
+     in the middle cell, so it's centred on the whole window */
+  .customize-header{align-items:stretch; justify-content:flex-start; gap:0; padding:env(safe-area-inset-top) 0 0; background:#000; margin-bottom:0;}
+  #customize-page > #format-tabs{margin-top:4px;}   /* 4px under the header, like every card under a header */
+  .customize-header > *{flex:none;}
+  #customize-back-btn, #customize-save-btn{
+    flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
+    font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; background-clip:padding-box;
+  }
+  #customize-back-btn, #customize-back-btn:hover, #customize-back-btn:active{background:#7a2f2b; color:#fff; border-right:3px solid #000; box-shadow:none;}   /* Brick, the cover colour */
+  #customize-save-btn, #customize-save-btn:hover, #customize-save-btn:active{background:#2e4636; color:#fff; border-left:3px solid #000; box-shadow:none;}
+  .customize-header h2{flex:1 1 0; min-width:0; max-width:none; height:42px; line-height:42px; padding:0 6px; text-align:center; background:var(--bg); color:var(--ink);
+    font:700 min(.74rem, 2.95vw)/42px Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}   /* same type as the main tabs */
+  /* Sort and Filter: header like Add a Book's (Back cell on the left only, title centred on the window),
+     filters as separate cards in a top section, sort cards below; every word inside a card */
+  .sh-head{flex:none; display:flex; align-items:stretch; padding:env(safe-area-inset-top) 0 0; background:#000; border-top:3px solid #000; border-bottom:3px solid #000;}
+  .sh-head #sort-done, .sh-head #sort-done:hover, .sh-head #sort-done:active{flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-right:3px solid #000; border-radius:0; box-shadow:none;
+    background:#7a2f2b; background-clip:padding-box; color:#fff; font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+  .sh-head h2{flex:1 1 0; min-width:0; margin:0; height:42px; padding:0 25% 0 0; display:flex; align-items:center; justify-content:center; background:var(--bg);
+    font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink); white-space:nowrap;}
+  #sort-page .so-filter{height:auto; margin:0; padding:0 4px 4px; display:flex; flex-direction:column; gap:4px; border:0; border-bottom:3px solid #000; border-radius:0; overflow:visible; background:var(--bg);}
+  #sort-page .so-filter .so-opt{width:100%; height:45px; box-sizing:border-box; margin:0; padding:0 8px; border:3px solid #000; border-radius:8px; background:var(--panel);
+    display:flex; flex-direction:column; justify-content:center; align-items:flex-start; text-align:left; text-transform:none; letter-spacing:0; line-height:1.15; box-shadow:none; font-weight:400;}
+  #sort-page .so-filter .so-opt + .so-opt{border-left:3px solid #000;}
+  #sort-page .so-filter .so-opt:hover{background:var(--panel); box-shadow:none;}
+  #sort-page .so-filter .so-opt.on, #sort-page .so-filter .so-opt.on:hover{background:var(--ink);}
+  #sort-page .so-filter .so-opt.on b{color:#fff;} #sort-page .so-filter .so-opt.on span{color:#cfc8ba;}
+  #sort-page .so-list{padding-top:0;}
+  /* every card on this page: capitals, one height */
+  #sort-page .so-opt{height:45px; box-sizing:border-box; flex:none;}
+  #sort-page .so-opt b{font:700 .78rem/1.15 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  #sort-page .so-opt span{font:400 .58rem/1.2 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
+  #sort-page .list-divider{height:45px;}
   /* every header and footer bar is boxed: 3px black at its top and its bottom */
   #app-header, #book-toolbar, .lg-head, .customize-header{border-top:3px solid #000;}
   #app-footer, #page-panel, .tl-foot{border-bottom:3px solid #000;}
+  /* the page never widens past the window, so the frozen header and footer always keep their size */
+  html, body{overflow-x:clip; max-width:100%;}
+  /* Reading Log, Collections, Authors, Timeline and Data headers: the same strip as Add a Book —
+     a brick cell on the left, the title in capitals centred on the window, an optional green cell on the right */
+  .lg-head{display:flex; align-items:stretch; gap:0; padding:env(safe-area-inset-top) 0 0; background:#000; border-bottom:3px solid #000;}
+  .lg-head > *{flex:none;}
+  .lg-head h2{flex:1 1 0; min-width:0; height:42px; margin:0; padding:0 6px; display:flex; align-items:center; justify-content:center; background:var(--bg);
+    font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink); white-space:nowrap;}
+  .lg-head > span{display:none;}
+  .lg-head > h2:has(+ span){padding-right:25%;}   /* no right cell: the title still centres on the window */
+  .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done), .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done):hover, .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done):active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
+    background:#7a2f2b; background-clip:padding-box; color:#fff; border-right:3px solid #000;
+    font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+  .lg-head > h2 + #log-add, .lg-head > h2 + #log-add:hover, .lg-head > h2 + #log-add:active{background:#2e4636; border-right:0; border-left:3px solid #000;}   /* + Add Day: forest, like Add */
+  /* every button card reads in capitals, at the main window's size and weight */
+  #book-actions button, .dd-acts button, .rr-btns button, .dt-split button, #play-update, .dd-confirm, #tag-new-add, #author-new-add{
+    text-transform:uppercase; font-family:Arial, sans-serif; font-weight:700; letter-spacing:.3px;}
+  #book-actions button, .dd-acts button, .rr-btns button, .dt-split button{font-size:min(.74rem, 2.95vw);}
+  /* header strip: unpicked tabs and the title cells a shade darker than the page */
+  :root{--hdr-cell:#d9d0be;}
+  #tabs, #tabs .tab:not(.active), .customize-header h2, .sh-head h2, .lg-head h2{background:var(--hdr-cell);}
+  /* tab cards (Shelf | List, Book | Audiobook, the Timeline and Data choices): the unpicked side in the same shade */
+  .tabs .tab:not(.active), .tl-views button:not(.on), .tl-views button:not(.on):hover{background:var(--hdr-cell);}
+  #tabs .tab:not(.active), .tabs .tab:not(.active), .tl-views button:not(.on), .tl-views button:not(.on):hover{color:var(--ink);}   /* unpicked text: the picked side's dark */
+  /* every tab — the main strip and every tab card — one size and weight: the main strip's */
+  #tabs .tab, .tabs .tab, #view-tabs .tab, #format-tabs .tab, .dt-tabs .tab, .tl-views button{
+    font-family:Arial, sans-serif; font-size:min(.74rem, 2.95vw); font-weight:700; letter-spacing:0;}
+  /* filter / sort card: the tabs' size and weight */
+  #shelf-controls #sort-card .sort-k, #shelf-controls #sort-card .sort-v, #sort-q{font-size:min(.74rem, 2.95vw); font-weight:700; letter-spacing:0;}
+  /* Add Book: olive, white capitals, bold and a size up */
+  #add-card, #add-card:hover, #add-card:active{background:#5b6633; color:#fff;
+    font:700 min(.92rem, 3.7vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  #add-card .plus{color:#fff; font-size:1.15em; font-weight:700;}
+  /* Add Book in pearlescent bookcloth: the olive weave is drawn on a canvas behind the words */
+  #add-card{position:relative; overflow:hidden;}
+  #add-card > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
+  #add-card > span{position:relative; text-shadow:none;}
+  /* the label in the covers' own serif, bold, in spaced capitals like a title stamped on a spine */
+  #add-card .add-lbl{font:700 min(1rem, 4vw)/1 Georgia, 'Times New Roman', serif; letter-spacing:.14em; text-transform:uppercase;}
+  #add-card:active > canvas{filter:brightness(.92);}
+  /* Data › Export: Copy (navy) and Download (plum) as two separate bookcloth cards side by side */
+  .dt-pair{display:flex; gap:4px;}
+  .cloth-btn, .cloth-btn:hover, .cloth-btn:active{position:relative; overflow:hidden; flex:1 1 0; min-width:0; height:45px; margin:0; padding:0; box-sizing:border-box;
+    border:3px solid #000; border-radius:8px; background:#000; box-shadow:none; color:#fff; cursor:pointer;
+    font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  .cloth-btn > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
+  .cloth-btn > .lbl{position:relative; text-shadow:none;}
+  .cloth-btn > .lbl{font:700 min(1rem, 4vw)/1 Georgia, 'Times New Roman', serif; letter-spacing:.14em; text-transform:uppercase;}   /* same as Add New Book */
+  .dt-pair:has(> :nth-child(3)) > .cloth-btn > .lbl{font-size:min(.86rem, 3vw); letter-spacing:.08em; white-space:nowrap;}   /* three across: a touch smaller to fit */
+  .cloth-btn:active > canvas{filter:brightness(.92);}
+  /* the tab-card rows under the main strip, and the footer bars: walnut */
+  #app-header, #app-footer, .tl-foot, .dt-foot, #book-toolbar, #page-panel{background:#6b4a32;}
+  /* main tabs: the picked one stays dark with a little book-cloth card round its word (its own colour,
+     spine bands at the ends); same font and size, only the text turns white. No fade: it swaps at once */
+  #tabs .tab{position:relative; transition:none;}
+  #tabs .tab > .bk{position:absolute; inset:4px; border:2.5px solid #000; border-radius:6px; overflow:hidden; display:none; pointer-events:none;}
+  #tabs .tab > .bk canvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  #tabs .tab.active > .bk{display:block;}
+  #tabs .tab > span{position:relative;}
+  /* list dropdowns: the unpicked tabs' tan */
+  .book-dd, .book-row.tape-simple + .tape-dd{background:var(--hdr-cell);}   /* the open book's bars too */
 </style>
 <style>
   /* ---------- splash: STACK drops onto the top shelf, TRACKER slides in one book at a time ---------- */
-  #splash{position:fixed; inset:0; z-index:100000; background:#f4f1ea; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  #splash{position:fixed; inset:0; z-index:100000; background:#efeadf; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
     transition:opacity .35s ease; overflow:hidden;}
   #splash.gone{opacity:0; pointer-events:none;}
   #splash .sp-shelf{position:relative; width:250px; height:82px;}
@@ -1347,10 +1467,10 @@
 <div id="app-header">
  <!-- pages: the top of the header itself, split in three; Data opens its own window -->
  <div id="tabs">
-   <div class="tab active" data-view="all">Library</div>
-   <div class="tab" data-view="library">Collections</div>
-   <div class="tab" data-view="timeline">Timeline</div>
-   <div class="tab" data-view="data">Data</div>
+   <div class="tab active" data-view="all" data-cloth="#7a2f2b"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Library</span></div>
+   <div class="tab" data-view="library" data-cloth="#2b5752"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Stacks</span></div>
+   <div class="tab" data-view="timeline" data-cloth="#303d66"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Timeline</span></div>
+   <div class="tab" data-view="data" data-cloth="#8a6a3f"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Data</span></div>
  </div>
  <!-- row 2 (My Library only): shelf/list view and sort -->
  <div class="hdr-row" id="shelf-controls">
@@ -1358,7 +1478,7 @@
     <div class="tab active" data-mode="shelf">Shelf</div>
     <div class="tab" data-mode="list">List</div>
   </div>
-  <div id="sort-card" class="shelf-ctl"><span class="sort-k" id="sort-k">Sort and Filter</span><span id="sort-name">Date added</span></div>
+  <div id="sort-card" class="shelf-ctl"><span id="sort-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="sort-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="sort-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="filter-name">All books</span><span class="sort-k">• Sort by:</span><span class="sort-v" id="sort-name">Date added</span></div>
  </div>
  <!-- Timeline: what to chart, and over what span -->
  <div class="hdr-row hidden" id="timeline-controls">
@@ -1375,8 +1495,8 @@
 <div id="app-footer">
  <div class="hdr-row">
   <div id="add-card">
-    <span class="plus">+</span>
-    <span>Add Book</span>
+    <canvas aria-hidden="true"></canvas>
+    <span class="add-lbl">Add New Book</span>
   </div>
  </div>
 </div>
@@ -1397,7 +1517,7 @@
 
 <div id="customize-page">
   <div class="customize-header">
-    <button id="customize-back-btn">Back</button>
+    <button id="customize-back-btn">Cancel</button>
     <h2 id="customize-page-title">Customize</h2>
     <button type="button" id="customize-save-btn">Save</button>
   </div>
@@ -1481,9 +1601,9 @@
   <div id="play-row" class="hidden">
   <!-- the percent slider with − / + first, then time played (3/8) | Update (1/4) | time left (3/8) -->
   <div id="play-pct">
-    <button type="button" class="pp-btn" data-d="-1" aria-label="Back one percent">−</button>
+    <button type="button" class="pp-btn" data-d="-1" aria-label="Back one minute">−</button>
     <div id="play-pct-bar"><canvas id="play-pct-fill"></canvas><span id="play-pct-text" data-v="0%"></span></div>
-    <button type="button" class="pp-btn" data-d="1" aria-label="Forward one percent">+</button>
+    <button type="button" class="pp-btn" data-d="1" aria-label="Forward one minute">+</button>
   </div>
   <div id="play-line">
   <div id="play-wheels" class="play-set" aria-label="Time played">
@@ -1551,18 +1671,17 @@
 
 <!-- sort chooser -->
 <div id="sort-page">
-  <div class="lg-head">
-    <button type="button" id="sort-done">Done</button>
-    <h2>Sort &amp; Filter</h2>
-    <span></span>
-  </div>
-  <div class="so-head">Show</div>
+  <!-- header: the main-strip style; Back on the left, the title centred on the whole window -->
+  <div class="sh-head"><button type="button" id="sort-done">Back</button><h2>Sort and Filter</h2></div>
+  <!-- top section: one card per filter -->
   <div class="so-filter" id="filter-row">
-    <button type="button" data-f="all">All books</button>
-    <button type="button" data-f="read">Read</button>
-    <button type="button" data-f="unread">Unread</button>
+    <div class="list-divider"><span class="ld-name">Filter</span></div>
+    <button type="button" class="so-opt" data-f="all"><b>All books</b><span>Every book in your library</span></button>
+    <button type="button" class="so-opt" data-f="read"><b>Read</b><span>Finished books only</span></button>
+    <button type="button" class="so-opt" data-f="started"><b>Started</b><span>In progress, not finished yet</span></button>
+    <button type="button" class="so-opt" data-f="unread"><b>Unread</b><span>Not started yet</span></button>
   </div>
-  <div class="so-head">Sort by</div>
+  <!-- bottom section: the sort cards -->
   <div class="so-list" id="sort-list"></div>
 </div>
 
@@ -1588,18 +1707,18 @@
   </div>
   <div class="dt-view active" id="dt-view-export">
     <textarea class="dt-text" id="dt-export-text" readonly spellcheck="false"></textarea>
-    <div class="dt-foot"><div class="dt-split">
-      <button type="button" id="dt-copy">Copy</button>
-      <button type="button" id="dt-download">Download</button>
+    <div class="dt-foot"><div class="dt-pair">
+      <button type="button" id="dt-copy" class="cloth-btn" data-cloth="#234a5e"><canvas aria-hidden="true"></canvas><span class="lbl">Copy</span></button>
+      <button type="button" id="dt-download" class="cloth-btn" data-cloth="#3a2f52"><canvas aria-hidden="true"></canvas><span class="lbl">Download</span></button>
     </div></div>
   </div>
   <div class="dt-view" id="dt-view-import">
     <textarea class="dt-text" id="dt-import-text" spellcheck="false" placeholder="Paste exported JSON here, or load a file below"></textarea>
     <div class="dt-card" id="dt-status">Import<b>Waiting for JSON</b></div>
-    <div class="dt-foot"><div class="dt-split">
-      <button type="button" id="dt-load">Load File</button>
-      <button type="button" id="dt-merge">Merge</button>
-      <button type="button" id="dt-replace">Replace</button>
+    <div class="dt-foot"><div class="dt-pair">
+      <button type="button" id="dt-load" class="cloth-btn" data-cloth="#2b5752"><canvas aria-hidden="true"></canvas><span class="lbl">Load File</span></button>
+      <button type="button" id="dt-merge" class="cloth-btn" data-cloth="#86452b"><canvas aria-hidden="true"></canvas><span class="lbl">Merge</span></button>
+      <button type="button" id="dt-replace" class="cloth-btn" data-cloth="#7a2f2b"><canvas aria-hidden="true"></canvas><span class="lbl">Replace</span></button>
     </div></div>
     <input type="file" id="dt-file" accept=".json,application/json,text/plain" hidden>
   </div>
@@ -1613,7 +1732,7 @@
       <button type="button" data-every="never">Never</button>
     </div>
     <div class="dt-note">Backing up saves a file of your whole library (share sheet or download). Copy on the Export tab counts too.</div>
-    <div class="dt-foot"><div class="dt-split"><button type="button" id="bk-now">Back Up Now</button></div></div>
+    <div class="dt-foot"><div class="dt-pair"><button type="button" id="bk-now" class="cloth-btn" data-cloth="#8a6a3f"><canvas aria-hidden="true"></canvas><span class="lbl">Back Up Now</span></button></div></div>
   </div>
 </div>
 
@@ -1847,9 +1966,14 @@
   function daysApart(fromKey, toKey){ return Math.round((keyDate(toKey) - keyDate(fromKey)) / 86400000); }
   const sumDays = arr => arr.reduce((s,v)=>s+v, 0);
   const bookRead = b => sumDays(b.days);
-  const bookFinished = b => b.pages > 0 && bookRead(b) >= b.pages;
+  // finished: within a hair of the end counts (an audiobook logged to the second, or a backup's rounding,
+  // can leave 99.9999%); syncBookFinish then snaps the log to exactly 100%
+  const FINISH_EPS = 0.01;
+  const bookFinished = b => b.pages > 0 && bookRead(b) >= b.pages - FINISH_EPS;
   // date the newest log entry stands for: the finish day once finished
   // (lastDayKey keeps following the calendar), otherwise lastDayKey
+  // pages as a daily figure: whole pages, or 0.xx when under one a day
+  const fmtPg = v => v > 0 && v < 1 ? v.toFixed(2) : Math.round(v).toLocaleString('en-US');
   const lastLogKey = b => (bookFinished(b) && b.finishedOn) ? b.finishedOn : (b.lastDayKey || localTodayKey());
 
   function normalizeBook(b){
@@ -1880,6 +2004,8 @@
     if(!/^\d{8}$/.test(b.seed || '')){ b.seed = String(Math.floor(Math.random() * 1e8)).padStart(8, '0'); normalizeBook.dirty = true; }
     if(!b.lastDayKey) b.lastDayKey = localTodayKey();
     if(!Array.isArray(b.reads)) b.reads = [];
+    // a finished book with no finish date (older data, an import): it finished on its last logged day, not today
+    if(bookFinished(b) && !b.finishedOn) b.finishedOn = b.lastDayKey;
     // calendar rollover
     const gap = daysApart(b.lastDayKey, localTodayKey());
     if(gap > 0 && bookRead(b) > 0 && !bookFinished(b)){
@@ -1892,6 +2018,11 @@
   // finish date is stamped the moment the log first reaches 100%, and
   // cleared if an edit takes it back under
   function syncBookFinish(b){
+    if(bookFinished(b)){
+      // the finished tag: the log totals exactly the book, never 99.99…%
+      const diff = b.pages - bookRead(b);
+      if(diff !== 0){ let i = b.days.length - 1; while(i > 0 && !(b.days[i] > 0)) i--; b.days[i] = Math.max(0, b.days[i] + diff); }
+    }
     if(bookFinished(b) && !b.finishedOn) b.finishedOn = localTodayKey();
     if(!bookFinished(b)) b.finishedOn = null;
     b.currentPage = Math.min(bookRead(b), b.pages);
@@ -1966,7 +2097,7 @@
   const POCKET_CS = 0.37, TAPE_CS = 0.31;                       // pocket sized for a tape at 0.37; the tape is 0.31
   const POCKET_SINK = 0.48*POCKET_CS + 0.03;                    // pocket depth from the cover's face
   function totalDepth(b){
-    const d = pagesDepth(b.pages) + 2*coverThickness(b);
+    const d = pagesDepth(b.pages) + 2*coverThickness(b) + (b.cover === 'soft' ? 0 : 0.004);   // hardcover: boards a hair clear of the pages
     return b.format === 'both' ? Math.max(d, POCKET_SINK + coverThickness(b) + 0.06) : d;
   }
   // shelf spine width: same px-per-unit as the page-based width, so the
@@ -2049,6 +2180,7 @@
       tooltip.style.opacity = 0;
     });
     spine.addEventListener('pointerdown', ()=>{ if(spine._live) prepLiveBook(spine._live, b); });
+    spine._book = b;
     spine.addEventListener('click', ()=>{
       tooltip.style.opacity = 0;
       openBook(b, spine);
@@ -2068,20 +2200,39 @@
     countEl.textContent = books.length ? `${plural(books.length, 'book')} in total` : '';
     if(!books.length) return;
 
-    const ordered = sortedBooks();
-    if(currentFilter().id !== 'all') countEl.textContent = `${ordered.length} of ${plural(books.length, 'book')}`;
+    const search = searchQ.trim() ? searchResults() : null;
+    const ordered = search ? search.items : sortedBooks();
+    if(search) countEl.textContent = `${ordered.length} ${ordered.length === 1 ? 'match' : 'matches'}`;
+    else if(currentFilter().id !== 'all') countEl.textContent = `${ordered.length} of ${plural(books.length, 'book')}`;
     if(!ordered.length){
-      const msg = `<div class="so-empty">No ${currentFilter().name.toLowerCase()} books.</div>`;
+      const msg = search ? `<div class="so-empty">No titles or authors match “${searchQ.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;')}”.</div>`
+                         : `<div class="so-empty">No ${currentFilter().name.toLowerCase()} books.</div>`;
       shelvesContainer.innerHTML = msg; listContainer.innerHTML = msg;
       return;
     }
-    renderList(ordered);
-    // Status sort: each status gets its own divider and starts on a fresh shelf
-    const shelfGroup = prefs.sort === 'status' ? currentSort().group : null;
+    renderList(ordered, listContainer, search ? search.groups : null);
+    // Status sort (or a search): each group gets its own divider and starts on a fresh shelf
+    const shelfGroup = search ? (b, i) => search.groups[i] : prefs.sort === 'status' ? currentSort().group : null;
     const case3d = shelf3dOK();
     shelvesContainer.classList.toggle('live3d', case3d);
     resetCaseKeys();              // rebuild the 3D boards on the next paint
     const full = estimateShelfWidth() - (case3d ? 4 : 0);   // room inside 6px at each end
+    // split into shelves: avail(i) is the room on shelf i; a spine too thick for the rest of a shelf starts the next
+    function packRows(list, avail){
+      const rows = []; let cur = null, used = 0;
+      list.forEach(b=>{
+        const w = spineWidthFor(b) + (b.format === 'audio' ? TAPE_GAP : 0);
+        if(!cur || used + w > avail(rows.length - 1)){ cur = []; rows.push(cur); used = 0; }
+        cur.push(b); used += w;
+      });
+      return rows;
+    }
+    function makeShelf(parent, list){
+      const shelfDiv = document.createElement('div');
+      shelfDiv.className = 'shelf';
+      parent.appendChild(shelfDiv);
+      list.forEach(b => shelfDiv.appendChild(createSpineWrap(b)));
+    }
     // fill one column with shelves of spines, wrapping when a shelf is full
     function fillShelves(parent, list, avail){
       let shelfDiv = null, used = 0;
@@ -2102,8 +2253,8 @@
     // divider; under it, books and audiobooks side by side only when it holds both —
     // otherwise one full-width shelf
     const sections = [];
-    ordered.forEach(b=>{
-      const g = shelfGroup ? shelfGroup(b) : null;
+    ordered.forEach((b, i)=>{
+      const g = shelfGroup ? shelfGroup(b, i) : null;
       if(!sections.length || sections[sections.length - 1].name !== g) sections.push({name: g, items: []});
       sections[sections.length - 1].items.push(b);
     });
@@ -2117,14 +2268,26 @@
       }
       const tapes = sec.items.filter(b => b.format === 'audio'), paper = sec.items.filter(b => b.format !== 'audio');
       if(tapes.length && paper.length){
-        // two shelves side by side with a gap: books (two thirds) and tapes (one third)
-        const cols = document.createElement('div'); cols.className = 'shelf-cols';
-        const left = document.createElement('div'); left.className = 'shelf-col col-books';
-        const right = document.createElement('div'); right.className = 'shelf-col col-tapes';
-        cols.append(left, right); shelvesContainer.appendChild(cols);
         const inner = full - SHELF_COL_GAP - 12;   // two shelves, 6px in at each of their ends
-        fillShelves(left, paper, inner*2/3);
-        fillShelves(right, tapes, inner/3);
+        const tapeRows = packRows(tapes, ()=> inner/3);
+        if(tapeRows.length <= 2){
+          // one or two tape shelves: each sits beside a two-thirds book shelf; the books
+          // carry on full width once the tapes run out
+          const bookRows = packRows(paper, i => i < tapeRows.length ? inner*2/3 : full);
+          tapeRows.forEach((tr, i)=>{
+            const cols = document.createElement('div'); cols.className = 'shelf-cols';
+            const left = document.createElement('div'); left.className = 'shelf-col col-books';
+            const right = document.createElement('div'); right.className = 'shelf-col col-tapes';
+            cols.append(left, right); shelvesContainer.appendChild(cols);
+            if(bookRows[i]) makeShelf(left, bookRows[i]);
+            makeShelf(right, tr);
+          });
+          bookRows.slice(tapeRows.length).forEach(r => makeShelf(shelvesContainer, r));
+        } else {
+          // three or more: the books get full-width shelves, then the tapes have full-width shelves of their own
+          fillShelves(shelvesContainer, paper, full);
+          fillShelves(shelvesContainer, tapes, full);
+        }
       } else {
         fillShelves(shelvesContainer, sec.items, full);
       }
@@ -2293,10 +2456,37 @@
   // filters: which books show (shelves, list and collections)
   const FILTERS = [
     { id:'all',    name:'All books', short:'All',    fn: ()=> true },
-    { id:'read',   name:'Read',      short:'Read',   fn: b => bookFinished(b) },
-    { id:'unread', name:'Unread',    short:'Unread', fn: b => !bookFinished(b) }    // not finished yet, including in progress
+    { id:'read',    name:'Read',      short:'Read',    fn: b => bookFinished(b) },
+    { id:'started', name:'Started',   short:'Started', fn: b => !bookFinished(b) && bookRead(b) > 0 },   // in progress
+    { id:'unread',  name:'Unread',    short:'Unread',  fn: b => !bookFinished(b) && !(bookRead(b) > 0) } // not begun
   ];
   function currentFilter(){ return FILTERS.find(f => f.id === prefs.filter) || FILTERS[0]; }
+  // search (the filter card's search field): every book whose title matches, then every book by each
+  // author whose name matches. Searches the whole library; each part gets its own divider
+  let searchQ = '';
+  function searchResults(){
+    const q = searchQ.trim().toLowerCase().replace(/\s+/g, ' ');
+    const byTitle = SORTS.find(x => x.id === 'title'), byAuthor = SORTS.find(x => x.id === 'author');
+    // matches only start at the beginning of a word ("ken" finds Ken Follett, not Frankenstein or Dickens),
+    // titles only (not subtitles), and a search starting with a small word — the, a, an, of, on, to and the
+    // like — only matches titles that start with that word, never ones where it sits in the middle
+    const SMALL = new Set(['the','a','an','of','on','to','in','at','by','for','from','with','into','onto','upon','as','and','or','but','nor','so','yet','up','off','out','over']);
+    const first = q.split(' ')[0], art = SMALL.has(first);
+    const norm = t => (t || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    const wordHit = (t, firstOnly) => {
+      for(let i = t.indexOf(q); i >= 0; i = t.indexOf(q, i + 1)){
+        if(i > 0 && (firstOnly || !/[\s\-–—:;,.!?()\[\]"“”/]/.test(t[i-1]))) continue;
+        if(SMALL.has(q) && i + q.length < t.length && /[a-z0-9]/.test(t[i + q.length])) continue;   // "a" alone: the word A, not "Anathem"
+        return true;
+      }
+      return false;
+    };
+    const titles = books.filter(b => wordHit(norm(b.title), art)).sort(byTitle.fn);
+    const authors = books.filter(b => wordHit(norm(b.author), false)).sort(byAuthor.fn);   // all of each matching author's books
+    const items = titles.concat(authors);
+    const groups = titles.map(() => 'Title').concat(authors.map(b => 'Author · ' + byAuthor.group(b)));
+    return { items, groups };
+  }
   function sortedBooks(){
     const s = currentSort(), f = currentFilter();
     const list = books.filter(f.fn);
@@ -2897,8 +3087,24 @@
   const DD_STATS = '<div class="dd-stats"><div class="ds-row"><span><b class="ds-days">0</b> <span class="ds-word">days</span> <span class="ds-verb">read</span></span><span class="ds-span"></span></div>' +
     '<div class="ds-row ds-pace"><span class="ds-avg"></span><span class="ds-streak"></span><span class="ds-best"></span></div></div>';
   const DS_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // a card dressed in the book's own cover: its colour in the cover cloth (no end bands), text in white
+  // (or ink on a pale cover) so it stays readable; drawn whenever the card has a size
+  function clothBehind(card, hex){
+    let cv = card.querySelector(':scope > canvas.cloth-bg');
+    if(!cv){ cv = document.createElement('canvas'); cv.className = 'cloth-bg'; cv.setAttribute('aria-hidden', 'true'); card.prepend(cv); }
+    const ink = readableTextOn(hex);
+    card.classList.add('cloth');
+    card.style.setProperty('--ds-ink', ink);
+    card.style.setProperty('--ds-muted', ink === '#fff' ? 'rgba(255,255,255,.78)' : 'rgba(43,38,32,.7)');
+    const go = () => { if(window.CLOTH && cv.dataset.hex) window.CLOTH.draw(cv, window.CLOTH.rgb(cv.dataset.hex), false); };
+    const changed = cv.dataset.hex !== hex;
+    cv.dataset.hex = hex;
+    if(!cv._ro && window.ResizeObserver){ cv._ro = new ResizeObserver(() => requestAnimationFrame(go)); cv._ro.observe(cv); }
+    if(changed) requestAnimationFrame(go);
+  }
   function paintDDStats(dd, b){
     const el = dd.querySelector('.dd-stats'); if(!el) return;
+    clothBehind(el, bookColor(b));
     const read = bookRead(b) ? b.days.length : 0;   // every day of the span, including days with nothing logged
     el.querySelector('.ds-days').textContent = read;
     el.querySelector('.ds-word').textContent = read === 1 ? 'day' : 'days';
@@ -2906,7 +3112,7 @@
     const span = el.querySelector('.ds-span');
     // average a day over the whole span, longest run of days with reading, biggest day
     const audio = b.format === 'audio' && b.audioSeconds > 0 && b.pages > 0, spp = audio ? b.audioSeconds / b.pages : 1;
-    const amt = v => audio ? fmtDur(v * spp) : String(Math.round(v));
+    const amt = v => audio ? fmtDur(v * spp) : fmtPg(v);
     const unit = audio ? '' : ' pages';
     const n = b.days.length, done = Math.min(bookRead(b), b.pages), best = Math.max(0, ...b.days), streak = longestStreak(b.days);
     el.querySelector('.ds-avg').innerHTML = `<b>${done ? amt(done / n) : 0}</b>${unit}/day`;
@@ -3092,7 +3298,7 @@
     viewTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === prefs.view));
     document.getElementById('sort-name').textContent = currentSort().name;
     const flt = currentFilter();
-    document.getElementById('sort-k').textContent = flt.id === 'all' ? 'Sort and Filter' : flt.name + ' only';
+    document.getElementById('filter-name').textContent = flt.name;
   }
   viewTabs.forEach(t => t.addEventListener('click', ()=>{
     prefs.view = t.dataset.mode; savePrefs(); applyView();
@@ -3102,21 +3308,42 @@
   const sortList = document.getElementById('sort-list');
   function renderSortOptions(){
     document.querySelectorAll('#filter-row button').forEach(b => b.classList.toggle('on', b.dataset.f === currentFilter().id));
-    sortList.innerHTML = '';
+    sortList.innerHTML = '<div class="list-divider"><span class="ld-name">Sort</span></div>';
     SORTS.forEach(s=>{
       const o = document.createElement('div');
       o.className = 'so-opt' + (s.id === prefs.sort ? ' on' : '');
       o.innerHTML = `<b>${s.name}</b><span>${s.desc}</span>`;
       o.addEventListener('click', ()=>{
         prefs.sort = s.id; savePrefs(); applyView(); render(); renderCollections();
-        renderSortOptions();
-        setTimeout(()=> sortPage.classList.remove('open'), 180);
+        renderSortOptions();   // stays open: Back returns to the shelves
       });
       sortList.appendChild(o);
     });
   }
 
-  document.getElementById('sort-card').addEventListener('click', ()=>{ renderSortOptions(); sortPage.classList.add('open'); });
+  const sortCardEl = document.getElementById('sort-card'), sortQ = document.getElementById('sort-q');
+  sortCardEl.addEventListener('click', ()=>{
+    if(sortCardEl.classList.contains('searching')){ sortQ.focus(); return; }
+    renderSortOptions(); sortPage.classList.add('open');
+  });
+  // search: open the field; results follow what you type (a short pause, so the shelves aren't rebuilt every key)
+  let searchTimer = 0;
+  document.getElementById('sort-search').addEventListener('click', e=>{
+    e.stopPropagation();
+    sortCardEl.classList.add('searching'); sortQ.focus();
+    window.scrollTo(0, 0);
+  });
+  sortQ.addEventListener('input', ()=>{
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(()=>{ if(searchQ !== sortQ.value){ searchQ = sortQ.value; render(); window.scrollTo(0, 0); } }, 220);   // results always start from the top
+  });
+  sortQ.addEventListener('keydown', e=>{ if(e.key === 'Enter') sortQ.blur(); });
+  document.getElementById('sort-close').addEventListener('click', e=>{
+    e.stopPropagation();
+    clearTimeout(searchTimer);
+    sortCardEl.classList.remove('searching'); sortQ.value = ''; sortQ.blur();
+    if(searchQ){ searchQ = ''; render(); window.scrollTo(0, 0); }
+  });
   document.getElementById('sort-done').addEventListener('click', ()=> sortPage.classList.remove('open'));
   // picking a filter applies it straight away; the page stays open so a sort can be picked too
   document.querySelectorAll('#filter-row button').forEach(b => b.addEventListener('click', ()=>{
@@ -3498,7 +3725,7 @@
     } else if(bookFinished(book)){
       const end = keyDate(book.finishedOn);
       const start = new Date(end); start.setDate(start.getDate() - (n-1));
-      const avg = Math.round(book.pages / n);
+      const avg = fmtPg(book.pages / n);
       el.innerHTML =
         `<div>${fmtShortDate(start)} – ${fmtShortDate(end)}: ${plural(n, 'day')} to read</div>` +
         `<div class="rd-stats">` +
@@ -3928,8 +4155,8 @@
     c.width = 512; c.height = 680;
     const ctx = c.getContext('2d');
     const g = ctx.createLinearGradient(0,0,c.width,0);
-    g.addColorStop(0, shade(color,-18));
-    g.addColorStop(.08, color);
+    g.addColorStop(0, shade(color, isHard ? -6 : -18));   // hardcover: barely darkens at the hinge edge
+    g.addColorStop(isHard ? .02 : .08, color);
     g.addColorStop(.92, color);
     g.addColorStop(1, shade(color,-25));
     ctx.fillStyle = g;
@@ -3939,14 +4166,8 @@
       ctx.fillStyle = Math.random()<.5 ? 'rgba(255,255,255,.025)' : 'rgba(0,0,0,.03)';
       ctx.fillRect(Math.random()*c.width, Math.random()*c.height, 2, 2);
     }
-    // hardcover: faint shading inside the real hinge groove; design centers on the board
-    const groovePx = Math.round(0.15/2.35*c.width);
-    let boardL = 0;
-    if(isHard){
-      ctx.fillStyle = 'rgba(0,0,0,.08)';
-      ctx.fillRect((isFront ? groovePx : c.width-groovePx) - 8, 0, 16, c.height);
-      boardL = groovePx + 22;
-    }
+    // design centred across the whole board (hardcover too: the real groove's own shading is the crease)
+    const boardL = 0;
     const tex = new THREE.CanvasTexture(c);
     tex.anisotropy = 4;
 
@@ -3957,11 +4178,6 @@
       img.crossOrigin = 'anonymous';
       img.onload = () => {
         drawImageCover(ctx, img, boardL, 0, c.width - boardL, c.height);
-        // faint hinge shadow redrawn on top so the crease still reads through the image
-        if(isHard){
-          ctx.fillStyle = 'rgba(0,0,0,.14)';
-          ctx.fillRect(groovePx - 8, 0, 16, c.height);
-        }
         tex.needsUpdate = true;
         if(onReady) onReady();
       };
@@ -3991,19 +4207,21 @@
   function pocketLayout(book){
     const W = 2.35, H = 3, CW = 512, CH = 680;
     const isHard = book.cover !== 'soft';
-    const Rc = isHard ? Math.min(0.16, totalDepth(book)*0.42) : 0;
+    const Rc = isHard ? HC_SPINE_R : 0;
     const x0 = -W/2 + Rc, bw = W - Rc;                          // the front art spans x0 … W/2
-    const boardL = isHard ? Math.round(0.15/2.35*CW) + 8 : 0;   // Both books: border starts nearer the hinge
+    const boardL = 0;   // design spans the whole board, hard or soft
     const boardCX = (boardL + CW - 10)/2, boardW = CW - 10 - boardL;
     const INSET = BOTH_BORDER_INSET;
     pocketCtx.font = '700 44px Georgia, serif';
     const lines = titleLineCount(pocketCtx, book.title || '', boardW - 100);
     const authorY = 150 + (lines - 1)*52 + 46;
+    pocketCtx.font = 'italic 26px Georgia, serif';
+    const aLines = titleLineCount(pocketCtx, book.author || '', boardW - 110);   // a long author name wraps; the pocket moves down for it
     // the pocket's own border sits m outside it; keep CLEAR px between that and the cover's border
     // (and the pattern inside it) on every side, shrinking the pocket and tape if the board is narrow
     const M = 0.045, CLEAR = 30;
     const mx = M/bw*CW, my = M/H*CH;
-    const top = authorY + 22 + my, bottom = CH - 48 - CLEAR - my;
+    const top = authorY + (aLines - 1)*30 + 22 + my, bottom = CH - 48 - CLEAR - my;
     // full-size pocket and tape always; only shrinks in the rare case it truly can't fit
     let pw = 4.016*POCKET_CS + 0.05, ph = 2.552*POCKET_CS + 0.05;
     const maxPwPx = (boardW - 2*INSET) - 2*16 - 2*mx;
@@ -4025,7 +4243,7 @@
       ctx.font = '700 44px Georgia, serif';
       wrapText(ctx, book.title, boardCX, 150, boardW-100, 52);
       ctx.font = 'italic 26px Georgia, serif'; ctx.fillStyle = 'rgba(255,255,255,.85)';
-      ctx.fillText(book.author, boardCX, L.authorY);
+      wrapText(ctx, book.author || '', boardCX, L.authorY, boardW-110, 30);   // a long name wraps
       const m = L.m;
       const x1 = L.toPxX(L.cx - L.pw/2 - m), x2 = L.toPxX(L.cx + L.pw/2 + m);
       const y1 = L.toPxY(L.cy + L.ph/2 + m), y2 = L.toPxY(L.cy - L.ph/2 - m);
@@ -4048,7 +4266,9 @@
     }
     ctx.font = 'italic 26px Georgia, serif';
     ctx.fillStyle = 'rgba(255,255,255,.85)';
-    ctx.fillText(book.author, boardCX, c.height-92);
+    // a long author name wraps, growing upward so its last line keeps its place by the border
+    const al = wrapLines(ctx, book.author || '', boardW-110);
+    al.forEach((ln, i) => ctx.fillText(ln, boardCX, c.height-92 - (al.length - 1 - i)*30));
   }
 
   function wrapLines(ctx, text, maxW){
@@ -4612,35 +4832,44 @@
   }
 
   // ---------- hardcover case: one continuous wrapped piece ----------
-  // A single cross-section — back board, a rounded turn, the spine, another
-  // turn, the front board — swept up the book's height, so the spine curves
-  // smoothly into each cover with no seam. The art is laid out flat like a
-  // dust jacket (back | spine | front) and wrapped round it by distance along
-  // the profile. Shelf copies (lite) skip the cover artwork until taken out.
+  // One cross-section — back board, a tight turn, a flat (very slightly domed) spine, another
+  // turn, the front board — extruded up the book's height with a small bevel, so every edge
+  // and corner is just softened. A narrow, shallow hinge groove runs right beside the spine.
+  // The art is laid out flat like a dust jacket (back | spine | front) and wrapped round it
+  // by distance along the outline; the inside and the board edges are plain cover colour.
+  // Shelf copies (lite) skip the cover artwork until taken out.
+  const HC_SPINE_R = 0.035;   // outer spine corners
   function hardcoverProfile(W, D, T, noFront){
-    const Rc = Math.min(0.16, D*0.42);
     const xs = -W/2, xf = W/2, zf = D/2, zb = -D/2;
-    const gx = xs + Rc + 0.15*(W - Rc)/2.35, gw = 0.11, gd = 0.018;   // hinge groove
+    const rO = HC_SPINE_R;
+    const dome = Math.min(0.02, D*0.03);               // the spine bows out a hair
+    const gx = xs + rO + 0.04, gw = 0.03, gd = 0.012; // groove: right beside the spine, narrow, shallow
     const groove = x => Math.abs(x - gx) < gw/2 ? gd * 0.5*(1 + Math.cos(Math.PI*(x - gx)/(gw/2))) : 0;
-    const P = [];
-    const NF = 40, NA = 12, NS = 4;
-    for(let i = 0; i <= NF; i++){ const x = xf + (xs + Rc - xf)*i/NF; P.push([x, zb + groove(x)]); }
+    const P = [], NF = 60, NA = 8, NS = 10;
+    // board x positions: an even spread, plus many close together through the groove and a point
+    // right at each of its edges, so the shading turns sharply there instead of smearing outward
+    const xsB = [];
+    for(let i = 0; i <= NF; i++) xsB.push(xf + (xs + rO - xf)*i/NF);
+    for(let x = gx - gw/2; x <= gx + gw/2 + 1e-9; x += gw/16) xsB.push(x);
+    xsB.push(gx - gw/2 - 0.002, gx + gw/2 + 0.002);
+    const boardXs = [...new Set(xsB.map(v => Math.round(v*1e5)/1e5))].filter(x => x >= xs + rO && x <= xf).sort((a, b) => b - a);
+    boardXs.forEach(x => P.push([x, zb + groove(x)]));
     const spineStart = P.length - 1;
-    for(let k = 1; k <= NA; k++){ const a = -Math.PI/2 - (Math.PI/2)*k/NA; P.push([xs + Rc + Rc*Math.cos(a), zb + Rc + Rc*Math.sin(a)]); }
-    for(let k = 1; k < NS; k++) P.push([xs, zb + Rc + (D - 2*Rc)*k/NS]);
-    for(let k = 0; k <= NA; k++){ const a = Math.PI - (Math.PI/2)*k/NA; P.push([xs + Rc + Rc*Math.cos(a), zf - Rc + Rc*Math.sin(a)]); }
+    for(let k = 1; k <= NA; k++){ const a = -Math.PI/2 - (Math.PI/2)*k/NA; P.push([xs + rO + rO*Math.cos(a), zb + rO + rO*Math.sin(a)]); }
+    for(let k = 1; k < NS; k++){ const z = zb + rO + (D - 2*rO)*k/NS, t = z / (D/2 - rO); P.push([xs - dome*(1 - t*t), z]); }
+    for(let k = 0; k <= NA; k++){ const a = Math.PI - (Math.PI/2)*k/NA; P.push([xs + rO + rO*Math.cos(a), zf - rO + rO*Math.sin(a)]); }
     const spineEnd = P.length - 1;
-    if(!noFront) for(let i = 1; i <= NF; i++){ const x = xs + Rc + (xf - xs - Rc)*i/NF; P.push([x, zf - groove(x)]); }
-    else P.push([xs + Rc + 0.002, zf]);   // a sliver past the turn, tucked under the front slab
+    if(!noFront) boardXs.slice().reverse().slice(1).forEach(x => P.push([x, zf - groove(x)]));
+    else P.push([xs + rO + 0.002, zf]);   // a sliver past the turn, tucked under the front slab
+    // inside of the case: a plain box — boards a board-thickness in, the spine wall straight
+    const I = P.map(([x, z]) => {
+      const xi = Math.max(x, xs + T);
+      const zi = Math.max(zb + T, Math.min(zf - T, z));
+      return Math.abs(z - zb) < 0.5*T && x > xs + T ? [x, zb + T] : Math.abs(z - zf) < 0.5*T && x > xs + T ? [x, zf - T] : [xi, zi];
+    });
     const S = [0];
     for(let i = 1; i < P.length; i++) S.push(S[i-1] + Math.hypot(P[i][0]-P[i-1][0], P[i][1]-P[i-1][1]));
-    const I = P.map((p, i)=>{
-      const a = P[Math.max(0, i-1)], b = P[Math.min(P.length-1, i+1)];
-      let tx = b[0]-a[0], tz = b[1]-a[1]; const l = Math.hypot(tx, tz) || 1; tx /= l; tz /= l;
-      return [p[0] + tz*T, p[1] - tx*T];        // pushed in by the board thickness
-    });
-    const L = S[S.length-1];
-    return { P, I, S, L, lb: S[spineStart], ls: S[spineEnd] - S[spineStart] };
+    return { P, I, S, L: S[S.length-1], lb: S[spineStart], ls: S[spineEnd] - S[spineStart] };
   }
   // jacket art: back | spine (incl. both turns) | front
   const JACKET_M = 0.12;      // plain cover colour either side of the spine on a shelf copy
@@ -4652,11 +4881,14 @@
     return uv;
   }
   // jacket art: back | spine (incl. both turns) | front
+  const JACKET_EDGE_PX = 32;   // plain cover colour past the art: the case's inside and board edges
   function drawJacket(canvas, book, style, prof, H, full, spineTitle){
     const [u0, uL] = jacketSpan(prof, full);
     const JH = full ? 1024 : 512, JW = Math.round(JH * uL / H);   // shelf copies: half size is plenty
-    canvas.width = JW; canvas.height = JH;
+    canvas.width = JW + JACKET_EDGE_PX; canvas.height = JH;
     const x = canvas.getContext('2d');
+    x.fillStyle = style.color; x.fillRect(JW, 0, JACKET_EDGE_PX, JH);
+    canvas._uMax = JW / canvas.width; canvas._uEdge = (JW + JACKET_EDGE_PX*3/4) / canvas.width;
     const px = v => Math.round((v - u0) / uL * JW);
     const a = px(prof.lb), b = px(prof.lb + prof.ls);
     if(!full){
@@ -4682,9 +4914,56 @@
       backTex.dispose();
     }
   }
+  // the case solid: the outline (outer skin, then the inner skin back) extruded up the height
+  // with a small bevel, fillets on the boards' fore-edge corners. UVs: outside by distance along
+  // the outline into the jacket art; inside, the board ends and top/bottom edges in the plain strip.
+  function caseGeometry(prof, H, full, uMax, uEdge, noFront){
+    const { P, I } = prof;
+    const bev = 0.014, r = 0.016;
+    const arc = (cx, cz, a0, a1, n = 5) => Array.from({length: n + 1}, (_, k) => { const a = a0 + (a1 - a0)*k/n; return [cx + r*Math.cos(a), cz + r*Math.sin(a)]; });
+    const p0 = P[0], pn = P[P.length-1], i0 = I[0], i_n = I[I.length-1];
+    const outline = [
+      ...arc(p0[0] - r, p0[1] + r, 0, -Math.PI/2),                 // back board: fore-edge to outside face
+      ...P.slice(1, -1),
+      ...(noFront ? [pn] : arc(pn[0] - r, pn[1] - r, Math.PI/2, 0)),   // front board: outside face to fore-edge
+      ...(noFront ? [i_n] : arc(i_n[0] - r, i_n[1] + r, 0, -Math.PI/2)),
+      ...I.slice(1, -1).reverse(),
+      ...arc(i0[0] - r, i0[1] - r, Math.PI/2, 0)
+    ];
+    const [u0, uL] = jacketSpan(prof, full);
+    const uvAt = (x, z) => {
+      let bp = 0, dpMin = 1e9, diMin = 1e9;
+      for(let k = 0; k < P.length; k++){ const dp = Math.hypot(P[k][0]-x, P[k][1]-z), di = Math.hypot(I[k][0]-x, I[k][1]-z);
+        if(dp < dpMin){ dpMin = dp; bp = k; } if(di < diMin) diMin = di; }
+      if(diMin < dpMin - 0.02) return uEdge;
+      return Math.max(0, Math.min(1, (prof.S[bp] - u0)/uL)) * uMax;
+    };
+    const shape = new THREE.Shape(outline.map(q => new THREE.Vector2(q[0], -q[1])));
+    // the contour exactly as ExtrudeGeometry walks it, with each point's u worked out once:
+    // its side walls come quad by quad, (steps + 2 × bevel segments) per edge, point 0 → 1 first
+    const cont = shape.extractPoints(4).shape;
+    if(cont.length > 1 && cont[cont.length-1].equals(cont[0])) cont.pop();
+    if(THREE.ShapeUtils.isClockWise(cont)) cont.reverse();
+    const cu = cont.map(q => uvAt(q.x, -q.y)), LAY = 1 + 3*2;
+    let quad = 0;
+    const uvGen = {
+      generateTopUV(g, v, a, b, c){ return [a, b, c].map(() => new THREE.Vector2(uEdge, .5)); },
+      // per quad: a face that bridges outside and inside (the board ends) is all plain colour,
+      // so its UVs never stretch from one end of the jacket to the other
+      generateSideWallUV(g, v, a, b, c, d){
+        const j = Math.floor(quad++ / LAY), k = (j + 1) % cont.length;
+        const fast = j < cont.length && Math.hypot(v[a*3] - cont[j].x, v[a*3+1] - cont[j].y) < 0.05 && Math.hypot(v[b*3] - cont[k].x, v[b*3+1] - cont[k].y) < 0.05;
+        const us = fast ? [cu[j], cu[k], cu[k], cu[j]] : [a, b, c, d].map(i => uvAt(v[i*3], -v[i*3+1]));
+        const mixed = us.some(u => u === uEdge) || Math.max(...us) - Math.min(...us) > 0.5;
+        return [a, b, c, d].map((i, k) => new THREE.Vector2(mixed ? uEdge : us[k], (v[i*3+2] + bev) / H)); }
+    };
+    const depth = H - 2*bev;
+    const geo = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelOffset: -bev, bevelSegments: 3, curveSegments: 4, steps: 1, UVGenerator: uvGen });
+    geo.rotateX(-Math.PI/2); geo.translate(0, -depth/2, 0); geo.computeVertexNormals();
+    return geo;
+  }
   function buildWrappedCase(book, style, W, H, D, T, opts){
     const prof = hardcoverProfile(W, D, T, opts.noFront);
-    const { P, I, S, L } = prof;
     const jc = document.createElement('canvas');
     drawJacket(jc, book, style, prof, H, !opts.lite, opts.spineTitle);
     const jacket = new THREE.CanvasTexture(jc);
@@ -4692,37 +4971,10 @@
     jacket.anisotropy = 8;
     const g = new THREE.Group();
     g.name = 'case';
-    function skin(prof2, withUV){
-      const pos = [], idx = [];
-      prof2.forEach((p, i)=>{
-        pos.push(p[0], -H/2, p[1],  p[0], H/2, p[1]);
-        if(i){ const a = (i-1)*2; idx.push(a, a+2, a+1,  a+1, a+2, a+3); }
-      });
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-      if(withUV) geo.setAttribute('uv', new THREE.Float32BufferAttribute(jacketUVs(prof, !opts.lite), 2));
-      geo.setIndex(idx); geo.computeVertexNormals();
-      return geo;
-    }
-    const outer = new THREE.Mesh(skin(P, true), new THREE.MeshLambertMaterial({map: jacket, side: THREE.DoubleSide}));
+    const outer = new THREE.Mesh(caseGeometry(prof, H, !opts.lite, jc._uMax, jc._uEdge, !!opts.noFront), new THREE.MeshLambertMaterial({map: jacket}));
     outer.name = 'jacket';
     outer.userData.prof = { W, H, D, T, noFront: !!opts.noFront };     // enough to redraw the jacket later (numbers survive clone())
     g.add(outer);
-    const plain = new THREE.MeshLambertMaterial({color: new THREE.Color(shade(style.color, -10)), side: THREE.DoubleSide});
-    g.add(new THREE.Mesh(skin(I, false), plain));
-    const sh = new THREE.Shape(P.map(p => new THREE.Vector2(p[0], -p[1])).concat(I.slice().reverse().map(p => new THREE.Vector2(p[0], -p[1]))));
-    [-1, 1].forEach(sy=>{
-      const cap = new THREE.ShapeGeometry(sh, 1);
-      cap.rotateX(-Math.PI/2); cap.translate(0, sy*H/2, 0);
-      g.add(new THREE.Mesh(cap, plain));
-    });
-    [0, P.length-1].forEach(i=>{
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.Float32BufferAttribute([
-        P[i][0], -H/2, P[i][1],  P[i][0], H/2, P[i][1],  I[i][0], -H/2, I[i][1],  I[i][0], H/2, I[i][1]], 3));
-      geo.setIndex([0, 2, 1, 1, 2, 3]); geo.computeVertexNormals();
-      g.add(new THREE.Mesh(geo, plain));
-    });
     return g;
   }
 
@@ -4880,11 +5132,11 @@
 
     // hardcover: the text block starts where the spine's rounded turn ends,
     // so its corners stay inside the case instead of poking through the curve
-    const Rc = Math.min(0.16, D*0.42);
+    const Rc = COVER_T + 0.004;
     const spineIn = isHard ? Rc + 0.004 : COVER_T;
     const pw = W - spineIn - PAGE_INSET;
     const ph = H - PAGE_INSET*2;
-    const pd = Math.max(D - COVER_T*2 - (isHard ? 0.012 : 0), 0.02);   // hardcover: a hair clear of the boards
+    const pd = Math.max(D - COVER_T*2 - (isHard ? 0.004 : 0), 0.02);   // hardcover: a hair clear of the boards (the softcover's own page block)
     const pagesBlock = new THREE.Mesh(new THREE.BoxGeometry(pw, ph, pd), pagesMat);
     pagesBlock.position.x = -W/2 + spineIn + pw/2;
 
@@ -4960,7 +5212,7 @@
     const bookmark = new THREE.Group();
     bookmark.name = 'bookmark';
     bookmark.add(shaftMesh, tipMesh);
-    bookmark.position.x = pagesBlock.position.x - pw/2 + bookmarkW/2 + (isHard ? 0.16 : 0.04); // near spine edge (hardcover: clear of the curve)
+    bookmark.position.x = pagesBlock.position.x - pw/2 + bookmarkW/2 + 0.04;   // 0.04 from the pages' spine edge, hard or soft
     bookmark.position.y = H/2;   // group origin sits exactly at the book's top edge
     bookmark.visible = false;
 
@@ -5094,10 +5346,9 @@
         const jc = document.createElement('canvas');
         drawJacket(jc, book, style, prof, pr.H, true);
         const tex = new THREE.CanvasTexture(jc); jc._tex = tex; tex.anisotropy = 8;
-        const mat = new THREE.MeshLambertMaterial({map: tex, side: THREE.DoubleSide});
+        const mat = new THREE.MeshLambertMaterial({map: tex});
         // its own geometry with full-jacket UVs (the shelf one may be shared with a twin)
-        const geo = outer.geometry.clone();
-        geo.setAttribute('uv', new THREE.Float32BufferAttribute(jacketUVs(prof, true), 2));
+        const geo = caseGeometry(prof, pr.H, true, jc._uMax, jc._uEdge, pr.noFront);
         const oldGeo = outer.geometry;
         saved.push([outer, outer.material]); made.push(mat);
         outer.material = mat; outer.geometry = geo;
@@ -5652,7 +5903,10 @@
     if(e.target.closest && e.target.closest('.spine.live')) animateShelf(250);   // follow the hover lift
   }));
 
-  function openBook(book, spineEl){
+  // the book in your hand, while it's open: Edit uses this to swap in the edited book without a trip to the shelf
+  let heldBookCtl = null;
+  function openBook(book, spineEl, opts){
+    let snap = !!(opts && opts.instant);   // no fly in / out: straight to the hand, or straight back
     if(activeBook) return;
     activeBook = true;
 
@@ -5699,6 +5953,7 @@
       built = { group: liveEntry.group, W: bb.W, H: bb.H, D: bb.D, coverT: bb.coverT,
                 bookmark: liveEntry.group.getObjectByName('bookmark') };
       clearTimeout(liveEntry.prepTimer);
+      liveEntry.group.visible = true;   // tapped right after a scroll, before the shelf drew it in view: still show it
       restoreLiveCovers = liveEntry.prepRestore || upgradeLiveBook(liveEntry, book);
       liveEntry.prepRestore = null;
       liveEntry.held = true;
@@ -5854,8 +6109,7 @@
         locked: ()=> bookFinished(book),
         onLocked: ()=> rereadModal.classList.add('open'),
         step: d => { const cur = playStaged !== null ? playStaged : playSecsNow();
-          const pc = Math.round(cur / book.audioSeconds * 100) + d;
-          stagePlay(Math.max(0, Math.min(100, pc)) / 100 * book.audioSeconds); },
+          stagePlay(Math.max(playDayStart(), cur + d * 60)); },   // a minute a step, like the list
         frac: f => stagePlay(f * book.audioSeconds)
       };
       playUpdate.addEventListener('click', onPlayUpdate);
@@ -5922,10 +6176,10 @@
       if(idx > -1) books.splice(idx, 1);
       close();   // flies back to (now-vacant) shelf slot, then renderAll() reflects the removal
     }
-    function onEditClick(){
-      close();
-      openEditModal(book);
-    }
+    // Edit: the edit page opens over the book in your hand; Cancel comes straight back to it
+    function onEditClick(){ openEditModal(book); }
+    let afterCleanup = null;
+    heldBookCtl = { book, snapClose(cb){ afterCleanup = cb; snap = true; close(); } };
     function onLogClick(){ openLogEditor(); }
     editBtn.addEventListener('click', onEditClick);
     logBtn.addEventListener('click', onLogClick);
@@ -6214,7 +6468,7 @@
       tapeProgressTick(ts);
       if(phaseT0===null){
         // list view: blur in fully first, book + panels start once it's done
-        if(phase==='opening' && listMode){
+        if(phase==='opening' && listMode && !snap){
           const now = performance.now();   // wall clock: the first frame's ts can predate the book build
           if(blurT0===null){ blurT0 = now; setBlur(true, BLUR_MS); }
           if(now - blurT0 < BLUR_MS){
@@ -6224,7 +6478,7 @@
             return;
           }
         }
-        phaseT0 = ts;
+        phaseT0 = snap ? ts - 1e7 : ts;
         if(phase==='opening' && !tapeCase){   // panels (+ blur, from the shelf) start on the same frame as the book
           if(!listMode) backdrop.classList.add('active');
           bookToolbar.classList.add('active');
@@ -6360,7 +6614,10 @@
       hitEl.removeEventListener('pointermove', onMove);
       hitEl.removeEventListener('pointerup', onUp);
       hitEl.removeEventListener('pointercancel', onUp);
+      heldBookCtl = null;
       renderAll();
+      const cb = afterCleanup; afterCleanup = null;
+      if(cb) cb();
     }
 
     function close(){
@@ -7003,8 +7260,8 @@
     touched = new Set();
     customizingBook = book;
     customizePageTitle.textContent =
-      customizeMode === 'add' ? 'Add a Book' : customizeMode === 'edit' ? 'Edit Book' : book.title;
-    customizeSaveBtn.textContent = customizeMode === 'add' ? 'Add' : 'Save';
+      customizeMode === 'add' ? 'Add a Book' : customizeMode === 'edit' ? 'Edit a Book' : book.title;
+    customizeSaveBtn.textContent = customizeMode === 'add' ? 'Add' : customizeMode === 'edit' ? 'Update' : 'Save';
     bookFields.classList.toggle('hidden', customizeMode === 'customize');
     fieldCards.forEach(c=>c.classList.remove('invalid'));
     if(customizeMode !== 'customize'){
@@ -7072,7 +7329,7 @@
 
   function closeCustomizeModal(){
     customizePage.classList.remove('active');
-    document.body.classList.remove('book-open');
+    if(!heldBookCtl) document.body.classList.remove('book-open');   // a book still in your hand keeps its view
     customizingBook = null;
     cancelAnimationFrame(custAnimId);
     disposeCustMesh();
@@ -7118,6 +7375,17 @@
         b.tags = customizeTags.slice();
         applyOptions(b, true);
         if(b.days) syncBookFinish(b);
+        if(heldBookCtl && heldBookCtl.book === b){
+          // edited from the book in your hand: swap the old one out and the edited one in, in place —
+          // it never goes back to the shelf
+          saveBooks();
+          heldBookCtl.snapClose(()=>{
+            const sp = [...document.querySelectorAll('.view.active .spine')].find(x => x._book === b);
+            if(sp) openBook(b, sp, {instant: true});
+            setTimeout(closeCustomizeModal, 400);   // once the panels have settled under it
+          });
+          return;
+        }
       }
     }
     renderAll();
@@ -7232,6 +7500,93 @@
   }
   function openEditModal(book){ openCustomizeModal(book, 'edit'); }
   addCard.addEventListener('click', openAddModal);
+  // ---------- pearlescent bookcloth: the Add Book card, and Data's Copy / Download ----------
+  // cotton cloth under a pearl coating: a fine plain weave, lit from the top left so the threads read through
+  // light and shade, with a faint pink-to-green shimmer drifting across it
+  (function(){
+    const rgb = h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16));
+    const hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2147483647) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967295; };
+    const fade = t => t * t * (3 - 2 * t), frac = v => v - Math.floor(v);
+    function noise(x, y, s){
+      const xi = Math.floor(x), yi = Math.floor(y), xf = fade(x - xi), yf = fade(y - yi);
+      const a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s);
+      return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
+    }
+    const fbm = (x, y, s) => noise(x, y, s) * .5 + noise(x * 2.1, y * 2.1, s + 1) * .3 + noise(x * 4.3, y * 4.3, s + 2) * .2;
+    function draw(cv, col, bands = true, bandIn = 10){
+      const s = window.devicePixelRatio || 1, r = cv.getBoundingClientRect();
+      const W = Math.round(r.width * s), H = Math.round(r.height * s);
+      if(!W || !H) return;
+      const key = col.join(',') + (bands ? '|b' + bandIn : '');
+      if(cv.width === W && cv.height === H && cv._drawn === key) return;
+      cv.width = W; cv.height = H; cv._drawn = key;
+      const p = Math.max(2, Math.round(1.2 * s)) / s;          // thread spacing on whole screen pixels: no moiré
+      const weave = (u, v) => {
+        const fu = u / p, fv = v / p, over = (Math.floor(fu) + Math.floor(fv)) & 1;
+        const across = Math.sin(Math.PI * frac(fv)) * (0.55 + 0.45 * Math.sin(Math.PI * frac(fu)));
+        const down = Math.sin(Math.PI * frac(fu)) * (0.55 + 0.45 * Math.sin(Math.PI * frac(fv)));
+        return over ? Math.max(across, down * .55) : Math.max(down, across * .55);
+      };
+      const h = (u, v) => weave(u, v) * .6 + fbm(u * .1, v * .1, 13) * .2;
+      const x = cv.getContext('2d'), img = x.createImageData(W, H), d = img.data;
+      const [R, G, B] = col;
+      const hg = new Float32Array((W + 1) * (H + 1));
+      for(let j = 0; j <= H; j++) for(let i = 0; i <= W; i++) hg[j * (W + 1) + i] = h(i / s, j / s);
+      const L = [-.45, -.6, .66], ln = Math.hypot(...L); L.forEach((v, k) => L[k] = v / ln);
+      const Hv = [L[0], L[1], L[2] + 1], hn = Math.hypot(...Hv); Hv.forEach((v, k) => Hv[k] = v / hn);
+      for(let j = 0; j < H; j++) for(let i = 0; i < W; i++){
+        const k = j * (W + 1) + i;
+        const dx = (hg[k + 1] - hg[k]) * .9 * s, dy = (hg[k + W + 1] - hg[k]) * .9 * s;
+        const nl = Math.hypot(dx, dy, 1), nx = -dx / nl, ny = -dy / nl, nz = 1 / nl;
+        const diff = Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]);
+        const spec = Math.pow(Math.max(0, nx * Hv[0] + ny * Hv[1] + nz * Hv[2]), 14) * .35;
+        const u = i / s, v = j / s;
+        const tone = 1 + (noise(u * 1.7, v * .35, 21) - .5) * .08;
+        const cover = 1.08 - .13 * (i / W) - .22 * (j / H);
+        const sh = (0.42 + 0.68 * diff) * tone * cover;
+        let r2 = R * sh + 255 * spec, g2 = G * sh + 255 * spec, b2 = B * sh + 255 * spec;
+        const pp = .5 + .5 * Math.sin(u * .045 + v * .12), pa = .07 * (0.3 + diff);
+        r2 += (215 + 30 * pp - r2) * pa; g2 += (220 + 25 * (1 - pp) - g2) * pa; b2 += (240 - b2) * pa;
+        const o = (j * W + i) * 4; d[o] = r2; d[o + 1] = g2; d[o + 2] = b2; d[o + 3] = 255;
+      }
+      x.putImageData(img, 0, 0);
+      const g = x.createLinearGradient(0, 0, 0, H);   // where the cloth turns over the board's edge
+      g.addColorStop(0, 'rgba(255,255,255,.06)'); g.addColorStop(.12, 'rgba(255,255,255,0)'); g.addColorStop(.85, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.18)');
+      x.fillStyle = g; x.fillRect(0, 0, W, H);
+      // a band near each end, like the ones across the book spines: a pale strip pressed into the cloth,
+      // with a shadow on its left edge and a highlight on its right so it reads as inset
+      if(!bands) return;
+      const bw = Math.max(2, Math.round(2 * s)), e = Math.max(1, Math.round(s));
+      [Math.round(bandIn * s), W - Math.round(bandIn * s) - bw].forEach(bx => {
+        // solid, smooth band (no weave through it): the cover colour lifted toward white, a touch darker lower down
+        const mix = (c, t) => Math.round(c + (255 - c) * t);
+        const bg = x.createLinearGradient(0, 0, 0, H);
+        bg.addColorStop(0, `rgb(${col.map(c => mix(c, .52)).join(',')})`); bg.addColorStop(1, `rgb(${col.map(c => mix(c, .4)).join(',')})`);
+        x.fillStyle = bg; x.fillRect(bx, 0, bw, H);
+        x.fillStyle = 'rgba(0,0,0,.28)'; x.fillRect(bx - e, 0, e, H);
+        x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(bx + bw, 0, e, H);
+      });
+    }
+    // each cloth card: drawn when it first has a size (the Data cards start hidden) and again if it changes
+    const cards = [[document.querySelector('#add-card > canvas'), '#5b6633'],   // olive
+      ...[...document.querySelectorAll('.cloth-btn')].map(b => [b.querySelector('canvas'), b.dataset.cloth])];
+    cards.forEach(([cv, hex]) => {
+      if(!cv) return;
+      const go = () => draw(cv, rgb(hex));
+      if(window.ResizeObserver) new ResizeObserver(() => requestAnimationFrame(go)).observe(cv);
+      else { requestAnimationFrame(go); window.addEventListener('resize', go); }
+    });
+    window.CLOTH = { draw, rgb };
+    // the main tabs' cards: each painted ahead of time (shown just long enough to measure), so picking a tab
+    // swaps in a finished card at once
+    const tabCards = [...document.querySelectorAll('#tabs .tab[data-cloth]')];
+    const paintTabs = () => tabCards.forEach(t => { const bk = t.querySelector('.bk'), on = bk.style.display;
+      bk.style.display = 'block'; draw(bk.querySelector('canvas'), rgb(t.dataset.cloth), true, 6); bk.style.display = on; });
+    // repainted whenever the strip changes size (on a phone the first layout can be the 980px desktop width)
+    if(window.ResizeObserver && tabCards.length) new ResizeObserver(() => requestAnimationFrame(paintTabs)).observe(tabCards[0].parentElement);
+    else { requestAnimationFrame(paintTabs); window.addEventListener('resize', paintTabs); }
+  })();
+
 
   // typing updates the 3D preview (title on the cover, thickness from pages)
   let fieldPreviewTimer = null;
@@ -7533,7 +7888,7 @@
                  : TL.view === 'year' ? first.getFullYear() - now.getFullYear() : 0;
     const title = TL.view === 'month' ? `${TL_MONTH[R.t0.getMonth()]} ${R.t0.getFullYear()}` : TL.view === 'year' ? String(R.t0.getFullYear()) : 'All Time';
     const unit = TL.view === 'month' ? 'month' : 'year';
-    const hint = TL.mode === 'timeline' ? 'Tap a book to see it here' : TL.view === 'month' ? 'Tap a bar to see that day' : 'Tap a bar to see that month';
+    const hint = TL.mode === 'timeline' ? 'Tap a book to see it here' : TL.view === 'month' ? 'Tap a bar to see that day' : TL.view === 'all' && R.t1.getFullYear() - R.t0.getFullYear() > 9 ? 'Tap a bar to see that year' : 'Tap a bar to see that month';
     tlInfo.classList.add('nav');
     tlInfo.innerHTML = `<button type="button" class="tl-nav" data-d="-1" aria-label="Previous ${unit}"${TL.off <= minOff ? ' disabled' : ''}>◀</button>` +
       `<div class="tl-mid"><div class="t">${title}</div><div class="tot">${tot}</div><div class="hint">${hint}</div></div>` +
@@ -7555,15 +7910,16 @@
     books.forEach(b => {
       const audio = b.format === 'audio' && b.audioSeconds > 0 && b.pages > 0, spp = audio ? b.audioSeconds / b.pages : 1;
       const page = paperOf(styleForBook(b).pageTone);
-      const add = (days, endKey, finished, reread) => {
+      const bs = (parseInt(b.seed, 10) || 0) % 2147483000;
+      const add = (days, endKey, finished, reread, k) => {
         if(!Array.isArray(days) || !endKey) return;
         const first = days.findIndex(v => v > 0); if(first < 0) return;
         const end = keyDate(endKey), s = tlAdd(end, -(days.length - 1 - first));
-        out.push({ id: id++, title: b.title, kind: audio ? 'audio' : 'book', reread, page, s, e: finished ? end : null,
+        out.push({ id: id++, title: b.title, kind: audio ? 'audio' : 'book', reread, page, s, e: finished ? end : null, seed: 1 + (bs + k * 7919) % 2147483000,
           daily: days.slice(first).map(v => audio ? v * spp : v) });
       };
-      (b.reads || []).forEach((r, k) => add(r.days, r.finishedOn, true, k > 0));
-      add(b.days, lastLogKey(b), bookFinished(b), (b.reads || []).length > 0);
+      (b.reads || []).forEach((r, k) => add(r.days, r.finishedOn, true, k > 0, k));
+      add(b.days, lastLogKey(b), bookFinished(b), (b.reads || []).length > 0, (b.reads || []).length);
     });
     return out;
   }
@@ -7590,29 +7946,33 @@
     return { t0, t1, marks, lines };
   }
   // textures: page block edge-on (horizontal lines), tape wound curved (This Year / This Month) or straight (All Time)
-  function tlPageLines(){
-    if(TL.tex.page) return TL.tex.page;
+  // every bar draws its own pattern from a seed (the book's, or the period's): no two alike
+  const tlRnd = seed => { let s = Math.max(1, Math.floor(seed) % 2147483646); for(let i = 0; i < 3; i++) s = (s * 16807) % 2147483647; return () => (s = (s * 16807) % 2147483647) / 2147483647; };
+  function tlPageLines(seed = 23){
+    const key = 'page' + seed;
+    if(TL.tex[key]) return TL.tex[key];
     const c = document.createElement('canvas'); c.width = 4; c.height = 120; const x = c.getContext('2d');
-    let s = 23; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const rnd = tlRnd(seed);
     for(let i = 0; i < c.height; i += 2 + Math.floor(rnd() * 2)){ const dark = rnd() < .6;
       x.fillStyle = dark ? `rgba(60,40,20,${.10 + rnd() * .14})` : `rgba(255,250,240,${.3 + rnd() * .3})`; x.fillRect(0, i, 4, 1); }
-    return TL.tex.page = `url(${c.toDataURL()})`;
+    return TL.tex[key] = `url(${c.toDataURL()})`;
   }
-  function tlTapeStraight(){
-    if(TL.tex.ts) return TL.tex.ts;
+  function tlTapeStraight(seed = 5){
+    const key = 'ts' + seed;
+    if(TL.tex[key]) return TL.tex[key];
     const c = document.createElement('canvas'); c.width = 4; c.height = 90; const x = c.getContext('2d');
     x.fillStyle = '#8c5229'; x.fillRect(0, 0, 4, 90);
-    let s = 5; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const rnd = tlRnd(seed);
     for(let i = 0; i < 90; i += 1 + Math.floor(rnd() * 2)){ const v = rnd();
       x.fillStyle = v < .5 ? `rgba(60,26,6,${.15 + v * .3})` : `rgba(225,160,110,${.1 + (v - .5) * .35})`; x.fillRect(0, i, 4, 1); }
-    return TL.tex.ts = `url(${c.toDataURL()})`;
+    return TL.tex[key] = `url(${c.toDataURL()})`;
   }
-  function tlTapeWraps(w){
-    const key = 'tw' + Math.round(w);
+  function tlTapeWraps(w, seed = 5){
+    const key = 'tw' + Math.round(w) + '-' + seed;
     if(TL.tex[key]) return TL.tex[key];
     const dpr = 2, h = 90, c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * dpr)); c.height = h * dpr;
     const x = c.getContext('2d'); x.scale(dpr, dpr); x.fillStyle = '#8c5229'; x.fillRect(0, 0, w, h);
-    let s = 5; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647, bow = 3.5;
+    const rnd = tlRnd(seed), bow = 3.5;
     for(let yy = 0; yy < h + bow; yy += 1.1){ const v = rnd();
       x.strokeStyle = v < .5 ? `rgba(60,26,6,${.12 + v * .3})` : `rgba(225,160,110,${.08 + (v - .5) * .3})`;
       x.lineWidth = .35 + v * .35; x.beginPath(); x.moveTo(0, yy); x.quadraticCurveTo(w / 2, yy - bow * 2, w, yy); x.stroke(); }
@@ -7620,10 +7980,11 @@
   }
   // the graph's sideways bars (This Year / This Month): the list's progress-fill textures, vertical lines —
   // page edges on cream for pages, tape wraps for listening
-  function tlFillLines(kind){
-    if(TL.tex['f' + kind]) return TL.tex['f' + kind];
+  function tlFillLines(kind, seed = 11){
+    const key = 'f' + kind + seed;
+    if(TL.tex[key]) return TL.tex[key];
     const c = document.createElement('canvas'); c.width = 240; c.height = 4; const x = c.getContext('2d');
-    let s = 11; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const rnd = tlRnd(seed);
     if(kind === 'tape'){
       x.fillStyle = '#8c5229'; x.fillRect(0, 0, 240, 4);
       for(let i = 0; i < 240; i += 2 + Math.floor(rnd() * 2)){ const v = rnd();
@@ -7632,23 +7993,32 @@
       for(let i = 0; i < 240; i += 3 + Math.floor(rnd() * 3)){ const dark = rnd() < .6;
         x.fillStyle = dark ? `rgba(60,40,20,${.05 + rnd() * .07})` : `rgba(255,250,240,${.08 + rnd() * .1})`; x.fillRect(i, 0, 1, 4); }
     }
-    return TL.tex['f' + kind] = `url(${c.toDataURL()})`;
+    return TL.tex[key] = `url(${c.toDataURL()})`;
   }
   function tlFrame(today){
     tlCanvas.innerHTML = '';
-    const R = tlRange(today), W = tlCanvas.clientWidth, H = tlCanvas.getBoundingClientRect().height, LW = 39;   // a 45px square with the card's edge and the 3px rule, lined up with the footer card's ◀ section
+    const R = tlRange(today), W = tlCanvas.clientWidth, LW = 39;   // a 45px square with the card's edge and the 3px rule, lined up with the footer card's ◀ section
+    // All Time on the Timeline: each year gets at least 240px and the card scrolls, so short reads stay readable
+    const tall = TL.view === 'all' && TL.mode === 'timeline';
+    const years = (R.t1 - R.t0) / (365.25 * 864e5);
+    const H = Math.max(tlCanvas.getBoundingClientRect().height, tall ? Math.round(years * 240) : 0);
+    tlCanvas.style.overflowY = tall ? 'auto' : 'hidden';
     const y = d => (R.t1 - d) / (R.t1 - R.t0) * H;
     const el = (css, cls, txt) => { const e = document.createElement('div'); e.style.cssText = css; if(cls) e.className = cls; if(txt != null) e.textContent = txt; tlCanvas.appendChild(e); return e; };
     // This Month: a 1px line between every date in the date column
     // This Month / This Year: a 1px line between every date / month in the label column too
-    if(TL.view !== 'all') R.lines.forEach(l => el(`left:0;width:${LW}px;top:${(y(l.at) - .5).toFixed(1)}px;height:1px;background:#d9d2c4;z-index:2`));
+    tlCanvas.scrollLeft = 0; tlCanvas.style.setProperty('--sx', '0px'); tlCanvas.style.overflowX = 'hidden';
+    if(TL.view !== 'all') R.lines.forEach(l => el(`left:0;width:${LW}px;top:${(y(l.at) - .5).toFixed(1)}px;height:1px;background:#d9d2c4;z-index:5`, 'tl-pin'));
+    if(tall) el(`left:0;top:0;width:1px;height:${H}px;visibility:hidden`);   // gives the scroll its length
+    tlCanvas.scrollTop = 0;                                                  // newest at the top
     return { R, W, H, LW, y, el };
   }
+  tlCanvas.addEventListener('scroll', ()=> tlCanvas.style.setProperty('--sx', tlCanvas.scrollLeft + 'px'), {passive: true});
   function tlDrawTimeline(){
     const today = tlDay(new Date()), { R, W, H, LW, y, el } = tlFrame(today), { t0, t1 } = R;
     R.lines.forEach(l => el(`left:${l.strong ? 0 : LW + 3}px;right:0;top:${(y(l.at) - (l.strong ? 1.5 : 0)).toFixed(1)}px;height:${l.strong ? 3 : 1}px;background:${l.strong ? '#000' : '#efeae0'};z-index:${l.strong ? 2 : 1}`));
-    R.marks.forEach(m => el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:2`, 'tl-lbl', m.text));
-    el(`left:${LW}px;top:0;bottom:0;width:3px;background:#000;z-index:2`);
+    R.marks.forEach(m => el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:5`, 'tl-lbl tl-pin', m.text));
+    el(`left:${LW}px;top:0;height:${H}px;width:3px;background:#000;z-index:5`, 'tl-pin');
     if(today >= t0 && today < t1) el(`left:${LW+3}px;right:0;top:${(y(tlAdd(today, 1)) - .5).toFixed(1)}px;height:1px;background:#b5342a;z-index:4`);
     const list = TL.reads.filter(r => r.s < t1 && (r.e ? tlAdd(r.e, 1) : tlAdd(today, 1)) > t0).sort((a, b) => a.s - b.s);
     if(!list.length){ el(`left:${LW+3}px;right:0;top:${H/2}px;transform:translateY(-50%);text-align:center;z-index:2`, 'tl-empty', 'Nothing read here yet'); return; }
@@ -7659,15 +8029,28 @@
       if(k < 0){ k = laneEnds.length; laneEnds.push(0); }
       laneEnds[k] = r.end; r.lane = k;
     });
-    const N = laneEnds.length, GAP = 10, room = W - LW - 3 - 8;
-    const BW = Math.max(8, Math.min(34, Math.floor((room - (N - 1) * GAP) / N))), groupW = N * BW + (N - 1) * GAP;
+    const N = laneEnds.length, room = W - LW - 3 - 8;
+    // crowded: close the gaps up first; past that the bars keep a readable width and the card scrolls sideways
+    let GAP = 10, BW = Math.floor((room - (N - 1) * GAP) / N);
+    if(BW < 12){ GAP = 3; BW = Math.floor((room - (N - 1) * GAP) / N); }
+    BW = Math.max(8, Math.min(34, BW));
+    const groupW = N * BW + (N - 1) * GAP;
     const x0 = LW + 3 + Math.max(4, Math.round((W - LW - 3 - groupW) / 2));
+    const fullW = Math.max(W, x0 + groupW + 6);
+    if(fullW > W){
+      tlCanvas.style.overflowX = 'auto';
+      // lines that ran to the card's right edge now run the whole scroll width
+      tlCanvas.querySelectorAll(':scope > div').forEach(e => { if(e.style.right === '0px'){ e.style.right = 'auto'; e.style.width = (fullW - (parseFloat(e.style.left) || 0)) + 'px'; } });
+      // the date column's own ground, over the bars that scroll under it, with its year rules on top
+      el(`left:0;top:0;width:${LW}px;height:${H}px;background:#fff;z-index:4`, 'tl-pin');
+      R.lines.filter(l => l.strong).forEach(l => el(`left:0;width:${LW}px;top:${(y(l.at) - 1.5).toFixed(1)}px;height:3px;background:#000;z-index:5`, 'tl-pin'));
+    }
     list.forEach(r => {
       const bt = r.end >= t1 ? -10 : y(r.end), bb = r.s < t0 ? H + 10 : y(r.s);
       const bh = Math.max(5, bb - bt), bx = x0 + r.lane * (BW + GAP);
       const look = TL.view === 'all'
-          ? (r.kind === 'audio' ? `background:#8c5229 ${tlTapeStraight()} repeat;background-size:4px 90px` : `background:#e7dfc9 ${tlPageLines()} repeat;background-size:4px 120px`)
-          : (r.kind === 'audio' ? `background:#8c5229 ${tlTapeWraps(BW - 4)} repeat-y;background-size:${BW - 4}px 90px` : `background:${r.page} ${tlPageLines()} repeat;background-size:4px 120px`);
+          ? (r.kind === 'audio' ? `background:#8c5229 ${tlTapeStraight(r.seed)} repeat;background-size:4px 90px` : `background:#e7dfc9 ${tlPageLines(r.seed)} repeat;background-size:4px 120px`)
+          : (r.kind === 'audio' ? `background:#8c5229 ${tlTapeWraps(BW - 4, r.seed)} repeat-y;background-size:${BW - 4}px 90px` : `background:${r.page} ${tlPageLines(r.seed)} repeat;background-size:4px 120px`);
       const bar = el(`left:${bx}px;top:${bt.toFixed(1)}px;width:${BW}px;height:${bh.toFixed(1)}px;${look}`, 'tl-bar' + (r.e ? '' : ' now') + (TL.picked === r.key ? ' on' : ''));
       bar.addEventListener('click', () => {
         tlCanvas.querySelectorAll('.tl-bar.on').forEach(t => t.classList.remove('on'));
@@ -7685,23 +8068,27 @@
     R.lines.filter(l => l.strong).forEach(l => el(`left:0;right:0;top:${(y(l.at) - 1.5).toFixed(1)}px;height:3px;background:#000;z-index:2`));
     if(all) R.lines.filter(l => !l.strong).forEach(l => el(`left:${LW + 3}px;right:0;top:${(y(l.at) - .5).toFixed(1)}px;height:1px;background:#efeae0;z-index:1`));   // month lines
     R.marks.forEach(m => el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:2`, 'tl-lbl', m.text));
-    el(`left:${LW}px;top:0;bottom:0;width:3px;background:#000;z-index:2`);
+    el(`left:${LW}px;top:0;height:${H}px;width:3px;background:#000;z-index:2`);
     const x0 = LW + 3;
     const buckets = [];
+    // All Time over more than nine years: one bar per year instead of one per month
+    const yearly = all && t1.getFullYear() - t0.getFullYear() > 9;
+    const keyOf = d => TL.view === 'month' ? +d : yearly ? d.getFullYear() : d.getFullYear() * 12 + d.getMonth();
     if(TL.view === 'month') for(let d = new Date(t0); d < t1; d = tlAdd(d, 1)) buckets.push({ a: d, b: tlAdd(d, 1) });
+    else if(yearly) for(let Y = t0.getFullYear(); Y < t1.getFullYear(); Y++) buckets.push({ a: new Date(Y, 0, 1), b: new Date(Y + 1, 0, 1) });
     else for(let d = new Date(t0); d < t1; d = new Date(d.getFullYear(), d.getMonth() + 1, 1)) buckets.push({ a: d, b: new Date(d.getFullYear(), d.getMonth() + 1, 1) });
     buckets.forEach(k => { k.pages = 0; k.secs = 0; k.n = Math.round((Math.min(k.b, tlAdd(today, 1)) - k.a) / 864e5); });
-    const idx = new Map(buckets.map((k, j) => [TL.view === 'month' ? +k.a : k.a.getFullYear() * 12 + k.a.getMonth(), j]));
+    const idx = new Map(buckets.map((k, j) => [keyOf(k.a), j]));
     TL.reads.forEach(r => r.daily.forEach((v, j) => {
       if(!v) return; const d = tlAdd(r.s, j);
-      const k = buckets[idx.get(TL.view === 'month' ? +d : d.getFullYear() * 12 + d.getMonth())]; if(k) k[r.kind === 'audio' ? 'secs' : 'pages'] += v;
+      const k = buckets[idx.get(keyOf(d))]; if(k) k[r.kind === 'audio' ? 'secs' : 'pages'] += v;
     }));
     // one column per kind read in this span: pages, listening, or both side by side
     let cols = [
       { key: 'pages', max: Math.max(1, ...buckets.map(k => k.pages)), text: v => `${tlN(v)} pages`,
-        look: all ? '' : `background:#e7dfc9 ${tlFillLines('page')} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
+        look: sd => all ? '' : `background:#e7dfc9 ${tlFillLines('page', sd)} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
       { key: 'secs', max: Math.max(1, ...buckets.map(k => k.secs)), text: v => tlHM(v),
-        look: all ? '' : `background:#8c5229 ${tlFillLines('tape')} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
+        look: sd => all ? '' : `background:#8c5229 ${tlFillLines('tape', sd)} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
     ];
     const used = cols.filter(c => buckets.some(k => k[c.key] > 0));
     if(used.length) cols = used;
@@ -7712,7 +8099,7 @@
       tlCanvas.querySelectorAll('.tl-gbar.on').forEach(t => t.classList.remove('on'));
       if(TL.pickedK === String(+k.a)){ TL.pickedK = ''; tlIdle(); return; }
       tlCanvas.querySelectorAll(`.tl-gbar[data-k="${+k.a}"]`).forEach(t => t.classList.add('on')); TL.pickedK = String(+k.a);
-      const when = TL.view === 'month' ? tlFmt(k.a) : `${TL_MON[k.a.getMonth()]} ${k.a.getFullYear()}`, n = Math.max(1, k.n);
+      const when = TL.view === 'month' ? tlFmt(k.a) : yearly ? String(k.a.getFullYear()) : `${TL_MON[k.a.getMonth()]} ${k.a.getFullYear()}`, n = Math.max(1, k.n);
       // pages on one line, time listened below it (just the one if only one happened); monthly views add the daily average
       const perDay = v => TL.view === 'month' ? '' : ` · ${v} a day`, rows = [];
       if(k.pages) rows.push(`<b>${tlN(k.pages)}</b> pages${perDay(`<b>${tlN(k.pages / n)}</b>`)}`);
@@ -7727,7 +8114,11 @@
     const tlCtx = tlDrawGraph.ctx || (tlDrawGraph.ctx = document.createElement('canvas').getContext('2d'));
     cols.forEach(c => {
       const room = c.end - 10 - c.x;
-      if(all){ c.scale = room - 84; return; }    // All Time: yearly totals sit at the right instead
+      if(all){                                   // All Time: bars stop 8px short of the widest yearly total
+        const tot = new Map(); buckets.forEach(k => tot.set(k.a.getFullYear(), (tot.get(k.a.getFullYear()) || 0) + k[c.key]));
+        tlCtx.font = '800 10px Arial, sans-serif';
+        const tw = Math.max(0, ...[...tot.values()].filter(Boolean).map(v => tlCtx.measureText(c.text(v)).width + 6));
+        c.scale = Math.max(20, (W - c.r - tw) - 8 - c.x); return; }   // label's left edge, less 8px
       c.scale = Infinity;
       buckets.forEach(k => {
         const v = k[c.key]; if(!v || k.a > today) return;
@@ -7738,14 +8129,20 @@
       if(!isFinite(c.scale)) c.scale = room - 84;
     });
     buckets.forEach(k => {
-      const top = y(k.b), h = y(k.a) - top, pad = all ? Math.min(4.5, h * .3) : Math.min(3, h * .15), bh = Math.max(2, h - pad * 2);
+      let top = y(k.b), h = y(k.a) - top, pad = all ? Math.min(4.5, h * .3) : Math.min(3, h * .15), bh = Math.max(2, h - pad * 2);
+      if(yearly){ pad = Math.min(14, h * .2); bh = Math.max(2, h - pad * 2); }   // one fat bar, well clear of the year lines
+      else if(all){   // a little extra air on both sides of each year line
+        const m = k.a.getMonth(), extra = Math.min(2.5, bh * .3);
+        if(m === 11){ top += extra; bh -= extra; } else if(m === 0) bh -= extra;
+        bh = Math.max(1.5, bh);
+      }
       if(!all) el(`left:${x0}px;right:0;top:${(top + h - .5).toFixed(1)}px;height:1px;background:#efeae0;z-index:1`);
       if(k.a > today) return;
       const size = bh >= 12 ? 9 : Math.max(6.5, bh * .7);
       cols.forEach(c => {
         const v = k[c.key]; if(!v) return;
         const w = Math.max(4, v / c.max * c.scale);
-        const bar = el(`left:${c.x}px;top:${(top + pad).toFixed(1)}px;width:${w.toFixed(1)}px;height:${bh.toFixed(1)}px;${c.look}`, 'tl-gbar' + (all ? ' plain' : '') + (TL.pickedK === String(+k.a) ? ' on' : ''));
+        const bar = el(`left:${c.x}px;top:${(top + pad).toFixed(1)}px;width:${w.toFixed(1)}px;height:${bh.toFixed(1)}px;${c.look(1 + Math.floor(+k.a / 864e5) * 31 + (c.key === 'secs' ? 17 : 0))}`, 'tl-gbar' + (all ? ' plain' : '') + (TL.pickedK === String(+k.a) ? ' on' : ''));
         bar.dataset.k = +k.a;
         if(!all) el(`left:${(c.x + w + 3).toFixed(1)}px;top:${(top + h / 2).toFixed(1)}px;font-size:${size.toFixed(1)}px`, 'tl-gval', c.text(v));
         bar.addEventListener('click', () => show(k));
@@ -7799,7 +8196,7 @@
     const bEl = document.createElement('b'); bEl.textContent = value; dtStatus.appendChild(bEl);
     dtStatus.classList.toggle('error', !!isError);
   }
-  function disarmReplace(){ replaceArmed = false; clearTimeout(replaceTimer); dtReplace.textContent = 'Replace'; }
+  function disarmReplace(){ replaceArmed = false; clearTimeout(replaceTimer); dtReplace.querySelector('.lbl').textContent = 'Replace'; }
 
   // ---- export ----
   document.getElementById('dt-copy').addEventListener('click', async (e)=>{
@@ -7807,7 +8204,8 @@
     dtExportText.value = exportJSON();
     try{ await navigator.clipboard.writeText(dtExportText.value); }
     catch(err){ dtExportText.focus(); dtExportText.select(); document.execCommand('copy'); }
-    btn.textContent = 'Copied'; setTimeout(()=> btn.textContent = 'Copy', 1500);
+    const lbl = btn.querySelector('.lbl') || btn;
+    lbl.textContent = 'Copied'; setTimeout(()=> lbl.textContent = 'Copy', 1500);
     markBackedUp();
   });
   // Back up: on phones, hand the file to the share sheet (Save to Files / Drive / email);
@@ -7815,7 +8213,8 @@
   // button says so and selects the text, ready to Copy instead.
   async function backupNow(btn, idle){
     const name = `stack-tracker-${localTodayKey()}.json`, json = exportJSON();
-    const say = (t, ms)=>{ if(!btn) return; btn.textContent = t; clearTimeout(btn._t); btn._t = setTimeout(()=> btn.textContent = idle, ms || 1800); };
+    const lbl = btn && (btn.querySelector('.lbl') || btn);
+    const say = (t, ms)=>{ if(!btn) return; lbl.textContent = t; clearTimeout(btn._t); btn._t = setTimeout(()=> lbl.textContent = idle, ms || 1800); };
     try{
       const file = new File([json], name, {type:'application/json'});
       if(navigator.canShare && navigator.canShare({files:[file]})){
@@ -7831,7 +8230,7 @@
       a.href = URL.createObjectURL(blob); a.download = name;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(()=> URL.revokeObjectURL(a.href), 4000);
-      markBackedUp(); say('Downloading…'); return true;
+      markBackedUp(); say('Saved'); return true;
     } catch(err){
       dtExportText.value = json; showDataTab('export'); dtExportText.focus(); dtExportText.select();
       say('Use Copy', 3000); return false;
@@ -7956,7 +8355,7 @@
   dtReplace.addEventListener('click', ()=>{
     if(!pendingImport) return;
     if(!replaceArmed){
-      replaceArmed = true; dtReplace.textContent = 'Confirm?';
+      replaceArmed = true; dtReplace.querySelector('.lbl').textContent = 'Confirm?';
       replaceTimer = setTimeout(disarmReplace, 3000);
       return;
     }
@@ -8011,7 +8410,7 @@
     const size = b => audio ? (b.audioSeconds || b.pages*60) : b.pages;
     const longestOne = list.reduce((m,b)=> !m || size(b) > size(m) ? b : m, null);
     const fmt = n => n.toLocaleString('en-US');
-    const amt = v => audio ? fmtDur(v) : fmt(Math.round(v));       // pages, or h/m of listening
+    const amt = v => audio ? fmtDur(v) : fmtPg(v);       // pages (0.xx under one), or h/m of listening
     // short labels so most cards fit three across; the longest title gets two
     return [
       [audio ? 'Audiobooks' : 'Books', fmt(list.length)],
