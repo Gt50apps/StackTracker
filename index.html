@@ -6,10 +6,11 @@
 <title>Stack Tracker</title>
 <!-- installable, works offline: manifest + icons + service worker (sw.js) -->
 <link rel="manifest" href="app.webmanifest">
-<meta name="theme-color" content="#efeadf">
+<meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Stack Tracker">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
@@ -109,6 +110,10 @@
   .br-fill{position:absolute; left:-3px; top:-3px; bottom:-3px; pointer-events:none;   /* past the edges: the card clips it */
     background-image:var(--page-lines); background-repeat:repeat; background-size:120px 100%;}
   .br-main, .br-prog{position:relative;}
+  /* placeholder fill: the card's full fill at 50% until there's progress (book page edges / audiobook tape) */
+  .br-ghost{position:absolute; left:-3px; top:-3px; bottom:-3px; width:calc(100% + 6px); pointer-events:none;}
+  .br-ghost, .tape-ghost{opacity:.5; transition:opacity 1s linear;}
+  .br-ghost.out, .tape-ghost.out{opacity:0;}
   .book-row:active .br-fill{filter:brightness(.95);}
   .book-row:not(.tape-row){background:#fff;}   /* white, so the page-coloured fill stands out */
   /* wound tape, drawn per tape; runs a few px past the top and bottom so the card's own
@@ -201,7 +206,7 @@
   .ds-row > span{min-width:0; overflow:hidden; text-overflow:ellipsis;}
   .dd-stats b{color:var(--ink);}
   /* in the book's cover cloth */
-  .dd-stats.cloth{position:relative; overflow:hidden; background:#000; color:var(--ds-muted);}
+  .dd-stats.cloth{position:relative; overflow:hidden; background:var(--cloth, #6b4a32); color:var(--ds-muted);}
   .dd-stats.cloth > canvas.cloth-bg{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
   .dd-stats.cloth > .ds-row{position:relative;}
   .dd-stats.cloth b{color:var(--ds-ink);}
@@ -1349,7 +1354,25 @@
   #book-actions button, .dd-acts button, .rr-btns button, .dt-split button{font-size:min(.74rem, 2.95vw);}
   /* header strip: unpicked tabs and the title cells a shade darker than the page */
   :root{--hdr-cell:#d9d0be;}
-  #tabs, #tabs .tab:not(.active), .customize-header h2, .sh-head h2, .lg-head h2{background:var(--hdr-cell);}
+  #tabs .tab:not(.active), .customize-header h2, .sh-head h2, .lg-head h2{background:var(--hdr-cell);}
+  /* the phone's own strips: black above the tabs (status bar) and below the footer (home bar) */
+  html{background:var(--bg);}   /* (the phone strips are black from the tabs and footer themselves) */
+  #tabs{background:#000;}
+  #app-footer{box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 #000;}
+  /* a shadow cast by the header / footer onto the page below / above them, always shown */
+  #app-header{box-shadow:none;}
+  #app-header::after, #app-footer::before{content:''; position:absolute; left:0; right:0; height:14px; pointer-events:none;
+    opacity:1;}   /* always on */
+  #app-header::after{top:100%; margin-top:3px; background:linear-gradient(180deg, rgba(0,0,0,.32), rgba(0,0,0,.12) 40%, rgba(0,0,0,0));}
+  #app-footer::before{bottom:100%; margin-bottom:3px; background:linear-gradient(0deg, rgba(0,0,0,.32), rgba(0,0,0,.12) 40%, rgba(0,0,0,0));}
+  .tl-foot, .dt-foot{box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 #000;}
+  /* Timeline and Data have their own footers: the same shadow up onto the page above them */
+  .tl-foot, .dt-foot{position:relative; z-index:3;}
+  .tl-foot::before, .dt-foot::before{content:''; position:absolute; left:0; right:0; bottom:100%; margin-bottom:3px; height:14px; pointer-events:none;
+    background:linear-gradient(0deg, rgba(0,0,0,.32), rgba(0,0,0,.12) 40%, rgba(0,0,0,0));}
+  #page-panel{box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 #000, 0 -8px 24px rgba(0,0,0,.18);}
+  #page-panel::after{content:''; position:absolute; left:0; right:0; top:100%; height:env(safe-area-inset-bottom); background:#000;}   /* under the lifted panel too */
+  #book-toolbar{box-shadow:inset 0 env(safe-area-inset-top) 0 #000, 0 8px 24px rgba(0,0,0,.18);}
   /* tab cards (Shelf | List, Book | Audiobook, the Timeline and Data choices): the unpicked side in the same shade */
   .tabs .tab:not(.active), .tl-views button:not(.on), .tl-views button:not(.on):hover{background:var(--hdr-cell);}
   #tabs .tab:not(.active), .tabs .tab:not(.active), .tl-views button:not(.on), .tl-views button:not(.on):hover{color:var(--ink);}   /* unpicked text: the picked side's dark */
@@ -1372,7 +1395,7 @@
   /* Data › Export: Copy (navy) and Download (plum) as two separate bookcloth cards side by side */
   .dt-pair{display:flex; gap:4px;}
   .cloth-btn, .cloth-btn:hover, .cloth-btn:active{position:relative; overflow:hidden; flex:1 1 0; min-width:0; height:45px; margin:0; padding:0; box-sizing:border-box;
-    border:3px solid #000; border-radius:8px; background:#000; box-shadow:none; color:#fff; cursor:pointer;
+    border:3px solid #000; border-radius:8px; background:var(--cloth, #5b6633); box-shadow:none; color:#fff; cursor:pointer;
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   .cloth-btn > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
   .cloth-btn > .lbl{position:relative; text-shadow:none;}
@@ -1384,12 +1407,20 @@
   /* main tabs: the picked one stays dark with a little book-cloth card round its word (its own colour,
      spine bands at the ends); same font and size, only the text turns white. No fade: it swaps at once */
   #tabs .tab{position:relative; transition:none;}
-  #tabs .tab > .bk{position:absolute; inset:4px; border:2.5px solid #000; border-radius:6px; overflow:hidden; display:none; pointer-events:none;}
+  #tabs .tab > .bk{position:absolute; inset:4px; border:2.5px solid #000; border-radius:6px; overflow:hidden; display:none; pointer-events:none; background:var(--cloth);}
   #tabs .tab > .bk canvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
   #tabs .tab.active > .bk{display:block;}
   #tabs .tab > span{position:relative;}
   /* list dropdowns: the unpicked tabs' tan */
-  .book-dd, .book-row.tape-simple + .tape-dd{background:var(--hdr-cell);}   /* the open book's bars too */
+  .book-dd, .book-row.tape-simple + .tape-dd{background:var(--hdr-cell);}
+  /* list cards stay 45px. A title too long for one line wraps onto two, in smaller type, with the author
+     (smaller too) on a third line under it; past two lines it ends in … */
+  .book-row.wrap .br-title{white-space:normal; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2;
+    overflow:hidden; overflow-wrap:anywhere; font-size:.72rem; line-height:1.05;}
+  .book-row.wrap .br-author{font-size:.58rem; line-height:1.15;}
+  .book-row.wrap .br-main{line-height:1.05;}
+  /* list view dividers: as slim as the shelf view's, so the list reads just as tight (Library and My Lists) */
+  #list-container > .list-divider, #coll-list .list-divider{height:24px;}   /* the open book's bars too */
 </style>
 <style>
   /* ---------- splash: STACK drops onto the top shelf, TRACKER slides in one book at a time ---------- */
@@ -1412,6 +1443,7 @@
   #splash.go .sp-slide.r{animation:spSlideR .42s cubic-bezier(.22,1,.36,1) both;}
   @keyframes spSlideL{ 0%{transform:translateX(-220px); opacity:0;} 30%{opacity:1;} 100%{transform:none; opacity:1;} }
   @keyframes spSlideR{ 0%{transform:translateX(220px); opacity:0;} 30%{opacity:1;} 100%{transform:none; opacity:1;} }
+  #splash .sp-spine.landed{animation:none !important; opacity:1; transform:none; will-change:auto;}
   #splash .sp-sub{font:600 .6rem Arial, sans-serif; letter-spacing:1.6px; color:#8a8378; text-transform:uppercase; opacity:0; transition:opacity .4s;}
   #splash .sp-sub.in{opacity:1;}
 </style>
@@ -1444,6 +1476,9 @@
     drops.forEach((d, i) => d.style.animationDelay = (60 + i * 115) + 'ms');          // last lands ~0.94 s
     order.forEach((idx, k) => slides[idx].style.animationDelay = (60 + k * 80) + 'ms'); // last lands ~0.96 s
     el.querySelector('.sp-sub').style.transitionDelay = '0s';
+    // once a book has landed it is set down for good: its animation and its own GPU layer are dropped and it
+    // simply sits there (fully shown), so nothing the loading app does can make it flicker
+    el.querySelectorAll('.sp-spine').forEach(b => b.addEventListener('animationend', () => b.classList.add('landed'), {once: true}));
     // start on the first painted frame, so the books are seen from the very beginning
     requestAnimationFrame(() => {
       el.classList.add('go');
@@ -1467,10 +1502,10 @@
 <div id="app-header">
  <!-- pages: the top of the header itself, split in three; Data opens its own window -->
  <div id="tabs">
-   <div class="tab active" data-view="all" data-cloth="#7a2f2b"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Library</span></div>
-   <div class="tab" data-view="library" data-cloth="#2b5752"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Stacks</span></div>
-   <div class="tab" data-view="timeline" data-cloth="#303d66"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Timeline</span></div>
-   <div class="tab" data-view="data" data-cloth="#8a6a3f"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Data</span></div>
+   <div class="tab active" data-view="all" data-cloth="#7a2f2b" style="--cloth:#7a2f2b"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Library</span></div>
+   <div class="tab" data-view="library" data-cloth="#2b5752" style="--cloth:#2b5752"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>My Lists</span></div>
+   <div class="tab" data-view="timeline" data-cloth="#303d66" style="--cloth:#303d66"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Timeline</span></div>
+   <div class="tab" data-view="data" data-cloth="#8a6a3f" style="--cloth:#8a6a3f"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Data</span></div>
  </div>
  <!-- row 2 (My Library only): shelf/list view and sort -->
  <div class="hdr-row" id="shelf-controls">
@@ -1539,7 +1574,7 @@
       <div class="lw-wheel" data-k="1"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>M</span></div>
       <div class="lw-wheel" data-k="2"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>S</span></div>
     </div>
-    <div class="field-card" id="tags-card"><label>Collections</label><div id="tags-value">None</div></div>
+    <div class="field-card" id="tags-card"><label>Lists</label><div id="tags-value">None</div></div>
   </div>
   <div id="customize-fields">
     <div class="cycle-card" id="customize-binding-card">
@@ -1641,12 +1676,12 @@
 <div id="tags-page">
   <div class="lg-head">
     <button type="button" id="tags-done">Done</button>
-    <h2>Collections</h2>
+    <h2>My Lists</h2>
     <span></span>
   </div>
   <div class="so-list">
     <div class="tg-new">
-      <div class="field-card"><label for="tag-new-input">New collection</label><input id="tag-new-input" autocomplete="off" placeholder="Collection name"></div>
+      <div class="field-card"><label for="tag-new-input">New list</label><input id="tag-new-input" autocomplete="off" placeholder="List name"></div>
       <button type="button" id="tag-new-add">Add</button>
     </div>
     <div id="tags-list" style="display:contents"></div>
@@ -1708,17 +1743,17 @@
   <div class="dt-view active" id="dt-view-export">
     <textarea class="dt-text" id="dt-export-text" readonly spellcheck="false"></textarea>
     <div class="dt-foot"><div class="dt-pair">
-      <button type="button" id="dt-copy" class="cloth-btn" data-cloth="#234a5e"><canvas aria-hidden="true"></canvas><span class="lbl">Copy</span></button>
-      <button type="button" id="dt-download" class="cloth-btn" data-cloth="#3a2f52"><canvas aria-hidden="true"></canvas><span class="lbl">Download</span></button>
+      <button type="button" id="dt-copy" class="cloth-btn" data-cloth="#234a5e" style="--cloth:#234a5e"><canvas aria-hidden="true"></canvas><span class="lbl">Copy</span></button>
+      <button type="button" id="dt-download" class="cloth-btn" data-cloth="#3a2f52" style="--cloth:#3a2f52"><canvas aria-hidden="true"></canvas><span class="lbl">Download</span></button>
     </div></div>
   </div>
   <div class="dt-view" id="dt-view-import">
     <textarea class="dt-text" id="dt-import-text" spellcheck="false" placeholder="Paste exported JSON here, or load a file below"></textarea>
     <div class="dt-card" id="dt-status">Import<b>Waiting for JSON</b></div>
     <div class="dt-foot"><div class="dt-pair">
-      <button type="button" id="dt-load" class="cloth-btn" data-cloth="#2b5752"><canvas aria-hidden="true"></canvas><span class="lbl">Load File</span></button>
-      <button type="button" id="dt-merge" class="cloth-btn" data-cloth="#86452b"><canvas aria-hidden="true"></canvas><span class="lbl">Merge</span></button>
-      <button type="button" id="dt-replace" class="cloth-btn" data-cloth="#7a2f2b"><canvas aria-hidden="true"></canvas><span class="lbl">Replace</span></button>
+      <button type="button" id="dt-load" class="cloth-btn" data-cloth="#2b5752" style="--cloth:#2b5752"><canvas aria-hidden="true"></canvas><span class="lbl">Load File</span></button>
+      <button type="button" id="dt-merge" class="cloth-btn" data-cloth="#86452b" style="--cloth:#86452b"><canvas aria-hidden="true"></canvas><span class="lbl">Merge</span></button>
+      <button type="button" id="dt-replace" class="cloth-btn" data-cloth="#7a2f2b" style="--cloth:#7a2f2b"><canvas aria-hidden="true"></canvas><span class="lbl">Replace</span></button>
     </div></div>
     <input type="file" id="dt-file" accept=".json,application/json,text/plain" hidden>
   </div>
@@ -1732,7 +1767,7 @@
       <button type="button" data-every="never">Never</button>
     </div>
     <div class="dt-note">Backing up saves a file of your whole library (share sheet or download). Copy on the Export tab counts too.</div>
-    <div class="dt-foot"><div class="dt-pair"><button type="button" id="bk-now" class="cloth-btn" data-cloth="#8a6a3f"><canvas aria-hidden="true"></canvas><span class="lbl">Back Up Now</span></button></div></div>
+    <div class="dt-foot"><div class="dt-pair"><button type="button" id="bk-now" class="cloth-btn" data-cloth="#8a6a3f" style="--cloth:#8a6a3f"><canvas aria-hidden="true"></canvas><span class="lbl">Back Up Now</span></button></div></div>
   </div>
 </div>
 
@@ -2638,7 +2673,9 @@
     if(row.classList.contains('tape-row')){ paintTapeRow(row, b); return; }
     if(row.classList.contains('tape-simple')){
       const f = pct(b);
-      drawTapeFill(row.querySelector('canvas.tape-fill'), f, tapeLook(b.title), bookFinished(b));
+      drawTapeFill(row.querySelector('canvas.tape-fill:not(.tape-ghost)'), f, tapeLook(b.title), bookFinished(b));
+      const tg = row.querySelector('canvas.tape-ghost');
+      if(tg){ drawTapeFill(tg, 1, tapeLook(b.title), false); tg.classList.toggle('out', bookRead(b) > 0); }
       row.classList.toggle('done', bookFinished(b));
       row.querySelector('.br-pages').textContent = `${secsToLength(f * b.audioSeconds)} / ${secsToLength(b.audioSeconds)}`;
       row.querySelector('.br-pct').textContent = (f*100).toFixed(2) + '%';
@@ -2651,6 +2688,9 @@
     fill.style.width = `calc(${pct(b)*100}% + ${pct(b) >= 1 ? 6 : 3}px)`;   // +3px for the overhang on the left (+3 more at 100%)
     // the book's page colour, a shade deeper; finished books go much darker with white text
     paintPageFill(fill, styleForBook(b).pageTone, bookFinished(b), b.seed);
+    // unstarted: the whole fill at half strength shows it's a book; it fades out (1 s) once reading starts, back in at 0
+    const ghost = row.querySelector('.br-ghost');
+    if(ghost){ paintPageFill(ghost, styleForBook(b).pageTone, false, b.seed); ghost.classList.toggle('out', bookRead(b) > 0); }
     row.classList.toggle('done', bookFinished(b));
     row.querySelector('.br-pages').textContent = `${Math.min(bookRead(b), b.pages)} / ${b.pages}`;
     row.querySelector('.br-pct').textContent = (pct(b)*100).toFixed(2) + '%';
@@ -2933,7 +2973,7 @@
     row.className = 'book-row tape-simple';
     row._book = b;
     row.innerHTML =
-      `<canvas class="tape-fill" data-pad="3"></canvas>` +
+      `<canvas class="tape-fill tape-ghost" data-pad="3"></canvas><canvas class="tape-fill" data-pad="3"></canvas>` +
       `<div class="br-anchor"></div>` +
       `<div class="br-main"><div class="br-title"></div><div class="br-author"></div></div>` +
       `<div class="br-prog"><div class="br-pages"></div><div class="br-pct"></div></div>`;
@@ -3022,6 +3062,11 @@
     });
     paintListRow(row, b);
     requestAnimationFrame(()=> paintListRow(row, b));     // drawn once it has a size
+    // and again whenever its size changes: a card built while its page is hidden (another tab, the shelf
+    // view, an open book) gets its tape and its placeholder tape drawn the moment it's shown
+    if(window.ResizeObserver){ let lastW = 0; new ResizeObserver(es => { const w = Math.round(es[0].contentRect.width);
+      const h = Math.round(es[0].contentRect.height);
+      if(w && (w !== lastW || h !== row._lastH)){ lastW = w; row._lastH = h; paintListRow(row, row._book); } }).observe(row); }
     const frag = document.createDocumentFragment(); frag.append(row, dd);
     return frag;
   }
@@ -3094,13 +3139,14 @@
     if(!cv){ cv = document.createElement('canvas'); cv.className = 'cloth-bg'; cv.setAttribute('aria-hidden', 'true'); card.prepend(cv); }
     const ink = readableTextOn(hex);
     card.classList.add('cloth');
+    card.style.setProperty('--cloth', hex);   // its flat colour shows until the cloth is drawn
     card.style.setProperty('--ds-ink', ink);
     card.style.setProperty('--ds-muted', ink === '#fff' ? 'rgba(255,255,255,.78)' : 'rgba(43,38,32,.7)');
     const go = () => { if(window.CLOTH && cv.dataset.hex) window.CLOTH.draw(cv, window.CLOTH.rgb(cv.dataset.hex), false); };
     const changed = cv.dataset.hex !== hex;
     cv.dataset.hex = hex;
-    if(!cv._ro && window.ResizeObserver){ cv._ro = new ResizeObserver(() => requestAnimationFrame(go)); cv._ro.observe(cv); }
-    if(changed) requestAnimationFrame(go);
+    if(!cv._ro && window.ResizeObserver){ cv._ro = new ResizeObserver(go); cv._ro.observe(cv); }
+    if(changed){ go(); requestAnimationFrame(go); }   // straight away if it can (no stale colour), again once laid out
   }
   function paintDDStats(dd, b){
     const el = dd.querySelector('.dd-stats'); if(!el) return;
@@ -3221,7 +3267,40 @@
   }
 
   // target: Library's list, or Collections' list; groups: one name per book (Collections), else the sort's own groups
+  // which list cards need their title wrapped: measured on one line at full size, wrapped if it doesn't fit.
+  // Run once the list is shown and whenever its width changes
+  // a wrapped title is split as evenly as it can be between its two lines, at a space, with the first line
+  // never the shorter of the two
+  const titleMeasure = document.createElement('canvas').getContext('2d');
+  function splitTitle(t){
+    const full = t.dataset.full != null ? t.dataset.full : (t.dataset.full = t.textContent);
+    const words = full.split(' ');
+    if(words.length < 2){ t.textContent = full; return; }
+    titleMeasure.font = getComputedStyle(t).font;
+    const w = s => titleMeasure.measureText(s).width;
+    let best = -1, bestD = Infinity;
+    for(let k = 1; k < words.length; k++){
+      const a = w(words.slice(0, k).join(' ')), b = w(words.slice(k).join(' '));
+      if(a >= b && a - b < bestD){ bestD = a - b; best = k; }
+    }
+    if(best < 0 || w(words.slice(0, best).join(' ')) > t.clientWidth){ t.textContent = full; return; }   // can't balance it: wrap as usual
+    t.textContent = '';
+    t.append(words.slice(0, best).join(' '), document.createElement('br'), words.slice(best).join(' '));
+  }
+  function fitListTitles(container){
+    const rows = [...container.querySelectorAll('.book-row')];
+    rows.forEach(r => { r.classList.remove('wrap'); const t = r.querySelector('.br-title'); if(t && t.dataset.full != null) t.textContent = t.dataset.full; });
+    const long = rows.filter(r => { const t = r.querySelector('.br-title'); return t && t.clientWidth && t.scrollWidth > t.clientWidth + 1; });
+    long.forEach(r => r.classList.add('wrap'));
+    long.forEach(r => splitTitle(r.querySelector('.br-title')));
+  }
+  [listContainer, document.getElementById('coll-list')].forEach(c => {
+    if(!c) return;
+    let lastW = 0;
+    if(window.ResizeObserver) new ResizeObserver(es => { const w = Math.round(es[0].contentRect.width); if(w && w !== lastW){ lastW = w; fitListTitles(c); } }).observe(c);
+  });
   function renderList(ordered, target = listContainer, groups = null){
+    requestAnimationFrame(() => fitListTitles(target));
     const listContainer = target;
     listContainer.innerHTML = '';
     // author / status sorts get a divider card at the start of each group
@@ -3246,7 +3325,7 @@
       const row = document.createElement('div');
       row.className = 'book-row';
       row.innerHTML =
-        `<div class="br-fill"></div>` +
+        `<div class="br-ghost"></div><div class="br-fill"></div>` +
         `<div class="br-anchor"></div>` +
         `<div class="br-main"><div class="br-title"></div><div class="br-author"></div></div>` +
         `<div class="br-prog"><div class="br-pages"></div><div class="br-pct"></div></div>`;
@@ -3370,7 +3449,7 @@
     const names = allCollections();
     const collList = document.getElementById('coll-list');
     if(!names.length){
-      container.innerHTML = collList.innerHTML = '<div class="coll-empty">No collections yet.<br>Add a book to a collection from Add Book or a book\'s Edit.</div>';
+      container.innerHTML = collList.innerHTML = '<div class="coll-empty">No lists yet.<br>Add a book to a list from Add Book or a book\'s Edit.</div>';
       return;
     }
     { // the list: every collection's books, in the chosen sort, under a divider with its name
@@ -7461,7 +7540,7 @@
       .sort((a,b)=> a.toLowerCase().localeCompare(b.toLowerCase()));
     tagsList.innerHTML = '';
     if(!names.length){
-      tagsList.innerHTML = '<div class="tg-empty">No collections yet — add one above.</div>';
+      tagsList.innerHTML = '<div class="tg-empty">No lists yet — add one above.</div>';
       return;
     }
     names.forEach(n=>{
@@ -7470,7 +7549,7 @@
       const count = books.filter(b => b !== customizingBook && bookTags(b).includes(n)).length;
       o.innerHTML = '<b></b><span></span>';
       o.querySelector('b').textContent = n;
-      o.querySelector('span').textContent = customizeTags.includes(n) ? 'In this collection' : plural(count, 'other book');
+      o.querySelector('span').textContent = customizeTags.includes(n) ? 'On this list' : plural(count, 'other book');
       o.addEventListener('click', ()=>{
         customizeTags = customizeTags.includes(n) ? customizeTags.filter(t => t !== n) : [...customizeTags, n];
         renderTagOptions(); showTagsValue();
@@ -7513,13 +7592,16 @@
       return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
     }
     const fbm = (x, y, s) => noise(x, y, s) * .5 + noise(x * 2.1, y * 2.1, s + 1) * .3 + noise(x * 4.3, y * 4.3, s + 2) * .2;
-    function draw(cv, col, bands = true, bandIn = 10){
-      const s = window.devicePixelRatio || 1, r = cv.getBoundingClientRect();
-      const W = Math.round(r.width * s), H = Math.round(r.height * s);
-      if(!W || !H) return;
-      const key = col.join(',') + (bands ? '|b' + bandIn : '');
-      if(cv.width === W && cv.height === H && cv._drawn === key) return;
-      cv.width = W; cv.height = H; cv._drawn = key;
+    // the cloth itself, made once per colour into a sheet as wide as the screen: the slow part, done while the
+    // app loads; every card then just copies its piece of the sheet, which is instant
+    const sheets = new Map();
+    function sheet(col, s, needW, needH){
+      const k = col.join(',') + '@' + s;
+      let c = sheets.get(k);
+      if(c && c.width >= needW && c.height >= needH) return c;
+      const W = Math.max(needW, Math.ceil(Math.max(screen.width || 0, document.documentElement.clientWidth || 0, 420) * s));
+      const H = Math.max(needH, Math.ceil(50 * s));
+      c = document.createElement('canvas'); c.width = W; c.height = H;
       const p = Math.max(2, Math.round(1.2 * s)) / s;          // thread spacing on whole screen pixels: no moiré
       const weave = (u, v) => {
         const fu = u / p, fv = v / p, over = (Math.floor(fu) + Math.floor(fv)) & 1;
@@ -7528,7 +7610,7 @@
         return over ? Math.max(across, down * .55) : Math.max(down, across * .55);
       };
       const h = (u, v) => weave(u, v) * .6 + fbm(u * .1, v * .1, 13) * .2;
-      const x = cv.getContext('2d'), img = x.createImageData(W, H), d = img.data;
+      const x = c.getContext('2d'), img = x.createImageData(W, H), d = img.data;
       const [R, G, B] = col;
       const hg = new Float32Array((W + 1) * (H + 1));
       for(let j = 0; j <= H; j++) for(let i = 0; i <= W; i++) hg[j * (W + 1) + i] = h(i / s, j / s);
@@ -7542,14 +7624,29 @@
         const spec = Math.pow(Math.max(0, nx * Hv[0] + ny * Hv[1] + nz * Hv[2]), 14) * .35;
         const u = i / s, v = j / s;
         const tone = 1 + (noise(u * 1.7, v * .35, 21) - .5) * .08;
-        const cover = 1.08 - .13 * (i / W) - .22 * (j / H);
-        const sh = (0.42 + 0.68 * diff) * tone * cover;
+        const sh = (0.42 + 0.68 * diff) * tone;
         let r2 = R * sh + 255 * spec, g2 = G * sh + 255 * spec, b2 = B * sh + 255 * spec;
         const pp = .5 + .5 * Math.sin(u * .045 + v * .12), pa = .07 * (0.3 + diff);
         r2 += (215 + 30 * pp - r2) * pa; g2 += (220 + 25 * (1 - pp) - g2) * pa; b2 += (240 - b2) * pa;
         const o = (j * W + i) * 4; d[o] = r2; d[o + 1] = g2; d[o + 2] = b2; d[o + 3] = 255;
       }
       x.putImageData(img, 0, 0);
+      sheets.set(k, c);
+      return c;
+    }
+    function draw(cv, col, bands = true, bandIn = 10){
+      const s = window.devicePixelRatio || 1, r = cv.getBoundingClientRect();
+      const W = Math.round(r.width * s), H = Math.round(r.height * s);
+      if(!W || !H) return;
+      const key = col.join(',') + (bands ? '|b' + bandIn : '');
+      if(cv.width === W && cv.height === H && cv._drawn === key) return;
+      cv.width = W; cv.height = H; cv._drawn = key;
+      const x = cv.getContext('2d');
+      x.drawImage(sheet(col, s, W, H), 0, 0, W, H, 0, 0, W, H);
+      // light from the top left, falling off toward the bottom right
+      const lg = x.createLinearGradient(0, 0, W * .25, H * 1.6);
+      lg.addColorStop(0, 'rgba(255,255,255,.07)'); lg.addColorStop(1, 'rgba(0,0,0,.16)');
+      x.fillStyle = lg; x.fillRect(0, 0, W, H);
       const g = x.createLinearGradient(0, 0, 0, H);   // where the cloth turns over the board's edge
       g.addColorStop(0, 'rgba(255,255,255,.06)'); g.addColorStop(.12, 'rgba(255,255,255,0)'); g.addColorStop(.85, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.18)');
       x.fillStyle = g; x.fillRect(0, 0, W, H);
@@ -7573,19 +7670,53 @@
     cards.forEach(([cv, hex]) => {
       if(!cv) return;
       const go = () => draw(cv, rgb(hex));
-      if(window.ResizeObserver) new ResizeObserver(() => requestAnimationFrame(go)).observe(cv);
+      if(window.ResizeObserver) new ResizeObserver(go).observe(cv);
       else { requestAnimationFrame(go); window.addEventListener('resize', go); }
     });
     window.CLOTH = { draw, rgb };
+    // make every cloth sheet now, while the app loads (one a frame, so nothing stalls): the buttons, the tab
+    // cards and every cover colour a book's stats card can use. Pages never opened still have theirs ready
+    {
+      const s0 = window.devicePixelRatio || 1;
+      const todo = [...new Set(['#5b6633', ...[...document.querySelectorAll('[data-cloth]')].map(e => e.dataset.cloth),
+        ...COVER_COLOR_PRESETS.map(c => c.hex)].map(h => h.toLowerCase()))];
+      const next = () => { const h = todo.shift(); if(!h) return; sheet(rgb(h), s0, 0, 0); requestAnimationFrame(next); };
+      requestAnimationFrame(next);
+    }
+    document.querySelectorAll('.cloth-btn[data-cloth], #tabs .tab[data-cloth]').forEach(e => e.style.setProperty('--cloth', e.dataset.cloth));
     // the main tabs' cards: each painted ahead of time (shown just long enough to measure), so picking a tab
     // swaps in a finished card at once
     const tabCards = [...document.querySelectorAll('#tabs .tab[data-cloth]')];
     const paintTabs = () => tabCards.forEach(t => { const bk = t.querySelector('.bk'), on = bk.style.display;
       bk.style.display = 'block'; draw(bk.querySelector('canvas'), rgb(t.dataset.cloth), true, 6); bk.style.display = on; });
     // repainted whenever the strip changes size (on a phone the first layout can be the 980px desktop width)
-    if(window.ResizeObserver && tabCards.length) new ResizeObserver(() => requestAnimationFrame(paintTabs)).observe(tabCards[0].parentElement);
+    if(window.ResizeObserver && tabCards.length) new ResizeObserver(paintTabs).observe(tabCards[0].parentElement);
     else { requestAnimationFrame(paintTabs); window.addEventListener('resize', paintTabs); }
+    // after the phone has had the app in the background it may throw away what's drawn on canvases (to save
+    // memory) without telling us: draw every cloth again from scratch. Cards on hidden pages are redrawn the
+    // moment they're shown
+    window.CLOTH.repaintAll = () => {
+      sheets.clear();
+      const fresh = cv => { cv._drawn = ''; };
+      cards.forEach(([cv, hex]) => { if(cv){ fresh(cv); draw(cv, rgb(hex)); } });
+      tabCards.forEach(t => fresh(t.querySelector('.bk canvas'))); paintTabs();
+      document.querySelectorAll('canvas.cloth-bg').forEach(cv => { fresh(cv); if(cv.dataset.hex) draw(cv, rgb(cv.dataset.hex), false); });
+    };
   })();
+  // back from the background (or a canvas the browser dropped and has now restored): redraw everything drawn
+  // on canvases — the cloth cards, the list's tape fills and placeholders, and the open audiobook's bar
+  {
+    let t = 0;
+    const repaintCanvases = () => { clearTimeout(t); t = setTimeout(() => requestAnimationFrame(() => {
+      if(window.CLOTH && window.CLOTH.repaintAll) window.CLOTH.repaintAll();
+      repaintTapeRows();
+      if(activeBookCtx && activeBookCtx.refresh) activeBookCtx.refresh();
+    }), 60); };
+    document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') repaintCanvases(); });
+    window.addEventListener('pageshow', repaintCanvases);
+    window.addEventListener('focus', repaintCanvases);
+    document.addEventListener('contextrestored', repaintCanvases, true);
+  }
 
 
   // typing updates the 3D preview (title on the cover, thickness from pages)
