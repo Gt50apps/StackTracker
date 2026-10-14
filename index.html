@@ -1357,6 +1357,76 @@
   .book-row.wrap .br-main{line-height:1.05;}
   /* list view dividers: as slim as the shelf view's, so the list reads just as tight (Library and My Lists) */
   #list-container > .list-divider, #coll-list .list-divider{height:24px;}   /* the open book's bars too */
+
+  /* ===== option footer and its pickers (Cover, Design, Ribbon, Pages): flat, in the app's own colours
+     (walnut frame, page-tan card, black borders) ===== */
+  /* the option cards sit in a walnut footer, edge to edge along the bottom of the screen (one black line along its
+     top), as one rounded card split into its sections; the footer sits over the picker's bottom edge */
+  #opt-foot{position:relative; z-index:41; flex:none; box-sizing:border-box; width:calc(100% + 8px); margin:4px -4px calc(-4px - env(safe-area-inset-bottom));
+    padding:4px 4px calc(4px + env(safe-area-inset-bottom)); background:#6b4a32; border-top:3px solid #000;
+    border-bottom:3px solid #000; box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 #000;}   /* like the main window's footer */
+  #opt-foot > #customize-fields{margin-top:0; max-width:none;}
+  /* while a picker is open: a gap in the page under the top field card makes room (the 3D book's space shrinks),
+     the top card (Author) becomes a "tap to input book data" card, and the other field cards slide off the bottom */
+  #ct-gap{flex:none; width:100%; height:0;}
+  #book-fields > :not(#author-card){transition:transform .26s cubic-bezier(.2,.7,.3,1); will-change:transform;}
+  #book-fields.ct-gone > :not(#author-card){transform:translateY(110vh); transition:transform .26s cubic-bezier(.55,0,.9,.5);}
+  #author-card{position:relative;}
+  #author-card > *{transition:opacity .15s ease;}
+  #author-card::after{content:'Tap to input book data'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font:700 .74rem/1 Arial, sans-serif; text-transform:uppercase; letter-spacing:.04em; color:var(--ink); opacity:0; pointer-events:none; transition:opacity .15s ease;}
+  #author-card.ct-prompt{cursor:pointer;}
+  #author-card.ct-prompt > *{opacity:0; pointer-events:none;}
+  #author-card.ct-prompt::after{opacity:1;}
+  /* the picker: a second footer above it, up to just under the 3D book */
+  #ctray{position:fixed; z-index:40; box-sizing:border-box; border:3px solid #000; overflow:hidden;
+    background:#6b4a32; padding:4px; display:flex; flex-direction:column;}
+  #ctray .ct-floor{position:relative; flex:1; min-height:0; width:100%; box-sizing:border-box; border:3px solid #000; border-radius:8px; overflow:hidden; background:var(--bg);}
+  #ctray .ct-grid{position:absolute; inset:0; display:flex; flex-wrap:wrap; padding:8px; box-sizing:border-box; align-content:space-evenly; justify-content:center;}
+  #ctray .ct-grid > .ct-book{margin:0 calc(var(--gx, 8px) / 2);}
+  #ctray .ct-book{grid-column:auto; position:relative; width:var(--bw); height:calc(var(--bw) / var(--asp, .7833)); min-width:0; padding:0; margin:0; border:0; background:none; cursor:pointer;
+    box-shadow:none; transition:transform .2s cubic-bezier(.2,.8,.3,1); animation:ct-in .22s cubic-bezier(.2,.8,.3,1) backwards;}
+  #ctray .ct-book i{position:absolute; box-sizing:border-box; border-radius:3px;}
+  /* Cover: a closed book lying on its back: cover colour, a darker spine down the left, the page edge at the right and bottom */
+  #ctray .k-cover .pg{left:3px; top:3px; right:-3px; bottom:-3px; border:2px solid #000; background:#f4efe3;}
+  #ctray .k-cover .cv{inset:0; border:2.5px solid #000; background:linear-gradient(90deg, var(--cd) 0 12%, var(--c) 12%);}
+  /* Pages: three loose sheets in a neat stack; the picked stack is knocked askew */
+  #ctray .k-paper .sh{width:calc(var(--bw) * .92); height:calc(var(--bw) * .92 * 3 / 2.35); left:0; top:0; border:2px solid #000; border-radius:2px;
+    background:var(--pg); box-shadow:inset 0 0 0 2px var(--edge); transition:transform .22s cubic-bezier(.3,1.4,.5,1);}
+  #ctray .k-paper .s1{transform:translate(4px, 4px);}
+  #ctray .k-paper .s2{transform:translate(2px, 2px);}
+  #ctray .k-paper .s3{transform:translate(0, 0);}
+  #ctray .k-paper.on{transform:translateY(-4px);}
+  #ctray .k-paper.on .s1{transform:translate(5px, 6px) rotate(9deg);}
+  #ctray .k-paper.on .s2{transform:translate(-4px, 3px) rotate(-11deg);}
+  #ctray .k-paper.on .s3{transform:translate(1px, -2px) rotate(4deg);}
+  /* Ribbons: one row standing up from past the bottom edge of the screen; the picked one stands higher */
+  /* ribbons: the card keeps its margins; the ribbons run over its bottom edge and under the picker's bottom border */
+  #ctray .rib-floor{overflow:visible;}
+  #ctray .rib-row{display:flex; justify-content:space-evenly; align-items:flex-start; gap:0; padding:0 8px; inset:0;}
+  #ctray .k-rib{width:var(--rw); height:var(--rh); flex:none; transform:translateY(var(--low));}
+  #ctray .k-rib svg{display:block;}
+  #ctray .k-rib.on{transform:translateY(var(--high));}
+  /* Design: a square brown block, its side showing at the right and bottom, the pattern in white round its edge */
+  #ctray .k-block .pg{background:#3f2b1d;}
+  #ctray .k-block .cv{background:#6b4a32; overflow:hidden;}
+  #ctray .k-block .cv canvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  /* the one picked lifts and tips a little */
+  #ctray .ct-book.on{z-index:2;}
+  #ctray .k-cover.on{transform:translateY(-7px) rotate(-6deg) scale(1.04);}
+  #ctray .k-cover.on .cv{border-width:3px;}
+  #ctray.closing .ct-book{transform:translateY(-10px) scale(1.1) !important; opacity:0; transition:transform .14s ease, opacity .14s ease;}
+  /* everything comes in the same way: quickly up from below the bottom of the picker */
+  @keyframes ct-in{ from{transform:translateY(var(--in));} }
+  /* the bar along the tray's back edge */
+  #ctray .ct-bar{position:relative; flex:none; height:30px; padding-left:4px; display:flex; align-items:center; gap:8px;}
+  #ctray .ct-k{font:700 .62rem/1 Arial, sans-serif; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.7);}
+  #ctray .ct-name{flex:1; text-align:center; font:700 .78rem/1 Arial, sans-serif; text-transform:uppercase; letter-spacing:.04em; color:#fff;}
+  #ctray .ct-done{height:28px; padding:0 14px; margin:0; border:3px solid #000; border-radius:8px; background:#fff; color:var(--ink);
+    font:700 .62rem/1 Arial, sans-serif; text-transform:uppercase; letter-spacing:.06em; cursor:pointer; box-shadow:none;}
+  /* while it lifts out, it still looks like the Cover card it came from */
+  #ctray .ct-from{position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center; pointer-events:none;
+    font:700 .7rem/1 Georgia, serif; text-transform:uppercase; color:#fff;}
 </style>
 <style>
   /* ---------- splash: STACK drops onto the top shelf, TRACKER slides in one book at a time ---------- */
@@ -1512,6 +1582,7 @@
     </div>
     <div class="field-card" id="tags-card"><label>Lists</label><div id="tags-value">None</div></div>
   </div>
+  <div id="opt-foot">
   <div id="customize-fields">
     <div class="cycle-card" id="customize-binding-card">
       <div class="cycle-title">Binding</div>
@@ -1544,6 +1615,7 @@
       <div class="cycle-subtitle" id="customize-shape-subtitle"></div>
     </div>
   </div>
+</div>
 </div>
 
 <div class="tooltip" id="tooltip"></div>
@@ -1974,6 +2046,7 @@
     // pattern seed: a short string of digits, picked once, that always draws this book's own page lines and spots
     if(!/^\d{8}$/.test(b.seed || '')){ b.seed = String(Math.floor(Math.random() * 1e8)).padStart(8, '0'); normalizeBook.dirty = true; }
     if(!b.lastDayKey) b.lastDayKey = localTodayKey();
+    if(convertTapeColours(b)) normalizeBook.dirty = true;   // old (or imported) tape colours → the new lists
     if(!Array.isArray(b.reads)) b.reads = [];
     // a finished book with no finish date (older data, an import): it finished on its last logged day, not today
     if(bookFinished(b) && !b.finishedOn) b.finishedOn = b.lastDayKey;
@@ -2024,6 +2097,7 @@
 
 
   function bookColor(b){
+    if(b.format === 'audio') return tapeColours(b).shell;   // a tape is its shell colour everywhere
     return b.color || colorForTitle(b.title);
   }
 
@@ -2690,7 +2764,7 @@
     wireDDActions(dd, row, b);
     const confirmBtn = dd.querySelector('.dd-confirm');
     const st = styleForBook(b);
-    const bodyCol = mixHex(st.color, '#ffffff', TAPE_BODY_LIGHTEN);     // the cassette's body colour
+    const bodyCol = st.color;     // the cassette's shell colour
     confirmBtn.style.setProperty('--bookmark', bodyCol);
     confirmBtn.style.setProperty('--bookmark-ink', readableTextOn(bodyCol));
     row._staged = null;
@@ -3384,16 +3458,88 @@
     {name:'Gilt gold', base:'#d9b65a', tint:0xf2e2b8, edge:'gilt', paper:'#e7dfc9'},
     {name:'Gilt red', base:'#a8382f', tint:0xf0d8d4, edge:'gilt', paper:'#e7dfc9'}
   ];
-  // audiobook label (sticker) colours: light tints that read well with dark text and sit
-  // clearly against every body colour (the bodies are mid-tones)
-  const STICKERS = [
-    {name:'Cream', hex:'#e9d8a8'}, {name:'White', hex:'#f2f0ea'}, {name:'Kraft', hex:'#c8a473'},
-    {name:'Lemon', hex:'#eed566'}, {name:'Tangerine', hex:'#f0a95e'}, {name:'Peach', hex:'#f0bd96'},
-    {name:'Coral', hex:'#ec9a86'}, {name:'Blush', hex:'#eab0b3'}, {name:'Lilac', hex:'#c9b6e4'},
-    {name:'Sky', hex:'#a9cbe8'}, {name:'Aqua', hex:'#9fd5cf'}, {name:'Mint', hex:'#addcbc'},
-    {name:'Sage', hex:'#c3cf9e'}, {name:'Silver', hex:'#c6cbd1'},
-    {name:'Charcoal', hex:'#3a3a3d'}, {name:'Black', hex:'#1c1b1a'}           // dark labels: white text
+  // ---------- audiobook (cassette) colours: real shell, hub and label colours ----------
+  // shells from cassette makers' catalogues (Pantone numbers where given), the standard hubs plus
+  // coloured-hub runs, and label stocks. Short names, so each fits its section in Add / Edit.
+  const TAPE_SHELLS = [
+    {name:'Black', hex:'#1c1c1e'}, {name:'White', hex:'#eeebe4'}, {name:'Grey', hex:'#bdbfbd'},
+    {name:'Burgundy', hex:'#8c2238'}, {name:'Orange', hex:'#f2581f'}, {name:'Yellow', hex:'#f6cf1d'},
+    {name:'Gold', hex:'#b4975a'}, {name:'Green', hex:'#0b7a3a'}, {name:'Blue', hex:'#1a6fc4'}, {name:'Purple', hex:'#772f68'}
   ];
+  const TAPE_SPINNERS = [
+    {name:'White', hex:'#f3f1ec'}, {name:'Nylon', hex:'#e6dcc3'}, {name:'Grey', hex:'#c8c9c7'},
+    {name:'Red', hex:'#c0252f'}, {name:'Orange', hex:'#e8641e'}, {name:'Yellow', hex:'#f2c614'},
+    {name:'Gold', hex:'#c8a443'}, {name:'Green', hex:'#1f7a3e'}, {name:'Blue', hex:'#2346a8'}, {name:'Purple', hex:'#6b3a9a'}
+  ];
+  const TAPE_LABELS = [
+    {name:'White', hex:'#f6f5f1'}, {name:'Ivory', hex:'#ece6d6'}, {name:'Pink', hex:'#f3c4cc'},
+    {name:'Red', hex:'#c9302c'}, {name:'Orange', hex:'#ff9a3c'}, {name:'Gold', hex:'#cfae5a'},
+    {name:'Mint', hex:'#c4e3c0'}, {name:'Sky', hex:'#b9d4ee'}, {name:'Blue', hex:'#2f5fae'}, {name:'Lavender', hex:'#d3c4ea'}
+  ];
+  // ---- converting the old tape colours (body = cover colour, spinners = ribbon, label = sticker number or page colour) ----
+  // every old preset has a chosen new colour; anything else goes to the nearest by hue (by lightness for greys)
+  const LEGACY_STICKERS = ['#e9d8a8', '#f2f0ea', '#c8a473', '#eed566', '#f0a95e', '#f0bd96', '#ec9a86', '#eab0b3',
+    '#c9b6e4', '#a9cbe8', '#9fd5cf', '#addcbc', '#c3cf9e', '#c6cbd1', '#3a3a3d', '#1c1b1a'];
+  const TAPE_FROM_OLD = {
+    // cover → shell: Brick, Rust, Ochre, Mustard, Olive, Forest, Pine, Navy, Indigo, Plum, Wine, Walnut, Umber, Espresso, Slate, Onyx
+    shell: {'#7a2f2b':'Burgundy', '#86452b':'Orange', '#8a6a3f':'Gold', '#857636':'Yellow', '#5b6633':'Green', '#2e4636':'Green',
+      '#2b5752':'Green', '#234a5e':'Blue', '#303d66':'Blue', '#3a2f52':'Purple', '#66304c':'Burgundy', '#6b4a32':'Gold',
+      '#5a4636':'Black', '#4a3a2b':'Black', '#57646e':'Grey', '#1d1b22':'Black'},
+    // ribbon → spinners: Crimson, Amber, Gold, Lime, Emerald, Teal, Sky, Sapphire, Violet, Magenta, Charcoal
+    spin: {'#b5342a':'Red', '#e0752a':'Orange', '#c9a83a':'Gold', '#7a9a35':'Green', '#2e6b4a':'Green', '#1a7a6b':'Green',
+      '#2a7aa8':'Blue', '#2e4a8a':'Blue', '#8a3ac9':'Purple', '#b0407a':'Purple', '#333333':'Grey'},
+    // old sticker → label: Cream, White, Kraft, Lemon, Tangerine, Peach, Coral, Blush, Lilac, Sky, Aqua, Mint, Sage, Silver, Charcoal, Black
+    label: {'#e9d8a8':'Ivory', '#f2f0ea':'White', '#c8a473':'Gold', '#eed566':'Gold', '#f0a95e':'Orange', '#f0bd96':'Orange',
+      '#ec9a86':'Pink', '#eab0b3':'Pink', '#c9b6e4':'Lavender', '#a9cbe8':'Sky', '#9fd5cf':'Mint', '#addcbc':'Mint',
+      '#c3cf9e':'Mint', '#c6cbd1':'White', '#3a3a3d':'Blue', '#1c1b1a':'Blue'}
+  };
+  // lightness, chroma and hue (CIE LCh) for matching by eye rather than by raw RGB
+  function lchOf(hex){
+    const n = parseInt(hex.slice(1), 16);
+    const c = [n >> 16, (n >> 8) & 255, n & 255].map(v => { v /= 255; return v > .04045 ? Math.pow((v + .055) / 1.055, 2.4) : v / 12.92; });
+    const f = t => t > .008856 ? Math.cbrt(t) : 7.787 * t + 16/116;
+    const X = f((c[0]*.4124 + c[1]*.3576 + c[2]*.1805) / .95047), Y = f(c[0]*.2126 + c[1]*.7152 + c[2]*.0722), Z = f((c[0]*.0193 + c[1]*.1192 + c[2]*.9505) / 1.08883);
+    const A = 500 * (X - Y), B = 200 * (Y - Z);
+    return [116 * Y - 16, Math.hypot(A, B), (Math.atan2(B, A) * 180 / Math.PI + 360) % 360];
+  }
+  function nearestTape(list, hex, table){
+    hex = String(hex).toLowerCase();
+    const exact = list.find(t => t.hex === hex); if(exact) return exact.hex;
+    const named = table && table[hex] && list.find(t => t.name === table[hex]); if(named) return named.hex;
+    const [L, C, H] = lchOf(hex);
+    let best = list[0], bd = Infinity;
+    list.forEach(t => { const [L2, C2, H2] = lchOf(t.hex); let d;
+      if(C < 12) d = (L - L2) ** 2 + (C2 * .5) ** 2;                  // a grey: closest in lightness, preferring greys
+      else if(C2 < 12) return;                                         // a colour never becomes a grey
+      else { const dh = Math.min(Math.abs(H - H2), 360 - Math.abs(H - H2)); d = dh * dh + ((L - L2) * .5) ** 2; }
+      if(d < bd){ bd = d; best = t; } });
+    return best.hex;
+  }
+  // a tape's three colours: its own if set, else converted from the old system. Anything off the
+  // lists (hand-edited, an older export) goes to the nearest too.
+  function tapeColours(b){
+    const ok = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v);
+    let label = b.tapeLabel;
+    if(!ok(label)){
+      if(b.stickerIdx != null && LEGACY_STICKERS[b.stickerIdx]) label = LEGACY_STICKERS[b.stickerIdx];
+      else { const rnd = mulberry32(hashStr(b.title + '|' + b.author));     // never chose a sticker: the label was its page colour
+        const tone = PAGE_TONES[b.pageToneIdx != null ? b.pageToneIdx : Math.floor(rnd()*PAGE_TONES_RANDOM)] || PAGE_TONES[0];
+        label = tone.name === 'White' ? '#f6f5f1' : '#ece6d6'; }      // white paper → White, any other paper → Ivory
+    }
+    return {
+      shell: nearestTape(TAPE_SHELLS, ok(b.tapeShell) ? b.tapeShell : (b.color || colorForTitle(b.title || '')), TAPE_FROM_OLD.shell),
+      spin: nearestTape(TAPE_SPINNERS, ok(b.tapeSpin) ? b.tapeSpin : (b.bookmarkColor || DEFAULT_BOOKMARK_COLOR), TAPE_FROM_OLD.spin),
+      label: nearestTape(TAPE_LABELS, label, TAPE_FROM_OLD.label)
+    };
+  }
+  // store the converted colours on a tape (load, import, merge); true if anything changed
+  function convertTapeColours(b){
+    if(b.format !== 'audio') return false;
+    const t = tapeColours(b);
+    if(b.tapeShell === t.shell && b.tapeSpin === t.spin && b.tapeLabel === t.label) return false;
+    b.tapeShell = t.shell; b.tapeSpin = t.spin; b.tapeLabel = t.label;
+    return true;
+  }
   const PAGE_TONES_RANDOM = 5;                  // books with no page colour set pick from the first five (as before)
   const paperOf = t => t.paper || t.base;       // the paper itself (differs from the edge colour for gilt)
   const BORDER_STYLE_NAMES = [
@@ -3440,10 +3586,10 @@
       color: bookColor(book),  // matches the 2D shelf spine
       pageTone: PAGE_TONES[book.pageToneIdx != null ? book.pageToneIdx : Math.floor(rnd()*PAGE_TONES_RANDOM)] || PAGE_TONES[0],
       border: (b => b === BORDER_RETIRED ? 0 : b)(book.borderStyle != null ? book.borderStyle : Math.floor(rnd()*BORDER_STYLES)),
-      bookmarkColor: book.bookmarkColor || DEFAULT_BOOKMARK_COLOR,
+      bookmarkColor: book.format === 'audio' ? tapeColours(book).spin : (book.bookmarkColor || DEFAULT_BOOKMARK_COLOR),
       bookmarkShape: 0,                   // ribbon tip: always classic
-      // audiobook label: its own sticker colour, or (never chosen) the page colour as before
-      get sticker(){ return book.stickerIdx != null && STICKERS[book.stickerIdx] ? STICKERS[book.stickerIdx].hex : paperOf(this.pageTone); }
+      // audiobook label colour
+      get sticker(){ return tapeColours(book).label; }
     };
   }
 
@@ -4228,15 +4374,41 @@
     }
   }
 
-  const TAPE_BODY_LIGHTEN = 0.28;   // cassette body = cover colour this much toward white
+  // matte plastic and paper: no shine at all (no specular), and a fine stippled grain on the moulded shell
+  let matteGrainTex = null;
+  function matteGrain(){
+    if(!matteGrainTex){
+      const N = 256, c = document.createElement('canvas'); c.width = c.height = N;
+      const x = c.getContext('2d'), img = x.createImageData(N, N), d = img.data;
+      let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      for(let i = 0; i < N*N; i++){ const v = 110 + rnd()*90; d[i*4] = d[i*4+1] = d[i*4+2] = v; d[i*4+3] = 255; }
+      x.putImageData(img, 0, 0);
+      matteGrainTex = new THREE.CanvasTexture(c);
+      matteGrainTex.wrapS = matteGrainTex.wrapT = THREE.RepeatWrapping;
+      matteGrainTex.repeat.set(0.7, 0.7);
+      matteGrainTex.anisotropy = 8;
+      matteGrainTex._shared = true;
+    }
+    return matteGrainTex;
+  }
+  // the shared scenes are lit for books; a tape's matte surfaces take 85% of the light so its
+  // colours read as picked (as in the colour lab), not washed out
+  const MATTE_LIGHT = 0.85;
+  function matte(o, grain){
+    const m = new THREE.MeshPhongMaterial(Object.assign({specular: 0x000000, shininess: 0}, o));
+    m.color = new THREE.Color(o.color != null ? o.color : 0xffffff).multiplyScalar(MATTE_LIGHT);
+    if(grain){ m.bumpMap = matteGrain(); m.bumpScale = 0.006; }
+    return m;
+  }
   function buildCassetteGroup(book){
     const style = styleForBook(book);
     // colours from the book: body a lighter cover colour, spinners a light
     // ribbon colour, label the page colour
     const mixWhite = (hex, f) => '#' + new THREE.Color(hex).lerp(new THREE.Color(0xffffff), f).getHexString();
-    const BODY = mixWhite(style.color, TAPE_BODY_LIGHTEN), PANEL = mixWhite(style.color, 0.12);
-    const SPIN = style.bookmarkColor;                     // spinners: the ribbon colour as it is
-    const PAPER = style.sticker;
+    const tc = tapeColours(book);
+    const BODY = tc.shell, PANEL = '#' + new THREE.Color(tc.shell).lerp(new THREE.Color(0x000000), 0.06).getHexString();
+    const SPIN = tc.spin;
+    const PAPER = tc.label;
     const W = 4.016, H = 2.552, D = 0.48;
     const fx = u => (u - 200)/400 * W, fy = v => -(v - 127)/254 * H, fr = r => r/400 * W;
     // hubs and window sit a little high on the label, leaving room for the time below
@@ -4260,7 +4432,7 @@
     const BEV = 0.012;
     const shellGeo = new THREE.ExtrudeGeometry(sh, {depth: D - BEV*2, bevelEnabled: true, bevelThickness: BEV, bevelSize: BEV, bevelSegments: 2, curveSegments: 20});
     shellGeo.translate(0, 0, -(D - BEV*2)/2);
-    g.add(new THREE.Mesh(shellGeo, new THREE.MeshLambertMaterial({color: new THREE.Color(BODY)})));
+    g.add(new THREE.Mesh(shellGeo, matte({color: new THREE.Color(BODY)}, true)));
     NOTCHES.forEach(([a, b])=>{                        // dark inside each opening
       const m = new THREE.Mesh(new THREE.PlaneGeometry(b - a, D - 0.04), new THREE.MeshBasicMaterial({color: 0x111214, side: THREE.DoubleSide}));
       m.rotation.x = Math.PI/2; m.position.set((a + b)/2, -H/2 + NOTCH_H - 0.004, 0); g.add(m);
@@ -4314,7 +4486,7 @@
     const labelCanvas = document.createElement('canvas'); labelCanvas.width = LW; labelCanvas.height = LH;
     drawLabel(labelCanvas, p0);
     const labelTex = new THREE.CanvasTexture(labelCanvas); labelTex.anisotropy = 8;
-    const labelMat = new THREE.MeshLambertMaterial({map: labelTex, alphaTest: 0.5, color: 0xe6e6e6});
+    const labelMat = matte({map: labelTex, alphaTest: 0.5, color: 0xffffff});
     [1, -1].forEach(s=>{
       const m = new THREE.Mesh(new THREE.PlaneGeometry(W, H), labelMat);
       m.name = 'casLabel';
@@ -4325,7 +4497,7 @@
     const trap = new THREE.Shape();
     trap.moveTo(fx(112), fy(184)); trap.lineTo(fx(288), fy(184)); trap.lineTo(fx(314), fy(244)); trap.lineTo(fx(86), fy(244)); trap.lineTo(fx(112), fy(184));
     const trapGeo = new THREE.ExtrudeGeometry(trap, {depth: 0.03, bevelEnabled: true, bevelThickness: 0.008, bevelSize: 0.008, bevelSegments: 1});
-    const trapMat = new THREE.MeshLambertMaterial({color: new THREE.Color(PANEL)});
+    const trapMat = matte({color: new THREE.Color(PANEL)}, true);
     [1, -1].forEach(s=>{ const m = new THREE.Mesh(trapGeo, trapMat); m.position.z = s*D/2; if(s < 0) m.rotation.y = Math.PI; g.add(m); });
     // on that panel: the percentage in big three-digit numbers, with PERCENT beneath
     const PU = 12;                                                 // canvas pixels per drawing unit (sharp up close)
@@ -4349,7 +4521,7 @@
     drawPct(pc, p0);
     const pTex = new THREE.CanvasTexture(pc); pTex.anisotropy = 16;
     // smooth (blended) edges instead of a hard cut-out, so the letters aren't jagged
-    const pMat = new THREE.MeshLambertMaterial({map: pTex, transparent: true, depthWrite: false});
+    const pMat = matte({map: pTex, transparent: true, depthWrite: false});
     [1, -1].forEach(s=>{
       const m = new THREE.Mesh(new THREE.PlaneGeometry(fr(176), fr(60)), pMat);
       m.name = 'casPct';
@@ -4358,7 +4530,7 @@
       g.add(m);
     });
     const screwGeo = new THREE.CylinderGeometry(fr(5), fr(5), 0.012, 16); screwGeo.rotateX(Math.PI/2);
-    const screwMat = new THREE.MeshLambertMaterial({color: 0x8d9096});
+    const screwMat = matte({color: 0x8d9096});
     [[16,16],[384,16],[16,238],[384,238],[200,198]].forEach(([u, v])=>[1, -1].forEach(s=>{
       const m = new THREE.Mesh(screwGeo, screwMat); m.position.set(fx(u), fy(v), s*(D/2 + 0.004)); g.add(m);
     }));
@@ -4367,10 +4539,10 @@
     const R_DRUM = Math.sqrt(R_IN*R_IN + (RMAX*RMAX - R_IN*R_IN)*0.5);
     const rad = c => Math.sqrt(R_DRUM*R_DRUM + (RMAX*RMAX - R_IN*R_IN) * Math.max(0, c)/100);
     const DRUM_D = D - 0.03, ZI = D - 0.06;
-    const plastic = new THREE.MeshLambertMaterial({color: 0xf1eee6});               // the wheel (drum)
-    const spinMat = new THREE.MeshLambertMaterial({color: new THREE.Color(SPIN)});   // the spinner: hub + teeth
-    const tapeSide = new THREE.MeshLambertMaterial({color: 0x2e1609});
-    const tapeFace = new THREE.MeshLambertMaterial({map: tapeWindTexture(rad(100))});
+    const plastic = matte({color: 0xf1eee6});               // the wheel (drum)
+    const spinMat = matte({color: new THREE.Color(SPIN)});   // the spinner: hub + teeth
+    const tapeSide = matte({color: 0x2e1609});
+    const tapeFace = matte({map: tapeWindTexture(rad(100))});
     const p = p0;
     const packGeo = count => {
       const pk = new THREE.Shape(); pk.absarc(0, 0, rad(count), 0, Math.PI*2, false); pk.holes.push(circ(0, 0, R_DRUM - 0.002));
@@ -4409,7 +4581,7 @@
     const idx = [];
     for(let i = 1; i < 6; i++){ const a = (i-1)*2; idx.push(a, a+1, a+2, a+1, a+3, a+2); }
     const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(runPos(p), 3)); rg.setIndex(idx); rg.computeVertexNormals();
-    const run = new THREE.Mesh(rg, new THREE.MeshLambertMaterial({color: 0x3a1c0b, side: THREE.DoubleSide}));
+    const run = new THREE.Mesh(rg, matte({color: 0x3a1c0b, side: THREE.DoubleSide}));
     run.name = 'casRun'; g.add(run);
     // tape length per unit of progress (pack area / tape thickness), for how far the reels turn
     const TAPE_T = fr(1), LTOT = Math.PI*(RMAX*RMAX - R_IN*R_IN)/TAPE_T;
@@ -4566,13 +4738,15 @@
   // Built in the same frame as a book on the shelf: x into the shelf, y up, z across,
   // with the door on the -x end (facing you). The tape lies inside on its long edge.
   function buildTapeCase(book){
-    const st = styleForBook(book), col = st.color, paperCol = st.sticker;
+    const col = '#1c1c1e';                              // every case is black; the tape's own colour shows through the flap
     const CW = 109/TAPE_MM, CH = 70/TAPE_MM, CD = 17/TAPE_MM, PT = 0.04;   // tall, deep, thick
     const outer = new THREE.Group(), inner = new THREE.Group();
     inner.scale.setScalar(TAPE_S); inner.name = 'tapeInner';
     outer.add(inner);
-    const sleeve = new THREE.MeshLambertMaterial({color: new THREE.Color(col)});
-    const dark = new THREE.MeshLambertMaterial({color: new THREE.Color(col).multiplyScalar(0.45)});
+    // matte black plastic; the hinged flap is 60% opaque so the tape shows through it
+    const CASE_OPACITY = 0.6;
+    const sleeve = matte({color: new THREE.Color(col)});
+    const dark = matte({color: new THREE.Color(col).multiplyScalar(0.45), transparent: true, opacity: CASE_OPACITY, depthWrite: false});
     const box = (w, h, d, m, x, y, z, parent) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); (parent || inner).add(b); return b; };
     [-1, 1].forEach(sz => box(CH, CW, PT, sleeve, 0, 0, sz*(CD/2 - PT/2)));            // the two faces
     [-1, 1].forEach(sy => box(CH, PT, CD, sleeve, 0, sy*(CW/2 - PT/2), 0));            // top and bottom
@@ -4582,6 +4756,7 @@
     door.position.set(-CH/2, 0, -CD/2); inner.add(door);
     const c = document.createElement('canvas'); c.width = 96; c.height = 600;
     const k = c.getContext('2d');
+    k.globalAlpha = CASE_OPACITY;                       // the door's plastic and frame are see-through; the title is printed solid
     k.fillStyle = col; k.fillRect(0, 0, c.width, c.height);
     // a framed edge round the door, so two cases of one colour still read as two:
     // dark rim, then a thin lit bevel just inside it
@@ -4592,16 +4767,20 @@
     k.fillRect(8, 8, 3, c.height - 16); k.fillRect(8, 8, c.width - 16, 3);
     k.fillStyle = shade(col, -22);
     k.fillRect(c.width - 11, 8, 3, c.height - 16); k.fillRect(8, c.height - 11, c.width - 16, 3);
+    k.globalAlpha = 1;
     k.save(); k.translate(c.width/2, c.height/2); k.rotate(Math.PI/2);
-    k.fillStyle = paperCol; k.textAlign = 'center'; k.textBaseline = 'middle';
+    const ink = '#f4f1ea';                              // white title
+    k.fillStyle = ink; k.textAlign = 'center'; k.textBaseline = 'middle';
     k.font = '700 40px Georgia, serif'; k.fillText(book.title || '', 0, 2, c.height*0.82);
     k.restore();
     const art = new THREE.CanvasTexture(c); art.anisotropy = 8;
-    const doorFace = new THREE.MeshLambertMaterial({map: art});
+    const doorFace = matte({map: art, transparent: true, depthWrite: false});
     // box faces: +x, -x, +y, -y, +z, -z — the outside (-x) carries the title
     box(PT, CW, CD, [dark, doorFace, sleeve, sleeve, sleeve, sleeve], PT/2, 0, CD/2, door);
-    // the tape itself stands inside, but it can't be seen with the door shut,
-    // so it's only built when the case is first touched (ensureCassette)
+    // the tape itself stands inside, seen through the plastic
+    const tape = buildCassetteGroup(book);
+    tape.name = 'tapeCassette'; tape.rotation.z = Math.PI/2; tape.position.set(0.04, 0, 0);
+    inner.add(tape);
     const dummy = new THREE.Group(); dummy.name = 'bookmark'; dummy.visible = false; outer.add(dummy);
     return { group: outer, W: CH*TAPE_S, H: CW*TAPE_S, D: CD*TAPE_S, coverT: 0, bookmark: dummy,
              tapeSlide: CH + 0.3 };
@@ -5000,7 +5179,7 @@
     // everything that changes the model — including whether it's a book, an audiobook or
     // book + tape — so switching a title's format never reuses the old model
     const key = JSON.stringify([b.format || 'book', b.title, b.author, b.pages, st.color, b.cover || 'hard',
-      st.bookmarkColor, st.bookmarkShape, st.pageTone.name, st.border, b.currentPage || 0, b.audioSeconds || 0]);
+      st.bookmarkColor, st.bookmarkShape, st.pageTone.name, st.border, b.format === 'audio' ? st.sticker : '', b.currentPage || 0, b.audioSeconds || 0]);
     let base = shelfBases.get(key);
     if(!base){
       const built = b.format === 'audio' ? buildTapeCase(b) : buildBookGroup(b, {lite:true});
@@ -5575,7 +5754,7 @@
       paintPlayUpdate();
     }
     if(playMode){
-      const tapeBody = mixHex(barStyle.color, '#ffffff', TAPE_BODY_LIGHTEN);   // the cassette's body colour, like Confirm in the list
+      const tapeBody = barStyle.color;   // the cassette's shell colour, like Confirm in the list
       playUpdate.style.setProperty('--bookmark', tapeBody);
       playUpdate.style.setProperty('--bookmark-ink', readableTextOn(tapeBody));
       shelfPlay = {
@@ -6229,7 +6408,10 @@
   let customizeBookmarkIdx = 0;
   let customizeBorderChoice = 0;
   let customizeToneChoice = 0;
-  let customizeStickerIdx = 0;              // audiobook: the label colour (the Pages card becomes Sticker)
+  let customizeShellIdx = 0, customizeSpinIdx = 0, customizeLabelIdx = 0;   // audiobook: shell, spinners, label (own lists)
+  // the Cover and Ribbon cards pick from the tape lists for an audiobook
+  const colorCardSet = () => customizeFormat === 'audio' ? [TAPE_SHELLS, customizeShellIdx] : [COVER_COLOR_PRESETS, customizeColorIdx];
+  const ribbonCardSet = () => customizeFormat === 'audio' ? [TAPE_SPINNERS, customizeSpinIdx] : [BOOKMARK_COLOR_PRESETS, customizeBookmarkIdx];
   let customizeCoverIdx = 0;
   let customizeShapeChoice = 0;
 
@@ -6375,8 +6557,8 @@
   }
   function paintStickerSection(){
     const el = customizeTonePreview, card = el.closest('.cycle-card');
-    const tone = (STICKERS[customizeStickerIdx] || STICKERS[0]).hex;          // the label: its sticker colour
-    const body = mixHex(COVER_COLOR_PRESETS[customizeColorIdx].hex, '#ffffff', TAPE_BODY_LIGHTEN);
+    const tone = (TAPE_LABELS[customizeLabelIdx] || TAPE_LABELS[0]).hex;      // the label colour
+    const body = (TAPE_SHELLS[customizeShellIdx] || TAPE_SHELLS[0]).hex;
     card.classList.remove('bookish', 'open-left');
     el.removeAttribute('style');
     fillCycleSection(el, tone);
@@ -6401,14 +6583,13 @@
     return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="display:block; width:100%; height:100%">${g}</svg>`;
   }
   function renderColorPreview(previewEl, subtitleEl, presets, idx){
-    const tapeBody = customizeFormat === 'audio' && presets === COVER_COLOR_PRESETS;
-    const hex = tapeBody ? mixHex(presets[idx].hex, '#ffffff', TAPE_BODY_LIGHTEN) : presets[idx].hex;
+    const hex = presets[idx].hex;
     previewEl.style.background = hex;
     fillCycleSection(previewEl, hex);
     subtitleEl.textContent = presets[idx].name;
     // Cover (books): a sunken panel, its frame wider for hardcover
-    if(presets === COVER_COLOR_PRESETS){
-      const card = previewEl.closest('.cycle-card'), audio = customizeFormat === 'audio';
+    if(presets === COVER_COLOR_PRESETS || presets === TAPE_SHELLS){
+      const card = previewEl.closest('.cycle-card'), audio = presets === TAPE_SHELLS;
       card.classList.add('corner');
       previewEl.style.background = '';
       // audiobook Body: a raised plastic shell with a screw in each corner
@@ -6417,8 +6598,8 @@
     }
     // Ribbon (books): the ribbon lies on the page, its classic V tip cut shallowly from the
     // top so the plain page colour shows through, with the ribbon's shadow falling on it
-    if(presets === BOOKMARK_COLOR_PRESETS){
-      const card = previewEl.closest('.cycle-card'), ribbon = customizeFormat !== 'audio';
+    if(presets === BOOKMARK_COLOR_PRESETS || presets === TAPE_SPINNERS){
+      const card = previewEl.closest('.cycle-card'), ribbon = presets === BOOKMARK_COLOR_PRESETS;
       card.classList.toggle('ribbon', ribbon);
       if(ribbon){
         card.style.background = paperOf(PAGE_TONES[customizeToneChoice] || PAGE_TONES[0]);
@@ -6494,13 +6675,13 @@
   function paintBookSections(){
     paintBindingAndPages();
     // the ribbon's notch and the cover corner show the page colour (and the corner the binding), so they follow too
-    renderColorPreview(customizeColorPreview, customizeColorSubtitle, COVER_COLOR_PRESETS, customizeColorIdx);
-    renderColorPreview(customizeBookmarkPreview, customizeBookmarkSubtitle, BOOKMARK_COLOR_PRESETS, customizeBookmarkIdx);
+    renderColorPreview(customizeColorPreview, customizeColorSubtitle, ...colorCardSet());
+    renderColorPreview(customizeBookmarkPreview, customizeBookmarkSubtitle, ...ribbonCardSet());
   }
   function renderTonePreview(){
     paintBookSections();
     const tn = PAGE_TONES[customizeToneChoice] || PAGE_TONES[0];
-    customizeToneSubtitle.textContent = customizeFormat === 'audio' ? (STICKERS[customizeStickerIdx] || STICKERS[0]).name
+    customizeToneSubtitle.textContent = customizeFormat === 'audio' ? (TAPE_LABELS[customizeLabelIdx] || TAPE_LABELS[0]).name
       : tn.edge ? tn.name + ' edges' : tn.name + ' pages';   // CREAM PAGES, GILT GOLD EDGES; a tape shows its sticker
   }
   const DESIGN_FILL = '#6b4a32';
@@ -6609,7 +6790,7 @@
       bookmarkColor: BOOKMARK_COLOR_PRESETS[customizeBookmarkIdx].hex,
       borderStyle: customizeBorderChoice,
       pageToneIdx: customizeToneChoice,
-      stickerIdx: customizeStickerIdx,
+      tapeShell: TAPE_SHELLS[customizeShellIdx].hex, tapeSpin: TAPE_SPINNERS[customizeSpinIdx].hex, tapeLabel: TAPE_LABELS[customizeLabelIdx].hex,
       cover: COVER_TYPE_OPTIONS[customizeCoverIdx].val,
       bookmarkShape: customizeShapeChoice,
       format: customizeFormat
@@ -6691,7 +6872,8 @@
       const t = document.querySelector('#' + id + ' .cycle-title');
       if(t) t.textContent = audio ? tape : book;
     });
-    renderColorPreview(customizeColorPreview, customizeColorSubtitle, COVER_COLOR_PRESETS, customizeColorIdx);   // body sample follows the format
+    renderColorPreview(customizeColorPreview, customizeColorSubtitle, ...colorCardSet());   // Cover or Body, by format
+    renderColorPreview(customizeBookmarkPreview, customizeBookmarkSubtitle, ...ribbonCardSet());   // Ribbon or Spinners
     renderTonePreview(customizeToneChoice);                // Pages: a book for books, a plain sticker colour for tapes
     if(!audio) renderBorderPreview(customizeBorderChoice);  // Design is hidden for tapes; draw it now it's back
     // Pages becomes Length (h:mm:ss) for an audiobook
@@ -6724,6 +6906,7 @@
   const fieldCards = ['title-card','author-card','pages-card'].map(id=>document.getElementById(id));
 
   function openCustomizeModal(book, mode){
+    if(window.__tray) window.__tray.reset();
     customizeMode = mode || 'customize';
     touched = new Set();
     customizingBook = book;
@@ -6754,8 +6937,11 @@
     customizeBorderChoice = style.border;
     customizeToneChoice = PAGE_TONES.indexOf(style.pageTone);
     if(customizeToneChoice < 0) customizeToneChoice = 0;
-    // a tape that never had a sticker chosen starts on the one nearest its current label colour
-    customizeStickerIdx = book.stickerIdx != null ? book.stickerIdx : closestColorIdx(STICKERS, style.sticker);
+    // the tape colours: its own, or (a book, or older data) converted from its cover / ribbon / page colours
+    const tc = tapeColours(book);
+    customizeShellIdx = closestColorIdx(TAPE_SHELLS, tc.shell);
+    customizeSpinIdx = closestColorIdx(TAPE_SPINNERS, tc.spin);
+    customizeLabelIdx = closestColorIdx(TAPE_LABELS, tc.label);
     customizeCoverIdx = book.cover === 'soft' ? 1 : 0;
     customizeShapeChoice = book.bookmarkShape != null ? book.bookmarkShape : 0;
     customizeFormat = book.format === 'audio' ? 'audio' : 'book';   // just Book or Audiobook now
@@ -6764,23 +6950,28 @@
     if(customizeMode === 'add'){
       // new books start with a random cover color instead of all Walnut
       customizeColorIdx = Math.floor(Math.random() * COVER_COLOR_PRESETS.length);
+      customizeShellIdx = Math.floor(Math.random() * TAPE_SHELLS.length);
     }
 
     const mark = (key, set) => v => { set(v); touched.add(key); };
     setupCycleCard(document.getElementById('customize-color-card'),
-      ()=>customizeColorIdx, mark('color', v=>customizeColorIdx=v), COVER_COLOR_PRESETS.length,
-      idx => renderColorPreview(customizeColorPreview, customizeColorSubtitle, COVER_COLOR_PRESETS, idx));
+      ()=> colorCardSet()[1],
+      v=>{ if(customizeFormat === 'audio'){ customizeShellIdx = v; touched.add('tapeShell'); } else { customizeColorIdx = v; touched.add('color'); } },
+      ()=> colorCardSet()[0].length,
+      ()=> renderColorPreview(customizeColorPreview, customizeColorSubtitle, ...colorCardSet()));
     setupCycleCard(document.getElementById('customize-bookmark-card'),
-      ()=>customizeBookmarkIdx, mark('bookmarkColor', v=>customizeBookmarkIdx=v), BOOKMARK_COLOR_PRESETS.length,
-      idx => renderColorPreview(customizeBookmarkPreview, customizeBookmarkSubtitle, BOOKMARK_COLOR_PRESETS, idx));
+      ()=> ribbonCardSet()[1],
+      v=>{ if(customizeFormat === 'audio'){ customizeSpinIdx = v; touched.add('tapeSpin'); } else { customizeBookmarkIdx = v; touched.add('bookmarkColor'); } },
+      ()=> ribbonCardSet()[0].length,
+      ()=> renderColorPreview(customizeBookmarkPreview, customizeBookmarkSubtitle, ...ribbonCardSet()));
     setupCycleCard(document.getElementById('customize-border-card'),
       ()=>Math.max(0, BORDER_CHOICES.indexOf(customizeBorderChoice)), mark('border', v=>customizeBorderChoice=BORDER_CHOICES[v]),
       BORDER_CHOICES.length, i => renderBorderPreview(BORDER_CHOICES[i]));
     setupCycleCard(document.getElementById('customize-tone-card'),
       // books: the page colour; audiobooks: the label (sticker) colour, a list of its own
-      ()=> customizeFormat === 'audio' ? customizeStickerIdx : customizeToneChoice,
-      v=>{ if(customizeFormat === 'audio'){ customizeStickerIdx = v; touched.add('sticker'); } else { customizeToneChoice = v; touched.add('tone'); } },
-      ()=> customizeFormat === 'audio' ? STICKERS.length : PAGE_TONES.length, renderTonePreview);
+      ()=> customizeFormat === 'audio' ? customizeLabelIdx : customizeToneChoice,
+      v=>{ if(customizeFormat === 'audio'){ customizeLabelIdx = v; touched.add('tapeLabel'); } else { customizeToneChoice = v; touched.add('tone'); } },
+      ()=> customizeFormat === 'audio' ? TAPE_LABELS.length : PAGE_TONES.length, renderTonePreview);
     setupCycleCard(document.getElementById('customize-binding-card'),
       ()=>customizeCoverIdx, mark('cover', v=>customizeCoverIdx=v), COVER_TYPE_OPTIONS.length, renderBindingPreview);
     setupCycleCard(document.getElementById('customize-shape-card'),
@@ -6796,6 +6987,7 @@
   }
 
   function closeCustomizeModal(){
+    if(window.__tray) window.__tray.reset();
     customizePage.classList.remove('active');
     if(!heldBookCtl) document.body.classList.remove('book-open');   // a book still in your hand keeps its view
     customizingBook = null;
@@ -6810,7 +7002,11 @@
     if(on('bookmarkColor')) b.bookmarkColor = BOOKMARK_COLOR_PRESETS[customizeBookmarkIdx].hex;
     if(on('border')) b.borderStyle = customizeBorderChoice;
     if(on('tone')) b.pageToneIdx = customizeToneChoice;
-    if(on('sticker')) b.stickerIdx = customizeStickerIdx;
+    // a tape's colours: written when picked, or all three when it becomes a tape (so it keeps what the preview showed)
+    const tapeNow = on('format') && customizeFormat === 'audio';
+    if(tapeNow || on('tapeShell')) b.tapeShell = TAPE_SHELLS[customizeShellIdx].hex;
+    if(tapeNow || on('tapeSpin')) b.tapeSpin = TAPE_SPINNERS[customizeSpinIdx].hex;
+    if(tapeNow || on('tapeLabel')) b.tapeLabel = TAPE_LABELS[customizeLabelIdx].hex;
     if(on('cover')) b.cover = COVER_TYPE_OPTIONS[customizeCoverIdx].val;
     if(on('shape')) b.bookmarkShape = customizeShapeChoice;
   }
@@ -6968,6 +7164,404 @@
   }
   function openEditModal(book){ openCustomizeModal(book, 'edit'); }
   addCard.addEventListener('click', openAddModal);
+
+  // ===================== option pickers: Cover, Ribbon and Pages (plain shapes drawn with CSS) =====================
+  // The option cards are the page's footer. Tapping Cover, Ribbon or Pages raises a picker out of the footer's top
+  // edge, up to just under the 3D book; the fields it covers are hidden while it's open. Tapping another of the
+  // three swaps what it holds; Done, or the open card again, sinks it back. Tapping into a text field folds it away
+  // at once. Picking a cover or paper turns the book once while its colours blend; a new ribbon tucks in and out.
+  (function(){
+    const page = document.getElementById('customize-page');
+    const canvas3d = document.getElementById('customize-canvas');
+    let T = null;
+
+    const shade = (hex, f) => mixHex(hex, f > 0 ? '#ffffff' : '#000000', Math.abs(f));
+    const coverHex = () => COVER_COLOR_PRESETS[customizeColorIdx].hex;
+    // ---- a bold miniature of each border design, readable on a block about 30px across ----
+    // Each is a few big motifs per side in thick white, round the block's edge (corners left clear). Drawn for the
+    // top edge, then turned for the other three.
+    function miniBorder(c, kind, S){
+      const m = S * .08, band = S * .2, L = S - 2 * m, lw = Math.max(2, S * .055), y0 = m, y1 = m + band, cy = m + band / 2;
+      c.strokeStyle = c.fillStyle = '#fff'; c.lineWidth = lw; c.lineCap = 'round'; c.lineJoin = 'round';
+      const sides = draw => { for(let k = 0; k < 4; k++){ c.save(); c.translate(S / 2, S / 2); c.rotate(k * Math.PI / 2); c.translate(-S / 2, -S / 2); draw(); c.restore(); } };
+      const along = (n, f) => { for(let i = 0; i < n; i++) f(m + band * .55 + (i + .5) * (L - band * 1.1) / n, (L - band * 1.1) / n); };
+      const frame = (inset, w) => { c.lineWidth = w; c.strokeRect(inset, inset, S - 2 * inset, S - 2 * inset); c.lineWidth = lw; };
+      const dot = (x, y, r, solid) => { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); solid ? c.fill() : c.stroke(); };
+      switch(BORDER_STYLE_NAMES[kind]){
+        case 'Classic': frame(m + lw / 2, lw * 1.3); frame(m + band, lw * .7); break;
+        case 'Chevron': sides(() => { c.beginPath(); along(4, (x, w) => { c.lineTo(x - w / 2, y1); c.lineTo(x, y0); c.lineTo(x + w / 2, y1); }); c.stroke(); }); break;
+        case 'Chain': sides(() => along(3, (x, w) => { c.beginPath(); c.ellipse(x, cy, w * .42, band * .36, 0, 0, Math.PI * 2); c.stroke(); })); break;
+        case 'Meander': sides(() => { c.beginPath(); along(3, (x, w) => { const a = x - w / 2, q = w / 4;
+          c.lineTo(a, y1); c.lineTo(a, y0); c.lineTo(a + 3 * q, y0); c.lineTo(a + 3 * q, y1 - band * .35); c.lineTo(a + q * 1.6, y1 - band * .35); c.lineTo(a + q * 1.6, y1); c.lineTo(a + w, y1); }); c.stroke(); }); break;
+        case 'Rope': sides(() => along(5, (x, w) => { c.beginPath(); c.moveTo(x - w * .3, y1); c.lineTo(x + w * .3, y0); c.stroke(); })); break;
+        case 'Basket': sides(() => along(4, (x, w) => { if(Math.round((x - m) / w) % 2) c.fillRect(x - w / 2, y0, w, band); else c.strokeRect(x - w * .35, y0 + band * .15, w * .7, band * .7); })); break;
+        case 'Diamonds': sides(() => along(4, (x, w) => { const r = Math.min(w * .42, band * .55); c.beginPath(); c.moveTo(x, cy - r); c.lineTo(x + r, cy); c.lineTo(x, cy + r); c.lineTo(x - r, cy); c.closePath(); c.fill(); })); break;
+        case 'Feathers': sides(() => along(4, (x, w) => { c.beginPath(); c.moveTo(x - w * .3, y0); c.lineTo(x + w * .2, cy); c.lineTo(x - w * .3, y1); c.stroke(); })); break;
+        case 'Rings': sides(() => along(3, (x, w) => dot(x, cy, Math.min(w * .32, band * .4), false))); break;
+        case 'Pinwheel': for(let k = 0; k < 4; k++){ c.save(); c.translate(S / 2, S / 2); c.rotate(k * Math.PI / 2); c.translate(-S / 2, -S / 2);
+            c.beginPath(); c.moveTo(m, m); c.lineTo(m + band * 1.9, m); c.lineTo(m, m + band * 1.9); c.closePath(); c.fill(); c.restore(); } break;
+        case 'Ladder': frame(m + lw / 2, lw); frame(m + band, lw); sides(() => along(4, x => { c.beginPath(); c.moveTo(x, y0); c.lineTo(x, y1); c.stroke(); })); break;
+        case 'Dashes': c.setLineDash([S * .1, S * .07]); frame(m + band / 2, lw * 1.4); c.setLineDash([]); break;
+        case 'Wavy': sides(() => { c.beginPath(); for(let x = m + band * .55; x <= S - m - band * .55; x += 1) c.lineTo(x, cy + Math.sin((x - m) / (L / 3.5) * Math.PI * 2) * band * .32); c.stroke(); }); break;
+        case 'Hatched': c.save(); c.beginPath(); c.rect(m, m, L, L); c.rect(m + band, m + band, L - 2 * band, L - 2 * band); c.clip('evenodd');
+          c.lineWidth = lw * .8; for(let x = -S; x < 2 * S; x += S * .12){ c.beginPath(); c.moveTo(x, 0); c.lineTo(x + S, S); c.stroke(); } c.restore(); frame(m + band, lw * .6); break;
+        case 'Circles': sides(() => along(3, (x, w) => dot(x, cy, Math.min(w * .3, band * .42), true))); break;
+        case 'Triangle': sides(() => along(4, (x, w) => { c.beginPath(); c.moveTo(x - w * .38, y0); c.lineTo(x + w * .38, y0); c.lineTo(x, y1); c.closePath(); c.fill(); })); break;
+        case 'Pearls': sides(() => along(6, (x, w) => dot(x, cy, Math.max(1.2, Math.min(w * .26, band * .26)), true))); break;
+        case 'Bevel': frame(m + lw / 2, lw); frame(m + band * .6, lw * .8); frame(m + band * 1.2, lw * .6); break;
+        case 'Arrows': sides(() => { const a = S / 2; c.beginPath(); c.moveTo(a - band * .9, y0); c.lineTo(a, y1); c.lineTo(a + band * .9, y0); c.stroke();
+            c.beginPath(); c.moveTo(m, m + band); c.lineTo(m, m); c.lineTo(m + band, m); c.stroke(); }); break;
+        default: frame(m + lw / 2, lw);
+      }
+    }
+
+    // what each footer holds, how its little books look, and what picking one changes
+    const KINDS = {
+      cover: {
+        card: document.getElementById('customize-color-card'), label: 'Cover', items: () => COVER_COLOR_PRESETS,
+        get: () => customizeColorIdx, name: i => COVER_COLOR_PRESETS[i].name,
+        set: i => { customizeColorIdx = i; touched.add('color'); renderColorPreview(customizeColorPreview, customizeColorSubtitle, ...colorCardSet()); },
+        // a closed book lying on its back: its cover colour, a darker spine down the left, the page edge at the right and bottom
+        paint: (b, p) => { b.classList.add('k-cover'); b.style.setProperty('--c', p.hex); b.style.setProperty('--cd', shade(p.hex, -.35)); },
+        html: '<i class="pg"></i><i class="cv"></i>',
+        fromBg: () => coverHex()
+      },
+      pages: {
+        card: document.getElementById('customize-tone-card'), label: 'Pages', items: () => PAGE_TONES,
+        get: () => customizeToneChoice, name: i => { const t = PAGE_TONES[i]; return t.edge ? t.name + ' edges' : t.name + ' pages'; },
+        set: i => { customizeToneChoice = i; touched.add('tone'); renderTonePreview(); },
+        // three loose sheets of that paper in a neat little stack (gilt: the gilding shows round their edges);
+        // the one picked is knocked askew, its sheets at different angles
+        paint: (b, p) => { b.classList.add('k-paper'); b.style.setProperty('--pg', paperOf(p)); b.style.setProperty('--edge', p.edge ? p.base : 'transparent'); },
+        html: '<i class="sh s1"></i><i class="sh s2"></i><i class="sh s3"></i>',
+        fromBg: () => (PAGE_TONES[customizeToneChoice] || PAGE_TONES[0]).base
+      },
+      border: {
+        card: document.getElementById('customize-border-card'), label: 'Design', items: () => BORDER_CHOICES,
+        get: () => Math.max(0, BORDER_CHOICES.indexOf(customizeBorderChoice)), name: i => BORDER_STYLE_NAMES[BORDER_CHOICES[i]],
+        set: i => { customizeBorderChoice = BORDER_CHOICES[i]; touched.add('border'); renderBorderPreview(customizeBorderChoice); },
+        // a square brown block with its design in white round the edge (the app's own pattern, drawn small)
+        paint: b => b.classList.add('k-block', 'k-cover'),
+        html: '<i class="pg"></i><i class="cv"><canvas></canvas></i>',
+        square: true, max: 52,
+        fill: (b, kind, size) => {
+          const cv = b.querySelector('canvas'), dpr = Math.min(2, window.devicePixelRatio || 1);
+          cv.width = cv.height = Math.round(size * dpr);
+          miniBorder(cv.getContext('2d'), kind, cv.width);
+        },
+        fromBg: () => DESIGN_FILL
+      },
+      ribbon: {
+        card: document.getElementById('customize-bookmark-card'), label: 'Ribbon', items: () => BOOKMARK_COLOR_PRESETS,
+        get: () => customizeBookmarkIdx, name: i => BOOKMARK_COLOR_PRESETS[i].name,
+        set: i => { customizeBookmarkIdx = i; touched.add('bookmarkColor'); renderColorPreview(customizeBookmarkPreview, customizeBookmarkSubtitle, ...ribbonCardSet()); },
+        // a ribbon standing up from below the bottom of the screen, its classic V tip at the top
+        paint: (b, p) => { b.classList.add('k-rib'); b.style.setProperty('--c', p.hex); },
+        html: '<svg></svg>',
+        row: true, tuck: true,
+        fromBg: () => BOOKMARK_COLOR_PRESETS[customizeBookmarkIdx].hex
+      }
+    };
+
+    const row = document.getElementById('opt-foot');
+    const fields = document.getElementById('book-fields'), authorCard = document.getElementById('author-card');
+    const footTop = () => row.getBoundingClientRect().top;
+    // How it opens, smoothly: while it moves, nothing on the page is re-laid out and the 3D canvas keeps its size.
+    //  - the 3D book shrinks and rises by a camera zoom and shift that look exactly like its space getting shorter
+    //  - the top card (Author) slides up by its own height (+4px) and becomes a "tap to input book data" card
+    //  - the picker, already at its open place, slides up out of the footer (which sits over it)
+    //  - the other field cards slide down off the screen
+    // Only when it's done does the page take its new shape, all in one frame with the book redrawn at once, so
+    // nothing jumps or blinks. Closing makes the page its old shape first (same look), then runs it all back.
+    const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    function look(e){                                   // e: 0 shut, 1 open, on the page as laid out shut
+      const L = T.lay;
+      authorCard.style.transform = `translateY(${-L.d * e}px)`;
+      T.el.style.transform = `translateY(${L.H * (1 - e)}px)`;
+      custCamera.zoom = 1 + (L.z - 1) * e;
+      custCamera.setViewOffset(L.cw, L.ch, 0, L.d / 2 * e, L.cw, L.ch);
+      custCamera.updateProjectionMatrix();
+    }
+    function redrawNow(){ sizeCustomizeThree(); custRenderer.render(custScene, custCamera); }
+    function plain(){                                   // no stand-ins: the camera and the card as they normally are
+      authorCard.style.transform = '';
+      custCamera.zoom = 1; custCamera.clearViewOffset(); custCamera.updateProjectionMatrix();
+    }
+    function layOpen(on){                               // the page's real shape, open or shut, in one go
+      const L = T.lay;
+      fields.style.height = on ? L.h1 + 'px' : '';
+      L.spacer.style.height = on ? L.S + 'px' : '0px';
+    }
+    function run(from, to, ms, done){
+      cancelAnimationFrame(run.raf);
+      const t0 = performance.now();
+      const step = now => {
+        if(!T) return;
+        const k = Math.min(1, (now - t0) / ms), p = from + (to - from) * k;
+        T.p = p; look(ease(p));
+        if(k < 1) run.raf = requestAnimationFrame(step); else if(done) done();
+      };
+      run.raf = requestAnimationFrame(step);
+    }
+    // the field cards other than the top one leave (and come back) one after another
+    function sendOthers(away){
+      const list = [...fields.children].filter(c => c !== authorCard);
+      list.forEach((c, i) => c.style.transitionDelay = (away ? i * 25 : (list.length - 1 - i) * 25) + 'ms');
+      fields.classList.toggle('ct-gone', away);
+    }
+
+    // the picker's contents for one kind: its bar (name, Done) and its little books
+    function fillTray(el, K, to, quick){
+      const items = K.items(), n = items.length;
+      el.innerHTML =
+        `<div class="ct-floor${K.row ? ' rib-floor' : ''}"><div class="ct-grid${K.row ? ' rib-row' : ''}"></div></div>`;
+      const grid = el.querySelector('.ct-grid');
+      items.forEach((p, i) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'ct-book';
+        K.paint(b, p);
+        b.style.animationDelay = (quick ? i * 10 : 110 + i * 10) + 'ms';   // first open: once the picker is mostly up
+        b.setAttribute('aria-label', K.name(i));
+        b.innerHTML = K.html;
+        b.addEventListener('click', () => choose(i));
+        b._item = p;
+        grid.appendChild(b);
+      });
+      // the card's inside: the picker less its borders and 4px margins, and the card's own borders
+      const fw = window.innerWidth - 8 - 6, floorH = to.height - 6 - 8 - 6;
+      grid.style.setProperty('--in', (to.height + 30) + 'px');          // they start below the picker's bottom edge
+      if(K.row){
+        // ribbons: one row, each rising from behind the bottom edge; the picked one stands higher
+        // each runs on past the card's bottom edge and its margin, and slips under the picker's bottom border
+        const rw = Math.floor(Math.min(26, (fw - 16 - (n - 1) * 6) / n)), rh = floorH + 24, tip = Math.round(rw * .45);
+        grid.style.setProperty('--rw', rw + 'px'); grid.style.setProperty('--rh', rh + 'px');
+        grid.style.setProperty('--low', Math.round(floorH * .42) + 'px'); grid.style.setProperty('--high', Math.round(floorH * .14) + 'px');
+        grid.querySelectorAll('svg').forEach(sv => {
+          sv.setAttribute('viewBox', `0 0 ${rw} ${rh}`); sv.setAttribute('width', rw); sv.setAttribute('height', rh);
+          sv.innerHTML = `<path d="M1.5 1.5 L${rw / 2} ${tip} L${rw - 1.5} 1.5 L${rw - 1.5} ${rh} L1.5 ${rh} Z" fill="var(--c)" stroke="#000" stroke-width="2.5" stroke-linejoin="round"/>` +
+            `<path d="M${rw * .28} ${tip * .9} L${rw * .28} ${rh}" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>`;
+        });
+      } else {
+        // two rows; a size smaller than the space would allow, so they sit with room round them
+        // as big as the card allows (up to each kind's size), trying 1 to 4 rows. Every item keeps clear room beside
+        // and above it for the picked one's tilt and growth (worked out from its 8 degree tilt and 1.1x size: about a
+        // seventh of its width beside it, a tenth above plus the lift), so the picked one never overlaps a neighbour.
+        // clear room the picked one needs (6 degree tilt at 1.04x, lifted 7px, its 3px side edge, 2px to spare):
+        // beside it about 7% of its width + 6px, above it 7% of its height + the lift + 3px
+        const asp = K.square ? 1 : 2.35 / 3, RX = .08, PX = 6, RY = .08, LIFT = 12, cap = K.max || 27;
+        let best = null;
+        for(let rows = 1; rows <= 4; rows++){
+          const cols = Math.ceil(n / rows);
+          const byW = (fw - 16 - cols * PX) / (cols * (1 + RX));
+          const byH = (floorH - 12 - rows * LIFT) / (rows * (1 / asp + RY));
+          const bw = Math.floor(Math.min(byW, byH, cap));
+          if(!best || bw > best.bw) best = { rows, cols, bw };
+        }
+        const { cols, bw } = best;
+        grid.style.setProperty('--bw', bw + 'px'); grid.style.setProperty('--cols', cols);
+        grid.style.setProperty('--asp', asp);
+        // the same spacing between every pair, so a short last row sits centred under a full one
+        grid.style.setProperty('--gx', Math.floor((fw - 16 - cols * bw) / cols) + 'px');
+        if(K.fill) grid.querySelectorAll('.ct-book').forEach(b => K.fill(b, b._item, bw));
+      }
+    }
+    function paintSel(){
+      T.el.querySelectorAll('.ct-book').forEach((b, i) => b.classList.toggle('on', i === T.sel));
+    }
+
+    function openFooter(kind){
+      if(customizeFormat === 'audio') return;
+      const K = KINDS[kind];
+      if(T && !T.closing){
+        if(T.K === K){ closeFooter(false); return; }      // the open one tapped again: close
+        switchTo(K); return;                            // another one: swap what the picker holds
+      }
+      if(T) return;
+      // measured once, shut: the picker's open height (just under the 3D book down to the footer), how far the top
+      // card moves (its height + 4px), and the 3D space's size, for the stand-in zoom (its share once shortened)
+      const cr = canvas3d.getBoundingClientRect(), fr = fields.getBoundingClientRect(), ar = authorCard.getBoundingClientRect();
+      const top = Math.round(cr.bottom + 4), H = Math.round(footTop() + 3 - top), d = Math.round(ar.height + 4);
+      const cw = canvas3d.clientWidth, ch = canvas3d.clientHeight;
+      const spacer = document.createElement('div'); spacer.id = 'ct-gap';
+      row.parentNode.insertBefore(spacer, row);
+      const el = document.createElement('div'); el.id = 'ctray';
+      Object.assign(el.style, { left: '-3px', width: (window.innerWidth + 6) + 'px', top: top + 'px', height: H + 'px' });
+      fillTray(el, K, { height: H });
+      page.appendChild(el);
+      T = { el, K, sel: K.get(), closing: false, p: 0,
+            lay: { H, d, cw, ch, z: (ch - d) / ch, h1: ar.bottom - fr.top, S: H - 3, spacer } };
+      paintSel();
+      look(0);
+      authorCard.classList.add('ct-prompt');
+      sendOthers(true);
+      run(0, 1, 300, () => {                           // done: the page takes its open shape in one frame
+        if(!T || T.closing) return;
+        layOpen(true); plain(); T.el.style.transform = ''; redrawNow(); T.settled = true;
+      });
+    }
+    // another kind while open: the contents swap in place, the picker stays up
+    // the picker stays up: what's on it drops quickly off the bottom, then the new things drop in
+    function switchTo(K){
+      const el = T.el, gen = T.gen = (T.gen || 0) + 1;
+      T.K = K; T.sel = K.get();
+      const drop = el.clientHeight, old = el.querySelectorAll('.ct-book');
+      old.forEach((b, i) => b.animate(
+        [{ transform: getComputedStyle(b).transform === 'none' ? 'translateY(0)' : getComputedStyle(b).transform, opacity: 1 },
+         { transform: `translateY(${drop}px)`, opacity: 0 }],
+        { duration: 150, delay: i * 5, easing: 'cubic-bezier(.5,0,.9,.6)', fill: 'forwards' }));
+      // the new set comes in only once the last of the old has gone
+      setTimeout(() => {
+        if(!T || T.el !== el || T.gen !== gen || T.closing) return;
+        fillTray(el, K, { height: T.lay.H }, true); paintSel();
+      }, 150 + (old.length - 1) * 5 + 15);
+    }
+
+    // ---- the big book: one full turn, its colours blending from the old look to the new as it goes ----
+    // The new book is built at once beside the old one (same shape, so their parts pair up one to one).
+    // Each part of the new book draws a mix of the old and new: picture textures through a small shader
+    // addition, plain colours by easing the colour. The old book is never shown; it just lends its look.
+    const BLEND_FRAG = (shader) => {
+      shader.uniforms.mapOld = { value: null }; shader.uniforms.mixT = { value: 0 };
+      shader.fragmentShader = 'uniform sampler2D mapOld;\nuniform float mixT;\n' +
+        shader.fragmentShader.replace('#include <map_fragment>',
+          '#ifdef USE_MAP\n  vec4 texelColor = mix( texture2D( mapOld, vUv ), texture2D( map, vUv ), mixT );\n' +
+          '  texelColor = mapTexelToLinear( texelColor );\n  diffuseColor *= texelColor;\n#endif');
+    };
+    function blendTo(rebuild){
+      const old = custMesh;
+      if(!old){ rebuild(); return; }
+      custScene.remove(old); custMesh = null;      // keep the old book's textures: the new one borrows them while blending
+      rebuild();
+      const neu = custMesh;
+      const meshes = g => { const a = []; g.traverse(o => { if(o.isMesh) a.push(o); }); return a; };
+      const A = meshes(old), B = meshes(neu), pairs = [];
+      if(A.length === B.length){
+        A.forEach((ma, k) => {
+          const mb = B[k], la = [].concat(ma.material), lb = [].concat(mb.material);
+          lb.forEach((mat, j) => {
+            const o = la[j]; if(!o) return;
+            if(mat.map && o.map && mat.map !== o.map){
+              const u = { mapOld: null, mixT: 0 };
+              mat.onBeforeCompile = sh => { BLEND_FRAG(sh); sh.uniforms.mapOld.value = o.map; u.ref = sh.uniforms; };
+              u.own = mat.map; u.old = o.map;
+              mat.customProgramCacheKey = () => 'blend';
+              mat.needsUpdate = true;
+              pairs.push({ kind: 'map', u });
+            } else if(mat.color && o.color && !mat.color.equals(o.color)){
+              pairs.push({ kind: 'col', mat, a: o.color.clone(), b: mat.color.clone() });
+              mat.color.copy(o.color);
+            }
+          });
+        });
+      }
+      return {
+        set(t){ pairs.forEach(p => { if(p.kind === 'map'){ if(p.u.ref) p.u.ref.mixT.value = t; } else p.mat.color.copy(p.a).lerp(p.b, t); }); },
+        done(){
+          // the new book stops borrowing: each part points back at its own picture, then the old book is freed
+          const keep = new Set();
+          neu.traverse(o => { if(o.isMesh) [].concat(o.material).forEach(m => { if(m.map) keep.add(m.map); }); });
+          pairs.forEach(p => { if(p.kind === 'map' && p.u.ref){ p.u.ref.mixT.value = 1; p.u.ref.mapOld.value = p.u.own; } });
+          old.traverse(o => { if(o.isMesh){ o.geometry.dispose(); [].concat(o.material).forEach(m => { if(m.map && !m.map._shared && !keep.has(m.map)) m.map.dispose(); m.dispose(); }); } });
+        }
+      };
+    }
+    function choose(i){
+      if(!T || T.closing || i === T.sel) return;
+      T.sel = i; paintSel();
+      T.K.set(i);
+      if(T.K.tuck){ tuckRibbon(BOOKMARK_COLOR_PRESETS[i].hex); return; }
+      const start = custUserRot, t0 = performance.now(), D = 760;
+      custVelY = 0; cancelAnimationFrame(choose.raf);
+      if(choose.blend) choose.blend.done();
+      const blend = choose.blend = blendTo(rebuildCustomizePreview);
+      const spin = now => {
+        const t = Math.min(1, (now - t0) / D), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        custUserRot = start + e * Math.PI * 2;
+        const m = Math.max(0, Math.min(1, (e - .08) / .55));          // the colours blend over the first half of the turn
+        if(blend) blend.set(m * m * (3 - 2 * m));
+        if(t < 1) choose.raf = requestAnimationFrame(spin);
+        else { custUserRot = start; if(blend){ blend.set(1); blend.done(); if(choose.blend === blend) choose.blend = null; } }
+      };
+      choose.raf = requestAnimationFrame(spin);
+    }
+
+    // ---- a new ribbon: it slides down into the book out of sight, changes colour, and springs back out ----
+    function tuckRibbon(hex){
+      const bm = custMesh && custMesh.getObjectByName('bookmark');
+      if(!bm){ rebuildCustomizePreview(); return; }
+      if(bm.userData.y0 == null) bm.userData.y0 = bm.position.y;
+      const y0 = bm.userData.y0, DOWN = .42, IN = 230, HOLD = 70, OUT = 380;
+      const from = bm.position.y, t0 = performance.now(); let swapped = false;
+      cancelAnimationFrame(tuckRibbon.raf);
+      const easeIn = t => t * t * t, easeOutBack = t => { const c = 1.4; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+      const step = now => {
+        const el = now - t0;
+        if(el < IN) bm.position.y = from + (y0 - DOWN - from) * easeIn(el / IN);
+        else if(el < IN + HOLD){ bm.position.y = y0 - DOWN;
+          if(!swapped){ swapped = true; bm.traverse(o => { if(o.isMesh) [].concat(o.material).forEach(m => m.color && m.color.set(hex)); }); } }
+        else { const t = Math.min(1, (el - IN - HOLD) / OUT); bm.position.y = y0 - DOWN + DOWN * easeOutBack(t);
+          if(t >= 1){ bm.position.y = y0; return; } }
+        tuckRibbon.raf = requestAnimationFrame(step);
+      };
+      tuckRibbon.raf = requestAnimationFrame(step);
+    }
+
+    // everything runs back: the picker sinks into the footer, the book's space grows back, the field cards
+    // return and the top card is Author again. quick: a text field was tapped, so it goes at once.
+    function closeFooter(quick){
+      if(!T || T.closing) return;
+      T.closing = true;
+      const t = T;
+      cancelAnimationFrame(run.raf);
+      // back to the shut page shape first, with the stand-ins set to look exactly as it does now
+      if(t.settled){ layOpen(false); t.p = 1; }
+      redrawNow(); look(ease(t.p)); custRenderer.render(custScene, custCamera);
+      t.el.classList.add('closing');                   // the little books lift off and fade
+      authorCard.classList.remove('ct-prompt');
+      sendOthers(false);
+      const finish = () => {
+        plain(); custRenderer.render(custScene, custCamera);
+        t.el.remove(); t.lay.spacer.remove(); fields.style.height = '';
+        [...fields.children].forEach(c => c.style.transitionDelay = '');
+        if(T === t) T = null;
+      };
+      setTimeout(() => run(t.p, 0, quick ? 120 : 300, finish), quick ? 0 : 70);
+    }
+
+    // Cover, Ribbon and Pages open (or swap, or close) the picker; for an audiobook its cards still cycle
+    Object.entries(KINDS).forEach(([kind, K]) => K.card.addEventListener('click', e => {
+      if(customizeFormat === 'audio' || fields.classList.contains('hidden')) return;
+      e.stopImmediatePropagation(); e.preventDefault();
+      openFooter(kind);
+    }, true));
+    // a text field: fold away at once (pointerdown comes before the focus that brings up the keyboard)
+    const isField = el => el && el.matches && el.matches('input, textarea, [contenteditable]');
+    page.addEventListener('pointerdown', e => { if(T && isField(e.target) && !authorCard.contains(e.target)) closeFooter(true); }, true);
+    // the pushed-up card ("tap to input book data") closes the picker
+    ['pointerdown', 'click'].forEach(ev => authorCard.addEventListener(ev, e => {
+      if(!T || !authorCard.classList.contains('ct-prompt')) return;
+      e.preventDefault(); e.stopPropagation();
+      if(ev === 'click') closeFooter(false);
+    }, true));
+    page.addEventListener('focusin', e => { if(T && isField(e.target)) closeFooter(true); }, true);
+    document.getElementById('format-tabs').addEventListener('click', () => { if(T) closeFooter(true); }, true);
+    window.addEventListener('resize', () => { if(T && !T.closing && T.settled){ const top = Math.round(authorCard.getBoundingClientRect().bottom + 4);
+      Object.assign(T.el.style, { width: (window.innerWidth + 6) + 'px', top: top + 'px', height: Math.round(footTop() + 3 - top) + 'px' }); } });
+    // leaving the page (Cancel, Add, Update) or opening it again: put everything back at once
+    function resetNow(){
+      if(!T) return;
+      cancelAnimationFrame(run.raf); cancelAnimationFrame(choose.raf); cancelAnimationFrame(tuckRibbon.raf);
+      if(choose.blend){ choose.blend.set(1); choose.blend.done(); choose.blend = null; }
+      if(custCamera) plain();
+      T.el.remove(); T.lay.spacer.remove();
+      fields.style.height = ''; fields.classList.remove('ct-gone'); authorCard.classList.remove('ct-prompt');
+      [...fields.children].forEach(c => c.style.transitionDelay = '');
+      T = null;
+    }
+    // Add / Update with a picker up: fold it away first, so any field marked as missing can be seen
+    customizeSaveBtn.addEventListener('click', () => { if(T) closeFooter(true); }, true);
+    window.__tray = { open: openFooter, close: closeFooter, reset: resetNow, state: () => T };
+  })();
+
   // ---------- pearlescent bookcloth: the Add Book card, and Data's Copy / Download ----------
   // cotton cloth under a pearl coating: a fine plain weave, lit from the top left so the threads read through
   // light and shade, with a faint pink-to-green shimmer drifting across it
