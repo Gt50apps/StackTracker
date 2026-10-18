@@ -1125,7 +1125,7 @@
   }
   .dt-text:focus{border-color:#000;}
   /* restore: the three newest backups from the backup folder, one wide card each */
-  #dt-restore{flex:none; display:flex; flex-direction:column; gap:4px;}
+  #dt-restore{flex:none; display:flex; flex-direction:column; gap:4px; padding:4px; background:var(--bg); border:3px solid #000; border-radius:8px;}
   #dt-restore:empty{display:none;}
   #dt-restore .rs-card{grid-column:auto; display:flex; flex-direction:column; justify-content:center; gap:3px; width:100%; height:45px; margin:0; padding:0 8px; box-sizing:border-box;
     background:var(--panel); border:3px solid #000; border-radius:8px; box-shadow:none; cursor:pointer; text-align:left;
@@ -1143,7 +1143,7 @@
   #dt-restore .rs-card.on .rs-sec + .rs-sec{border-left-color:#000;}
   #dt-restore .rs-row > span{min-width:0; overflow:hidden; text-overflow:ellipsis;}
   #dt-restore b{color:var(--ink); font-weight:700;}
-  #dt-restore .rs-when{font:600 .8rem/1 Georgia, serif; text-transform:none; color:var(--ink);}
+  #dt-restore .rs-when{font:700 .66rem/1.1 Arial, sans-serif; text-transform:uppercase; color:var(--ink);}
   #dt-restore .rs-card.on .rs-when{color:#fff;}
   .dt-card{
     grid-column:1 / -1; display:flex; flex-direction:column; justify-content:center; min-width:0;
@@ -1153,6 +1153,13 @@
     color:var(--muted); line-height:1.15;
   }
   .dt-card.half{grid-column:span 1;}
+  .dt-card.bk-when{flex-direction:row; align-items:stretch; padding:0;}
+  .dt-card.bk-when > span{flex:1 1 0; min-width:0; display:flex; flex-direction:column; justify-content:center; padding:0 8px;}
+  .dt-card.bk-when > span + span{border-left:3px solid #000;}
+  .dt-card.bk-how{justify-content:center; gap:3px; font-size:min(.62rem, 2.55vw); color:var(--ink);}
+  /* the Backup tab: every card's words centred */
+
+  .dt-card.bk-how > span{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   /* backup location: the card is the button; a ✕ section on its right once a folder is chosen */
   .dt-card.bk-loc{flex-direction:row; align-items:stretch; padding:0; overflow:hidden;}
   .bk-loc button{grid-column:auto; margin:0; border:0; border-radius:0; box-shadow:none; background:transparent; cursor:pointer;
@@ -1575,6 +1582,11 @@
     background:none; box-shadow:none; cursor:pointer; -webkit-tap-highlight-color:transparent;}
   #rand-pin:hover, #rand-pin:active{background:none; box-shadow:none;}
   #rand-pin canvas{display:block; width:100%; height:100%;}
+  /* the Backup tab: every card's words centred (the split cards still run their dividers full height) */
+  #dt-view-backup .dt-card{align-items:center; text-align:center;}
+  #dt-view-backup .dt-card.bk-when, #dt-view-backup .dt-card.bk-loc{align-items:stretch;}
+  #dt-view-backup .dt-card.bk-when > span, #dt-view-backup #bk-loc-pick{align-items:center; text-align:center;}
+  #dt-view-backup .dt-card b{max-width:100%;}
 </style>
 <style>
   /* ---------- splash: STACK drops onto the top shelf, TRACKER slides in one book at a time ---------- */
@@ -1674,10 +1686,10 @@
   <div class="tl-views" id="tl-modes"><button type="button" data-m="graph" class="on">Pages &amp; Listening</button><button type="button" data-m="timeline">Timeline</button></div>
   <div class="tl-views" id="tl-ranges"><button type="button" data-v="all">All Time</button><button type="button" data-v="year">This Year</button><button type="button" data-v="month" class="on">This Month</button><button type="button" data-v="week">This Week</button></div>
  </div>
- <!-- Data: Export | Import, then Stats | Backup -->
+ <!-- Data: Stats | Backup, then Export | Import (opens on Stats) -->
  <div class="hdr-row hidden" id="data-controls">
-  <div class="tabs dt-tabs"><div class="tab active" data-dt="export">Export</div><div class="tab" data-dt="import">Import</div></div>
-  <div class="tabs dt-tabs"><div class="tab" data-dt="stats">Stats</div><div class="tab" data-dt="backup">Backup</div></div>
+  <div class="tabs dt-tabs"><div class="tab active" data-dt="stats">Stats</div><div class="tab" data-dt="backup">Backup</div></div>
+  <div class="tabs dt-tabs"><div class="tab" data-dt="export">Export</div><div class="tab" data-dt="import">Import</div></div>
  </div>
  </div>
 <!-- footer: Add Book, full width -->
@@ -1925,16 +1937,17 @@
   </div>
   <div class="dt-view dt-stats" id="dt-view-stats"></div>
   <div class="dt-view" id="dt-view-backup">
-    <div class="dt-card">Last backup<b id="bk-last">Never</b></div>
+    <!-- last backup | next backup -->
+    <div class="dt-card bk-when"><span>Last backup<b id="bk-last">Never</b></span><span>Next backup<b id="bk-next">—</b></span></div>
     <!-- where backups go: tap to pick a folder (kept for next time); ✕ goes back to the share sheet / Downloads -->
     <div class="dt-card bk-loc" id="bk-loc"><button type="button" id="bk-loc-pick">Backup location<b id="bk-loc-name">Share sheet or Downloads</b></button><button type="button" id="bk-loc-clear" aria-label="Stop using this folder" hidden>✕</button></div>
-    <div class="dt-card">Remind me to back up<b id="bk-next">—</b></div>
     <div class="dt-split" id="bk-every">
       <button type="button" data-every="day">Daily</button>
       <button type="button" data-every="week"><span class="wk-label">Weekly</span><span class="wk-days"><i data-wd="0">S</i><i data-wd="1">M</i><i data-wd="2">T</i><i data-wd="3">W</i><i data-wd="4">T</i><i data-wd="5">F</i><i data-wd="6">S</i></span></button>
       <button type="button" data-every="never">Never</button>
     </div>
-    <div class="dt-note">Backing up saves a file of your whole library: into the folder you picked (once a day by itself, the first time you open the app; the newest 10 are kept there, older ones deleted), or else through the share sheet or a download. Copy on the Export tab counts too.</div>
+    <!-- how saving and backing up work, in one card -->
+    <div class="dt-card bk-how" id="bk-how"><span></span><span></span></div>
     <div class="dt-foot"><div class="dt-pair"><button type="button" id="bk-now" class="cloth-btn" data-cloth="#8a6a3f" style="--cloth:#8a6a3f"><canvas aria-hidden="true"></canvas><span class="lbl">Back Up Now</span></button></div></div>
   </div>
 </div>
@@ -8894,7 +8907,7 @@
   function openDataPage(){
     dtImportText.value = '';
     parseImport();
-    showDataTab('export');
+    showDataTab('stats');
     dataPage.classList.add('open');
   }
   document.getElementById('data-done').addEventListener('click', ()=> dataPage.classList.remove('open'));
@@ -9355,7 +9368,7 @@
     t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); };
   let backupDir = null;
   const BACKUP_KEEP = 10;            // backups kept in the chosen folder
-  const fsReady = FS_OK ? fsGet('backupDir').then(h => { backupDir = h || null; paintBackupLoc(); }).catch(()=>{}) : Promise.resolve();
+  const fsReady = FS_OK ? fsGet('backupDir').then(h => { backupDir = h || null; paintBackupTab(); }).catch(()=>{}) : Promise.resolve();
   function paintBackupLoc(note){
     const nm = document.getElementById('bk-loc-name'); if(!nm) return;
     nm.textContent = note || (backupDir ? backupDir.name : FS_OK ? 'Share sheet or Downloads · tap to pick a folder' : 'Share sheet or Downloads');
@@ -9365,10 +9378,10 @@
     if(!FS_OK){ paintBackupLoc("This browser can't save to a chosen folder"); setTimeout(()=> paintBackupLoc(), 2600); return; }
     try{
       const h = await window.showDirectoryPicker({ id: 'stack-tracker-backups', mode: 'readwrite' });
-      backupDir = h; await fsPut('backupDir', h); paintBackupLoc();
+      backupDir = h; await fsPut('backupDir', h); paintBackupTab();
     } catch(err){ if(!err || err.name !== 'AbortError'){ paintBackupLoc("Couldn't use that folder"); setTimeout(()=> paintBackupLoc(), 2600); } }
   });
-  document.getElementById('bk-loc-clear').addEventListener('click', async ()=>{ backupDir = null; try{ await fsPut('backupDir', undefined); }catch(e){} paintBackupLoc(); });
+  document.getElementById('bk-loc-clear').addEventListener('click', async ()=>{ backupDir = null; try{ await fsPut('backupDir', undefined); }catch(e){} paintBackupTab(); });
   // write the backup into the chosen folder; false if there isn't one or the browser won't allow it right now
   async function backupToFolder(name, json){
     if(!backupDir) return false;
@@ -9391,7 +9404,8 @@
   async function autoBackupDaily(){
     await fsReady;
     if(!backupDir || !books.length) return false;
-    if(prefs.lastBackup && dayKey(new Date(prefs.lastBackup)) === localTodayKey()) return false;    // already one today
+    const due = backupDueAt();                                             // Daily: the first open of each day; Weekly: from the chosen day on
+    if(due === null || Date.now() < due) return false;                     // Never, or not due yet
     try{ if(await backupDir.queryPermission({ mode: 'readwrite' }) !== 'granted') return false; }catch(e){ return false; }
     if(!(await backupToFolder(`stack-tracker-${localTodayKey()}.json`, exportJSON()))) return false;
     markBackedUp();
@@ -9498,12 +9512,20 @@
     if(!last) return;
     last.textContent = prefs.lastBackup ? fmtWhen(prefs.lastBackup) : 'Never';
     const due = backupDueAt();
-    next.textContent = prefs.backupEvery === 'never' ? 'Off'
-      : (prefs.backupEvery === 'day' ? 'Daily, first open of the day' : 'Weekly on ' + ['Sundays','Mondays','Tuesdays','Wednesdays','Thursdays','Fridays','Saturdays'][prefs.backupDay])
-        + ' · next ' + (due <= Date.now() ? 'now' : new Date(due).toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'}));
+    // when the next backup is due (with a folder it happens by itself then; without one, that's when you're reminded)
+    const when = prefs.backupEvery === 'never' ? null : due;
+    next.textContent = when === null ? 'Off' : when <= Date.now() ? 'Now' : new Date(when).toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'});
     document.querySelectorAll('#bk-every button').forEach(b => b.classList.toggle('on', b.dataset.every === prefs.backupEvery));
     document.querySelectorAll('#bk-every .wk-days i').forEach(i => i.classList.toggle('on', +i.dataset.wd === prefs.backupDay));
     if(typeof paintBackupLoc === 'function') paintBackupLoc();
+    const how = document.getElementById('bk-how');
+    if(how){
+      const day = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][prefs.backupDay], folder = typeof backupDir !== 'undefined' && backupDir;
+      const [a, b] = prefs.backupEvery === 'never' ? ['Backups are switched off.', 'Turn them on above, or back up by hand below.']
+        : folder ? [prefs.backupEvery === 'day' ? 'Backups run daily.' : `Backups run every ${day}.`, 'Tap any of your last 3 on the Import tab to restore it.']
+        : [prefs.backupEvery === 'day' ? "You'll be reminded to back up daily." : `You'll be reminded to back up every ${day}.`, 'Pick a backup folder to back up by itself and restore from Import.'];
+      how.children[0].textContent = a; how.children[1].textContent = b;
+    }
   }
   document.querySelectorAll('#bk-every button').forEach(b => b.addEventListener('click', e=>{
     const day = e.target.closest('.wk-days i');
