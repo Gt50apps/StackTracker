@@ -1124,6 +1124,27 @@
     white-space:pre; overflow:auto;
   }
   .dt-text:focus{border-color:#000;}
+  /* restore: the three newest backups from the backup folder, one wide card each */
+  #dt-restore{flex:none; display:flex; flex-direction:column; gap:4px;}
+  #dt-restore:empty{display:none;}
+  #dt-restore .rs-card{grid-column:auto; display:flex; flex-direction:column; justify-content:center; gap:3px; width:100%; height:45px; margin:0; padding:0 8px; box-sizing:border-box;
+    background:var(--panel); border:3px solid #000; border-radius:8px; box-shadow:none; cursor:pointer; text-align:left;
+    font:400 .62rem/1.15 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--muted);}
+  #dt-restore .rs-card:hover, #dt-restore .rs-card:active{background:var(--bg); box-shadow:none;}
+  #dt-restore .rs-card.on{background:var(--ink); color:#d6cfc2;}
+  #dt-restore .rs-card.on b{color:#fff;}
+  #dt-restore .rs-row{display:flex; justify-content:space-between; gap:8px; white-space:nowrap;}
+  #dt-restore .rs-card:has(> .rs-sec){flex-direction:row; align-items:stretch; padding:0;}
+  #dt-restore .rs-sec{flex:1 1 0; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:3px; padding:0 6px; white-space:nowrap; overflow:hidden; font-size:min(.6rem, 2.35vw); letter-spacing:-.1px;}
+  #dt-restore .rs-sec.rs-date{font-size:.62rem; letter-spacing:0; padding:0 8px;}
+  #dt-restore .rs-sec > *{overflow:hidden; text-overflow:ellipsis;}
+  #dt-restore .rs-sec.rs-date{flex:1 1 0;}   /* date, books and audiobooks: an even third each */
+  #dt-restore .rs-sec + .rs-sec{border-left:3px solid #000;}
+  #dt-restore .rs-card.on .rs-sec + .rs-sec{border-left-color:#000;}
+  #dt-restore .rs-row > span{min-width:0; overflow:hidden; text-overflow:ellipsis;}
+  #dt-restore b{color:var(--ink); font-weight:700;}
+  #dt-restore .rs-when{font:600 .8rem/1 Georgia, serif; text-transform:none; color:var(--ink);}
+  #dt-restore .rs-card.on .rs-when{color:#fff;}
   .dt-card{
     grid-column:1 / -1; display:flex; flex-direction:column; justify-content:center; min-width:0;
     margin:0; padding:0 8px; height:45px; flex:none; box-sizing:border-box;
@@ -1149,6 +1170,8 @@
   button.dt-card{cursor:pointer;}
   button.dt-card:hover, button.dt-card:active{background:var(--bg); box-shadow:none;}
   .dt-card.error b{color:#a33;}
+  #dt-status{align-items:center; text-align:center;}   /* the Import card: above the text field, centred */
+  #dt-status b{max-width:100%;}
   .dt-split{
     grid-column:1 / -1; display:flex; height:45px; flex:none; box-sizing:border-box;
     border:3px solid #000; border-radius:8px; overflow:hidden; background:var(--panel);
@@ -1889,8 +1912,10 @@
     </div></div>
   </div>
   <div class="dt-view" id="dt-view-import">
-    <textarea class="dt-text" id="dt-import-text" spellcheck="false" placeholder="Paste exported JSON here, or load a file below"></textarea>
     <div class="dt-card" id="dt-status">Import<b>Waiting for JSON</b></div>
+    <textarea class="dt-text" id="dt-import-text" spellcheck="false" placeholder="Paste exported JSON here, or load a file below"></textarea>
+    <!-- the newest backups in your backup folder: tap one to load it above -->
+    <div id="dt-restore"></div>
     <div class="dt-foot"><div class="dt-pair">
       <button type="button" id="dt-load" class="cloth-btn" data-cloth="#2b5752" style="--cloth:#2b5752"><canvas aria-hidden="true"></canvas><span class="lbl">Load File</span></button>
       <button type="button" id="dt-merge" class="cloth-btn" data-cloth="#86452b" style="--cloth:#86452b"><canvas aria-hidden="true"></canvas><span class="lbl">Merge</span></button>
@@ -1909,7 +1934,7 @@
       <button type="button" data-every="week"><span class="wk-label">Weekly</span><span class="wk-days"><i data-wd="0">S</i><i data-wd="1">M</i><i data-wd="2">T</i><i data-wd="3">W</i><i data-wd="4">T</i><i data-wd="5">F</i><i data-wd="6">S</i></span></button>
       <button type="button" data-every="never">Never</button>
     </div>
-    <div class="dt-note">Backing up saves a file of your whole library: into the folder you picked, or else through the share sheet or a download. Copy on the Export tab counts too.</div>
+    <div class="dt-note">Backing up saves a file of your whole library: into the folder you picked (once a day by itself, the first time you open the app; the newest 10 are kept there, older ones deleted), or else through the share sheet or a download. Copy on the Export tab counts too.</div>
     <div class="dt-foot"><div class="dt-pair"><button type="button" id="bk-now" class="cloth-btn" data-cloth="#8a6a3f" style="--cloth:#8a6a3f"><canvas aria-hidden="true"></canvas><span class="lbl">Back Up Now</span></button></div></div>
   </div>
 </div>
@@ -8861,6 +8886,7 @@
     ['export','import','stats','backup'].forEach(n=> document.getElementById('dt-view-'+n).classList.toggle('active', n === name));
     if(name === 'backup') paintBackupTab();
     if(name === 'export') dtExportText.value = exportJSON();
+    if(name === 'import' && typeof paintRestore === 'function') paintRestore();
     if(name === 'stats') renderDataStats();
   }
   document.querySelectorAll('.dt-tabs .tab').forEach(t=> t.addEventListener('click', ()=> showDataTab(t.dataset.dt)));
@@ -9328,7 +9354,8 @@
   const fsPut = async (k, v) => { const db = await fsDB(); return new Promise((res, rej) => { const t = db.transaction('kv', 'readwrite'); v === undefined ? t.objectStore('kv').delete(k) : t.objectStore('kv').put(v, k);
     t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); };
   let backupDir = null;
-  if(FS_OK) fsGet('backupDir').then(h => { backupDir = h || null; paintBackupLoc(); }).catch(()=>{});
+  const BACKUP_KEEP = 10;            // backups kept in the chosen folder
+  const fsReady = FS_OK ? fsGet('backupDir').then(h => { backupDir = h || null; paintBackupLoc(); }).catch(()=>{}) : Promise.resolve();
   function paintBackupLoc(note){
     const nm = document.getElementById('bk-loc-name'); if(!nm) return;
     nm.textContent = note || (backupDir ? backupDir.name : FS_OK ? 'Share sheet or Downloads · tap to pick a folder' : 'Share sheet or Downloads');
@@ -9351,8 +9378,67 @@
       if(perm !== 'granted') return false;
       const fh = await backupDir.getFileHandle(name, { create: true }), w = await fh.createWritable();
       await w.write(new Blob([json], { type: 'application/json' })); await w.close();
+      // keep the newest 10 backups in the folder, delete older ones (only the app's own dated backup files are touched)
+      try{
+        const ours = [];
+        for await (const [n, e] of backupDir.entries()) if(e.kind === 'file' && /^stack-tracker-\d{4}-\d{2}-\d{2}\.json$/.test(n)) ours.push(n);
+        ours.sort().reverse().slice(BACKUP_KEEP).forEach(n => backupDir.removeEntry(n).catch(()=>{}));
+      } catch(e){}
       return true;
     } catch(err){ return false; }
+  }
+  // ---- daily, on the first open of the day: back up into the folder by itself (if the browser still allows it without asking) ----
+  async function autoBackupDaily(){
+    await fsReady;
+    if(!backupDir || !books.length) return false;
+    if(prefs.lastBackup && dayKey(new Date(prefs.lastBackup)) === localTodayKey()) return false;    // already one today
+    try{ if(await backupDir.queryPermission({ mode: 'readwrite' }) !== 'granted') return false; }catch(e){ return false; }
+    if(!(await backupToFolder(`stack-tracker-${localTodayKey()}.json`, exportJSON()))) return false;
+    markBackedUp();
+    if(typeof backupModal !== 'undefined' && backupModal.classList.contains('open')){ backupModal.classList.remove('open'); document.body.classList.remove('bk-blur'); }
+    return true;
+  }
+  // ---- restore: the three newest backups in the folder, each with what's in it; tap one to load it into Import ----
+  const rsFmtHM = sec => { const m = Math.round(sec / 60); return `${Math.floor(m / 60)}H ${m % 60}M`; };
+  function backupSummary(txt){
+    const data = JSON.parse(txt);
+    let list = Array.isArray(data) ? data : (data && Array.isArray(data.books) ? data.books : []);
+    if(data && data.version >= 2) list = list.map(b => unpackBook(b, data.version));
+    let nb = 0, na = 0, pages = 0, secs = 0;
+    list.forEach(b => {
+      const audio = b.format === 'audio' && b.audioSeconds > 0 && b.pages > 0;
+      const logged = (b.reads || []).flatMap(r => r.days || []).concat(b.days || []).reduce((t, v) => t + (Number(v) || 0), 0);
+      if(audio){ na++; secs += logged * b.audioSeconds / b.pages; } else { nb++; pages += logged; }
+    });
+    return { nb, na, pages, secs };
+  }
+  async function paintRestore(){
+    const box = document.getElementById('dt-restore'); if(!box) return;
+    await fsReady;
+    box.innerHTML = '';
+    if(!backupDir) return;
+    let perm = 'denied'; try{ perm = await backupDir.queryPermission({ mode: 'read' }); }catch(e){}
+    if(perm !== 'granted'){
+      const c = document.createElement('button'); c.type = 'button'; c.className = 'rs-card';
+      c.innerHTML = `<div class="rs-row"><span class="rs-when">Show backups</span></div><div class="rs-row"><span>Tap to allow the ${tlEsc(backupDir.name)} folder</span></div>`;
+      c.addEventListener('click', async () => { try{ if(await backupDir.requestPermission({ mode: 'readwrite' }) === 'granted') paintRestore(); }catch(e){} });
+      box.appendChild(c); return;
+    }
+    const files = [];
+    try{ for await (const [n, e] of backupDir.entries()) if(e.kind === 'file' && /^stack-tracker-\d{4}-\d{2}-\d{2}\.json$/.test(n)) files.push([n, e]); }catch(e){ return; }
+    files.sort((a, b) => a[0] < b[0] ? 1 : -1);
+    for(const [n, e] of files.slice(0, 3)){
+      let txt, sum;
+      try{ txt = await (await e.getFile()).text(); sum = backupSummary(txt); }catch(err){ continue; }
+      const [, y, mo, d] = n.match(/(\d{4})-(\d{2})-(\d{2})/), when = new Date(+y, +mo - 1, +d);
+      const c = document.createElement('button'); c.type = 'button'; c.className = 'rs-card';
+      // one card split three ways: Backup date | Books (and pages read) | Audiobooks (and time listened)
+      c.innerHTML = `<span class="rs-sec rs-date">Backup date:<b class="rs-when">${when.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</b></span>` +
+        `<span class="rs-sec"><span>Books: <b>${sum.nb}</b></span><span>Pages: <b>${Math.round(sum.pages).toLocaleString()}</b></span></span>` +
+        `<span class="rs-sec"><span>Audiobooks: <b>${sum.na}</b></span><span>Listened: <b>${rsFmtHM(sum.secs)}</b></span></span>`;
+      c.addEventListener('click', () => { box.querySelectorAll('.rs-card').forEach(x => x.classList.toggle('on', x === c)); dtImportText.value = txt; parseImport(); });
+      box.appendChild(c);
+    }
   }
   async function backupNow(btn, idle){
     const name = `stack-tracker-${localTodayKey()}.json`, json = exportJSON();
@@ -9447,8 +9533,9 @@
     const ok = await backupNow(e.currentTarget, 'Back Up');
     if(ok){ backupModal.classList.remove('open'); document.body.classList.remove('bk-blur'); }
   });
-  setTimeout(checkBackupReminder, 1500);
-  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'visible') setTimeout(checkBackupReminder, 600); });
+  const autoThenRemind = async () => { try{ await autoBackupDaily(); }catch(e){} checkBackupReminder(); };
+  setTimeout(autoThenRemind, 1500);
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'visible') setTimeout(autoThenRemind, 600); });
 
   // ---- import: the text field is the source; a file just fills it ----
   function parseImport(){
