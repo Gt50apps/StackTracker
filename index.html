@@ -131,7 +131,7 @@
     border:3px solid #000; border-radius:8px; box-shadow:none; font-family:Arial, sans-serif; font-size:.85rem;
     font-weight:700; letter-spacing:.3px; text-transform:none; cursor:pointer;
     background:var(--bookmark, #a9825f); color:var(--bookmark-ink, #fff);}
-  .dd-confirm:hover{box-shadow:none;}
+  
   .dd-confirm:disabled{background:#d6d2c8; color:#8f8a80; cursor:default;}
   .book-row:not(.tape-row){touch-action:pan-y;}   /* sideways drags scrub the page, up/down still scrolls */
   /* GT50 divider: no card, just a centered line split around the title */
@@ -172,7 +172,7 @@
     background:#fff; color:var(--ink); font-family:Arial, sans-serif; font-size:.78rem; font-weight:600;
     letter-spacing:.3px; text-transform:none; cursor:pointer;}
   .dd-acts button + button{border-left:3px solid #000;}
-  .dd-acts button:hover, .dd-acts button:active{background:var(--bg); box-shadow:none;}
+   .dd-acts button:active{background:var(--bg); box-shadow:none;}
   .dd-acts .dd-del{color:#a33;}
   .dd-chart{height:45px; box-sizing:border-box; overflow:hidden; background:#fff; border:3px solid #000; border-radius:8px; padding:0;}
   .dd-chart svg{display:block; width:100%; overflow:visible;}
@@ -182,7 +182,7 @@
   .g-pm{grid-column:auto; flex:none; width:45px; height:45px; margin:0; padding:0; box-sizing:border-box;
     border:3px solid #000; border-radius:8px; box-shadow:none; font:400 1.4rem/1 Arial, sans-serif; letter-spacing:0;
     cursor:pointer; touch-action:manipulation; user-select:none; -webkit-tap-highlight-color:transparent;}
-  .g-pm:hover{box-shadow:none;}
+  
   .g-pm:active{filter:brightness(.9);}
   /* days read and the dates they span, above Edit / Log / Delete */
   .dd-stats{display:flex; flex-direction:column; justify-content:center; gap:2px; height:45px; box-sizing:border-box; padding:0 10px;
@@ -210,7 +210,7 @@
   }
   #tags-page.open, #authors-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
   #tags-done, #authors-done{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
-  #tags-done:hover, #authors-done:hover{background:var(--ink); box-shadow:none;}
+  
   .tg-new{display:flex; gap:4px; flex:none; height:45px;}
   .tg-new .field-card{flex:1; height:45px; box-sizing:border-box;}
   #tag-new-add, #author-new-add{
@@ -218,7 +218,7 @@
     background:var(--ink); color:#fff; border:3px solid #000; border-radius:8px;
     font-family:Arial, sans-serif; font-size:.8rem; font-weight:600; letter-spacing:.3px; text-transform:none;
   }
-  #tag-new-add:hover, #author-new-add:hover{background:var(--ink); box-shadow:none;}
+  
   .tg-empty{font-family:Arial, sans-serif; font-size:.72rem; color:var(--muted); text-align:center; padding:12px;}
 
   /* sort chooser page */
@@ -229,14 +229,14 @@
   }
   #sort-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
   #sort-done{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
-  #sort-done:hover{background:var(--ink); box-shadow:none;}
+  
   .so-filter{display:flex; height:45px; flex:none; box-sizing:border-box; margin:4px 4px 0;
     border:3px solid #000; border-radius:8px; overflow:hidden; background:var(--panel);}
   .so-filter button{grid-column:auto; flex:1; margin:0; padding:0; border:none; border-radius:0; box-shadow:none;
     background:var(--panel); color:var(--ink); font-family:Arial, sans-serif; font-size:.78rem; font-weight:600;
     letter-spacing:.3px; text-transform:none; cursor:pointer;}
   .so-filter button + button{border-left:3px solid #000;}
-  .so-filter button:hover{box-shadow:none;}
+  
   .so-filter button.on{background:var(--ink); color:#fff;}
   .so-empty{padding:40px 12px; text-align:center; font-family:Arial, sans-serif; font-size:.8rem; color:var(--muted);}
   .so-list{flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:4px; padding:4px 4px calc(4px + env(safe-area-inset-bottom));}
@@ -269,11 +269,7 @@
     cursor:pointer;
     transition:border-color .15s, color .15s, background .15s;
   }
-  #add-card:hover{
-    border-color:#000;
-    color:var(--ink);
-    background:#fff;
-  }
+  
   #add-card .plus{
     line-height:1;
   }
@@ -362,7 +358,7 @@
     border:3px solid #000; border-radius:10px; box-shadow:none;
     font-family:Arial, sans-serif; font-size:.85rem; font-weight:700; letter-spacing:.3px; text-transform:none;
     background:var(--bookmark, #a9825f); color:var(--bookmark-ink, #fff); cursor:pointer;}
-  #play-update:hover, #page-update:hover{box-shadow:none;}
+  
   .play-set .lw-wheel div{font-size:13px;}
   /* percent card: − | draggable fill | + ; it stages a time just like the wheels */
   #play-pct{flex:none; width:100%; min-width:0; display:flex; height:45px; box-sizing:border-box;
@@ -370,7 +366,7 @@
   #play-pct .pp-btn{grid-column:auto; flex:none; width:36px; margin:0; padding:0; border:none; border-radius:0;
     box-shadow:none; font-size:1rem; line-height:1; cursor:pointer; touch-action:manipulation; user-select:none;
     -webkit-tap-highlight-color:transparent; background:var(--bookmark, #a9825f); color:var(--bookmark-ink, #fff);}
-  #play-pct .pp-btn:hover{box-shadow:none;}
+  
   #play-pct .pp-btn:first-child{border-right:3px solid #000;}
   #play-pct .pp-btn:last-child{border-left:3px solid #000;}
   #play-pct-bar{position:relative; flex:1; min-width:0; background:var(--unread); touch-action:none; cursor:grab;}
@@ -441,7 +437,7 @@
     border:none; border-radius:0;
     background:transparent; color:var(--ink); font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; cursor:pointer;
   }
-  .fc-more:hover, .fc-more:active{background:var(--bg); box-shadow:none;}
+   .fc-more:active{background:var(--bg); box-shadow:none;}
   #tags-value{height:20px; line-height:20px; font-family:Georgia, serif; font-size:.82rem; color:var(--ink);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   #tags-value.none{color:#c4bdb0;}
@@ -581,7 +577,7 @@
     transition:background .15s, box-shadow .15s;
     box-shadow:0 3px 8px rgba(0,0,0,.18);
   }
-  button:hover{background:var(--wood-dark); box-shadow:0 4px 12px rgba(0,0,0,.25);}
+  
   .shelf-wrap{
     width:100%;
     max-width:900px;
@@ -657,12 +653,9 @@
   /* hover lift: real mouse only (on touch, :hover sticks after a tap), and
      never on a closed collection shelf where books can't be picked yet */
   @media (hover:hover) and (pointer:fine){
-    .spine:hover{
-      transform:translateY(-6px);
-      box-shadow:0 10px 14px rgba(0,0,0,.3);
-    }
-    .coll-block:not(.selected) .spine:hover{transform:none; box-shadow:none;}
-    .spine.live:hover{box-shadow:none;}
+    
+    
+    
   }
   .spine-wrap{
     position:relative;
@@ -796,7 +789,7 @@
   #book-actions button + button{border-left:3px solid #000;}
   #book-actions button:first-child{border-radius:8px 0 0 8px;}
   #book-actions button:last-child{border-radius:0 8px 8px 0;}
-  #book-actions button:hover, #book-actions button:active{background:var(--bg); box-shadow:none;}
+   #book-actions button:active{background:var(--bg); box-shadow:none;}
   #delete-btn{color:#a33;}
   #page-panel{
     position:fixed;
@@ -843,7 +836,7 @@
   }
   .pm-btn:first-child{border-right:3px solid #000;}
   .pm-btn:last-child{border-left:3px solid #000;}
-  .pm-btn:hover{box-shadow:none;}   /* the card's rounded corners clip the ends */
+     /* the card's rounded corners clip the ends */
   #combined-bar{
     position:relative;
     flex:1;
@@ -920,9 +913,9 @@
     letter-spacing:.3px; text-transform:none;
   }
   .rr-btns button + button{border-left:3px solid #000; background:var(--ink); color:#fff;}
-  .rr-btns button:hover{box-shadow:none;}
-  .rr-btns button:first-child:hover{background:var(--bg);}
-  .rr-btns button + button:hover{background:var(--ink);}
+  
+  
+  
 
   /* ---- reading log editor ---- */
   #log-page{
@@ -940,9 +933,9 @@
     font-family:Arial, sans-serif; font-size:.75rem; font-weight:600; border-radius:8px;
   }
   #log-add{border:3px solid #000; background:#fff; color:var(--ink); padding:0;}
-  #log-add:hover{background:var(--bg); box-shadow:none;}
+  
   #log-done{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
-  #log-done:hover{background:var(--ink); box-shadow:none;}
+  
   .lg-foot{display:flex; margin-top:auto;}
   .lg-summary{
     display:flex; height:45px; box-sizing:border-box; margin:6px 4px; flex:none;
@@ -1002,12 +995,12 @@
     grid-column:auto; width:40px; height:40px; margin:0; padding:0; border:3px solid #000; border-radius:8px; box-shadow:none;
     background:#fff; color:#a33; font-size:1rem; font-weight:900; -webkit-text-stroke:1.2px currentColor; letter-spacing:0; text-transform:none;
   }
-  .lg-del:hover{background:#fff; box-shadow:none;}   /* not the app-wide button hover */
+     /* not the app-wide button hover */
   /* pale red on hover only with a real mouse: on a phone :hover sticks after a tap */
-  @media (hover:hover){ .lg-del:not(:disabled):not(.armed):hover{background:#f6e3df;} }
-  .lg-del.armed, .lg-del.armed:hover{background:#a33; color:#fff;}   /* tapped once: tap again to delete */
+  @media (hover:hover){  }
+  .lg-del.armed{background:#a33; color:#fff;}   /* tapped once: tap again to delete */
   /* Today can't be deleted: the same card, greyed out and inert */
-  .lg-del:disabled, .lg-del:disabled:hover{background:#d6d2c8; color:#8f8a80; cursor:default;}
+  .lg-del:disabled{background:#d6d2c8; color:#8f8a80; cursor:default;}
   /* audiobook rows: Day | Played | Left | ✕, the same grid as a book's */
 
 
@@ -1033,21 +1026,21 @@
   }
   #timeline-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
   #timeline-back{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
-  #timeline-back:hover{background:var(--ink); box-shadow:none;}
+  
   #timeline-body{flex:1; min-height:0; display:flex; flex-direction:column;}
   /* two one-card choosers (what, and over what span), then the timeline card, then a fixed footer */
   .tl-views{flex:none; display:flex; gap:3px; margin:4px 4px 0; height:45px; background:#000; border:3px solid #000; border-radius:8px; overflow:hidden;}
   .tl-views button{grid-column:auto; flex:1 1 0; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:#fff; color:var(--muted);
     font-family:Arial, sans-serif; font-size:.78rem; font-weight:400; letter-spacing:.5px; text-transform:none; cursor:pointer;}
-  .tl-views button:hover{background:#fff; box-shadow:none;}
-  .tl-views button.on, .tl-views button.on:hover{background:var(--ink); color:#fff;}
+  
+  .tl-views button.on{background:var(--ink); color:#fff;}
   .tl-views button{transition:none;}   /* switch instantly: no fade from the last choice when the tab reopens */
   .tl-page{flex:1; min-height:0; display:flex; padding:4px;}
   .tl-card{flex:1; position:relative; border:3px solid #000; border-radius:8px; background:#fff; overflow:hidden;}
   /* under the card: a card the height of the tab cards that opens the chart on its own, full window */
   #tl-full{flex:none; grid-column:auto; height:21px; margin:0 4px 4px; padding:0; box-sizing:border-box; border:3px solid #000; border-radius:8px;
     background:#fff; color:var(--ink); box-shadow:none; font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; cursor:pointer;}   /* the tabs' own type */
-  #tl-full:hover, #tl-full:active{background:#fff; box-shadow:none;}
+   #tl-full:active{background:#fff; box-shadow:none;}
   /* full window: just the card on the page's ground, 4px from every edge; any tap brings everything back */
   body.tl-full #timeline-page{top:0; z-index:100;}
   body.tl-full #timeline-page .tl-foot, body.tl-full #tl-full{display:none;}
@@ -1103,7 +1096,7 @@
   #tl-info .tl-mid .tot{font-size:.66rem;}
   #tl-info .tl-mid .hint{flex:none; font-size:.54rem; letter-spacing:.2px;}
   #data-done{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
-  #data-done:hover{background:var(--ink); box-shadow:none;}
+  
   .dt-view{
     display:none; flex:1; min-height:0; flex-direction:column; gap:4px;
     padding:4px 4px calc(4px + env(safe-area-inset-bottom));
@@ -1112,10 +1105,41 @@
   /* each Data tab's action card sits in a footer bar at the bottom, like the app's other footers */
   .dt-foot{flex:none; margin:auto -4px calc(-4px - env(safe-area-inset-bottom)); padding:4px 4px calc(4px + env(safe-area-inset-bottom));
     background:var(--bg); border-top:3px solid #000; border-bottom:3px solid #000;}
-  .dt-view.dt-stats.active{display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); grid-auto-rows:auto; align-content:start; overflow-y:auto;}
-  .dt-stats .dt-card{padding:0 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .dt-stats .dt-card.wide{grid-column:span 2;}
-  .dt-stats .dt-divider{grid-column:1 / -1; margin:0 -4px; padding:0 8px; height:30px;}   /* runs the full width of the window */
+  /* Data → Stats: per section a bookcloth card naming it, a month/year bar card, then twelve figures in halves; all fit, nothing scrolls */
+  #dt-view-stats.active{display:flex; flex-direction:column; gap:4px; overflow:hidden; font-family:Arial, sans-serif; color:var(--ink);}
+  #dt-view-stats *{box-sizing:border-box;}
+  #dt-view-stats .st-c{border:3px solid #000; border-radius:8px; background:var(--panel); overflow:hidden; min-height:0; position:relative;}
+  #dt-view-stats .st-k{font:700 min(.62rem, 2.6vw)/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); white-space:nowrap;}
+  #dt-view-stats .st-v{font:600 min(.95rem, 4vw)/1.05 Georgia, serif; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;}
+  #dt-view-stats .st-sec{flex:none; height:34px; display:flex; align-items:center; justify-content:center;}
+  #dt-view-stats .st-sec > canvas.cloth-bg{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
+  #dt-view-stats .st-sec span{position:relative; font:700 min(1rem, 4vw)/1 Georgia, 'Times New Roman', serif; letter-spacing:.14em; text-transform:uppercase; color:var(--ds-ink);}
+  #dt-view-stats .st-list{flex:1 1 0; display:flex; flex-direction:column;}
+  #dt-view-stats .st-list > div{flex:1 1 0; display:flex; align-items:stretch; min-height:0;}
+  #dt-view-stats .st-list > div + div{border-top:1px solid #e3dccd;}
+  #dt-view-stats .st-half{flex:1 1 0; min-width:0; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 10px;}
+  #dt-view-stats .st-half:first-child{padding-right:12px;} #dt-view-stats .st-half + .st-half{padding-left:12px;}
+  /* the halves' dividing line: one solid line down the whole card */
+  #dt-view-stats .st-list::after{content:''; position:absolute; top:0; bottom:0; left:50%; width:3px; margin-left:-1.5px; background:#000; z-index:1; pointer-events:none;}
+  /* the bar card: regular card height; bars in the progress fill's paper (books) or tape (audiobooks), page lines across */
+  #dt-view-stats .st-mon{flex:none; height:45px; display:flex; gap:3px; padding:3px 8px 2px;}
+  #dt-view-stats .st-m{flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:1px;}
+  #dt-view-stats .st-bar{flex:1 1 0; width:100%; display:flex; align-items:flex-end; border-bottom:2px solid #000;}
+  #dt-view-stats .st-bar i{display:block; width:100%; border-radius:2px 2px 0 0; background-image:var(--page-lines-h); background-repeat:repeat; background-size:4px 120px;}
+  #dt-view-stats .st-mon.book .st-bar i{background-color:#cbc4b1;}
+  #dt-view-stats .st-mon.tape .st-bar i{background-color:#8c5229;}
+  #dt-view-stats .st-ml{font:700 min(.55rem, 2.4vw)/1 Arial, sans-serif; color:var(--muted);}
+  /* two to ten years: ten year slots, each its twelve month bars side by side over one baseline */
+  #dt-view-stats .st-mon.years .st-ml{letter-spacing:0;}
+  #dt-view-stats .st-ms{flex:1 1 0; min-height:0; width:100%; display:flex; gap:.5px; border-bottom:2px solid #000;}
+  #dt-view-stats .st-ms .st-bar{flex:1 1 0; min-width:0; border-bottom:0;}
+  #dt-view-stats .st-ms .st-bar i{border-radius:1px 1px 0 0;}
+  /* past ten years: a bar a year, 'xx under each to 25 years; past that the whole span once underneath */
+  #dt-view-stats .st-mon.decades{gap:1px;}
+  #dt-view-stats .st-mon.decades .st-ml{letter-spacing:0; white-space:nowrap; font-size:min(.5rem, 2.1vw);}
+  #dt-view-stats .st-mon.wide{flex-direction:column; gap:1px;}
+  #dt-view-stats .st-mon.wide .st-row{flex:1 1 0; min-height:0; display:flex; gap:1px;}
+  #dt-view-stats .st-mon.wide .st-ml.span{text-align:center; font-size:min(.55rem, 2.4vw); letter-spacing:.3px;}
   .dt-text{
     flex:1; min-height:0; width:100%; box-sizing:border-box; resize:none; margin:0;
     padding:8px; background:var(--panel); color:var(--ink);
@@ -1130,7 +1154,7 @@
   #dt-restore .rs-card{grid-column:auto; display:flex; flex-direction:column; justify-content:center; gap:3px; width:100%; height:45px; margin:0; padding:0 8px; box-sizing:border-box;
     background:var(--panel); border:3px solid #000; border-radius:8px; box-shadow:none; cursor:pointer; text-align:left;
     font:400 .62rem/1.15 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--muted);}
-  #dt-restore .rs-card:hover, #dt-restore .rs-card:active{background:var(--bg); box-shadow:none;}
+   #dt-restore .rs-card:active{background:var(--bg); box-shadow:none;}
   #dt-restore .rs-card.on{background:var(--ink); color:#d6cfc2;}
   #dt-restore .rs-card.on b{color:#fff;}
   #dt-restore .rs-row{display:flex; justify-content:space-between; gap:8px; white-space:nowrap;}
@@ -1164,7 +1188,7 @@
   .dt-card.bk-loc{flex-direction:row; align-items:stretch; padding:0; overflow:hidden;}
   .bk-loc button{grid-column:auto; margin:0; border:0; border-radius:0; box-shadow:none; background:transparent; cursor:pointer;
     font-family:Arial, sans-serif; letter-spacing:0; text-transform:none;}
-  .bk-loc button:hover, .bk-loc button:active{background:var(--bg); box-shadow:none;}
+   .bk-loc button:active{background:var(--bg); box-shadow:none;}
   #bk-loc-pick{flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; padding:0 8px;
     font-size:.62rem; color:var(--muted); line-height:1.15; text-align:left;}
   #bk-loc-pick b{max-width:100%;}
@@ -1175,7 +1199,7 @@
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   button.dt-card{cursor:pointer;}
-  button.dt-card:hover, button.dt-card:active{background:var(--bg); box-shadow:none;}
+   button.dt-card:active{background:var(--bg); box-shadow:none;}
   .dt-card.error b{color:#a33;}
   #dt-status{align-items:center; text-align:center;}   /* the Import card: above the text field, centred */
   #dt-status b{max-width:100%;}
@@ -1189,7 +1213,7 @@
     font-weight:600; letter-spacing:.3px; text-transform:none;
   }
   .dt-split button + button{border-left:3px solid #000;}
-  .dt-split button:hover, .dt-split button:active{background:var(--bg); box-shadow:none;}
+   .dt-split button:active{background:var(--bg); box-shadow:none;}
   #dt-replace:not(.cloth-btn){color:#a33;}
 
   .tabs{
@@ -1307,7 +1331,7 @@
     box-shadow:inset 0 1px 0 rgba(255,228,195,.55), inset 0 -1px 0 rgba(50,28,12,.35), 0 0 0 1px #4a2e18, 0 2px 0 1px #3d2513, 0 3px 4px rgba(0,0,0,.35);
     display:flex; align-items:center; justify-content:center;}
   #library-container:not(.live3d) .shelf .wbtn{bottom:-21px;}
-  .shelf .wbtn:hover{background:linear-gradient(180deg, #b07a4b 0, #996439 45%, #845530 100%);}
+  
   .shelf .wbtn.prev{left:6px;} .shelf .wbtn.next{right:6px;}
   .shelf .wbtn::after{content:''; width:0; height:0; border-top:4px solid transparent; border-bottom:4px solid transparent; filter:drop-shadow(0 1px 0 rgba(255,228,195,.45));}
   .shelf .wbtn.prev::after{border-right:6px solid #3a2213; margin-right:1px;}
@@ -1334,14 +1358,14 @@
     flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
     font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; background-clip:padding-box;
   }
-  #customize-back-btn, #customize-back-btn:hover, #customize-back-btn:active{background:#7a2f2b; color:#fff; border-right:3px solid #000; box-shadow:none;}   /* Brick, the cover colour */
-  #customize-save-btn, #customize-save-btn:hover, #customize-save-btn:active{background:#2e4636; color:#fff; border-left:3px solid #000; box-shadow:none;}
+  #customize-back-btn, #customize-back-btn:active{background:#7a2f2b; color:#fff; border-right:3px solid #000; box-shadow:none;}   /* Brick, the cover colour */
+  #customize-save-btn, #customize-save-btn:active{background:#2e4636; color:#fff; border-left:3px solid #000; box-shadow:none;}
   .customize-header h2{flex:1 1 0; min-width:0; max-width:none; height:42px; line-height:42px; padding:0 6px; text-align:center; background:var(--bg); color:var(--ink);
     font:700 min(.74rem, 2.95vw)/42px Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}   /* same type as the main tabs */
   /* Sort and Filter: header like Add a Book's (Back cell on the left only, title centred on the window),
      filters as separate cards in a top section, sort cards below; every word inside a card */
   .sh-head{flex:none; display:flex; align-items:stretch; padding:env(safe-area-inset-top) 0 0; background:#000; border-top:3px solid #000; border-bottom:3px solid #000;}
-  .sh-head #sort-done, .sh-head #sort-done:hover, .sh-head #sort-done:active{flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-right:3px solid #000; border-radius:0; box-shadow:none;
+  .sh-head #sort-done, .sh-head #sort-done:active{flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-right:3px solid #000; border-radius:0; box-shadow:none;
     background:#7a2f2b; background-clip:padding-box; color:#fff; font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
   .sh-head h2{flex:1 1 0; min-width:0; margin:0; height:42px; padding:0 25% 0 0; display:flex; align-items:center; justify-content:center; background:var(--bg);
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink); white-space:nowrap;}
@@ -1349,8 +1373,8 @@
   #sort-page .so-filter .so-opt{width:100%; height:45px; box-sizing:border-box; margin:0; padding:0 8px; border:3px solid #000; border-radius:8px; background:var(--panel);
     display:flex; flex-direction:column; justify-content:center; align-items:flex-start; text-align:left; text-transform:none; letter-spacing:0; line-height:1.15; box-shadow:none; font-weight:400;}
   #sort-page .so-filter .so-opt + .so-opt{border-left:3px solid #000;}
-  #sort-page .so-filter .so-opt:hover{background:var(--panel); box-shadow:none;}
-  #sort-page .so-filter .so-opt.on, #sort-page .so-filter .so-opt.on:hover{background:var(--ink);}
+  
+  #sort-page .so-filter .so-opt.on{background:var(--ink);}
   #sort-page .so-filter .so-opt.on b{color:#fff;} #sort-page .so-filter .so-opt.on span{color:#cfc8ba;}
   #sort-page .so-list{padding-top:0;}
   /* every card on this page: capitals, one height */
@@ -1371,10 +1395,10 @@
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink); white-space:nowrap;}
   .lg-head > span{display:none;}
   .lg-head > h2:has(+ span){padding-right:25%;}   /* no right cell: the title still centres on the window */
-  .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done), .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done):hover, .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done):active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
+  .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done), .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done):active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
     background:#7a2f2b; background-clip:padding-box; color:#fff; border-right:3px solid #000;
     font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
-  .lg-head > h2 + #log-add, .lg-head > h2 + #log-add:hover, .lg-head > h2 + #log-add:active{background:#2e4636; border-right:0; border-left:3px solid #000;}   /* + Add Day: forest, like Add */
+  .lg-head > h2 + #log-add, .lg-head > h2 + #log-add:active{background:#2e4636; border-right:0; border-left:3px solid #000;}   /* + Add Day: forest, like Add */
   /* every button card reads in capitals, at the main window's size and weight */
   #book-actions button, .dd-acts button, .rr-btns button, .dt-split button, #play-update, .dd-confirm, #tag-new-add, #author-new-add{
     text-transform:uppercase; font-family:Arial, sans-serif; font-weight:700; letter-spacing:.3px;}
@@ -1401,15 +1425,15 @@
   #page-panel::after{content:''; position:absolute; left:0; right:0; top:100%; height:env(safe-area-inset-bottom); background:#000;}   /* under the lifted panel too */
   #book-toolbar{box-shadow:inset 0 env(safe-area-inset-top) 0 #000, 0 8px 24px rgba(0,0,0,.18);}
   /* tab cards (Shelf | List, Book | Audiobook, the Timeline and Data choices): the unpicked side in the same shade */
-  .tabs .tab:not(.active), .tl-views button:not(.on), .tl-views button:not(.on):hover{background:var(--hdr-cell);}
-  #tabs .tab:not(.active), .tabs .tab:not(.active), .tl-views button:not(.on), .tl-views button:not(.on):hover{color:var(--ink);}   /* unpicked text: the picked side's dark */
+  .tabs .tab:not(.active), .tl-views button:not(.on){background:var(--hdr-cell);}
+  #tabs .tab:not(.active), .tabs .tab:not(.active), .tl-views button:not(.on){color:var(--ink);}   /* unpicked text: the picked side's dark */
   /* every tab — the main strip and every tab card — one size and weight: the main strip's */
   #tabs .tab, .tabs .tab, #view-tabs .tab, #format-tabs .tab, .dt-tabs .tab, .tl-views button{
     font-family:Arial, sans-serif; font-size:min(.74rem, 2.95vw); font-weight:700; letter-spacing:0;}
   /* filter / sort card: the tabs' size and weight */
   #shelf-controls #sort-card .sort-k, #shelf-controls #sort-card .sort-v, #sort-q{font-size:min(.74rem, 2.95vw); font-weight:700; letter-spacing:0;}
   /* Add Book: olive, white capitals, bold and a size up */
-  #add-card, #add-card:hover, #add-card:active{background:#5b6633; color:#fff;
+  #add-card, #add-card:active{background:#5b6633; color:#fff;
     font:700 min(.92rem, 3.7vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   #add-card .plus{color:#fff; font-size:1.15em; font-weight:700;}
   /* Add Book in pearlescent bookcloth: the olive weave is drawn on a canvas behind the words */
@@ -1421,7 +1445,7 @@
   #add-card:active > canvas{filter:brightness(.92);}
   /* Data › Export: Copy (navy) and Download (plum) as two separate bookcloth cards side by side */
   .dt-pair{display:flex; gap:4px;}
-  .cloth-btn, .cloth-btn:hover, .cloth-btn:active{position:relative; overflow:hidden; flex:1 1 0; min-width:0; height:45px; margin:0; padding:0; box-sizing:border-box;
+  .cloth-btn, .cloth-btn:active{position:relative; overflow:hidden; flex:1 1 0; min-width:0; height:45px; margin:0; padding:0; box-sizing:border-box;
     border:3px solid #000; border-radius:8px; background:var(--cloth, #5b6633); box-shadow:none; color:#fff; cursor:pointer;
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   .cloth-btn > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
@@ -1580,7 +1604,7 @@
   /* the randomize pin: a round metal badge, top right of the 3D area */
   #rand-pin{position:absolute; right:10px; top:60px; z-index:5; width:58px; height:58px; padding:0; margin:0; border:0; border-radius:50%;
     background:none; box-shadow:none; cursor:pointer; -webkit-tap-highlight-color:transparent;}
-  #rand-pin:hover, #rand-pin:active{background:none; box-shadow:none;}
+   #rand-pin:active{background:none; box-shadow:none;}
   #rand-pin canvas{display:block; width:100%; height:100%;}
   /* the Backup tab: every card's words centred (the split cards still run their dividers full height) */
   #dt-view-backup .dt-card{align-items:center; text-align:center;}
@@ -1612,6 +1636,110 @@
   #splash .sp-spine.landed{animation:none !important; opacity:1; transform:none; will-change:auto;}
   #splash .sp-sub{font:600 .6rem Arial, sans-serif; letter-spacing:1.6px; color:#8a8378; text-transform:uppercase; opacity:0; transition:opacity .4s;}
   #splash .sp-sub.in{opacity:1;}
+
+  /* ===== rereads: log reads, Compare Past Reads, Reset | Reread ===== */
+  /* summary card: (with rereads) Read x of x · the read's dates · how far and days logged; with rereads ◀ ▶ step through the reads, like the Timeline */
+  #log-sum{padding:0;}
+  #log-sum .lg-nav{display:none; flex:0 0 42px; align-self:stretch; box-sizing:border-box; border:none; margin:0; padding:0; box-shadow:none; transform:none; background:#fff; color:var(--ink); font:900 15px/1 Arial, sans-serif; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  #log-sum .lg-nav:disabled{color:#d6d0c4; cursor:default;}
+  #log-sum .lg-mid{flex:1; min-width:0; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:0 6px; text-align:center; line-height:1.05;}
+  #log-sum .lg-mid > span{display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  #log-sum .lg-which{display:none !important; font:700 .62rem/1.05 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink);}
+  #log-sum .lg-range{font-size:.66rem; color:var(--ink);}
+  #log-sum .lg-tot{font-size:.62rem;}
+  #log-sum .lg-tot > span + span::before{content:' · '; white-space:pre;}
+  #log-sum.nav .lg-nav{display:block;}
+  #log-sum.nav .lg-which{display:block !important;}
+  #log-sum.nav #log-prev{border-right:3px solid #000; border-radius:5px 0 0 5px;} #log-sum.nav #log-next{border-left:3px solid #000; border-radius:0 5px 5px 0;}
+  /* the top card sits in its own walnut band under the header, 4px all round, casting the header's shadow */
+  .lg-top{flex:none; position:relative; z-index:1; padding:4px; background:#6b4a32; border-bottom:3px solid #000;}
+  .lg-top::after{content:''; position:absolute; left:0; right:0; top:100%; margin-top:2px; height:15px; pointer-events:none;
+    background:linear-gradient(180deg, rgba(0,0,0,.32), rgba(0,0,0,.12) 40%, rgba(0,0,0,0));}
+  .lg-top .lg-summary{margin:0;}
+  /* the column names in one short full-width card (21px, like Tap for full window view), split where the columns
+     below are split: Date over the bar and the day cards, then the two value columns, then Delete */
+  .lg-list .lg-heads{height:21px; box-sizing:border-box; margin:4px 0 4px; padding:0; border:3px solid #000; border-radius:8px; overflow:hidden;
+    grid-template-columns:86.5px minmax(0, 1fr) minmax(0, 1fr) 44.5px; gap:3px; background:#000;}
+  .lg-list .lg-heads span{display:flex; align-items:center; justify-content:center; min-width:0; overflow:hidden; white-space:nowrap; background:#fff;
+    font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; color:var(--ink);}
+  /* Compare Past Reads: a section left of Edit, the same width as the others; on, it's dark like a picked tab */
+  .dd-acts .dd-cmp-btn{line-height:1.1; padding:0 4px;}
+  /* even: every section the same width, the 3px black dividers drawn as the gaps between them */
+  .dd-acts{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:3px; background:#000;}
+  .dd-acts button, .dd-acts button + button{min-width:0; padding:0 4px; border-left:none;}
+  .dd-acts .dd-cmp-btn.on{background:var(--ink); color:#fff;}
+  /* on: the graph card with − / + gives way to one stretched graph card per read, newest at the top */
+  .dd-cmp{display:none; flex-direction:column; gap:6px;}
+  .row-dd.cmp .dd-pm-row{display:none;}
+  .row-dd.cmp .dd-cmp{display:flex;}
+  .dd-cmp .dd-chart{-webkit-user-select:none; user-select:none;}
+  /* Delete's red eases in and out; Compare's dark switches with the view, at once */
+  .dd-acts .dd-del{transition:background-color .32s cubic-bezier(.45,0,.55,1), color .32s cubic-bezier(.45,0,.55,1);}
+  .dd-acts .dd-cmp-btn.on, .dd-acts .dd-cmp-btn.on:active{background:var(--ink); color:#fff;}
+  /* Delete, armed: Confirm? in white on red until it's tapped again or 3 s pass */
+  .dd-acts .dd-del.armed, .dd-acts .dd-del.armed:active{background:#a33; color:#fff;}
+  /* no hover or press colours on anything you can tap: a card only changes when what it does changes */
+   .dd-acts button:not(.on):not(.armed):active{background:#fff;}
+  
+  .book-row:active .br-fill{filter:none;}
+   button:active{box-shadow:none !important;}
+  .dd-acts .dd-cmp-btn{transition:none;}   /* its colour changes with the view, not after it */
+  /* comparing past reads or listens: just the graphs and the actions, no wheels or stats card */
+  .row-dd.cmp .dd-play, .row-dd.cmp .dd-stats{display:none !important;}
+  /* more than three reads: the fourth card, in the book's own cloth, opens them all */
+  .cmp-more, .cmp-more:active{position:relative; overflow:hidden; height:45px; margin:0; padding:0 8px; box-sizing:border-box; border:3px solid #000; border-radius:8px; box-shadow:none !important;
+    background:var(--cloth); cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .cmp-more > canvas.cloth-bg{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
+  .cmp-more span{position:relative; font:700 min(.9rem, 3.6vw)/1 Georgia, 'Times New Roman', serif; letter-spacing:.12em; text-transform:uppercase; color:var(--ds-ink); white-space:nowrap;}
+  /* Past Reads window: a full-window page like the Log, its title band, then one standard graph card per read under a Read x strip */
+  #reads-page{position:fixed; inset:0; z-index:41; background:var(--bg); display:flex; flex-direction:column;
+    opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
+  #reads-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  .lg-head > #rw-back, .lg-head > #rw-back:active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
+    background:#7a2f2b; color:#fff; border-right:3px solid #000; font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+  #reads-page .lg-summary{justify-content:space-between; padding:0 10px;}
+  #rw-book{color:var(--ink); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;}
+  #rw-count{flex:none;}
+  #rw-list{flex:1; min-height:0; overflow-y:auto; padding:4px 4px calc(4px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
+  .rw-card{border:3px solid #000; border-radius:8px; overflow:hidden; background:#fff; flex:none;}
+  .rw-card .rw-k{height:21px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; border-bottom:3px solid #000; background:#6b4a32;   /* walnut, like the header bands */
+    font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:#fff;}
+  .rw-card .dd-chart{height:39px; border:0; border-radius:0; -webkit-user-select:none; user-select:none;}
+  /* finished: Reset | Reread (or Relisten) as one full-width card in place of the wheels, even halves */
+  .dd-fin{display:none; height:45px; box-sizing:border-box; border:3px solid #000; border-radius:8px; overflow:hidden;
+    grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:3px; background:#000;}
+  .row-dd.fin .dd-play{display:none;}
+  .row-dd.fin .dd-fin{display:grid;}
+  .row-dd.cmp .dd-fin{display:none !important;}
+  .dd-fin button, .dd-fin button:active{grid-column:auto; margin:0; padding:0 4px; min-width:0; border:none; border-radius:0; box-shadow:none !important;
+    background:#fff; color:var(--ink); font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; cursor:pointer;}
+  .dd-fin .fin-reset{color:#a33;}
+  .dd-fin .fin-reset, .dd-fin .fin-again{transition:background-color .32s cubic-bezier(.45,0,.55,1), color .32s cubic-bezier(.45,0,.55,1);}
+  .dd-fin button.armed, .dd-fin button.armed:active{background:#a33; color:#fff;}
+  /* open book toolbar: Compare | Edit | Log | Delete (or the three), even sections, 3px black between */
+  #book-actions{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:3px; background:#000;}
+  #book-actions button, #book-actions button + button, #book-actions button:first-child, #book-actions button:last-child{border:none; border-radius:0; min-width:0; padding:0 4px; line-height:1.1;}
+  #book-actions button[hidden]{display:none;}
+   #book-actions button:not(.on):not(.armed):active{background:#fff;}
+  #cmp-btn{transition:none;}
+  #cmp-btn.on, #cmp-btn.on:active{background:var(--ink); color:#fff;}
+  #delete-btn{transition:background-color .32s cubic-bezier(.45,0,.55,1), color .32s cubic-bezier(.45,0,.55,1);}
+  #delete-btn.armed, #delete-btn.armed:active{background:#a33; color:#fff;}
+  /* finished: Reset | Reread in place of the wheels */
+  #bk-fin{margin-top:4px; border-radius:10px;}
+  #page-panel.fin #page-line, #page-panel.fin #play-line{display:none !important;}
+  #page-panel.fin #bk-fin{display:grid;}
+  /* comparing: one graph card per read, newest at the top; no wheels, stats or Reset | Reread */
+  #cmp-stack{display:none; flex-direction:column; gap:4px; margin-top:4px;}
+  #page-panel.cmp #cmp-stack{margin-top:0;}
+  #cmp-stack .cmp-more{border-radius:10px;}
+  #cmp-stack .dd-chart{border-radius:10px; -webkit-user-select:none; user-select:none;}
+  #page-panel.cmp #cmp-stack{display:flex;}
+  #page-panel.cmp #combined-card, #page-panel.cmp #play-pct, #page-panel.cmp #chart-card, #page-panel.cmp #page-line, #page-panel.cmp #play-line, #page-panel.cmp #reading-readout, #page-panel.cmp #bk-fin{display:none !important;}
+
+  /* long-press doesn't select text or pop the callout anywhere but the places you type */
+  html, body, body *{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
+  input, textarea, select, [contenteditable], [contenteditable] *{-webkit-user-select:text; user-select:text; -webkit-touch-callout:default;}
 </style>
 </head>
 <body>
@@ -1966,16 +2094,31 @@
 </div>
 
 <!-- reading log editor: days in order, Today always on top -->
+<!-- past reads: every read's graph, opened from Compare's fourth card when a book has more than three -->
+<div id="reads-page">
+  <div class="lg-head"><button type="button" id="rw-back">Back</button><h2 id="rw-title">Past Reads</h2><span></span></div>
+  <div class="lg-top"><div class="lg-summary"><span id="rw-book"></span><span id="rw-count"></span></div></div>
+  <div id="rw-list"></div>
+</div>
+
 <div id="log-page">
   <div class="lg-head">
     <button type="button" id="log-done">Cancel</button>
     <h2>Reading Log</h2>
     <button type="button" id="log-add">Update</button>
   </div>
-  <!-- summary card: how far you are on the left, days logged on the right -->
-  <div class="lg-summary">
-    <span><span id="log-read-label">Read</span> <b id="log-read">0</b> of <b id="log-total">0</b></span>
-    <span><b id="log-days">0</b> days logged</span>
+  <!-- summary card, in its own band: (with rereads) Read x of x, the read's dates, how far and days logged;
+       with rereads ◀ ▶ step through the reads, like the Timeline -->
+  <div class="lg-top">
+  <div class="lg-summary" id="log-sum">
+    <button type="button" class="lg-nav" id="log-prev" aria-label="Earlier read">◀</button>
+    <div class="lg-mid">
+      <span class="lg-which" id="log-which"></span>
+      <span class="lg-range" id="log-range"></span>
+      <span class="lg-tot"><span><span id="log-read-label">Read</span> <b id="log-read">0</b> of <b id="log-total">0</b></span><span><b id="log-days">0</b> days logged</span></span>
+    </div>
+    <button type="button" class="lg-nav" id="log-next" aria-label="Later read">▶</button>
+  </div>
   </div>
   <div class="lg-warn" id="log-warn"></div>
   <div class="lg-list" id="log-list"></div>
@@ -2824,7 +2967,7 @@
   // sets how far into the tape you are; same rules as the open book's bar
   // (today's entry takes the difference; can't go below earlier days)
   function setTapeSecs(b, secs){
-    if(bookFinished(b) || !(b.audioSeconds > 0)) return;
+    if((bookFinished(b) && !finishedToday(b)) || !(b.audioSeconds > 0)) return;
     const before = sumDays(b.days.slice(0, -1));
     const target = Math.max(before, Math.min(b.pages, Math.round(secs / b.audioSeconds * b.pages * 10000)/10000));
     b.days[b.days.length - 1] = target - before;
@@ -2970,7 +3113,7 @@
       mirror: [...dd.querySelectorAll('.tw-left .lw-wheel')],
       total: ()=> b.audioSeconds, get: ()=> pct(b) * b.audioSeconds,
       set: T => { row._staged = Math.round(T); row._paintConfirm(); },
-      locked: ()=> bookFinished(b), onLocked: ()=> askTapeReread(b), done: ()=>{}
+      locked: ()=> bookFinished(b), onLocked: ()=>{}, done: ()=>{}
     });
     // − / + stage a minute at a time on the wheels; Update commits, same as turning them
     dd.querySelectorAll('.g-pm').forEach(btn=>{
@@ -2978,8 +3121,9 @@
       const d = +btn.dataset.d; let rt = 0, ri = 0;
       const stop = ()=>{ clearTimeout(rt); clearInterval(ri); };
       const nudge = ()=>{
-        if(bookFinished(b)){ stop(); askTapeReread(b); return; }
+        if(bookFinished(b) && !(d < 0 && finishedToday(b))){ stop(); return; }
         const dayStart = Math.ceil(sumDays(b.days.slice(0, -1)) / b.pages * b.audioSeconds);
+        if(finishedToday(b)){ setTapeSecs(b, Math.max(dayStart, Math.round(pct(b) * b.audioSeconds) + d*60)); row._staged = null; saveBooks(); paintListRow(row, b); refreshRowChart(row); return; }   // wheels hidden: straight off
         const from = row._staged != null ? row._staged : Math.round(pct(b) * b.audioSeconds);
         row._staged = Math.max(dayStart, Math.min(b.audioSeconds, from + d*60));
         row._wheels.put(row._staged); row._paintConfirm();
@@ -3009,7 +3153,7 @@
         const dx = Math.abs(e.clientX - scrub.x0), dy = Math.abs(e.clientY - scrub.y0);
         if(dy > 8 && dy > dx){ scrub = null; return; }
         if(dx < 6) return;
-        if(bookFinished(b)){ scrub = null; askTapeReread(b); return; }
+        if(bookFinished(b) && !finishedToday(b)){ scrub = null; return; }
         scrub.live = true;
         try{ row.setPointerCapture(scrub.id); }catch(err){}
       }
@@ -3049,8 +3193,8 @@
     const del = dd.querySelector('.dd-del'); let armed = false, t = 0;
     del.addEventListener('click', e=>{
       e.stopPropagation();
-      if(!armed){ armed = true; del.textContent = 'Confirm?';
-        t = setTimeout(()=>{ armed = false; del.textContent = 'Delete'; }, 3000); return; }
+      if(!armed){ armed = true; del.textContent = 'Confirm?'; del.classList.add('armed');
+        t = setTimeout(()=>{ armed = false; del.textContent = 'Delete'; del.classList.remove('armed'); }, 3000); return; }
       clearTimeout(t);
       const i = books.indexOf(b); if(i > -1) books.splice(i, 1);
       renderAll();
@@ -3075,6 +3219,7 @@
     if(!open){ closeRowDD(dd); return; }
     (row.parentElement || listContainer).querySelectorAll('.row-dd.open').forEach(o=>{ if(o !== dd) closeRowDD(o); });
     dd.classList.add('open'); row.classList.add('open');
+    addCompare(row); syncFin(row);
     if(row._wheels){ if(row._staged != null) row._staged = null; row._wheels.sync(true); }
     if(row._paintConfirm) row._paintConfirm();
     refreshRowChart(row);
@@ -3090,7 +3235,7 @@
   }
   // a printed book's progress, same rules as the open book's bar
   function setBookPage(b, target){
-    if(bookFinished(b)) return;
+    if(bookFinished(b) && !finishedToday(b)) return;
     const before = sumDays(b.days.slice(0, -1));
     target = Math.max(before, Math.min(b.pages, Math.round(target)));
     b.days[b.days.length - 1] = target - before;
@@ -3256,7 +3401,7 @@
       mirror: [...dd.querySelectorAll('.pw-left .lw-wheel')],
       total: ()=> b.pages, get: ()=> pageNow(), min: ()=> dayStart(),
       set: P => { row._staged = Math.round(P); row._paintConfirm(); },
-      locked: ()=> bookFinished(b), onLocked: ()=> askTapeReread(b), done: ()=>{}
+      locked: ()=> bookFinished(b), onLocked: ()=>{}, done: ()=>{}
     });
     confirmBtn.addEventListener('click', e=>{
       e.stopPropagation();
@@ -3269,7 +3414,7 @@
       const d = +btn.dataset.d; let rt = 0, ri = 0;
       const stop = ()=>{ clearTimeout(rt); clearInterval(ri); };
       const nudge = ()=>{
-        if(bookFinished(b)){ stop(); askTapeReread(b); return; }
+        if(bookFinished(b) && !(d < 0 && finishedToday(b))){ stop(); return; }
         setBookPage(b, Math.min(bookRead(b), b.pages) + d);
         paintListRow(row, b); refreshRowChart(row);
         row._staged = null; row._wheels.put(Math.min(bookRead(b), b.pages)); row._paintConfirm();   // the wheels follow
@@ -3364,7 +3509,7 @@
           const dx = Math.abs(e.clientX - scrub.x0), dy = Math.abs(e.clientY - scrub.y0);
           if(dy > 8 && dy > dx){ scrub = null; return; }          // a scroll, not a scrub
           if(dx < 6) return;
-          if(bookFinished(b)){ scrub = null; askTapeReread(b); return; }
+          if(bookFinished(b) && !finishedToday(b)){ scrub = null; return; }
           scrub.live = true;
           try{ row.setPointerCapture(scrub.id); }catch(err){}
         }
@@ -6227,7 +6372,7 @@
       syncBookFinish(book);
       // outside a tap/drag, keep the lock state current (log edits, reread);
       // mid-gesture it stays as it was at pointerdown
-      if(!pointerActive) lockedAtDown = bookFinished(book);
+      if(!pointerActive) lockedAtDown = bookFinished(book) && !finishedToday(book);
       const page = book.currentPage;
       const frac = book.pages > 0 ? page/book.pages : 0;
       if(isTape && book.audioSeconds){
@@ -6253,11 +6398,12 @@
       renderDDChart(readingChartSvg, book);                       // same graph and stats card as the list dropdowns
       if(!readingReadout.firstElementChild) readingReadout.innerHTML = DD_STATS;
       paintDDStats(readingReadout, book);
+      sync3D(book);                                              // Compare in the toolbar, Reset | Reread when finished
     }
     // the bar sets the page you're on: the difference goes into Today, and
     // it can't go below what earlier days already logged (fix those in the Log)
     function setPageUI(target){
-      if(bookFinished(book)) return;
+      if(bookFinished(book) && !finishedToday(book)) return;
       const before = sumDays(book.days.slice(0, -1));
       // audiobook wheels go to the second, so its minutes ("pages") can be fractional
       const snap = playMode ? v => Math.round(v*10000)/10000 : Math.round;
@@ -6321,17 +6467,21 @@
       shelfPlay = {
         total: ()=> book.audioSeconds,
         locked: ()=> bookFinished(book),
-        onLocked: ()=> rereadModal.classList.add('open'),
+        onLocked: ()=>{},
         set: T => { playStaged = Math.round(T); paintPlayPct(T); paintPlayUpdate(); }
       };
       playPct.style.setProperty('--bookmark', barStyle.bookmarkColor);
       playPct.style.setProperty('--bookmark-ink', readableTextOn(barStyle.bookmarkColor));
+      // finished: locked, except on the day it was finished, when − and dragging back take the time straight off
+      // (the wheels are hidden then) until it's under 100% again
+      const ppDirect = T => { setPageUI(Math.max(playDayStart(), T) / book.audioSeconds * book.pages); saveBooks(); };
       pp.ctx = {
-        locked: ()=> bookFinished(book),
-        onLocked: ()=> rereadModal.classList.add('open'),
-        step: d => { const cur = playStaged !== null ? playStaged : playSecsNow();
+        locked: ()=> bookFinished(book) && !finishedToday(book),
+        onLocked: ()=>{},
+        step: d => { if(finishedToday(book)){ ppDirect(playSecsNow() + d * 60); return; }
+          const cur = playStaged !== null ? playStaged : playSecsNow();
           stagePlay(Math.max(playDayStart(), cur + d * 60)); },   // a minute a step, like the list
-        frac: f => stagePlay(f * book.audioSeconds)
+        frac: f => { if(finishedToday(book)){ ppDirect(f * book.audioSeconds); return; } stagePlay(f * book.audioSeconds); }
       };
       playUpdate.addEventListener('click', onPlayUpdate);
     }
@@ -6356,7 +6506,7 @@
         total: ()=> book.pages,
         min: ()=> sumDays(book.days.slice(0, -1)),
         locked: ()=> bookFinished(book),
-        onLocked: ()=> rereadModal.classList.add('open'),
+        onLocked: ()=>{},
         set: P => { pageStaged = Math.round(P); paintPageUpdate(); }
       };
       pageUpdate.addEventListener('click', onPageUpdate);
@@ -6367,14 +6517,13 @@
     // locked (finished) bar: any tap asks about a reread instead. Decided at
     // pointerdown, so the drag or tap that finishes the book doesn't also pop
     // it; re-checked after each click for clicks that have no pointerdown.
-    function onCardDownCapture(){ lockedAtDown = bookFinished(book); pointerActive = true; }
+    function onCardDownCapture(){ lockedAtDown = bookFinished(book) && !finishedToday(book); pointerActive = true; }
     function onCardUpCapture(){ pointerActive = false; }
     function onCardClickCapture(e){
       const wasLocked = lockedAtDown;
       pointerActive = false;
-      if(!wasLocked){ lockedAtDown = bookFinished(book); return; }
-      e.stopPropagation();
-      rereadModal.classList.add('open');
+      if(!wasLocked){ lockedAtDown = bookFinished(book) && !finishedToday(book); return; }
+      e.stopPropagation();   // locked: the tap does nothing
     }
     combinedCard.addEventListener('pointerdown', onCardDownCapture, true);
     combinedCard.addEventListener('pointerup', onCardUpCapture, true);
@@ -6411,10 +6560,10 @@
     function onDeleteClick(){
       if(!deleteArmed){
         deleteArmed = true;
-        deleteBtn.textContent = 'Confirm?';
+        deleteBtn.textContent = 'Confirm?'; deleteBtn.classList.add('armed');
         deleteArmTimer = setTimeout(()=>{
           deleteArmed = false;
-          deleteBtn.textContent = 'Delete';
+          deleteBtn.textContent = 'Delete'; deleteBtn.classList.remove('armed');
         }, 3000);
         return;
       }
@@ -6834,6 +6983,7 @@
       combinedCard.removeEventListener('pointercancel', onCardUpCapture, true);
       combinedCard.removeEventListener('click', onCardClickCapture, true);
       logBtn.removeEventListener('click', onLogClick);
+      end3D();
       bookToolbar.classList.remove('active');
       pagePanel.classList.remove('active');
       combinedBar.removeEventListener('pointerdown', onPageDown);
@@ -6845,7 +6995,7 @@
       editBtn.removeEventListener('click', onEditClick);
       deleteBtn.removeEventListener('click', onDeleteClick);
       clearTimeout(deleteArmTimer);
-      deleteBtn.textContent = 'Delete';
+      deleteBtn.textContent = 'Delete'; deleteBtn.classList.remove('armed');
       backdrop.removeEventListener('click', close);
       hitEl.removeEventListener('pointerdown', onDown);
       hitEl.removeEventListener('pointermove', onMove);
@@ -8667,7 +8817,7 @@
   function openLogEditor(){
     if(!activeBookCtx) return;
     logSnap = JSON.parse(JSON.stringify(activeBookCtx.book));
-    logInsertSlot = 1;
+    logInsertSlot = 1; logRead = (activeBookCtx.book.reads || []).length;
     renderLogEditor();
     logPage.classList.add('open');
   }
@@ -8678,7 +8828,7 @@
   }
   function renderLogEditor(){
     if(!activeBookCtx) return;
-    const b = activeBookCtx.book;
+    const b = logView(); paintLogNav();
     const N = b.days.length, last = N - 1;
     logInsertSlot = Math.min(Math.max(logInsertSlot, 1), N);
     const read = bookRead(b);
@@ -8715,9 +8865,9 @@
       const before = sumDays(b.days.slice(0, i));
       // dates count back one per row from the top (Today / finish) day
       const d = keyDate(lastLogKey(b)); d.setDate(d.getDate() - (last - i));
-      const dateStr = d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+      const dateStr = d.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ", '" + String(d.getFullYear()).slice(-2);   // Oct 18, '26
       // narrow card: the day's number, and under it the date (or just Today / Finished on the top row)
-      const sub = isTop ? (bookFinished(b) ? 'Finished' : 'Today') : dateStr;
+      const sub = isTop && !bookFinished(b) && !b._past ? 'Today' : dateStr;   // finished: the day it finished
       row.innerHTML =
         `<div class="lg-day"><b>Day ${i+1}</b><small>${sub}</small></div>` +
         (isAudio
@@ -8812,7 +8962,7 @@
   }
   document.getElementById('log-add-day').addEventListener('click', ()=>{
     if(!activeBookCtx) return;
-    const b = activeBookCtx.book;
+    const b = logView();
     b.days.splice(b.days.length - logInsertSlot, 0, 0);
     logChanged();
   });
@@ -9619,97 +9769,364 @@
     finishImport(list, `Library replaced with ${plural(list.length, 'book')}`);
   });
 
-  // Data → Stats: books and audiobooks each get their own set of cards,
-  // split by full-width dividers. Audiobook figures are in listening time.
+  // Data → Stats: books, then audiobooks (when there are any), each under its own bookcloth card with a bar card
+  // of its log and twelve figures in halves. Audiobook figures are in listening time.
+  const MON1 = ['J','F','M','A','M','J','J','A','S','O','N','D'];
   function statsFor(list, audio){
-    const byDate = new Map();   // YYYY-MM-DD -> pages (books) or seconds (audiobooks) that day, across every read
-    let finishedThisYear = 0, rereads = 0;
-    const year = String(new Date().getFullYear());
-    const unit = b => audio ? (b.audioSeconds > 0 && b.pages > 0 ? b.audioSeconds / b.pages : 60) : 1;   // logged unit -> pages or seconds
-    function addRun(days, lastKey, k){
-      if(!lastKey) return;
-      const end = keyDate(lastKey);
-      days.forEach((v, i)=>{
-        if(!(v > 0)) return;
-        const d = new Date(end); d.setDate(d.getDate() - (days.length - 1 - i));
-        const key = dayKey(d);
-        byDate.set(key, (byDate.get(key) || 0) + v*k);
-      });
-    }
-    list.forEach(b=>{
-      addRun(b.days, lastLogKey(b), unit(b));
-      if(b.finishedOn && b.finishedOn.startsWith(year)) finishedThisYear++;
-      (b.reads || []).forEach(r=>{
-        rereads++;
-        addRun(r.days || [], r.finishedOn, unit(b));
-        if(r.finishedOn && r.finishedOn.startsWith(year)) finishedThisYear++;
-      });
-    });
-    const finished = list.filter(bookFinished).length;
-    const going = list.filter(b => bookRead(b) > 0 && !bookFinished(b)).length;
-    const total = [...byDate.values()].reduce((a,v)=>a+v, 0);
-    const onShelf = list.reduce((a,b)=> a + (audio ? (b.audioSeconds || b.pages*60) : b.pages), 0);
-    const activeDays = byDate.size;
-    let best = null;
-    byDate.forEach((v,k)=>{ if(!best || v > best.v) best = {k, v}; });
-    const keys = [...byDate.keys()].sort();
-    let longest = 0, run = 0, prev = null;
-    keys.forEach(k=>{ run = (prev && daysApart(prev, k) === 1) ? run + 1 : 1; longest = Math.max(longest, run); prev = k; });
-    let current = 0;
-    const startGap = prev ? daysApart(prev, localTodayKey()) : 99;
-    if(startGap <= 1){
-      current = 1;
-      for(let i = keys.length - 1; i > 0 && daysApart(keys[i-1], keys[i]) === 1; i--) current++;
-    }
-    const size = b => audio ? (b.audioSeconds || b.pages*60) : b.pages;
-    const longestOne = list.reduce((m,b)=> !m || size(b) > size(m) ? b : m, null);
-    const fmt = n => n.toLocaleString('en-US');
-    const amt = v => audio ? fmtDur(v) : fmtPg(v);       // pages (0.xx under one), or h/m of listening
-    // short labels so most cards fit three across; the longest title gets two
-    return [
-      [audio ? 'Audiobooks' : 'Books', fmt(list.length)],
-      ['Finished', fmt(finished)],
-      [audio ? 'Listening' : 'Reading', fmt(going)],
-      ['Not started', fmt(list.length - finished - going)],
-      [audio ? 'Listened' : 'Pages read', amt(total)],
-      ['On shelf', amt(onShelf)],
-      [audio ? 'Days listened' : 'Days read', fmt(activeDays)],
-      [audio ? 'Per day' : 'Pages / day', activeDays ? amt(total / activeDays) : '—'],
-      [best ? 'Best · ' + fmtShortDate(keyDate(best.k)) : 'Best day', best ? amt(best.v) : '—'],
-      ['Best streak', plural(longest, 'day')],
-      ['Streak now', plural(current, 'day')],
-      ['This year', fmt(finishedThisYear)],
-      [audio ? 'Relistens' : 'Rereads', fmt(rereads)],
-      [(audio ? 'Longest · ' + (longestOne ? fmtDur(size(longestOne)) : '') : 'Longest · ' + (longestOne ? fmt(longestOne.pages) + ' pages' : '')),
-        longestOne ? longestOne.title : '—', 'wide']
-    ];
+    const byDate = new Map(), unit = b => audio ? (b.audioSeconds > 0 && b.pages > 0 ? b.audioSeconds / b.pages : 60) : 1;
+    let finishedThisYear = 0, rereads = 0; const year = String(new Date().getFullYear());
+    const addRun = (days, lastKey, k) => { if(!lastKey) return; const end = keyDate(lastKey);
+      days.forEach((v, i) => { if(!(v > 0)) return; const d = new Date(end); d.setDate(d.getDate() - (days.length - 1 - i)); const key = dayKey(d); byDate.set(key, (byDate.get(key) || 0) + v * k); }); };
+    list.forEach(b => { addRun(b.days, lastLogKey(b), unit(b)); if(b.finishedOn && b.finishedOn.startsWith(year)) finishedThisYear++;
+      (b.reads || []).forEach(r => { rereads++; addRun(r.days || [], r.finishedOn, unit(b)); if(r.finishedOn && r.finishedOn.startsWith(year)) finishedThisYear++; }); });
+    const finished = list.filter(bookFinished).length, going = list.filter(b => bookRead(b) > 0 && !bookFinished(b)).length;
+    const total = [...byDate.values()].reduce((a, v) => a + v, 0);
+    const size = b => audio ? (b.audioSeconds || b.pages * 60) : b.pages;
+    const onShelf = list.reduce((a, b) => a + size(b), 0);
+    const doneOnShelf = list.reduce((a, b) => a + Math.min(1, bookRead(b) / (b.pages || 1)) * size(b), 0);
+    let best = null; byDate.forEach((v, k) => { if(!best || v > best.v) best = { k, v }; });
+    const keys = [...byDate.keys()].sort(); let longest = 0, run = 0, prev = null;
+    keys.forEach(k => { run = (prev && daysApart(prev, k) === 1) ? run + 1 : 1; longest = Math.max(longest, run); prev = k; });
+    let current = 0; if(prev && daysApart(prev, localTodayKey()) <= 1){ current = 1; for(let i = keys.length - 1; i > 0 && daysApart(keys[i - 1], keys[i]) === 1; i--) current++; }
+    const months = Array(12).fill(0), wk = Array(7).fill(0), wkN = Array(7).fill(0);
+    byDate.forEach((v, k) => { const d = keyDate(k); if(String(d.getFullYear()) === year) months[d.getMonth()] += v; });
+    const byYear = {}; byDate.forEach((v, k) => { const d = keyDate(k), y = d.getFullYear(); (byYear[y] = byYear[y] || Array(12).fill(0))[d.getMonth()] += v; });
+    // weekday rhythm: the average for each weekday over the span of the log (quiet days count as zero)
+    if(keys.length){ const d = keyDate(keys[0]), end = keyDate(localTodayKey());
+      for(; d <= end; d.setDate(d.getDate() + 1)){ wkN[d.getDay()]++; wk[d.getDay()] += byDate.get(dayKey(d)) || 0; } }
+    const last14 = Array.from({ length: 14 }, (_, i) => { const d = keyDate(localTodayKey()); d.setDate(d.getDate() - 13 + i); return byDate.has(dayKey(d)); });
+    const longestOne = list.reduce((m, b) => !m || size(b) > size(m) ? b : m, null);
+    return { n: list.length, finished, going, total, onShelf, doneOnShelf, days: byDate.size, best, longest, current, finishedThisYear, rereads,
+      months, byYear, week: wk.map((v, i) => wkN[i] ? v / wkN[i] : 0), last14, longestOne, size };
   }
   function renderDataStats(){
     books.forEach(normalizeBook);
     const wrap = document.getElementById('dt-view-stats');
     wrap.innerHTML = '';
-    const isAudio = b => b.format === 'audio';
-    const sections = [
-      { name:'Books', list: books.filter(b => !isAudio(b)), audio:false },
-      { name:'Audiobooks', list: books.filter(isAudio), audio:true }
-    ].filter(sec => sec.list.length || sec.name === 'Books');
-    sections.forEach(sec=>{
-      if(sections.length > 1){                       // a full-width divider names each part
-        const d = document.createElement('div');
-        d.className = 'list-divider dt-divider';
-        d.innerHTML = '<span class="ld-name"></span>';
-        d.querySelector('.ld-name').textContent = sec.name;
-        wrap.appendChild(d);
+    const fmt = n => Math.round(n).toLocaleString('en-US');
+    const el = (cls, html) => { const e = document.createElement('div'); e.className = cls; e.innerHTML = html; wrap.appendChild(e); return e; };
+    [{ name:'Books', A:false, hex:'#5b6633' }, { name:'Audiobooks', A:true, hex:'#2f5fae' }].forEach(sec=>{
+      const A = sec.A, list = books.filter(b => (b.format === 'audio') === A);
+      if(!list.length && A) return;                       // no audiobooks: just the books
+      const s = statsFor(list, A), amt = v => A ? fmtDur(v) : fmtPg(v);
+      const ns = s.n - s.finished - s.going, pct = s.onShelf ? s.doneOnShelf / s.onShelf : 0, perDay = s.days ? s.total / s.days : 0;
+      const name = el('st-c st-sec', '<span></span>'); name.querySelector('span').textContent = sec.name;
+      clothBehind(name, sec.hex);
+      // one year logged: a bar per month, its initial underneath; two to ten years: the last ten years, each a slot
+      // of twelve month bars under its year; past ten: a bar a year, 'xx under each to 25 years, then the span (1986–2026)
+      const yr = new Date().getFullYear(), first = Math.min(yr, ...Object.keys(s.byYear).map(Number)), span = yr - first + 1;
+      const sum = a => a.reduce((t, v) => t + v, 0), bar = (v, mx) => `<span class="st-bar"><i style="height:${v > 0 ? `max(${(v / mx * 100).toFixed(1)}%, 2px)` : '0'}"></i></span>`;
+      let html, mode = '';
+      if(span > 10){
+        mode = 'decades';
+        const yrs = Array.from({ length: span }, (_, i) => first + i), tot = yrs.map(y => sum(s.byYear[y] || [])), mx = Math.max(1, ...tot);
+        if(span <= 25) html = yrs.map((y, i) => `<span class="st-m">${bar(tot[i], mx)}<span class="st-ml">'${String(y).slice(-2)}</span></span>`).join('');
+        else { mode += ' wide'; html = `<span class="st-row">${tot.map(v => `<span class="st-m">${bar(v, mx)}</span>`).join('')}</span><span class="st-ml span">${first}–${yr}</span>`; }
+      } else if(span > 1){
+        mode = 'years';
+        const yrs = Array.from({ length: 10 }, (_, i) => yr - 9 + i), sets = yrs.map(y => s.byYear[y] || Array(12).fill(0)), mx = Math.max(1, ...sets.flat());
+        html = sets.map((arr, n) => `<span class="st-m"><span class="st-ms">${arr.map(v => bar(v, mx)).join('')}</span><span class="st-ml">${yrs[n]}</span></span>`).join('');
+      } else {
+        const arr = s.byYear[yr] || Array(12).fill(0), mx = Math.max(1, ...arr);
+        html = arr.map((v, i) => `<span class="st-m">${bar(v, mx)}<span class="st-ml">${MON1[i]}</span></span>`).join('');
       }
-      statsFor(sec.list, sec.audio).forEach(([label, value, wide])=>{
-        const c = document.createElement('div');
-        c.className = 'dt-card half' + (wide ? ' wide' : '');
-        c.append(label);
-        const bEl = document.createElement('b'); bEl.textContent = value; c.appendChild(bEl);
-        wrap.appendChild(c);
-      });
+      el('st-c st-mon ' + (A ? 'tape' : 'book') + (mode ? ' ' + mode : ''), html);
+      // twelve, in pairs: each row split in half
+      const rows = [
+        [[A ? 'Audiobooks' : 'Books', fmt(s.n)], ['Finished', fmt(s.finished)]],
+        [[A ? 'Listening' : 'Reading', fmt(s.going)], ['Not started', fmt(ns)]],
+        [[A ? 'Listened' : 'Pages read', A ? fmtDur(s.total) : fmt(s.total)], ['Of shelf', Math.round(pct * 100) + '%']],
+        [[A ? 'Days listened' : 'Days read', fmt(s.days)], ['A day', s.days ? amt(perDay) : '—']],
+        [['Streak now', plural(s.current, 'day')], ['Best streak', plural(s.longest, 'day')]],
+        [['Best day', s.best ? amt(s.best.v) : '—'], ['This year', fmt(s.finishedThisYear)]]];
+      el('st-c st-list', rows.map(r => `<div>${r.map(([k, v]) => `<span class="st-half"><span class="st-k">${k}</span><span class="st-v">${v}</span></span>`).join('')}</div>`).join(''));
     });
   }
+
+
+
+// ---------- the log's reads: the current read, or one of the book's past reads ----------
+// a past read is shown through a stand-in for the book that carries that read's own days (the same array,
+// so edits land in the read) and ends on its finish day; Cancel still puts everything back as it was
+let logRead = 0;
+function logView(){
+  const b = activeBookCtx.book, reads = b.reads || [];
+  if(logRead >= reads.length) return b;
+  const r = reads[logRead];
+  if(!r._view){
+    const v = Object.create(b);
+    Object.defineProperty(v, 'days', { get: () => r.days, set: d => { r.days = d; } });
+    v.lastDayKey = r.finishedOn; v.finishedOn = r.finishedOn; v._past = true;
+    Object.defineProperty(r, '_view', { value: v, enumerable: false, configurable: true });   // not saved
+  }
+  return r._view;
+}
+function paintLogNav(){
+  // top card: (with rereads) Read x of x, then the read's dates in full, then how far and how many days
+  const b = activeBookCtx.book, reads = b.reads || [], n = reads.length + 1, sum = document.getElementById('log-sum');
+  sum.classList.toggle('nav', n > 1);
+  const audio = b.format === 'audio', v = logView(), end = keyDate(lastLogKey(v)), start = new Date(end);
+  start.setDate(start.getDate() - (v.days.length - 1));
+  const full = d => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });   // September 20, 2026
+  const current = logRead >= reads.length;
+  document.getElementById('log-which').textContent = `${audio ? 'Listen' : 'Read'} ${logRead + 1} of ${n}`;
+  document.getElementById('log-range').textContent = `${full(start)} – ${current && !bookFinished(b) ? 'Today' : full(end)}`;
+  document.getElementById('log-prev').disabled = logRead <= 0;
+  document.getElementById('log-next').disabled = current;
+}
+document.getElementById('log-prev').addEventListener('click', () => { if(logRead > 0){ logRead--; logInsertSlot = 1; renderLogEditor(); } });
+document.getElementById('log-next').addEventListener('click', () => { if(logRead < (activeBookCtx.book.reads || []).length){ logRead++; logInsertSlot = 1; renderLogEditor(); } });
+
+
+// ---------- Compare past reads (dropdown) ----------
+// a book with rereads gets a Compare Past Reads section left of Edit. On, the graph card loses its − / +, stretches
+// across, and every read gets its own graph card, newest at the top. All of them share one span (7 days, or the
+// longest read's days if longer) and one scale, so the reads line up day for day. Nothing picked: each card shows
+// its read's dates at the top; tap or drag a bar for that day, same as the graph card.
+// every read, oldest first: { days, end } (end: its last day). Each starts on its first logged day, so day 1 lines up
+// with day 1 across the reads (any empty days before it are left off)
+function readsOf(b){
+  const trim = d => { const i = d.findIndex(v => v > 0); return i > 0 ? d.slice(i) : d; };
+  return (b.reads || []).map(r => ({ days: trim(r.days || []), end: r.finishedOn })).concat([{ days: trim(b.days), end: lastLogKey(b), current: true }]);
+}
+const CMP_YR = d => `${DS_MON[d.getMonth()]} ${d.getDate()}, '${String(d.getFullYear()).slice(-2)}`;
+function cmpRange(rd){
+  const end = keyDate(rd.end), start = new Date(end); start.setDate(start.getDate() - (rd.days.length - 1));
+  if(rd.days.length === 1) return CMP_YR(start);
+  const same = start.getFullYear() === end.getFullYear();
+  return `${same ? `${DS_MON[start.getMonth()]} ${start.getDate()}` : CMP_YR(start)} – ${CMP_YR(end)}`;
+}
+function renderCmpChart(svg, book, rd, n, max, H = 39){              // H: the drawing's height (39 in a 45px card)
+  const W = Math.round(svg.getBoundingClientRect().width) || 300, GAP = H > 60 ? 20 : 14, DRAW = H - GAP;
+  const days = rd.days, slot = W / n, FILL = styleForBook(book).bookmarkColor, SEL = '#2b2620';
+  const barW = Math.max(1, Math.round(slot * 0.5)), dividers = n <= 60;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
+  let g = '';
+  for(let i = 1; i < n && dividers; i++){ const x = Math.round(i * slot); g += `<rect x="${x - (slot >= 6 ? .75 : .5)}" y="0" width="${slot >= 6 ? 1.5 : 1}" height="${H}" fill="var(--line)"/>`; }
+  const bars = [];
+  days.forEach((d, i) => {
+    const h = d > 0 ? Math.max(2, d / max * DRAW) : 0, x = Math.round(i * slot + slot / 2 - barW / 2);
+    bars.push({x, w: barW});
+    if(h) g += `<path data-i="${i}" d="${barPath(x, H - h, barW, H + 4)}" fill="${FILL}"/>`;
+  });
+  const txt = cls => `<text class="${cls}" text-anchor="middle" y="${H > 60 ? 14 : 10}" font-family="Arial, sans-serif" font-size="${H > 60 ? 12 : 10}" font-weight="700" fill="var(--ink)"
+    stroke="#fff" stroke-width="3" paint-order="stroke" stroke-linejoin="round"`;
+  g += `${txt('rg')} x="${W / 2}">${cmpRange(rd)}</text>${txt('co')} opacity="0"></text>`;
+  svg.innerHTML = g;
+  if(svg._ac) svg._ac.abort();
+  const ac = svg._ac = new AbortController(), on = {signal: ac.signal};
+  svg.style.touchAction = 'pan-y'; svg.style.cursor = 'pointer';
+  const co = svg.querySelector('.co'), rg = svg.querySelector('.rg');
+  let sel = -1;
+  const end = keyDate(rd.end);
+  const label = i => {
+    const dt = new Date(end); dt.setDate(dt.getDate() - (days.length - 1 - i));
+    const v = days[i], amt = book.format === 'audio' && book.audioSeconds > 0
+      ? secsToLength(v * book.audioSeconds / book.pages) : `${Math.round(v * 100) / 100} ${v === 1 ? 'page' : 'pages'}`;
+    return `${DS_MON[dt.getMonth()]} ${dt.getDate()} · ${amt}`;
+  };
+  const dayAt = clientX => { const r = svg.getBoundingClientRect(); return Math.floor((clientX - r.left) / r.width * n); };
+  function pick(clientX){
+    const i = dayAt(clientX);
+    if(i < 0 || i >= days.length || i === sel) return;
+    if(sel >= 0){ const o = svg.querySelector(`path[data-i="${sel}"]`); if(o) o.setAttribute('fill', FILL); }
+    sel = i;
+    const p = svg.querySelector(`path[data-i="${i}"]`); if(p) p.setAttribute('fill', SEL);
+    co.textContent = label(i); co.setAttribute('opacity', 1); rg.setAttribute('opacity', 0);
+    const cx = bars[i].x + bars[i].w / 2, half = co.getComputedTextLength() / 2 + 3;
+    co.setAttribute('x', Math.min(Math.max(cx, half), W - half));
+  }
+  function clear(){ if(sel >= 0){ const o = svg.querySelector(`path[data-i="${sel}"]`); if(o) o.setAttribute('fill', FILL); } sel = -1; co.setAttribute('opacity', 0); rg.setAttribute('opacity', 1); }
+  let down = null;
+  svg.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation();
+    const again = sel >= 0 && dayAt(e.clientX) === sel;
+    down = {x: e.clientX, y: e.clientY, id: e.pointerId, live: false, again};
+    if(!again) pick(e.clientX); }, on);
+  svg.addEventListener('pointermove', e => {
+    if(!down) return;
+    if(!down.live){
+      const dx = Math.abs(e.clientX - down.x), dy = Math.abs(e.clientY - down.y);
+      if(dy > 8 && dy > dx){ down = null; clear(); return; }
+      if(dx > 3){ down.live = true; try{ svg.setPointerCapture(down.id); }catch(err){} }
+    }
+    pick(e.clientX);
+  }, on);
+  const up = () => { if(!down) return; if(down.again && !down.live) clear(); down = null; };
+  svg.addEventListener('pointerup', up, on); svg.addEventListener('pointercancel', () => { down = null; clear(); }, on);
+  svg.addEventListener('click', e => e.stopPropagation(), on);
+}
+// the newest three reads as graph cards; with more than three, a fourth card in the book's cloth opens them all
+const CMP_SHOWN = 3;
+function cmpSet(b){
+  const reads = readsOf(b).reverse();                                 // newest at the top
+  return { reads, n: Math.max(7, ...reads.map(r => r.days.length)), max: Math.max(1, ...reads.flatMap(r => r.days)) };
+}
+function fillCmp(box, b, keep = CMP_SHOWN){             // keep: how many graphs before the card (3 in the open book, 2 in a list dropdown)
+  const { reads, n, max } = cmpSet(b), cap = reads.length > keep ? keep : reads.length, shown = reads.slice(0, cap);
+  box.innerHTML = shown.map(() => '<div class="dd-chart"><svg></svg></div>').join('');
+  [...box.querySelectorAll('svg')].forEach((svg, k) => renderCmpChart(svg, b, shown[k], n, max));
+  if(reads.length > keep){
+    const more = document.createElement('button'); more.type = 'button'; more.className = 'cmp-more';
+    more.innerHTML = '<span></span>';
+    more.querySelector('span').textContent = `Open Log of Past ${reads.length} ${b.format === 'audio' ? 'Listens' : 'Reads'}`;
+    box.appendChild(more); clothBehind(more, bookColor(b));
+    more.addEventListener('click', e => { e.stopPropagation(); openReadsWindow(b); });
+  }
+}
+function paintCompare(dd, b){
+  const box = dd.querySelector('.dd-cmp');
+  if(!box || !dd.classList.contains('cmp')) return;
+  fillCmp(box, b, 2);
+}
+// ---------- Past reads window: every read's graph card under its own Read x strip, newest at the top ----------
+const rwPage = document.getElementById('reads-page'), rwList = document.getElementById('rw-list');
+function openReadsWindow(b){
+  const audio = b.format === 'audio';
+  document.getElementById('rw-title').textContent = audio ? 'Past Listens' : 'Past Reads';
+  document.getElementById('rw-book').textContent = b.title;
+  const { reads, n, max } = cmpSet(b);
+  document.getElementById('rw-count').textContent = `${reads.length} ${audio ? 'listens' : 'reads'}`;
+  rwList.innerHTML = reads.map((r, k) => `<div class="rw-card"><div class="rw-k">${audio ? 'Listen' : 'Read'} ${reads.length - k}${r.current ? (bookFinished(b) ? '' : ' · now') : ''}</div><div class="dd-chart"><svg></svg></div></div>`).join('');
+  rwPage.classList.add('open');
+  requestAnimationFrame(() => [...rwList.querySelectorAll('svg')].forEach((svg, k) => renderCmpChart(svg, b, reads[k], n, max)));
+}
+document.getElementById('rw-back').addEventListener('click', () => rwPage.classList.remove('open'));
+function fitDD(dd){ if(dd.classList.contains('open')) dd.style.height = (dd.firstElementChild.offsetHeight + 3) + 'px'; }
+function addCompare(row){
+  const dd = row._dd, b = row._book;
+  if(!dd || !(b.reads || []).length || dd.querySelector('.dd-cmp-btn')) return;
+  const acts = dd.querySelector('.dd-acts');
+  const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'dd-cmp-btn'; btn.textContent = b.format === 'audio' ? 'Compare Past Listens' : 'Compare Past Reads';
+  acts.prepend(btn);
+  const box = document.createElement('div'); box.className = 'dd-cmp';
+  dd.querySelector('.dd-pm-row').after(box);
+  btn.addEventListener('click', e => { e.stopPropagation(); setCompare(row, !dd.classList.contains('cmp')); });
+}
+// on: every read's graph, and the section reads View Standard Graph; off: back to the graph card with − / +
+function setCompare(row, on){
+  const dd = row._dd, btn = dd && dd.querySelector('.dd-cmp-btn'); if(!btn) return;
+  dd.classList.toggle('cmp', on); btn.classList.toggle('on', on);
+  btn.textContent = on ? 'View Standard Graph' : (row._book.format === 'audio' ? 'Compare Past Listens' : 'Compare Past Reads');
+  if(on) paintCompare(dd, row._book); else { dd.querySelector('.dd-cmp').innerHTML = ''; refreshRowChart(row); }
+  fitDD(dd);
+}
+// a dropdown always opens on the standard graph: closing one puts it back
+const _closeRowDD = closeRowDD;
+closeRowDD = function(dd){ const row = dd.previousElementSibling; if(row && dd.classList.contains('cmp')){ dd.classList.remove('cmp'); setCompare(row, false); } _closeRowDD(dd); };
+// the graph card is redrawn after every change (log, wheels, scrub): the compare cards follow
+const _refreshRowChart = refreshRowChart;
+refreshRowChart = function(row){ _refreshRowChart(row); const dd = row._dd; if(dd && dd.classList.contains('cmp')){ paintCompare(dd, row._book); fitDD(dd); } };
+
+
+// ---------- a finished read: Reset | Reread in place of the wheels; nothing else asks about a reread ----------
+// locked once finished, except on the day it was finished: then − (and dragging back) still work, so a slip can be
+// taken back; it keeps its finished (dark) look until it goes under 100%
+function finishedToday(b){ return bookFinished(b) && b.finishedOn === localTodayKey(); }
+const FIN_CARD = '<div class="dd-fin"><button type="button" class="fin-reset">Reset</button><button type="button" class="fin-again"></button></div>';
+function addFinCard(row){
+  const dd = row._dd, b = row._book;
+  if(!dd || dd.querySelector('.dd-fin')) return;
+  dd.querySelector('.dd-play').insertAdjacentHTML('afterend', FIN_CARD);
+  const reset = dd.querySelector('.fin-reset'), again = dd.querySelector('.fin-again');
+  again.textContent = b.format === 'audio' ? 'Relisten' : 'Reread';
+  // Reset and Reread / Relisten: two taps each, like Delete (Confirm? in white on red for 3 s; arming one disarms the other)
+  const two = (btn, label, act) => {
+    let armed = false, t = 0;
+    const disarm = () => { armed = false; clearTimeout(t); btn.textContent = label; btn.classList.remove('armed'); };
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if(!armed){ others.forEach(o => o !== disarm && o()); armed = true; btn.textContent = 'Confirm?'; btn.classList.add('armed'); t = setTimeout(disarm, 3000); return; }
+      disarm(); act();
+    });
+    return disarm;
+  };
+  const others = [];
+  // Reset: this read goes back to nothing logged
+  others.push(two(reset, 'Reset', () => {
+    b.days = [0]; b.finishedOn = null; b.lastDayKey = localTodayKey(); syncBookFinish(b);
+    afterFinChange(row);
+  }));
+  // Reread / Relisten: this read joins the past reads and a new one starts
+  others.push(two(again, again.textContent, () => {
+    startReread(b);
+    afterFinChange(row);
+    addCompare(row);
+  }));
+  const disarm = () => others.forEach(o => o());
+  row._finDisarm = disarm;
+}
+function afterFinChange(row){
+  const b = row._book;
+  saveBooks(); row._staged = null;
+  paintListRow(row, b);
+  if(row._wheels){ row._wheels.sync(true); }
+  if(row._paintConfirm) row._paintConfirm();
+  refreshRowChart(row);
+}
+// the finished card shows whenever the read is at 100%
+function syncFin(row){
+  const dd = row && row._dd; if(!dd) return;
+  addFinCard(row);
+  const fin = bookFinished(row._book), was = dd.classList.contains('fin');
+  if(fin !== was){ dd.classList.toggle('fin', fin); if(!fin && row._finDisarm) row._finDisarm(); fitDD(dd); }
+}
+const _paintListRow = paintListRow;
+paintListRow = function(row, b){ _paintListRow(row, b); syncFin(row); };
+
+
+// ---------- the open (3D) book: Compare Past Reads in its toolbar, Reset | Reread when finished ----------
+const bk3 = { cmp: false, disarm: null };
+const bkActions = document.getElementById('book-actions'), bkPanel = document.getElementById('page-panel');
+const bkCmpBtn = document.createElement('button'); bkCmpBtn.type = 'button'; bkCmpBtn.id = 'cmp-btn'; bkCmpBtn.hidden = true;
+bkActions.prepend(bkCmpBtn);
+const bkStack = document.createElement('div'); bkStack.id = 'cmp-stack';
+document.getElementById('chart-card').after(bkStack);
+bkPanel.querySelector('#play-row').insertAdjacentHTML('afterend', '<div class="dd-fin" id="bk-fin"><button type="button" class="fin-reset">Reset</button><button type="button" class="fin-again"></button></div>');
+const bkFin = document.getElementById('bk-fin');
+const cmpLabel = b => b.format === 'audio' ? 'Compare Past Listens' : 'Compare Past Reads';
+// two taps, like Delete: Confirm? in white on red for 3 s; arming one of Reset / Reread puts the other back
+function twoTap(btns){
+  const ds = btns.map(([btn, label, act]) => {
+    let armed = false, t = 0;
+    const disarm = () => { armed = false; clearTimeout(t); btn.textContent = label(); btn.classList.remove('armed'); };
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if(!armed){ ds.forEach(o => o !== disarm && o()); armed = true; btn.textContent = 'Confirm?'; btn.classList.add('armed'); t = setTimeout(disarm, 3000); return; }
+      disarm(); act();
+    });
+    return disarm;
+  });
+  return () => ds.forEach(d => d());
+}
+const bkBook = () => activeBookCtx && !activeBookCtx.fromList ? activeBookCtx.book : null;
+bk3.disarm = twoTap([
+  [bkFin.querySelector('.fin-reset'), () => 'Reset', () => { const b = bkBook(); if(!b) return;
+    b.days = [0]; b.finishedOn = null; b.lastDayKey = localTodayKey(); syncBookFinish(b);
+    saveBooks(); shelfStale = true; activeBookCtx.refresh(); }],
+  [bkFin.querySelector('.fin-again'), () => { const b = bkBook(); return b && b.format === 'audio' ? 'Relisten' : 'Reread'; }, () => { const b = bkBook(); if(!b) return;
+    startReread(b); saveBooks(); shelfStale = true; activeBookCtx.refresh(); }]
+]);
+function paintCmp3D(b){ fillCmp(bkStack, b); }
+function setCmp3D(on){
+  const b = bkBook(); bk3.cmp = !!(on && b);
+  bkPanel.classList.toggle('cmp', bk3.cmp); bkCmpBtn.classList.toggle('on', bk3.cmp);
+  bkCmpBtn.textContent = bk3.cmp ? 'View Standard Graph' : (b ? cmpLabel(b) : '');
+  if(bk3.cmp) paintCmp3D(b); else bkStack.innerHTML = '';
+}
+bkCmpBtn.addEventListener('click', e => { e.stopPropagation(); setCmp3D(!bk3.cmp); });
+// every redraw of the open book's panel (refreshReadingUI) brings these along
+function sync3D(b){
+  const hasReads = (b.reads || []).length > 0, fin = bookFinished(b);
+  bkCmpBtn.hidden = !hasReads;
+  if(!hasReads && bk3.cmp) setCmp3D(false);
+  if(!bk3.cmp) bkCmpBtn.textContent = cmpLabel(b);
+  if(bkPanel.classList.contains('fin') !== fin){ bkPanel.classList.toggle('fin', fin); bk3.disarm(); }
+  bkFin.querySelector('.fin-again').classList.contains('armed') || (bkFin.querySelector('.fin-again').textContent = b.format === 'audio' ? 'Relisten' : 'Reread');
+  if(bk3.cmp) paintCmp3D(b);
+}
+// the book goes back: always opens again on the standard graph
+function end3D(){ setCmp3D(false); bkPanel.classList.remove('fin'); bk3.disarm(); bkCmpBtn.hidden = true; }
+
 
   renderAll();
 </script>
