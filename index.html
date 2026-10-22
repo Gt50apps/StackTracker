@@ -586,7 +586,7 @@
     display:flex;
     align-items:flex-end;
     gap:0;   /* books stand flush against each other */
-    min-height:125px;
+    min-height:calc(125px * var(--bs, 1));
     padding:0 4px;
     border-bottom:14px solid var(--wood);
     border-radius:2px 2px 0 0;
@@ -613,7 +613,7 @@
   .spine.tape{border-radius:0;}
   #library-container.live3d .library-shelf-block:first-child{margin-top:-12px;}   /* same gap under the header in both views */
   #shelves-container.live3d .shelf{border-bottom-color:transparent; padding:0 6px;}   /* books start 6px in from each end of the board, as in Lists */
-  #shelves-container.live3d .shelf[data-group]{min-height:150px;}   /* only shelves with a name holder are taller */
+  #shelves-container.live3d .shelf[data-group]{min-height:calc(125px * var(--bs, 1) + 25px);}   /* only shelves with a name holder are taller */
   /* My Lists in 3D: thick boards carry a metal name plate instead of the hanging sign */
   #library-container.live3d .overlay-sign{display:none;}
   #library-container.live3d .shelf{border-bottom-color:transparent;}
@@ -639,7 +639,7 @@
   }
 
   .spine{
-    height:95px;
+    height:calc(95px * var(--bs, 1));
     border-radius:2px 2px 0 0;
     display:flex;
     align-items:center;
@@ -1043,8 +1043,12 @@
    #tl-full:active{background:#fff; box-shadow:none;}
   /* full window: just the card on the page's ground, 4px from every edge; any tap brings everything back */
   body.tl-full #timeline-page{top:0; z-index:100;}
-  body.tl-full #timeline-page .tl-foot, body.tl-full #tl-full{display:none;}
-  body.tl-full .tl-page{padding:calc(4px + env(safe-area-inset-top)) calc(4px + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) calc(4px + env(safe-area-inset-left));}
+  body.tl-full #tl-full{display:none;}
+  body.tl-full #timeline-page .tl-foot{background:transparent !important; border:0 !important; box-shadow:none !important;
+    padding:0 calc(4px + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) calc(4px + env(safe-area-inset-left));}
+  body.tl-full #timeline-page .tl-foot::before{display:none;}
+  body.tl-full #tl-info .tl-nav, body.tl-full #tl-info .hint{display:none;}
+  body.tl-full .tl-page{padding:calc(4px + env(safe-area-inset-top)) calc(4px + env(safe-area-inset-right)) 4px calc(4px + env(safe-area-inset-left));}
   #tl-full-exit{display:none; position:fixed; inset:0; z-index:101; cursor:pointer; -webkit-tap-highlight-color:transparent;}
   body.tl-full #tl-full-exit{display:block;}
   #tl-canvas{position:absolute; inset:21px 0 0; overflow:hidden; -webkit-user-select:none; user-select:none;}   /* under the header strip */
@@ -1705,6 +1709,9 @@
   .rw-card .rw-k{height:21px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; border-bottom:3px solid #000; background:#6b4a32;   /* walnut, like the header bands */
     font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:#fff;}
   .rw-card .dd-chart{height:39px; border:0; border-radius:0; -webkit-user-select:none; user-select:none;}
+  .dd-acts button[hidden]{display:none;}
+  /* the read's stats card as the graph card's footer, in the book's cloth */
+  .rw-card .dd-stats{border:0; border-top:3px solid #000; border-radius:0;}
   /* finished: Reset | Reread (or Relisten) as one full-width card in place of the wheels, even halves */
   .dd-fin{display:none; height:45px; box-sizing:border-box; border:3px solid #000; border-radius:8px; overflow:hidden;
     grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:3px; background:#000;}
@@ -1737,6 +1744,118 @@
   #page-panel.cmp #cmp-stack{display:flex;}
   #page-panel.cmp #combined-card, #page-panel.cmp #play-pct, #page-panel.cmp #chart-card, #page-panel.cmp #page-line, #page-panel.cmp #play-line, #page-panel.cmp #reading-readout, #page-panel.cmp #bk-fin{display:none !important;}
 
+  /* ===== Data → Badges ===== */
+  :root{--bd-rust:#86452b; --bd-green:#5b6633; --bd-blue:#2f5fae; --bd-red:#7a2f2b; --bd-plum:#5d3a85; --bd-teal:#2b5752; --bd-gold:#c9a24a; --bd-paper:#e7dfc9;}
+  #dt-view-badges.active{display:flex; flex-direction:column; gap:4px; overflow-y:auto; -webkit-overflow-scrolling:touch;}
+  #dt-view-badges *, #badge-page *{box-sizing:border-box;}
+  /* All | Earned | Icons: one short card in three even parts */
+  .bd-seg{flex:none; height:31px; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:3px; background:#000; border:3px solid #000; border-radius:8px; overflow:hidden;}
+  .bd-seg button, .bd-seg button:active{grid-column:auto; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:#fff; color:var(--ink); font:700 min(.62rem, 2.6vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  .bd-seg button.on{background:var(--ink); color:#fff;}
+  .bd-strip{flex:none; height:21px; display:flex; align-items:center; justify-content:center; background:#6b4a32; color:#fff; border:3px solid #000; border-radius:8px;
+    font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  .bd-grid{display:flex; flex-direction:column; gap:4px;}
+  /* a badge: one regular card split by 3px lines — the art, its name and what it asks, then where you are */
+  .bd-card, .bd-card:active{grid-column:auto; letter-spacing:0; text-transform:none; flex:none; width:100%; height:45px; margin:0; padding:0; display:grid; grid-template-columns:39px minmax(0, 1fr) 76px; gap:3px; background:#000;
+    border:3px solid #000; border-radius:8px; overflow:hidden; box-shadow:none; text-align:left; color:var(--ink); cursor:pointer;}
+  .bd-card > span{background:#fff; min-width:0;}
+  .bd-art{position:relative; display:flex; align-items:center; justify-content:center; background:#ece7dc !important; overflow:hidden;}
+  .bd-card.got .bd-art{background:var(--bd-paper) !important;}
+  .bd-art svg{width:100%; height:100%;}
+  .bd-lv{position:absolute; right:1px; bottom:1px; min-width:15px; height:15px; padding:0 2px; border:2px solid #000; border-radius:4px; background:#fff;
+    display:flex; align-items:center; justify-content:center; font:700 .55rem/1 Arial, sans-serif; color:var(--ink);}
+  .bd-mid{display:flex; flex-direction:column; justify-content:center; gap:2px; padding:0 8px;}
+  .bd-nm{font:700 min(.62rem, 2.6vw)/1.1 Arial, sans-serif; letter-spacing:.2px; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .bd-card:not(.got) .bd-nm{color:var(--muted);}
+  .bd-hid{display:inline-block; margin-left:6px; padding:1px 4px; border:2px solid #000; border-radius:4px; background:var(--ink); color:#fff; font:700 .48rem/1.1 Arial, sans-serif; font-style:normal; letter-spacing:.3px; vertical-align:1px;}
+  .bd-ask{letter-spacing:0; font:400 .6rem/1.2 Arial, sans-serif; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-transform:none;}
+  .bd-st{position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; text-align:center; font:600 .72rem/1 Georgia, serif;}
+  .bd-st small{font:700 .5rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted);}
+  .bd-card.max .bd-st{color:var(--bd-gold); font-size:1rem;}
+  .bd-pr{position:absolute; left:0; right:0; bottom:0; height:5px; border-top:2px solid #000; background:var(--bg);}
+  .bd-pr i{position:absolute; left:0; top:0; bottom:0; background:var(--bd-gold);}
+  /* Icons: every earned badge's art at its level, 4px apart */
+  .bd-icons{display:grid; grid-template-columns:repeat(auto-fill, minmax(68px, 1fr)); gap:4px;}
+  .bd-icon, .bd-icon:active{grid-column:auto; aspect-ratio:1 / 1; width:100%; margin:0; padding:0; display:flex; align-items:center; justify-content:center; background:var(--bd-paper);
+    border:3px solid #000; border-radius:8px; box-shadow:none; cursor:pointer;}
+  .bd-icon svg{width:76%; height:76%; overflow:visible;}
+  .bd-empty{padding:12px 10px; border:3px solid #000; border-radius:8px; background:#fff; font:400 .74rem/1.4 Arial, sans-serif; text-align:center; color:var(--muted);}
+  /* a badge's own page: a full window like the Log */
+  #badge-page{position:fixed; inset:0; z-index:41; background:var(--bg); display:flex; flex-direction:column; opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
+  #badge-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  .lg-head > #bp-back, .lg-head > #bp-back:active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
+    background:#7a2f2b; color:#fff; border-right:3px solid #000; font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+  .bp-body{flex:1; min-height:0; overflow-y:auto; padding:4px 4px calc(8px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
+  .bp-c{flex:none; border:3px solid #000; border-radius:8px; background:#fff; overflow:hidden;}
+  #bp-art{aspect-ratio:1 / 1; width:100%; max-height:42vh; display:flex; align-items:center; justify-content:center; background:var(--bd-paper);}
+  #badge-page.locked #bp-art{background:#ece7dc;}
+  #bp-art svg{width:min(56%, 34vh); height:auto;}
+  #bp-name{min-height:45px; display:flex; align-items:center; justify-content:center; padding:4px 10px; border-top:3px solid #000; text-align:center;
+    font:700 1rem/1.15 Georgia, serif; letter-spacing:.06em; text-transform:uppercase; color:var(--ink);}
+  #bp-meter{position:relative; height:21px; border-top:3px solid #000; background:var(--bg);}
+  #bp-meter i{position:absolute; left:0; top:0; bottom:0; background:var(--bd-gold);}
+  #bp-meter span{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font:700 .6rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink);}
+  #bp-desc{padding:10px; font:400 .78rem/1.4 Arial, sans-serif; text-align:center; color:var(--ink);}
+  .bp-row{display:flex; align-items:center; gap:10px; height:45px; padding-right:10px;}
+  .bp-row + .bp-row{border-top:1px solid #e3dccd;}
+  .bp-lvart{position:relative; flex:none; width:42px; height:42px; display:flex; align-items:center; justify-content:center; border-right:3px solid #000; background:#ece7dc;}
+  .bp-row.done .bp-lvart{background:var(--bd-paper);}
+  .bp-lvart svg{width:34px; height:34px; overflow:visible;}
+  .bp-lvart b{position:absolute; right:1px; bottom:1px; min-width:14px; height:14px; border:2px solid #000; border-radius:4px; background:#fff; font:700 .5rem/10px Arial, sans-serif; text-align:center; color:var(--ink);}
+  .bp-tx{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; font:400 .72rem/1.2 Arial, sans-serif; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .bp-tx > span{font:700 .6rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted);}
+  .bp-row:not(.done) .bp-tx{color:var(--muted);}
+  .bp-v{font:600 .9rem/1 Georgia, serif; white-space:nowrap; color:var(--ink);}
+  /* ===== Developer options: a full window like the Log ===== */
+  #dev-page{position:fixed; inset:0; z-index:45; background:var(--bg); display:flex; flex-direction:column; opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
+  #dev-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  .lg-head > #dev-back, .lg-head > #dev-back:active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
+    background:#7a2f2b; color:#fff; border-right:3px solid #000; font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+  #dev-body{flex:1; min-height:0; overflow-y:auto; padding:4px 4px calc(8px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
+  #dev-body *{box-sizing:border-box;}
+  .dv-strip{flex:none; height:21px; display:flex; align-items:center; justify-content:center; background:#6b4a32; color:#fff; border:3px solid #000; border-radius:8px;
+    font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  .dv-c{flex:none; border:3px solid #000; border-radius:8px; background:#fff; overflow:hidden;}
+  .dv-line{display:flex; justify-content:space-between; align-items:center; gap:10px; min-height:36px; padding:4px 10px;}
+  .dv-line + .dv-line{border-top:1px solid #e3dccd;}
+  .dv-k{font:700 .6rem/1.2 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .dv-v{font:600 .85rem/1.2 Georgia, serif; color:var(--ink); text-align:right; white-space:nowrap;}
+  .dv-btn, .dv-btn:active{flex:none; grid-column:auto; height:45px; margin:0; padding:0 8px; border:3px solid #000; border-radius:8px; box-shadow:none; background:#fff; color:var(--ink);
+    font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; cursor:pointer;}
+  .dv-btn.red{color:#a33; transition:background-color .32s cubic-bezier(.45,0,.55,1), color .32s cubic-bezier(.45,0,.55,1);}
+  #dev-body .dv-btn.armed, #dev-body .dv-btn.armed:active{background:#a33; color:#fff;}
+  /* a switch per feature: name and what it covers on the left, On | Off on the right */
+  .dv-row{display:flex; align-items:center; gap:10px; min-height:52px; padding:4px 4px 4px 10px;}
+  .dv-row + .dv-row{border-top:1px solid #e3dccd;}
+  .dv-tx{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;}
+  .dv-tx b{font:700 .66rem/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink);}
+  .dv-tx span{font:400 .62rem/1.2 Arial, sans-serif; color:var(--muted);}
+  .dv-sw{flex:none; display:grid; grid-template-columns:1fr 1fr; gap:3px; width:110px; height:37px; background:#000; border:3px solid #000; border-radius:8px; overflow:hidden;}
+  .dv-sw button, .dv-sw button:active{grid-column:auto; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:#fff; color:var(--ink); font:700 .62rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; transition:none;}
+  .dv-sw button.on{background:var(--ink); color:#fff;}
+  /* what each switch hides when it's off */
+  body.off-badges .dt-tabs .tab[data-dt="badges"]{display:none !important;}
+  body.off-compare .dd-cmp-btn, body.off-compare #cmp-btn{display:none !important;}
+  body.off-pastlog .cmp-more{display:none !important;}
+  body.off-statbars #dt-view-stats .st-mon{display:none !important;}
+  body.off-timeline #tabs .tab[data-view="timeline"]{display:none !important;}
+
+  .dv-sw.three{grid-template-columns:repeat(3, 1fr); width:165px;}
+  body.off-stats .dt-tabs .tab[data-dt="stats"]{display:none !important;}
+  body.lib-one #view-tabs{display:none !important;}
+  /* the haptic tester: one page wheel in a framed box */
+  .dv-wheel{flex:none; display:flex; width:110px; height:37px; border:3px solid #000; border-radius:8px; overflow:hidden; background:#fff;}
+  /* just one Library view: the Shelf | List card goes, and Search / Filter / Sort grows to fill the row's height (21 + 4 + 21) */
+  body.lib-one #shelf-controls #sort-card{height:46px !important; align-items:center;}
+  /* a picked page / time not yet confirmed: the finished-book tone under the card's fill, out to the picked value */
+  div.br-stage{position:absolute; left:-3px; top:-3px; bottom:-3px; pointer-events:none; background-repeat:repeat;}
+  .br-stage[hidden]{display:none;}
+  canvas.br-stage{position:absolute; left:-3px; top:-3px; width:calc(100% + 6px); height:calc(100% + 6px); pointer-events:none;}
+  /* open book: the same staged fill under the bar's fill */
+  #combined-stage{position:absolute; left:0; top:-3px; bottom:-3px; pointer-events:none; background-repeat:repeat;}
+  #play-pct-stage{position:absolute; left:0; top:-3px; width:100%; height:calc(100% + 6px); pointer-events:none;}
+  #combined-stage[hidden], #play-pct-stage[hidden]{display:none;}
+
   /* long-press doesn't select text or pop the callout anywhere but the places you type */
   html, body, body *{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
   input, textarea, select, [contenteditable], [contenteditable] *{-webkit-user-select:text; user-select:text; -webkit-touch-callout:default;}
@@ -1749,6 +1868,7 @@
   // ready and the last book has landed, then removes itself
   (function(){
     const el = document.getElementById('splash');
+    try{ if(JSON.parse(localStorage.getItem('stack-tracker-dev-v1') || '{}').splash === true){ el.remove(); return; } }catch(e){}
     const COLORS = ['#7a2f2b', '#86452b', '#8a6a3f', '#857636', '#5b6633', '#2e4636', '#2b5752', '#234a5e', '#303d66', '#3a2f52', '#66304c', '#6b4a32'];
     const HEIGHTS = [62, 70, 58, 66, 60, 72, 64, 59, 68, 63, 71, 57];
     let n = 0;
@@ -1816,7 +1936,7 @@
  </div>
  <!-- Data: Stats | Backup, then Export | Import (opens on Stats) -->
  <div class="hdr-row hidden" id="data-controls">
-  <div class="tabs dt-tabs"><div class="tab active" data-dt="stats">Stats</div><div class="tab" data-dt="backup">Backup</div></div>
+  <div class="tabs dt-tabs"><div class="tab active" data-dt="stats">Stats</div><div class="tab" data-dt="badges">Badges</div><div class="tab" data-dt="backup">Backup</div></div>
   <div class="tabs dt-tabs"><div class="tab" data-dt="export">Export</div><div class="tab" data-dt="import">Import</div></div>
  </div>
  </div>
@@ -2064,6 +2184,7 @@
     <input type="file" id="dt-file" accept=".json,application/json,text/plain" hidden>
   </div>
   <div class="dt-view dt-stats" id="dt-view-stats"></div>
+  <div class="dt-view" id="dt-view-badges"></div>
   <div class="dt-view" id="dt-view-backup">
     <!-- last backup | next backup -->
     <div class="dt-card bk-when"><span>Last backup<b id="bk-last">Never</b></span><span>Next backup<b id="bk-next">—</b></span></div>
@@ -2094,6 +2215,22 @@
 </div>
 
 <!-- reading log editor: days in order, Today always on top -->
+<!-- developer options: five quick taps on the Library tab -->
+<div id="dev-page">
+  <div class="lg-head"><button type="button" id="dev-back">Back</button><h2>Developer Options</h2><span></span></div>
+  <div id="dev-body"></div>
+</div>
+
+<!-- a badge's own page (Data → Badges) -->
+<div id="badge-page">
+  <div class="lg-head"><button type="button" id="bp-back">Back</button><h2 id="bp-cat">Badges</h2><span></span></div>
+  <div class="bp-body">
+    <div class="bp-c"><div id="bp-art"></div><div id="bp-name"></div><div id="bp-meter"><i></i><span></span></div></div>
+    <div class="bp-c" id="bp-desc"></div>
+    <div class="bp-c" id="bp-lines"></div>
+  </div>
+</div>
+
 <!-- past reads: every read's graph, opened from Compare's fourth card when a book has more than three -->
 <div id="reads-page">
   <div class="lg-head"><button type="button" id="rw-back">Back</button><h2 id="rw-title">Past Reads</h2><span></span></div>
@@ -2172,6 +2309,7 @@
   function lwRender(){
     lwEls.forEach((w, k)=>{
       const rows = w.querySelectorAll('div'), c = Math.round(lw.pos[k]);
+      if(w._hc !== c){ if(w._hc != null && window.hapticTick) window.hapticTick(); w._hc = c; }
       rows.forEach((row, i)=>{
         const idx = c - 3 + i;
         const txt = lwWrap(k) ? String(lwMod(idx, 60)).padStart(2, '0') : (idx >= 0 && idx <= 99 ? String(idx).padStart(2, '0') : '');
@@ -2467,10 +2605,14 @@
   const TAPE_MM = 25, TAPE_S = (82/95*3) / (109/TAPE_MM);
   const TAPE_PX_H = 82, TAPE_PX_W = Math.round(17/TAPE_MM * TAPE_S * 95/3 * 10)/10;
   const TAPE_GAP = 0;    // cases stand touching; the framed doors keep them apart
+  // Small / Medium / Large shelves: every spine, tape and shelf scales together
+  let SHELF_S = 1, SHELF_TAPES_SIDE = false;
+  window.setTapeSide = on => { SHELF_TAPES_SIDE = !!on; if(typeof renderAll === 'function') renderAll(); };
+  window.setShelfScale = s => { SHELF_S = s; document.documentElement.style.setProperty('--bs', s); if(typeof renderAll === 'function') renderAll(); };
   function spineWidthFor(b){
-    if(b.format === 'audio') return TAPE_PX_W;
+    if(b.format === 'audio') return TAPE_PX_W * SHELF_S;
     const base = widthForPages(b.pages);
-    return base * totalDepth(b) / bookDepth(b.pages);
+    return base * totalDepth(b) / bookDepth(b.pages) * SHELF_S;
   }
 
   function createSpineWrap(b){
@@ -2482,7 +2624,7 @@
     spine.className='spine';
     const cssW = spineWidthFor(b);
     spine.style.width = cssW+'px';
-    if(b.format === 'audio'){ spine.style.height = TAPE_PX_H + 'px'; spine.classList.add('tape'); }
+    if(b.format === 'audio'){ spine.style.height = TAPE_PX_H * SHELF_S + 'px'; spine.classList.add('tape'); }
 
     const completed = b.currentPage > 0 && b.currentPage === b.pages;
 
@@ -2494,7 +2636,7 @@
       // resolution matching this spine's aspect, then scale down via CSS
       const sc = document.createElement('canvas');
       sc.height = 680;
-      sc.width = Math.max(24, Math.round(680 * cssW / 95));
+      sc.width = Math.max(24, Math.round(680 * cssW / (95 * SHELF_S)));
       drawSpineInto(sc.getContext('2d'), sc.width, sc.height, b.title, bookColor(b), completed);
       spine.style.backgroundImage = `url(${sc.toDataURL()})`;
       spine.style.backgroundSize = '100% 100%';
@@ -2631,7 +2773,7 @@
       if(tapes.length && paper.length){
         const inner = full - SHELF_COL_GAP - 12;   // two shelves, 6px in at each of their ends
         const tapeRows = packRows(tapes, ()=> inner/3);
-        if(tapeRows.length <= 2){
+        if(tapeRows.length <= 2 || SHELF_TAPES_SIDE){
           // one or two tape shelves: each sits beside a two-thirds book shelf; the books
           // carry on full width once the tapes run out
           const bookRows = packRows(paper, i => i < tapeRows.length ? inner*2/3 : full);
@@ -3017,7 +3159,9 @@
       paintSet(els, st.T, st.lower, total);
       if(ctx.mirror) paintSet(ctx.mirror, total - st.T, st.active < 0 ? 0 : mod(total - st.lower, UNIT[st.active]), total);
     }
-    function setT(T){ const c = Math.max(lo(), Math.min(ctx.total(), T)); st.hit = c !== T; st.T = c; draw(); ctx.set(st.T); }
+    function setT(T){ const c = Math.max(lo(), Math.min(ctx.total(), T)); st.hit = c !== T; st.T = c;
+      if(st.active >= 0){ const i = Math.round((c - st.lower)/UNIT[st.active]); if(i !== st.hi && window.hapticTick) window.hapticTick(); st.hi = i; }
+      draw(); ctx.set(st.T); }
     function snap(){
       const k = st.active; if(k < 0) return;
       const u = UNIT[k], from = st.T;
@@ -3040,7 +3184,7 @@
         st.af = requestAnimationFrame(step); };
       st.af = requestAnimationFrame(step);
     }
-    function begin(k){ cancelAnimationFrame(st.af); st.T = Math.round(st.T); st.active = k; st.lower = st.T % UNIT[k]; }
+    function begin(k){ cancelAnimationFrame(st.af); st.T = Math.round(st.T); st.active = k; st.lower = st.T % UNIT[k]; st.hi = Math.round((st.T - st.lower)/UNIT[k]); }
     // sign: +1 for the played wheels, −1 for the time-left wheels (turning them the same way moves time the other way)
     function attach(w, k, sign){
       let drag = null;
@@ -3108,6 +3252,7 @@
       const now = Math.round(pct(b) * b.audioSeconds);
       const dayStart = sumDays(b.days.slice(0, -1)) / b.pages * b.audioSeconds;
       confirmBtn.disabled = !(row._staged !== null && !bookFinished(b) && row._staged !== now && row._staged >= dayStart - 0.5);
+      paintStage(row, b);
     };
     row._wheels = makeTimeWheels([...dd.querySelectorAll('.tw-played .lw-wheel')], {
       mirror: [...dd.querySelectorAll('.tw-left .lw-wheel')],
@@ -3158,11 +3303,13 @@
         try{ row.setPointerCapture(scrub.id); }catch(err){}
       }
       const r = row.getBoundingClientRect();
-      setTapeSecs(b, Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * b.audioSeconds));
-      row._staged = null;
-      paintListRow(row, b);
+      const T = Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * b.audioSeconds);
+      if(finishedToday(b)){ setTapeSecs(b, T); row._staged = null; paintListRow(row, b); scrub.direct = true; return; }   // wheels hidden: straight in
+      const dayStart = Math.ceil(sumDays(b.days.slice(0, -1)) / b.pages * b.audioSeconds);
+      row._staged = Math.max(dayStart, Math.min(b.audioSeconds, T));
+      row._wheels.put(row._staged); row._paintConfirm();
     });
-    row.addEventListener('pointerup', ()=>{ const was = scrub && scrub.live; scrub = null; if(was){ saveBooks(); row._justScrubbed = true; } });
+    row.addEventListener('pointerup', ()=>{ const was = scrub && scrub.live, direct = scrub && scrub.direct; scrub = null; if(was){ if(direct) saveBooks(); row._justScrubbed = true; } });
     row.addEventListener('pointercancel', ()=>{ scrub = null; });
     row.addEventListener('click', ()=>{
       if(row._justScrubbed){ row._justScrubbed = false; return; }
@@ -3395,6 +3542,7 @@
     row._staged = null;
     row._paintConfirm = ()=>{
       confirmBtn.disabled = !(row._staged !== null && !bookFinished(b) && row._staged !== pageNow() && row._staged >= dayStart());
+      paintStage(row, b);
     };
     row._wheels = makeTimeWheels([...dd.querySelectorAll('.pw-read .lw-wheel')], {
       units: [1], flick: PAGE_FLICK,
@@ -3415,9 +3563,15 @@
       const stop = ()=>{ clearTimeout(rt); clearInterval(ri); };
       const nudge = ()=>{
         if(bookFinished(b) && !(d < 0 && finishedToday(b))){ stop(); return; }
-        setBookPage(b, Math.min(bookRead(b), b.pages) + d);
-        paintListRow(row, b); refreshRowChart(row);
-        row._staged = null; row._wheels.put(Math.min(bookRead(b), b.pages)); row._paintConfirm();   // the wheels follow
+        if(finishedToday(b)){   // finished today: the wheels are hidden, so − goes straight in
+          setBookPage(b, Math.min(bookRead(b), b.pages) + d);
+          paintListRow(row, b); refreshRowChart(row);
+          row._staged = null; row._wheels.put(Math.min(bookRead(b), b.pages)); row._paintConfirm(); return;
+        }
+        // otherwise a page at a time is staged on the wheels, shown dark on the card, until Update
+        const from = row._staged != null ? row._staged : pageNow();
+        row._staged = Math.max(dayStart(), Math.min(b.pages, from + d));
+        row._wheels.put(row._staged); row._paintConfirm();
       };
       btn.addEventListener('pointerdown', e=>{ e.preventDefault(); nudge(); stop();
         rt = setTimeout(()=>{ ri = setInterval(nudge, 60); }, 350); });
@@ -3515,10 +3669,11 @@
         }
         const r = row.getBoundingClientRect();
         const frac = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-        setBookPage(b, Math.round(frac * b.pages));
-        paintListRow(row, b); refreshRowChart(row);
+        if(finishedToday(b)){ setBookPage(b, Math.round(frac * b.pages)); paintListRow(row, b); refreshRowChart(row); scrub.direct = true; return; }   // wheels hidden: straight in
+        row._staged = Math.max(sumDays(b.days.slice(0, -1)), Math.min(b.pages, Math.round(frac * b.pages)));
+        row._wheels.put(row._staged); row._paintConfirm();
       });
-      const endScrub = ()=>{ const was = scrub && scrub.live; scrub = null; if(was){ saveBooks(); row._justScrubbed = true; } };
+      const endScrub = ()=>{ const was = scrub && scrub.live, direct = scrub && scrub.direct; scrub = null; if(was){ if(direct) saveBooks(); row._justScrubbed = true; } };
       row.addEventListener('pointerup', endScrub);
       row.addEventListener('pointercancel', ()=>{ scrub = null; });
       row.addEventListener('click', ()=>{
@@ -3706,6 +3861,9 @@
   document.querySelectorAll('#tabs .tab').forEach(tab=>{
     tab.addEventListener('click', ()=>{
       // every top tab is a page under the tab strip: My Library, My Collections, Timeline and Data
+      // any open list dropdown closes at once, so Library and My Lists always come back with them shut
+      document.querySelectorAll('.row-dd.open').forEach(dd => { dd.style.transition = 'none'; closeRowDD(dd); dd.offsetHeight; dd.style.transition = '';
+        [dd, dd.previousElementSibling].forEach(e => { if(e){ clearTimeout(e._liftT); e.classList.remove('dd-lift'); } }); });
       document.querySelectorAll('#tabs .tab').forEach(t=>t.classList.remove('active'));
       tab.classList.add('active');
       const view = tab.dataset.view;
@@ -6353,6 +6511,24 @@
     // end buttons = ribbon color, fill = cover color (toned down); both
     // drop to a darker tone once the book is finished and the bar locks
     const barStyle = styleForBook(book);
+    // a picked page not yet confirmed: the finished-book tone under the fill, out to the picked page (or, going back,
+    // the stretch you'd lose); the fill on top stops at the nearer of the two
+    function paintStage3D(){
+      const now = book.pages > 0 ? book.currentPage / book.pages : 0;
+      const on = pageMode && pageStaged !== null && !bookFinished(book) && pageStaged !== book.currentPage;
+      const f = on ? Math.max(0, Math.min(1, pageStaged / book.pages)) : now;
+      let st = document.getElementById('combined-stage');
+      if(on && !st){ st = document.createElement('div'); st.id = 'combined-stage'; combinedFill.before(st); }
+      if(st){ st.hidden = !on; if(on){ st.style.width = (Math.max(now, f) * 100) + '%'; paintPageFill(st, barStyle.pageTone, true, book.seed); } }
+      combinedFill.style.width = ((on ? Math.min(now, f) : now) * 100) + '%';
+    }
+    // stage a page (wheels follow, Update lights); finished today the wheels are hidden, so it goes straight in
+    function stagePage(P){
+      if(!pageMode || finishedToday(book)){ setPageUI(P); return; }
+      if(bookFinished(book)) return;
+      pageStaged = Math.max(sumDays(book.days.slice(0, -1)), Math.min(book.pages, Math.round(P)));
+      pageTW.put(pageStaged); paintPageUpdate(); paintStage3D();
+    }
     function paintBar(){
       const locked = bookFinished(book);
       combinedCard.classList.toggle('locked', locked);
@@ -6382,7 +6558,7 @@
         combinedTotal.textContent = book.pages;
         combinedPage.textContent = page;
       }
-      combinedFill.style.width = (frac*100) + '%';
+      paintStage3D();
       if(playMode && !shelfTW.busy() && playStaged === null){ const T0 = Math.round(frac * book.audioSeconds); shelfTW.put(T0); paintPlayPct(T0); }
       if(playMode) paintPlayUpdate();
       if(pageMode && !pageTW.busy() && pageStaged === null) pageTW.put(page);
@@ -6439,7 +6615,13 @@
     // the percent card shows the time being picked (or where you are, when nothing's picked)
     function paintPlayPct(T){
       const f = book.audioSeconds > 0 ? Math.max(0, Math.min(1, T / book.audioSeconds)) : 0;
-      drawTapeFill(playPctFill, f, tapeLook(book.title), bookFinished(book));
+      // a picked time not yet confirmed: the finished tape (curved) under the fill, out to the further of the two
+      const now = book.audioSeconds > 0 ? playSecsNow() / book.audioSeconds : 0;
+      const on = playStaged !== null && !bookFinished(book) && Math.abs(f - now) > 1e-9;
+      let st = document.getElementById('play-pct-stage');
+      if(on && !st){ st = document.createElement('canvas'); st.id = 'play-pct-stage'; playPctFill.before(st); }
+      if(st){ st.hidden = !on; if(on) drawTapeFill(st, Math.max(now, f), tapeLook(book.title), true); }
+      drawTapeFill(playPctFill, on ? Math.min(now, f) : f, tapeLook(book.title), bookFinished(book));
       playPct.classList.toggle('done', bookFinished(book));
       playPctText.dataset.v = (f*100).toFixed(1) + '%';
     }
@@ -6507,7 +6689,7 @@
         min: ()=> sumDays(book.days.slice(0, -1)),
         locked: ()=> bookFinished(book),
         onLocked: ()=>{},
-        set: P => { pageStaged = Math.round(P); paintPageUpdate(); }
+        set: P => { pageStaged = Math.round(P); paintPageUpdate(); paintStage3D(); }
       };
       pageUpdate.addEventListener('click', onPageUpdate);
     }
@@ -6534,7 +6716,7 @@
     function updatePageFromClientX(clientX){
       const r = combinedBar.getBoundingClientRect();
       const frac = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
-      setPageUI(Math.round(frac * book.pages));
+      stagePage(Math.round(frac * book.pages));
     }
     function onPageDown(e){
       pageDragging = true;
@@ -6551,8 +6733,8 @@
     combinedBar.addEventListener('pointerup', onPageUp);
     combinedBar.addEventListener('pointercancel', onPageUp);
 
-    function onPageMinus(){ setPageUI(book.currentPage - 1); }
-    function onPagePlus(){ setPageUI(book.currentPage + 1); }
+    function onPageMinus(){ stagePage((pageStaged !== null && !finishedToday(book) ? pageStaged : book.currentPage) - 1); }
+    function onPagePlus(){ stagePage((pageStaged !== null && !finishedToday(book) ? pageStaged : book.currentPage) + 1); }
     pageMinusBtn.addEventListener('click', onPageMinus);
     pagePlusBtn.addEventListener('click', onPagePlus);
 
@@ -9042,11 +9224,12 @@
     return b;
   }
   function exportJSON(){
-    return JSON.stringify({ app:'stack-tracker', version:3, exported:new Date().toISOString(), books: books.map(packBook) }, null, 2);
+    return JSON.stringify(Object.assign({ app:'stack-tracker', version:3, exported:new Date().toISOString(), books: books.map(packBook) }, window.devState ? { dev: window.devState() } : {}), null, 2);
   }
   function showDataTab(name){
     document.querySelectorAll('.dt-tabs .tab').forEach(t=> t.classList.toggle('active', t.dataset.dt === name));
-    ['export','import','stats','backup'].forEach(n=> document.getElementById('dt-view-'+n).classList.toggle('active', n === name));
+    ['export','import','stats','badges','backup'].forEach(n=> document.getElementById('dt-view-'+n).classList.toggle('active', n === name));
+    if(name === 'badges') renderBadges();
     if(name === 'backup') paintBackupTab();
     if(name === 'export') dtExportText.value = exportJSON();
     if(name === 'import' && typeof paintRestore === 'function') paintRestore();
@@ -9483,7 +9666,7 @@
   window.addEventListener('resize', () => { if(document.getElementById('timeline-page').classList.contains('open')) tlDraw(); });
   // full window view: the card alone, redrawn for its new size; a tap anywhere puts it back
   { const exit = document.createElement('div'); exit.id = 'tl-full-exit'; document.body.appendChild(exit);
-    const setFull = on => { document.body.classList.toggle('tl-full', on); tlDraw(); };
+    const setFull = on => { document.body.classList.toggle('tl-full', on); if(on){ TL.picked = ''; TL.pickedK = ''; } tlDraw(); };
     document.getElementById('tl-full').addEventListener('click', () => setFull(true));
     exit.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); setFull(false); }); }
 
@@ -9724,6 +9907,7 @@
     const valid = (list || []).filter(b => b && typeof b.title === 'string' && b.title.trim() && Number(b.pages) > 0);
     if(!valid.length){ setStatus('Import', 'No books found', true); return; }
     pendingImport = valid.map(b => Object.assign({}, b, { pages: Math.round(Number(b.pages)), author: b.author || '' }));
+    try{ const d = JSON.parse(txt); window._pendingDev = d && !Array.isArray(d) && d.dev && typeof d.dev === 'object' ? d.dev : null; }catch(e){ window._pendingDev = null; }
     setStatus('Import', `${plural(pendingImport.length, 'book')} found — merge or replace`);
   }
   let parseTimer = null;
@@ -9741,6 +9925,7 @@
   });
 
   function finishImport(added, msg){
+    if(window._pendingDev && window.devImport){ window.devImport(window._pendingDev); window._pendingDev = null; }
     added.forEach(normalizeBook);
     renderAll();
     pendingImport = null;
@@ -9965,10 +10150,12 @@ function fillCmp(box, b, keep = CMP_SHOWN){             // keep: how many graphs
   const { reads, n, max } = cmpSet(b), cap = reads.length > keep ? keep : reads.length, shown = reads.slice(0, cap);
   box.innerHTML = shown.map(() => '<div class="dd-chart"><svg></svg></div>').join('');
   [...box.querySelectorAll('svg')].forEach((svg, k) => renderCmpChart(svg, b, shown[k], n, max));
-  if(reads.length > keep){
+  // any finished read: the card that opens them all ("Past Read" for one, "Past 4 Reads" for more)
+  const done = (b.reads || []).length + (bookFinished(b) ? 1 : 0), unit = b.format === 'audio' ? 'Listen' : 'Read';
+  if(done > 0){
     const more = document.createElement('button'); more.type = 'button'; more.className = 'cmp-more';
     more.innerHTML = '<span></span>';
-    more.querySelector('span').textContent = `Open Log of Past ${reads.length} ${b.format === 'audio' ? 'Listens' : 'Reads'}`;
+    more.querySelector('span').textContent = done === 1 ? `Open Log of Past ${unit}` : `Open Log of Past ${done} ${unit}s`;
     box.appendChild(more); clothBehind(more, bookColor(b));
     more.addEventListener('click', e => { e.stopPropagation(); openReadsWindow(b); });
   }
@@ -9986,15 +10173,24 @@ function openReadsWindow(b){
   document.getElementById('rw-book').textContent = b.title;
   const { reads, n, max } = cmpSet(b);
   document.getElementById('rw-count').textContent = `${reads.length} ${audio ? 'listens' : 'reads'}`;
-  rwList.innerHTML = reads.map((r, k) => `<div class="rw-card"><div class="rw-k">${audio ? 'Listen' : 'Read'} ${reads.length - k}${r.current ? (bookFinished(b) ? '' : ' · now') : ''}</div><div class="dd-chart"><svg></svg></div></div>`).join('');
+  // each read: its Read x strip, its graph, and its own stats card as the footer (days, dates, pace, streak, best day)
+  rwList.innerHTML = reads.map((r, k) => `<div class="rw-card"><div class="rw-k">${audio ? 'Listen' : 'Read'} ${reads.length - k}${r.current ? (bookFinished(b) ? '' : ' · now') : ''}</div><div class="dd-chart"><svg></svg></div>${DD_STATS}</div>`).join('');
   rwPage.classList.add('open');
+  const view = r => { if(r.current) return b;                        // a past read seen as the book: its own days, ending on its finish day
+    const v = Object.create(b); Object.defineProperty(v, 'days', { value: r.days }); v.lastDayKey = r.end; v.finishedOn = r.end; return v; };
+  [...rwList.querySelectorAll('.rw-card')].forEach((card, k) => paintDDStats(card, view(reads[k])));
   requestAnimationFrame(() => [...rwList.querySelectorAll('svg')].forEach((svg, k) => renderCmpChart(svg, b, reads[k], n, max)));
 }
 document.getElementById('rw-back').addEventListener('click', () => rwPage.classList.remove('open'));
 function fitDD(dd){ if(dd.classList.contains('open')) dd.style.height = (dd.firstElementChild.offsetHeight + 3) + 'px'; }
+// Compare shows once a second read has started (the book has a past read)
+const hasDoneRead = b => (b.reads || []).length > 0;
 function addCompare(row){
   const dd = row._dd, b = row._book;
-  if(!dd || !(b.reads || []).length || dd.querySelector('.dd-cmp-btn')) return;
+  if(!dd) return;
+  const have = dd.querySelector('.dd-cmp-btn');
+  if(have){ const show = hasDoneRead(b); if(have.hidden === show){ have.hidden = !show; if(!show && dd.classList.contains('cmp')) setCompare(row, false); fitDD(dd); } return; }
+  if(!hasDoneRead(b)) return;
   const acts = dd.querySelector('.dd-acts');
   const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'dd-cmp-btn'; btn.textContent = b.format === 'audio' ? 'Compare Past Listens' : 'Compare Past Reads';
   acts.prepend(btn);
@@ -10066,7 +10262,7 @@ function afterFinChange(row){
 // the finished card shows whenever the read is at 100%
 function syncFin(row){
   const dd = row && row._dd; if(!dd) return;
-  addFinCard(row);
+  addFinCard(row); addCompare(row);
   const fin = bookFinished(row._book), was = dd.classList.contains('fin');
   if(fin !== was){ dd.classList.toggle('fin', fin); if(!fin && row._finDisarm) row._finDisarm(); fitDD(dd); }
 }
@@ -10116,7 +10312,7 @@ function setCmp3D(on){
 bkCmpBtn.addEventListener('click', e => { e.stopPropagation(); setCmp3D(!bk3.cmp); });
 // every redraw of the open book's panel (refreshReadingUI) brings these along
 function sync3D(b){
-  const hasReads = (b.reads || []).length > 0, fin = bookFinished(b);
+  const hasReads = hasDoneRead(b), fin = bookFinished(b);
   bkCmpBtn.hidden = !hasReads;
   if(!hasReads && bk3.cmp) setCmp3D(false);
   if(!bk3.cmp) bkCmpBtn.textContent = cmpLabel(b);
@@ -10126,6 +10322,648 @@ function sync3D(b){
 }
 // the book goes back: always opens again on the standard graph
 function end3D(){ setCmp3D(false); bkPanel.classList.remove('fin'); bk3.disarm(); bkCmpBtn.hidden = true; }
+
+
+// ===== Badges =====
+(function(){
+const S = 'stroke="#000" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
+const ART = {
+  flame: c => `<path ${S} fill="${c}" d="M32 6c4 10 14 15 14 28a14 14 0 0 1-28 0c0-8 5-12 7-18 3 5 5 7 7 7-2-6-1-12 0-17z"/><path ${S} fill="#e8b84a" d="M32 34c3 4 6 6 6 11a6 6 0 0 1-12 0c0-4 3-6 6-11z"/>`,
+  calendar: c => `<rect ${S} fill="#fff" x="10" y="14" width="44" height="40" rx="4"/><path ${S} fill="${c}" d="M10 18a4 4 0 0 1 4-4h36a4 4 0 0 1 4 4v8H10z"/><path ${S} d="M22 9v10M42 9v10"/><path ${S} fill="none" d="M22 40l7 7 13-14"/>`,
+  sun: c => `<circle ${S} fill="${c}" cx="32" cy="34" r="11"/><path ${S} d="M32 12v6M32 50v6M10 34h6M48 34h6M16.5 18.5l4 4M43.5 45.5l4 4M16.5 49.5l4-4M43.5 22.5l4-4"/>`,
+  moon: c => `<path ${S} fill="${c}" d="M40 10a22 22 0 1 0 14 34A18 18 0 0 1 40 10z"/><path ${S} fill="#fff" d="M48 14l1.5 3.5L53 19l-3.5 1.5L48 24l-1.5-3.5L43 19l3.5-1.5z"/>`,
+  pages: c => `<path ${S} fill="#fff" d="M10 16c8-3 15-3 22 2v34c-7-5-14-5-22-2z"/><path ${S} fill="#fff" d="M54 16c-8-3-15-3-22 2v34c7-5 14-5 22-2z"/><path ${S} fill="none" d="M15 26c4-1 8-1 12 1M15 34c4-1 8-1 12 1M37 27c4-2 8-2 12-1M37 35c4-2 8-2 12-1"/><path ${S} fill="${c}" d="M42 12h8v18l-4-3-4 3z"/>`,
+  stack: c => `<rect ${S} fill="${c}" x="10" y="42" width="44" height="10" rx="2"/><rect ${S} fill="#e8b84a" x="14" y="31" width="38" height="11" rx="2"/><rect ${S} fill="#fff" x="12" y="20" width="40" height="11" rx="2"/><path ${S} d="M18 47h28M20 36h24"/>`,
+  mountain: c => `<path ${S} fill="${c}" d="M6 52L24 20l9 14 6-8 19 26z"/><path ${S} fill="#fff" d="M24 20l5 8-4 3-3-2-3 3z"/><path ${S} d="M40 10v12"/><path ${S} fill="#e8b84a" d="M40 10h10l-3 3 3 3H40z"/>`,
+  bolt: c => `<path ${S} fill="${c}" d="M36 6L14 36h14l-4 22 24-32H34z"/>`,
+  first: c => `<rect ${S} fill="${c}" x="16" y="8" width="32" height="46" rx="3"/><path ${S} d="M22 8v46"/><path ${S} fill="#e8b84a" d="M32 22l2.6 5.4 5.9.8-4.3 4.1 1 5.8L32 35.3 26.8 38l1-5.8-4.3-4.1 5.9-.8z"/>`,
+  tape: c => `<rect ${S} fill="${c}" x="6" y="14" width="52" height="34" rx="4"/><rect ${S} fill="#fff" x="12" y="19" width="40" height="16" rx="2"/><circle ${S} fill="#e8b84a" cx="22" cy="27" r="4"/><circle ${S} fill="#e8b84a" cx="42" cy="27" r="4"/><path ${S} fill="none" d="M18 48l4-7h20l4 7"/>`,
+  headphones: c => `<path ${S} fill="none" d="M12 38v-6a20 20 0 0 1 40 0v6"/><rect ${S} fill="${c}" x="8" y="36" width="12" height="18" rx="4"/><rect ${S} fill="${c}" x="44" y="36" width="12" height="18" rx="4"/>`,
+  hourglass: c => `<path ${S} d="M16 8h32M16 56h32"/><path ${S} fill="#fff" d="M20 8c0 14 10 16 10 24S20 42 20 56h24c0-14-10-16-10-24s10-10 10-24z"/><path ${S} fill="${c}" d="M24 52c2-6 6-9 8-9s6 3 8 9z"/><path ${S} fill="${c}" d="M25 16h14c-1 5-4 8-7 10-3-2-6-5-7-10z"/>`,
+  again: c => `<path ${S} fill="none" d="M50 32A18 18 0 1 1 44.7 19.3"/><path ${S} fill="${c}" d="M50 24L39.5 23.6 47.4 14.6z"/><rect ${S} fill="#fff" x="25" y="23" width="14" height="19" rx="2"/><path ${S} d="M29 23v19"/>`,
+  infinity: c => `<path ${S} fill="none" stroke-width="5" d="M32 32c-5-7-10-11-15-11a11 11 0 0 0 0 22c5 0 10-4 15-11s10-11 15-11a11 11 0 0 1 0 22c-5 0-10-4-15-11z"/><path ${S} fill="none" stroke="${c}" stroke-width="3" d="M32 32c-5-7-10-11-15-11a11 11 0 0 0 0 22c5 0 10-4 15-11s10-11 15-11a11 11 0 0 1 0 22c-5 0-10-4-15-11z"/>`,
+  crown: c => `<path ${S} fill="${c}" d="M10 46l-2-26 13 11 11-17 11 17 13-11-2 26z"/><rect ${S} fill="#e8b84a" x="10" y="46" width="44" height="8" rx="2"/><circle ${S} fill="#fff" cx="32" cy="34" r="4"/>`,
+  shelf: c => `<rect ${S} fill="${c}" x="12" y="14" width="8" height="34" rx="1"/><rect ${S} fill="#e8b84a" x="20" y="18" width="8" height="30" rx="1"/><rect ${S} fill="#fff" x="28" y="12" width="9" height="36" rx="1"/><rect ${S} fill="${c}" x="38" y="20" width="7" height="28" rx="1" transform="rotate(12 41 34)"/><path ${S} d="M6 50h52"/>`,
+  trophy: c => `<path ${S} fill="${c}" d="M20 10h24v14a12 12 0 0 1-24 0z"/><path ${S} fill="none" d="M20 14h-7a7 7 0 0 0 9 11M44 14h7a7 7 0 0 1-9 11"/><path ${S} d="M32 36v8"/><rect ${S} fill="#e8b84a" x="22" y="44" width="20" height="10" rx="2"/>`,
+  mug: c => `<path ${S} fill="${c}" d="M14 24h28v20a10 10 0 0 1-10 10h-8a10 10 0 0 1-10-10z"/><path ${S} fill="none" d="M42 28h4a6 6 0 0 1 0 12h-4"/><path ${S} fill="none" d="M22 10c-2 3 2 5 0 8M30 10c-2 3 2 5 0 8"/>`,
+  split: c => `<path ${S} fill="${c}" d="M8 14h24v38H8z"/><rect ${S} fill="#e8b84a" x="32" y="22" width="24" height="22" rx="3"/><circle ${S} fill="#fff" cx="39" cy="33" r="3"/><circle ${S} fill="#fff" cx="49" cy="33" r="3"/><path ${S} d="M14 22h12M14 30h12M14 38h12"/>`,
+  blocks: c => `<rect ${S} fill="${c}" x="8" y="32" width="22" height="22" rx="3"/><rect ${S} fill="#e8b84a" x="34" y="32" width="22" height="22" rx="3"/><rect ${S} fill="#fff" x="21" y="10" width="22" height="22" rx="3"/><path ${S} fill="none" d="M27 26l5-11 5 11M29 22h6M14 49V37h5a3 3 0 0 1 0 6h-5h6a3 3 0 0 1 0 6zM50 39a5 5 0 1 0 0 8"/>`,
+  rainbow: c => `<path ${S} fill="${c}" d="M6 48a26 26 0 0 1 52 0h-8a18 18 0 0 0-36 0z"/><path ${S} fill="#e8b84a" d="M14 48a18 18 0 0 1 36 0h-7a11 11 0 0 0-22 0z"/><path ${S} fill="#fff" d="M21 48a11 11 0 0 1 22 0z"/><path ${S} d="M4 52h56"/>`,
+  juggle: c => `<path ${S} fill="none" stroke-dasharray="4 5" d="M14 44Q32 -8 50 44"/><circle ${S} fill="${c}" cx="14" cy="44" r="7"/><circle ${S} fill="#e8b84a" cx="32" cy="18" r="7"/><circle ${S} fill="#fff" cx="50" cy="44" r="7"/><path ${S} d="M8 56h12M44 56h12"/>`,
+  sunrise: c => `<path ${S} fill="${c}" d="M14 44a18 18 0 0 1 36 0z"/><path ${S} d="M6 44h52M32 14v6M14 22l4 4M50 22l-4 4M10 34h-2M56 34h-2"/><path ${S} fill="none" d="M22 52h20"/>`,
+  target: c => `<circle ${S} fill="#fff" cx="30" cy="34" r="22"/><circle ${S} fill="${c}" cx="30" cy="34" r="14"/><circle ${S} fill="#fff" cx="30" cy="34" r="6"/><path ${S} d="M30 34L54 10"/><path ${S} fill="#e8b84a" d="M54 10l-2 8-6-6z"/>`,
+  tiny: c => `<rect ${S} fill="#fff" x="23" y="8" width="18" height="26" rx="2"/><path ${S} d="M28 8v26"/><path ${S} fill="${c}" d="M12 28h40v14c0 9-8 14-20 14s-20-5-20-14z"/><path ${S} fill="none" stroke-dasharray="3 4" d="M17 33h30"/>`,
+  boomerang: c => `<path ${S} fill="${c}" d="M8 20c8 18 16 28 24 28s16-10 24-28l-7-4c-6 13-12 22-17 22s-11-9-17-22z"/><path ${S} fill="none" d="M6 34h6M52 34h6M10 44h5M49 44h5"/>`,
+  pumpkin: c => `<path ${S} fill="#5b6633" d="M31 22c0-6 1-10 5-12l3 3c-3 2-4 5-4 9z"/><ellipse ${S} fill="${c}" cx="32" cy="39" rx="24" ry="17"/><path ${S} fill="none" d="M32 22c-7 4-7 30 0 34M32 22c7 4 7 30 0 34M20 24c-8 6-8 24 0 30M44 24c8 6 8 24 0 30"/>`,
+  gift: c => `<rect ${S} fill="${c}" x="10" y="26" width="44" height="28" rx="3"/><rect ${S} fill="#e8b84a" x="8" y="18" width="48" height="10" rx="2"/><path ${S} d="M32 18v36"/><path ${S} fill="#fff" d="M32 18c-10-10-18-4-12 0zM32 18c10-10 18-4 12 0z"/>`,
+  cat: c => `<path ${S} fill="none" d="M46 52c9 0 11-10 5-15"/><path ${S} fill="${c}" d="M18 56c0-15 6-23 14-23s14 8 14 23z"/><path ${S} fill="${c}" d="M21 22l1-14 9 7M43 22l-1-14-9 7"/><circle ${S} fill="${c}" cx="32" cy="24" r="12"/><ellipse ${S} fill="#e8b84a" cx="27" cy="24" rx="2.6" ry="3.4"/><ellipse ${S} fill="#e8b84a" cx="37" cy="24" rx="2.6" ry="3.4"/><path ${S} fill="none" d="M30 30l2 1.6 2-1.6"/>`,
+  leap: c => `<rect ${S} fill="#fff" x="10" y="14" width="44" height="40" rx="4"/><path ${S} fill="${c}" d="M10 18a4 4 0 0 1 4-4h36a4 4 0 0 1 4 4v8H10z"/><path ${S} d="M22 9v10M42 9v10"/><text x="32" y="48" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="20" fill="#000">29</text>`,
+  bookends: c => `<rect ${S} fill="#fff" x="22" y="24" width="7" height="24"/><rect ${S} fill="#e8b84a" x="29" y="18" width="7" height="30"/><rect ${S} fill="#fff" x="36" y="26" width="6" height="22"/><path ${S} fill="${c}" d="M8 14h6v34h8v6H8z"/><path ${S} fill="${c}" d="M56 14h-6v34h-8v6h14z"/>`,
+  decade: c => `<rect ${S} fill="#fff" x="16" y="12" width="38" height="38" rx="4" transform="rotate(-6 35 31)"/><rect ${S} fill="#fff" x="10" y="16" width="40" height="40" rx="4"/><path ${S} fill="${c}" d="M10 20a4 4 0 0 1 4-4h32a4 4 0 0 1 4 4v8H10z"/><text x="30" y="49" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="18" fill="#000">10</text>`,
+  notfound: c => `<path ${S} fill="#fff" d="M14 8h26l10 10v38H14z"/><path ${S} fill="${c}" d="M40 8v10h10z"/><text x="32" y="44" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="15" fill="#000">404</text>`,
+  three: c => `<circle ${S} fill="#fff" cx="32" cy="34" r="22"/><path ${S} d="M32 34V18M32 34h11"/><circle ${S} fill="#000" cx="32" cy="34" r="2"/><path ${S} fill="${c}" d="M48 6a10 10 0 1 0 8 14 8 8 0 0 1-8-14z"/>`,
+  circle: c => `<circle ${S} fill="none" cx="32" cy="32" r="22"/><circle ${S} fill="${c}" cx="32" cy="10" r="6"/><path ${S} fill="#e8b84a" d="M32 26l2 4.2 4.6.7-3.3 3.2.8 4.6-4.1-2.2-4.1 2.2.8-4.6-3.3-3.2 4.6-.7z"/>`,
+  armchair: c => `<path ${S} fill="${c}" d="M14 22a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v14H14z"/><path ${S} fill="${c}" d="M8 30a5 5 0 0 1 10 0v10h28V30a5 5 0 0 1 10 0v16H8z"/><rect ${S} fill="#e8b84a" x="18" y="34" width="28" height="6" rx="2"/><path ${S} d="M12 46v8M52 46v8"/>`,
+  sneaker: c => `<path ${S} fill="${c}" d="M8 44c0-8 2-18 6-24h10c0 6 4 10 10 12l14 4c6 2 8 6 8 10v2H8z"/><path ${S} fill="#fff" d="M8 48h48v6H8z"/><path ${S} fill="none" d="M26 26l-4 4M30 29l-4 4M34 31l-4 4"/><path ${S} fill="none" d="M48 12a8 8 0 0 1 8 8"/><path ${S} fill="none" d="M44 16a5 5 0 0 1 6 6"/>`,
+  bed: c => `<path ${S} fill="none" d="M8 18v38M56 40v16"/><rect ${S} fill="${c}" x="8" y="38" width="48" height="10" rx="2"/><rect ${S} fill="#fff" x="12" y="30" width="16" height="10" rx="4"/><path ${S} fill="#e8b84a" d="M30 30h22a4 4 0 0 1 4 4v4H30z"/><path ${S} fill="none" d="M38 10h8l-8 8h8M48 4h5l-5 5h5"/>`,
+  metronome: c => `<path ${S} fill="${c}" d="M24 10h16l10 44H14z"/><path ${S} fill="#fff" d="M26 30h12l3 14H23z"/><path ${S} d="M32 50L44 18"/><rect ${S} fill="#e8b84a" x="38" y="22" width="8" height="6" rx="1" transform="rotate(21 42 25)"/><path ${S} d="M10 54h44"/>`,
+  tapeagain: c => `<rect ${S} fill="${c}" x="6" y="18" width="52" height="30" rx="4"/><rect ${S} fill="#fff" x="12" y="23" width="40" height="13" rx="2"/><circle ${S} fill="#e8b84a" cx="22" cy="29.5" r="3.5"/><circle ${S} fill="#e8b84a" cx="42" cy="29.5" r="3.5"/><path ${S} fill="none" d="M20 10h22a6 6 0 0 1 6 6"/><path ${S} fill="#000" d="M44 14l4 4 4-4z"/>`,
+  firework: c => `<circle ${S} fill="${c}" cx="32" cy="26" r="6"/><path ${S} d="M32 8v6M32 38v6M14 26h6M44 26h6M19 13l4 4M41 35l4 4M19 39l4-4M41 17l4-4"/><path ${S} fill="#e8b84a" d="M26 56l6-12 6 12z"/>`,
+  twins: c => `<rect ${S} fill="${c}" x="10" y="12" width="18" height="40" rx="2"/><rect ${S} fill="${c}" x="36" y="12" width="18" height="40" rx="2"/><path ${S} d="M15 12v40M41 12v40"/><path ${S} fill="#e8b84a" d="M19 26l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5zM45 26l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z"/>`,
+  domino: c => `<rect ${S} fill="${c}" x="8" y="16" width="20" height="36" rx="3" transform="rotate(-14 18 34)"/><rect ${S} fill="#fff" x="36" y="16" width="20" height="36" rx="3"/><path ${S} d="M36 34h20"/><circle fill="#000" cx="46" cy="25" r="2.5"/><circle fill="#000" cx="42" cy="42" r="2.5"/><circle fill="#000" cx="50" cy="44" r="2.5"/>`,
+  first1: c => `<rect ${S} fill="#fff" x="10" y="14" width="44" height="40" rx="4"/><path ${S} fill="${c}" d="M10 18a4 4 0 0 1 4-4h36a4 4 0 0 1 4 4v8H10z"/><path ${S} d="M22 9v10M42 9v10"/><text x="32" y="49" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="20" fill="#000">1st</text>`,
+  cake: c => `<rect ${S} fill="${c}" x="12" y="32" width="40" height="22" rx="3"/><path ${S} fill="#fff" d="M12 38c5 4 8-4 13 0s8-4 14 0 8-4 13 0v-6H12z"/><path ${S} d="M32 32v-10"/><path ${S} fill="#e8b84a" d="M32 12c3 4 3 7 0 8-3-1-3-4 0-8z"/>`,
+  midnight: c => `<circle ${S} fill="#fff" cx="32" cy="34" r="22"/><path ${S} d="M32 34V14M32 34l-2-14"/><circle fill="#000" cx="32" cy="34" r="2.5"/><path ${S} fill="${c}" d="M22 44h20v8H22z"/><path ${S} d="M32 44v8"/>`,
+  ribbon: c => `<circle ${S} fill="${c}" cx="32" cy="24" r="14"/><path ${S} fill="${c}" d="M24 34l-6 22 8-5 4 8 2-23M40 34l6 22-8-5-4 8-2-23"/><circle ${S} fill="#fff" cx="32" cy="24" r="7"/>`
+};
+// ---------- level art: the same picture, built up a little more at each level (n = the level, 1 up) ----------
+const G = '#e8b84a', W = '#fff';
+const range = n => Array.from({ length: n }, (_, i) => i);
+const FLAME = (c, x, y, k) => `<g transform="translate(${x} ${y}) scale(${k}) translate(-32 -56)"><path ${S} fill="${c}" d="M32 6c4 10 14 15 14 28a14 14 0 0 1-28 0c0-8 5-12 7-18 3 5 5 7 7 7-2-6-1-12 0-17z"/><path ${S} fill="${G}" d="M32 34c3 4 6 6 6 11a6 6 0 0 1-12 0c0-4 3-6 6-11z"/></g>`;
+const CHECK = (x, y, k) => `<path ${S} fill="none" d="M${x - 4 * k} ${y}l${3 * k} ${3 * k} ${6 * k}-${7 * k}"/>`;
+const STAR = (x, y, r, f) => { const p = range(10).map(i => { const a = Math.PI / 5 * i - Math.PI / 2, R = i % 2 ? r * .45 : r; return `${(x + R * Math.cos(a)).toFixed(1)} ${(y + R * Math.sin(a)).toFixed(1)}`; }); return `<path ${S} fill="${f || G}" d="M${p.join('L')}z"/>`; };
+const BOLT = (x, y, k, c) => `<g transform="translate(${x} ${y}) scale(${k}) translate(-32 -32)"><path ${S} fill="${c}" d="M36 6L14 36h14l-4 22 24-32H34z"/></g>`;
+Object.assign(ART, {
+  // Streak: the flame grows, then side flames catch, then embers fly
+  flame: (c, n = 1) => { const k = [.62, .74, .84, .92, 1][Math.min(n, 5) - 1];
+    return (n >= 3 ? FLAME(c, 15, 58, .42) : '') + (n >= 4 ? FLAME(c, 49, 58, .42) : '') + FLAME(c, 32, 58, k) +
+      (n >= 5 ? `<circle ${S} fill="${G}" cx="13" cy="20" r="2.5"/><circle ${S} fill="${G}" cx="52" cy="14" r="2.5"/>` : ''); },
+  // Perfect Month: more days ticked off the page
+  calendar: (c, n = 1) => { const grid = [[[32, 41, 2]], [[20, 41, 1.1], [32, 41, 1.1], [44, 41, 1.1]], [[20, 36, 1], [32, 36, 1], [44, 36, 1], [20, 47, 1], [32, 47, 1], [44, 47, 1]],
+      [[17, 34, .8], [27, 34, .8], [37, 34, .8], [47, 34, .8], [17, 42, .8], [27, 42, .8], [37, 42, .8], [47, 42, .8], [17, 50, .8], [27, 50, .8], [37, 50, .8], [47, 50, .8]]][Math.min(n, 4) - 1];
+    return `<rect ${S} fill="#fff" x="10" y="14" width="44" height="42" rx="4"/><path ${S} fill="${c}" d="M10 18a4 4 0 0 1 4-4h36a4 4 0 0 1 4 4v8H10z"/><path ${S} d="M22 9v10M42 9v10"/>` + grid.map(([x, y, k]) => CHECK(x, y, k)).join(''); },
+  // Early Pages: the sun climbs and gains rays
+  sun: (c, n = 1) => { const rays = [4, 6, 8, 12][Math.min(n, 4) - 1], r = 9 + n, cy = 38 - n * 2;
+    return range(rays).map(i => { const a = Math.PI * 2 / rays * i; return `<path ${S} d="M${(32 + Math.cos(a) * (r + 5)).toFixed(1)} ${(cy + Math.sin(a) * (r + 5)).toFixed(1)}L${(32 + Math.cos(a) * (r + 11)).toFixed(1)} ${(cy + Math.sin(a) * (r + 11)).toFixed(1)}"/>`; }).join('') +
+      `<circle ${S} fill="${c}" cx="32" cy="${cy}" r="${r}"/>` + (n >= 4 ? `<path ${S} d="M8 58h48"/>` : ''); },
+  // Night Owl: a star more each level
+  moon: (c, n = 1) => `<path ${S} fill="${c}" d="M38 10a22 22 0 1 0 14 34A18 18 0 0 1 38 10z"/>` + [[50, 14, 5], [56, 30, 3.6], [44, 26, 3], [58, 6, 3]].slice(0, Math.min(n, 4)).map(([x, y, r]) => STAR(x, y, r, '#fff')).join(''),
+  // Weekender: the cup steams more, then gets a saucer
+  mug: (c, n = 1) => `<path ${S} fill="${c}" d="M14 26h28v20a10 10 0 0 1-10 10h-8a10 10 0 0 1-10-10z"/><path ${S} fill="none" d="M42 30h4a6 6 0 0 1 0 12h-4"/>` +
+      [[28], [24, 32], [20, 28, 36], [16, 24, 32, 40]][Math.min(n, 4) - 1].map(x => `<path ${S} fill="none" d="M${x} 8c-2 3 2 5 0 8"/>`).join(''),
+  // Pages Read: the book grows a thicker block of pages under it
+  pages: (c, n = 1) => { const L = Math.min(n - 1, 4), u = -L * 2.4;
+    return `<g transform="translate(0 ${u})"><path ${S} fill="#fff" d="M10 16c8-3 15-3 22 2v34c-7-5-14-5-22-2z"/><path ${S} fill="#fff" d="M54 16c-8-3-15-3-22 2v34c7-5 14-5 22-2z"/><path ${S} fill="none" d="M15 26c4-1 8-1 12 1M15 34c4-1 8-1 12 1M37 27c4-2 8-2 12-1M37 35c4-2 8-2 12-1"/><path ${S} fill="${c}" d="M42 12h8v18l-4-3-4 3z"/>` +
+      range(L).map(k => `<path ${S} fill="none" d="M10 ${54 + k * 3.4}c8-3 15-3 22 2c7-5 14-5 22-2"/>`).join('') +
+      (n >= 6 ? `<path ${S} fill="${G}" d="M15 13h5v9l-2.5-2-2.5 2z"/>` : '') + (n >= 7 ? `<path ${S} fill="#fff" d="M23 15h4v7l-2-1.6-2 1.6z"/>` : '') +
+      (n >= 8 ? `<path ${S} fill="none" d="M15 42c4-1 8-1 12 1M37 43c4-2 8-2 12-1"/>` : '') + '</g>'; },
+  // Big Day: more bolts
+  bolt: (c, n = 1) => { const lines = [0, 4, 6, 8][Math.min(n, 4) - 1];
+    return (n >= 4 ? `<circle ${S} fill="${G}" cx="32" cy="32" r="20"/>` : '') +
+      range(lines).map(i => { const a = Math.PI * 2 / lines * i - Math.PI / 2; return `<path ${S} d="M${(32 + Math.cos(a) * 23).toFixed(1)} ${(32 + Math.sin(a) * 23).toFixed(1)}L${(32 + Math.cos(a) * 29).toFixed(1)} ${(32 + Math.sin(a) * 29).toFixed(1)}"/>`; }).join('') +
+      BOLT(32, 32, [.78, .84, .9, .86][Math.min(n, 4) - 1], c); },
+  // Summit: a hill, two peaks, snow on top, then the flag
+  mountain: (c, n = 1) => (n >= 2 ? `<path ${S} fill="${G}" d="M28 54l14-24 16 24z"/>` : '') +
+      `<path ${S} fill="${c}" d="M4 54L${n >= 2 ? 24 : 32} ${n >= 3 ? 14 : 22}L${n >= 2 ? 40 : 60} 54z"/>` +
+      (n >= 3 ? `<path ${S} fill="#fff" d="M24 14l6 10-3-1-3 3-3-3-3 1z"/>` : '') + (n >= 4 ? `<path ${S} d="M24 14V4"/><path ${S} fill="${G}" d="M24 4h10l-3 3 3 3H24z"/>` : ''),
+  // Steady Pages: the arm swings wider, a tick for each level
+  metronome: (c, n = 1) => { const ang = [-8, 14, -20, 26][Math.min(n, 4) - 1];
+    return `<path ${S} fill="${c}" d="M24 10h16l10 44H14z"/><path ${S} fill="#fff" d="M26 30h12l3 14H23z"/><path ${S} d="M10 56h44"/>` +
+      `<g transform="rotate(${ang} 32 50)"><path ${S} d="M32 50V14"/><rect ${S} fill="${G}" x="28" y="20" width="8" height="6" rx="1"/></g>` +
+      range(n).map(i => `<path ${S} d="M${20 + i * 8} 60v2"/>`).join(''); },
+  // Books Finished: the shelf fills, one book more each level
+  shelf: (c, n = 1) => { const k = n + 1, w = Math.min(8, 40 / k), x0 = 32 - k * w / 2, fills = [c, G, '#fff'];
+    return range(k).map(i => { const h = 26 + (i * 7) % 11; return `<rect ${S} fill="${fills[i % 3]}" x="${(x0 + i * w).toFixed(1)}" y="${50 - h}" width="${w.toFixed(1)}" height="${h}" rx="1"/>`; }).join('') + `<path ${S} d="M6 52h52"/>`; },
+  // Year of Books: a plain cup, then handles, then a star on a taller stand
+  trophy: (c, n = 1) => `<path ${S} fill="${c}" d="M20 10h24v14a12 12 0 0 1-24 0z"/>` + (n >= 2 ? `<path ${S} fill="none" d="M20 14h-7a7 7 0 0 0 9 11M44 14h7a7 7 0 0 1-9 11"/>` : '') +
+      `<path ${S} d="M32 36v${n >= 3 ? 6 : 8}"/><rect ${S} fill="${G}" x="${n >= 3 ? 18 : 22}" y="${n >= 3 ? 42 : 44}" width="${n >= 3 ? 28 : 20}" height="${n >= 3 ? 12 : 10}" rx="2"/>` + (n >= 3 ? STAR(32, 20, 6, '#fff') : ''),
+  // Quick Study: less sand left at the top each level
+  hourglass: (c, n = 1) => { const t = [12, 7, 2][Math.min(n, 3) - 1], b = [44, 39, 34][Math.min(n, 3) - 1];
+    return `<path ${S} d="M16 8h32M16 56h32"/><path ${S} fill="#fff" d="M20 8c0 14 10 16 10 24S20 42 20 56h24c0-14-10-16-10-24s10-10 10-24z"/>` +
+      `<path ${S} fill="${c}" d="M${24 - (b - 34) / 5} 53c2-${53 - b} 6-${53 - b + 2} 8-${53 - b + 2}s6 2 8 ${53 - b + 2}z"/>` + (t > 2 ? `<path ${S} fill="${c}" d="M${32 - t / 1.6} ${26 - t}h${t * 1.25}c-1 ${t / 2} -3 ${t / 1.4} -${t / 1.6} ${t}c-${t / 3} -${t / 4} -${t / 1.6} -${t / 2} -${t / 1.6} -${t}z"/>` : '') + `<path ${S} d="M32 32v${n >= 2 ? 18 : 10}"/>`; },
+  // Many Voices: the rosette gains rings
+  ribbon: (c, n = 1) => `<path ${S} fill="${c}" d="M24 34l-6 22 8-5 4 8 2-23M40 34l6 22-8-5-4 8-2-23"/><circle ${S} fill="${c}" cx="32" cy="24" r="16"/>` +
+      range(Math.min(n, 4)).map(i => `<circle ${S} fill="${i % 2 ? c : (i ? G : '#fff')}" cx="32" cy="24" r="${12 - i * 3}"/>`).join(''),
+  // Busy Shelf: a taller pile
+  stack: (c, n = 1) => { const k = n + 1, fills = [c, G, '#fff', c];
+    return range(k).map(i => { const y = 52 - (i + 1) * 10, w = 44 - i * 4, x = 32 - w / 2 + (i % 2 ? 2 : -2); return `<rect ${S} fill="${fills[i]}" x="${x}" y="${y}" width="${w}" height="10" rx="2"/><path ${S} d="M${x + 6} ${y + 5}h${w - 12}"/>`; }).join('') + `<path ${S} d="M6 54h52"/>`; },
+  // Audiobooks Finished: more tape wound onto the reel, then a second tape behind
+  tape: (c, n = 1) => { const r = 2.5 + n * .9;
+    return (n >= 5 ? `<rect ${S} fill="${G}" x="12" y="8" width="46" height="30" rx="4"/>` : '') +
+      `<rect ${S} fill="${c}" x="6" y="14" width="52" height="34" rx="4"/><rect ${S} fill="#fff" x="12" y="19" width="40" height="16" rx="2"/><circle ${S} fill="${G}" cx="22" cy="27" r="${Math.min(6.5, r).toFixed(1)}"/><circle ${S} fill="${G}" cx="42" cy="27" r="${Math.max(2.5, 8 - r).toFixed(1)}"/><path ${S} fill="none" d="M18 48l4-7h20l4 7"/>`; },
+  // Hours Listened: the sound spills out further
+  headphones: (c, n = 1) => `<path ${S} fill="none" d="M12 38v-6a20 20 0 0 1 40 0v6"/><rect ${S} fill="${c}" x="8" y="36" width="12" height="18" rx="4"/><rect ${S} fill="${c}" x="44" y="36" width="12" height="18" rx="4"/>` +
+      range(Math.min(n - 1, 3)).map(i => `<path ${S} fill="none" d="M${4 - i * 3.5} ${39 - i * 2}q-4 ${6 + i * 2} 0 ${12 + i * 4}"/><path ${S} fill="none" d="M${60 + i * 3.5} ${39 - i * 2}q4 ${6 + i * 2} 0 ${12 + i * 4}"/>`).join('') +
+      (n >= 5 ? `<path ${S} fill="none" d="M30 8v12M30 8l8 2v10"/><circle ${S} fill="${G}" cx="27" cy="20" r="3"/><circle ${S} fill="${G}" cx="35" cy="21" r="3"/>` : '') +
+      (n >= 6 ? `<path ${S} fill="none" d="M16 2v11"/><circle ${S} fill="${G}" cx="13" cy="13" r="3"/>` : '') +
+      (n >= 7 ? `<path ${S} fill="none" d="M50 2v11"/><circle ${S} fill="${G}" cx="47" cy="13" r="3"/>` : '') +
+      (n >= 8 ? `<path ${S} fill="none" d="M2 22l5 2M62 22l-5 2"/>` : ''),
+  // Marathon Ears: more speed lines
+  sneaker: (c, n = 1) => `<path ${S} fill="${c}" d="M14 44c0-8 2-18 6-24h10c0 6 4 10 10 12l12 4c6 2 8 6 8 10v2H14z"/><path ${S} fill="#fff" d="M14 48h46v6H14z"/><path ${S} fill="none" d="M30 26l-4 4M34 29l-4 4M38 31l-4 4"/>` +
+      range(Math.min(n, 3)).map(i => `<path ${S} d="M${2 + i * 2} ${30 + i * 8}h${8 - i * 2}"/>`).join(''),
+  split: (c, n = 1) => `<path ${S} fill="${c}" d="M6 14h22v38H6z"/><rect ${S} fill="${G}" x="36" y="22" width="22" height="22" rx="3"/><circle ${S} fill="#fff" cx="42" cy="33" r="3"/><circle ${S} fill="#fff" cx="52" cy="33" r="3"/><path ${S} d="M11 22h12M11 30h12M11 38h12"/>` +
+      (n >= 2 ? `<path ${S} d="M28 30h8"/>` : '') + (n >= 3 ? `<path ${S} d="M28 38h8M30 26v16" stroke="#000"/>` : ''),
+  // Bedtime Story: one more Z each level
+  bed: (c, n = 1) => `<path ${S} fill="none" d="M8 20v36M56 40v16"/><rect ${S} fill="${c}" x="8" y="38" width="48" height="10" rx="2"/><rect ${S} fill="#fff" x="12" y="30" width="16" height="10" rx="4"/><path ${S} fill="${G}" d="M30 30h22a4 4 0 0 1 4 4v4H30z"/>` +
+      [[34, 14, 7], [46, 6, 5], [56, 0, 4]].slice(0, Math.min(n, 3)).map(([x, y, s]) => `<path ${S} fill="none" d="M${x} ${y}h${s}l-${s} ${s}h${s}"/>`).join(''),
+  // Rereads: an arrowhead more around the loop
+  again: (c, n = 1) => `<circle ${S} fill="none" cx="32" cy="32" r="20"/>` + range(Math.min(n, 4)).map(i => { const a = -Math.PI / 4 + i * Math.PI / 2, x = 32 + 20 * Math.cos(a), y = 32 + 20 * Math.sin(a), dx = -Math.sin(a), dy = Math.cos(a);
+      return `<path ${S} fill="${c}" d="M${(x + dx * 6).toFixed(1)} ${(y + dy * 6).toFixed(1)}L${(x - dy * 5 - dx * 2).toFixed(1)} ${(y + dx * 5 - dy * 2).toFixed(1)}L${(x + dy * 5 - dx * 2).toFixed(1)} ${(y - dx * 5 - dy * 2).toFixed(1)}z"/>`; }).join('') +
+      `<rect ${S} fill="#fff" x="25" y="23" width="14" height="19" rx="2"/><path ${S} d="M29 23v19"/>`,
+  // Old Friend: one loop, the figure eight, a dot in it, then three loops
+  infinity: (c, n = 1) => n === 1 ? `<circle ${S} fill="none" stroke-width="7" cx="32" cy="32" r="18"/><circle fill="none" stroke="${c}" stroke-width="4" cx="32" cy="32" r="18"/>`
+      : n >= 4 ? [14, 32, 50].map(x => `<circle ${S} fill="none" stroke-width="5" cx="${x}" cy="32" r="9"/><circle fill="none" stroke="${c}" stroke-width="3" cx="${x}" cy="32" r="9"/>`).join('')
+      : `<path ${S} fill="none" stroke-width="5" d="M32 32c-5-7-10-11-15-11a11 11 0 0 0 0 22c5 0 10-4 15-11s10-11 15-11a11 11 0 0 1 0 22c-5 0-10-4-15-11z"/><path fill="none" stroke="${c}" stroke-width="3" d="M32 32c-5-7-10-11-15-11a11 11 0 0 0 0 22c5 0 10-4 15-11s10-11 15-11a11 11 0 0 1 0 22c-5 0-10-4-15-11z"/>` + (n >= 3 ? `<circle ${S} fill="${G}" cx="17" cy="32" r="4"/><circle ${S} fill="${G}" cx="47" cy="32" r="4"/>` : ''),
+  // Relistens: the tape, with one loop arrow more each level
+  tapeagain: (c, n = 1) => `<rect ${S} fill="${c}" x="6" y="22" width="52" height="30" rx="4"/><rect ${S} fill="#fff" x="12" y="27" width="40" height="13" rx="2"/><circle ${S} fill="${G}" cx="22" cy="33.5" r="3.5"/><circle ${S} fill="${G}" cx="42" cy="33.5" r="3.5"/>` +
+      range(Math.min(n, 3)).map(i => `<path ${S} fill="none" d="M${16 + i * 4} ${16 - i * 5}h${26 - i * 8}a5 5 0 0 1 5 5"/><path fill="#000" d="M${43 - i * 4 + 1} ${19 - i * 5}l4 4 4-4z"/>`).join(''),
+  // Long Time No See: the years on the page
+  decade: (c, n = 1) => `<rect ${S} fill="#fff" x="16" y="12" width="38" height="38" rx="4" transform="rotate(-6 35 31)"/><rect ${S} fill="#fff" x="10" y="16" width="40" height="40" rx="4"/><path ${S} fill="${c}" d="M10 20a4 4 0 0 1 4-4h32a4 4 0 0 1 4 4v8H10z"/><text x="30" y="49" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="18" fill="#000">${['1', '5', '10'][Math.min(n, 3) - 1]}</text>`,
+  // Alphabet Soup: A, then A B, then A B C
+  blocks: (c, n = 1) => { const b = [[21, 10, '#fff', 'A'], [8, 32, c, 'B'], [34, 32, G, 'C']].slice(0, Math.min(n, 3)), one = n === 1;
+    return b.map(([x, y, f, t]) => { const X = one ? 18 : x, Y = one ? 18 : y, s = one ? 28 : 22; return `<rect ${S} fill="${f}" x="${X}" y="${Y}" width="${s}" height="${s}" rx="3"/><text x="${X + s / 2}" y="${Y + s * .72}" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="${s * .62}" fill="#000">${t}</text>`; }).join(''); },
+  // Rainbow Shelf: a band more each level
+  rainbow: (c, n = 1) => { const bands = [c, G, '#fff', c].slice(0, Math.min(n, 3) + 1), R = 26, step = 26 / (bands.length + 1);
+    return bands.map((f, i) => { const r = R - i * step; return `<path ${S} fill="${f}" d="M${32 - r} 48a${r} ${r} 0 0 1 ${2 * r} 0z"/>`; }).join('') + `<path ${S} d="M4 52h56"/>`; },
+  // Juggler: a ball more each level
+  juggle: (c, n = 1) => { const k = Math.min(n, 3) + 1, pts = { 2: [[16, 40], [48, 40]], 3: [[14, 44], [32, 18], [50, 44]], 4: [[12, 46], [22, 22], [42, 22], [52, 46]] }[k], f = [c, G, '#fff', c];
+    return `<path ${S} fill="none" stroke-dasharray="4 5" d="M12 46Q32 -12 52 46"/>` + pts.map(([x, y], i) => `<circle ${S} fill="${f[i]}" cx="${x}" cy="${y}" r="6.5"/>`).join('') + `<path ${S} d="M6 58h12M46 58h12"/>`; },
+  // Dawn to Dusk: the sun rises a little more each level
+  sunrise: (c, n = 1) => { const cy = 46 - (n - 1) * 8;
+    return `<defs><clipPath id="hz${n}"><rect x="0" y="0" width="64" height="46"/></clipPath></defs><g clip-path="url(#hz${n})"><circle ${S} fill="${c}" cx="32" cy="${cy}" r="16"/></g><path ${S} d="M6 46h52"/>` +
+      (n >= 3 ? `<path ${S} d="M32 6v6M12 16l4 4M52 16l-4 4"/>` : '') + `<path ${S} fill="none" d="M20 54h24"/>`; },
+  // Bullseye: an arrow more in the target
+  target: (c, n = 1) => `<circle ${S} fill="#fff" cx="26" cy="38" r="20"/><circle ${S} fill="${c}" cx="26" cy="38" r="13"/><circle ${S} fill="#fff" cx="26" cy="38" r="5.5"/>` +
+      [[26, 38], [17, 31], [33, 46]].slice(0, Math.min(n, 3)).map(([x, y]) => `<path ${S} d="M${x} ${y}l13-13"/><path ${S} fill="${G}" d="M${x + 13} ${y - 13}l2-8 6 6-8 2z"/>`).join(''),   // darts: a short shaft, a gold flight
+  // Pocket Book: a book more in the pocket
+  tiny: (c, n = 1) => [[23, 8, '#fff'], [33, 12, G], [15, 13, '#fff']].slice(0, Math.min(n, 3)).reverse().map(([x, y, f]) => `<rect ${S} fill="${f}" x="${x}" y="${y}" width="15" height="24" rx="2"/>`).join('') +
+      `<path ${S} fill="${c}" d="M12 28h40v14c0 9-8 14-20 14s-20-5-20-14z"/><path ${S} fill="none" stroke-dasharray="3 4" d="M17 33h30"/>`,
+  // Comeback: the boomerang, then its way back, then a second one
+  boomerang: (c, n = 1) => `<path ${S} fill="${c}" d="M8 30c8 18 16 26 24 26s16-8 24-26l-7-4c-6 13-12 20-17 20s-11-7-17-20z"/>` +
+      (n >= 2 ? `<path ${S} fill="none" stroke-dasharray="4 5" d="M54 22C48 6 16 4 8 18"/>` : '') + (n >= 3 ? `<path ${S} fill="${G}" d="M8 18l-2-9 9 4z"/>` : ''),
+  // Spooky Season: the pumpkin, then a face on it
+  pumpkin: (c, n = 1) => `<path ${S} fill="#5b6633" d="M31 22c0-6 1-10 5-12l3 3c-3 2-4 5-4 9z"/><ellipse ${S} fill="${c}" cx="32" cy="39" rx="24" ry="17"/>` +
+      (n >= 2 ? `<path ${S} fill="${G}" d="M20 34l5-6 5 6zM34 34l5-6 5 6zM20 42c6 6 18 6 24 0l-4 2-4-2-4 2-4-2-4 2z"/>` : `<path ${S} fill="none" d="M32 22c-7 4-7 30 0 34M32 22c7 4 7 30 0 34M20 24c-8 6-8 24 0 30M44 24c8 6 8 24 0 30"/>`),
+  // Holiday Pages: a present more on the pile
+  gift: (c, n = 1) => { const g = [[10, 28, 44, 26, c], [40, 14, 18, 14, G], [6, 12, 20, 16, '#fff']].slice(0, Math.min(n, 3));
+    return g.map(([x, y, w, h, f], i) => `<rect ${S} fill="${f}" x="${x}" y="${y}" width="${w}" height="${h}" rx="2"/><path ${S} d="M${x + w / 2} ${y}v${h}${i ? '' : `M${x} ${y + 7}h${w}`}"/>`).join('') +
+      `<path ${S} fill="#fff" d="M32 28c-8-8-16-4-11 0zM32 28c8-8 16-4 11 0z"/>`; },
+  // Lucky Black Cat: the cat, then whiskers and a curled tail, then the moon behind it
+  cat: (c, n = 1) => (n >= 3 ? `<path ${S} fill="${G}" d="M50 4a10 10 0 1 0 10 13 8 8 0 0 1-10-13z"/>` : '') +
+      `<path ${S} fill="none" d="M46 52c${n >= 2 ? '12 0 13-14 4-17' : '9 0 11-10 5-15'}"/><path ${S} fill="${c}" d="M18 56c0-15 6-23 14-23s14 8 14 23z"/><path ${S} fill="${c}" d="M21 22l1-14 9 7M43 22l-1-14-9 7"/><circle ${S} fill="${c}" cx="32" cy="24" r="12"/><ellipse ${S} fill="${G}" cx="27" cy="24" rx="2.6" ry="3.4"/><ellipse ${S} fill="${G}" cx="37" cy="24" rx="2.6" ry="3.4"/><path ${S} fill="none" d="M30 30l2 1.6 2-1.6"/>` +
+      (n >= 2 ? `<path stroke="#000" stroke-width="2" stroke-linecap="round" d="M14 27l8 1M14 32l8-1M50 27l-8 1M50 32l-8-1"/>` : ''),
+  // Thirteen Thirteens (hidden): the Lucky Black Cat at its fullest, wearing a 13 tag
+  cat13: (c) => ART.cat(c, 3) + `<path stroke="#000" stroke-width="3" stroke-linecap="round" fill="none" d="M24 35c5 3 11 3 16 0"/><circle ${S} fill="#fff" cx="32" cy="44" r="7.5"/><text x="32" y="47.6" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="#000">13</text>`
+});
+
+// ---- more hidden badges (one level each) ----
+Object.assign(ART, {
+  // Pi Day: a pie with a slice out, π on it
+  pi: c => `<path ${S} fill="${c}" d="M32 32L52 20A24 24 0 1 1 32 8z"/><path ${S} fill="#e8b84a" d="M36 26V6a22 22 0 0 1 18 11z"/><path stroke="#000" stroke-width="3.5" stroke-linecap="round" fill="none" d="M17 33h20M23 33c0 7-1 11-4 13M31 33c0 6 0 10 3 12"/>`,
+  // Baby Steps: one page, a 1 on it
+  onepage: c => `<path ${S} fill="#fff" d="M16 8h22l10 10v38H16z"/><path ${S} fill="${c}" d="M38 8v10h10z"/><text x="31" y="47" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="24" fill="#000">1</text>`,
+  // Lucky Seven: a seven on a four-leaf clover
+  seven: c => `<circle ${S} fill="${c}" cx="23" cy="23" r="11"/><circle ${S} fill="${c}" cx="41" cy="23" r="11"/><circle ${S} fill="${c}" cx="23" cy="41" r="11"/><circle ${S} fill="${c}" cx="41" cy="41" r="11"/><path ${S} fill="none" d="M44 44l10 12"/><circle ${S} fill="#fff" cx="32" cy="32" r="10"/><text x="32" y="38.5" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="17" fill="#000">7</text>`,
+  // The Answer: a speech bubble saying 42
+  answer: c => `<path ${S} fill="${c}" d="M10 14h44v30H30l-10 10v-10H10z"/><rect ${S} fill="#fff" x="17" y="20" width="30" height="18" rx="3"/><text x="32" y="35" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="16" fill="#000">42</text>`,
+  // Easy as 1 2 3: three steps up
+  steps: c => `<path ${S} fill="${c}" d="M8 54V42h16V30h16V18h16v36z"/><text x="16" y="51" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="#fff">1</text><text x="32" y="51" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="#fff">2</text><text x="48" y="51" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="#fff">3</text><path ${S} fill="none" d="M24 42v12M40 30v24"/>`,
+  // Halfway There: an open book, a ribbon down the middle
+  half: c => `<path ${S} fill="#fff" d="M32 16c-8-5-16-6-24-4v38c8-2 16-1 24 4z"/><path ${S} fill="${c}" d="M32 16c8-5 16-6 24-4v38c-8-2-16-1-24 4z"/><path ${S} fill="#e8b84a" d="M30 12h4v46l-2-3-2 3z"/>`,
+  // Same Again: three bars, all the same
+  pace: c => `<rect ${S} fill="${c}" x="10" y="22" width="11" height="32" rx="2"/><rect ${S} fill="${c}" x="26.5" y="22" width="11" height="32" rx="2"/><rect ${S} fill="${c}" x="43" y="22" width="11" height="32" rx="2"/><path ${S} fill="none" stroke-dasharray="3 4" d="M6 15h52"/>`,
+  // A Week to the Day: a calendar page, seven days ticked and the last one ringed
+  week: c => `<rect ${S} fill="#fff" x="8" y="14" width="48" height="40" rx="4"/><path ${S} fill="${c}" d="M8 18a4 4 0 0 1 4-4h40a4 4 0 0 1 4 4v8H8z"/><path ${S} d="M20 9v10M44 9v10"/>` +
+    [0, 1, 2, 3, 4, 5].map(i => `<path stroke="#000" stroke-width="2.5" stroke-linecap="round" d="M${13 + i * 6.4} 36h3"/>`).join('') + `<circle ${S} fill="#e8b84a" cx="50" cy="44" r="5"/><path stroke="#000" stroke-width="2.5" stroke-linecap="round" d="M13 46h28"/>`,
+  // On the Hour: a stopwatch with a full turn on the dial
+  stopwatch: c => `<path ${S} d="M28 6h8M32 6v6M46 14l4-4"/><circle ${S} fill="${c}" cx="32" cy="36" r="22"/><circle ${S} fill="#fff" cx="32" cy="36" r="15"/><path ${S} fill="none" d="M32 36V24"/><circle fill="#000" cx="32" cy="36" r="2.5"/>`,
+  // Boo!: a ghost
+  ghost: c => `<path ${S} fill="${c === 'var(--bd-gold)' ? c : '#fff'}" d="M14 56V28a18 18 0 0 1 36 0v28l-6-5-6 5-6-5-6 5-6-5z"/><ellipse fill="#000" cx="26" cy="29" rx="3" ry="4"/><ellipse fill="#000" cx="38" cy="29" rx="3" ry="4"/><ellipse fill="#000" cx="32" cy="40" rx="3.5" ry="4.5"/>`,
+  // Down to the Wire: a clock at a minute to midnight, a spark beside it
+  midnight: c => `<circle ${S} fill="${c}" cx="30" cy="36" r="21"/><circle ${S} fill="#fff" cx="30" cy="36" r="15"/><path ${S} fill="none" d="M30 36V24M30 36l-2-12"/><path ${S} fill="#e8b84a" d="M52 6l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>`
+});
+ 
+Object.assign(ART, {
+  // Fahrenheit 451: a book with a flame rising off it
+  f451: c => `<path ${S} fill="#e8b84a" d="M32 6c8 9 12 14 8 22 4-1 6-4 6-7 5 7 2 17-14 17S14 28 20 20c1 4 3 6 6 7-3-9 2-15 6-21z"/><rect ${S} fill="${c}" x="10" y="40" width="44" height="16" rx="2"/><text x="32" y="53" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="11" fill="#fff">451</text>`,
+  // Room 101: a door with its number
+  door: c => `<rect ${S} fill="${c}" x="16" y="6" width="32" height="50" rx="2"/><path ${S} d="M8 56h48"/><rect ${S} fill="#fff" x="22" y="14" width="20" height="11" rx="2"/><text x="32" y="23.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="9" fill="#000">101</text><circle ${S} fill="#e8b84a" cx="41" cy="34" r="2.5"/>`,
+  // Catch-22: a loop that chases its own tail, 22 in the middle
+  loop22: c => `<path ${S} fill="none" stroke-width="7" stroke="#000" d="M48 22A20 20 0 1 0 52 36"/><path stroke="${c}" stroke-width="3.5" fill="none" stroke-linecap="round" d="M48 22A20 20 0 1 0 52 36"/><path ${S} fill="${c}" d="M42 22l10-6 2 12z"/><text x="32" y="40" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="15" fill="#000">22</text>`,
+  // Around the World in 80 Days: a globe and a little balloon
+  globe: c => `<circle ${S} fill="${c}" cx="28" cy="36" r="20"/><path ${S} fill="none" d="M8 36h40M28 16c-8 6-8 34 0 40M28 16c8 6 8 34 0 40"/><circle ${S} fill="#e8b84a" cx="50" cy="12" r="7"/><path ${S} fill="none" d="M46 17l2 6h4l2-6"/><rect ${S} fill="#fff" x="47" y="23" width="6" height="4"/>`,
+  // May the Fourth: a 4 among the stars
+  stars: c => `<circle ${S} fill="${c}" cx="32" cy="32" r="24"/><path stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M36 46V18L20 38h22"/><path fill="#fff" d="M15 16l1.5 3 3 1.5-3 1.5-1.5 3-1.5-3-3-1.5 3-1.5zM48 44l1.2 2.4 2.4 1.2-2.4 1.2-1.2 2.4-1.2-2.4-2.4-1.2 2.4-1.2z"/>`,
+  // Beware the Ides: a dagger
+  dagger: c => `<path ${S} fill="#fff" d="M32 4l6 8v26h-12V12z"/><path ${S} d="M32 10v26"/><rect ${S} fill="#e8b84a" x="18" y="38" width="28" height="6" rx="2"/><rect ${S} fill="${c}" x="28" y="44" width="8" height="12" rx="2"/><circle ${S} fill="#e8b84a" cx="32" cy="59" r="2.5"/>`,
+  // Love Letters: an envelope sealed with a heart
+  loveletter: c => `<rect ${S} fill="#fff" x="8" y="16" width="48" height="34" rx="3"/><path ${S} fill="none" d="M8 18l24 18 24-18"/><path ${S} fill="${c}" d="M32 48c-9-6-12-10-12-14a6 6 0 0 1 12-2 6 6 0 0 1 12 2c0 4-3 8-12 14z"/>`,
+  // Groundhog Day: a groundhog peeking out of its hole
+  groundhog: c => `<path ${S} fill="${c}" d="M18 50V32a14 14 0 0 1 28 0v18z"/><circle ${S} fill="${c}" cx="21" cy="22" r="4"/><circle ${S} fill="${c}" cx="43" cy="22" r="4"/><circle fill="#000" cx="27" cy="31" r="2.5"/><circle fill="#000" cx="37" cy="31" r="2.5"/><ellipse ${S} fill="#e8b84a" cx="32" cy="38" rx="5" ry="4"/><path ${S} fill="#5b6633" d="M6 50h52v6H6z"/>`,
+  // Case of the Mondays: a calendar page that just says MON
+  monday: c => `<rect ${S} fill="#fff" x="10" y="12" width="44" height="42" rx="4"/><path ${S} fill="${c}" d="M10 16a4 4 0 0 1 4-4h36a4 4 0 0 1 4 4v8H10z"/><path ${S} d="M22 7v10M42 7v10"/><text x="32" y="46" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="15" fill="#000">MON</text>`,
+  // Hat Trick: a top hat with three books stood in it
+  tophat: c => `<rect ${S} fill="#fff" x="22" y="6" width="6" height="22"/><rect ${S} fill="#e8b84a" x="29" y="4" width="6" height="24"/><rect ${S} fill="#fff" x="36" y="8" width="6" height="20"/><path ${S} fill="${c}" d="M18 26h28v24H18z"/><path ${S} fill="${c}" d="M8 50h48v6H8z"/><path stroke="#e8b84a" stroke-width="4" d="M19.5 42h25"/>`,
+  // Lazy Sunday: a sun dozing off
+  lazysun: c => `<circle ${S} fill="${c}" cx="28" cy="36" r="14"/><path ${S} fill="none" d="M28 10v6M28 56v6M2 36h6M48 36h6M10 18l4 4M42 50l4 4M10 54l4-4M42 22l4-4M21 36c2 2 4 2 6 0M31 36c2 2 4 2 6 0"/><text x="52" y="16" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="12" fill="#000">z</text><text x="58" y="8" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="9" fill="#000">z</text>`,
+  // Two Peas in a Pod: an open pod, two peas
+  peas: c => `<path ${S} fill="#5b6633" d="M6 36c10 14 42 14 52 0-10-6-42-6-52 0z"/><circle ${S} fill="${c}" cx="24" cy="36" r="8"/><circle ${S} fill="${c}" cx="40" cy="36" r="8"/><path ${S} fill="none" d="M58 36c2-4 2-8 0-10"/>`,
+  // Twelve Days of Reading: a bauble with 12 on it
+  ornament: c => `<path ${S} fill="none" d="M32 4c-6 0-6 6 0 6s6-6 0-6"/><rect ${S} fill="#e8b84a" x="26" y="10" width="12" height="6" rx="1"/><circle ${S} fill="${c}" cx="32" cy="38" r="20"/><path stroke="#fff" stroke-width="3" fill="none" d="M14 32c10 4 26 4 36 0"/><text x="32" y="49" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="13" fill="#fff">12</text>`,
+  // Earworm: a worm wearing headphones
+  earworm: c => `<path stroke="#000" stroke-width="12" stroke-linecap="round" fill="none" d="M10 50c8-12 14 4 22-8s14 2 18-12"/><path stroke="${c}" stroke-width="6" stroke-linecap="round" fill="none" d="M10 50c8-12 14 4 22-8s14 2 18-12"/><path ${S} fill="none" d="M42 26c0-12 18-12 18 0"/><rect ${S} fill="#e8b84a" x="39" y="24" width="6" height="9" rx="2"/><rect ${S} fill="#e8b84a" x="57" y="24" width="6" height="9" rx="2"/><circle fill="#000" cx="52" cy="28" r="1.8"/>`
+});
+
+  // ---------- the badges: what each one asks, worked out from the library's own logs ----------
+  const BD_CATS = ['Streaks', 'Pages', 'Books', 'Audio', 'Rereads', 'Fun'];
+  const BD_LV = ['var(--bd-rust)', 'var(--bd-green)', 'var(--bd-blue)', 'var(--bd-red)', 'var(--bd-plum)', 'var(--bd-teal)'];
+  const H = m => `${Math.floor(m / 60)}h`;
+  const BD = [
+    { id: 'streak', c: 0, art: 'flame', name: 'Streak', ask: n => `Read ${n} days in a row`, goals: [3, 7, 30, 100, 365] },
+    { id: 'month', c: 0, art: 'calendar', name: 'Perfect Month', ask: n => `Read every day of ${n === 1 ? 'a month' : n + ' months'}`, goals: [1, 3, 6, 12] },
+    { id: 'weekend', c: 0, art: 'mug', name: 'Weekender', ask: n => `Read on both days of ${n} weekends`, goals: [4, 12, 26, 52] },
+    { id: 'pages', c: 1, art: 'pages', name: 'Pages Read', ask: n => `Read ${n.toLocaleString('en-US')} pages`, goals: [100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000] },
+    { id: 'bigday', c: 1, art: 'bolt', name: 'Big Day', ask: n => `Read ${n} pages in one day`, goals: [50, 100, 200, 300] },
+    { id: 'summit', c: 1, art: 'mountain', name: 'Summit', ask: n => `Finish a book over ${n.toLocaleString('en-US')} pages`, goals: [400, 600, 800, 1000] },
+    { id: 'steady', c: 1, art: 'metronome', name: 'Steady Pages', ask: n => `Read 30 pages or more on ${n} days`, goals: [10, 50, 100, 250] },
+    { id: 'finished', c: 2, art: 'shelf', name: 'Books Finished', ask: n => `Finish ${n} ${n === 1 ? 'book' : 'books'}`, goals: [1, 10, 25, 50, 100] },
+    { id: 'year', c: 2, art: 'trophy', name: 'Year of Books', ask: n => `Finish ${n} books in one year`, goals: [12, 25, 52] },
+    { id: 'quick', c: 2, art: 'hourglass', name: 'Quick Study', ask: n => `Finish a book within ${n} days`, goals: [14, 7, 3], down: true },
+    { id: 'authors', c: 2, art: 'ribbon', name: 'Many Voices', ask: n => `Finish books by ${n} different authors`, goals: [5, 15, 30, 50] },
+    { id: 'busy', c: 2, art: 'stack', name: 'Busy Shelf', ask: n => `Have ${n} books going at once`, goals: [2, 3, 5] },
+    { id: 'tapes', c: 3, art: 'tape', name: 'Audiobooks Finished', ask: n => `Finish ${n} ${n === 1 ? 'audiobook' : 'audiobooks'}`, goals: [1, 5, 10, 25, 50] },
+    { id: 'hours', c: 3, art: 'headphones', name: 'Hours Listened', ask: n => `Listen for ${H(n)}`, goals: [60, 180, 300, 600, 1500, 3000, 6000, 15000, 30000], unit: 'min' },
+    { id: 'marathon', c: 3, art: 'sneaker', name: 'Marathon Ears', ask: n => `Listen for ${H(n)} in one day`, goals: [120, 240, 480], unit: 'min' },
+    { id: 'rereads', c: 4, art: 'again', name: 'Rereads', ask: n => `Finish ${n} ${n === 1 ? 'reread' : 'rereads'}`, goals: [1, 5, 10, 20] },
+    { id: 'friend', c: 4, art: 'infinity', name: 'Old Friend', ask: n => `Finish the same book ${n} times`, goals: [2, 3, 5] },
+    { id: 'relisten', c: 4, art: 'tapeagain', name: 'Relistens', ask: n => `Finish ${n} ${n === 1 ? 'relisten' : 'relistens'}`, goals: [1, 5, 10] },
+    { id: 'decade', c: 4, art: 'decade', name: 'Long Time No See', ask: n => `Reread a book ${n} ${n === 1 ? 'year' : 'years'} after first finishing it`, goals: [1, 5, 10] },
+    { id: 'alpha', c: 5, art: 'blocks', name: 'Alphabet Soup', ask: n => `Finish books starting with ${n} different letters`, goals: [5, 13, 26] },
+    { id: 'rainbow', c: 5, art: 'rainbow', name: 'Rainbow Shelf', ask: n => `Finish books in ${n} different cover colours`, goals: [3, 6, 12] },
+    { id: 'juggle', c: 5, art: 'juggle', name: 'Juggler', ask: n => `Log ${n} different books on the same day`, goals: [2, 3, 4] },
+    { id: 'dawn', c: 5, art: 'sunrise', name: 'Dawn to Dusk', ask: n => `Start and finish a book on the same day${n > 1 ? ', ' + n + ' times' : ''}`, goals: [1, 3, 5] },
+    { id: 'bull', c: 5, art: 'target', name: 'Bullseye', ask: n => `Log exactly 100 pages in a day${n > 1 ? ', ' + n + ' times' : ''}`, goals: [1, 3, 5] },
+    { id: 'pocket', c: 5, art: 'tiny', name: 'Pocket Book', ask: n => `Finish ${n === 1 ? 'a book' : n + ' books'} under 150 pages`, goals: [1, 5, 10] },
+    { id: 'comeback', c: 5, art: 'boomerang', name: 'Comeback', ask: n => `Finish ${n === 1 ? 'a book' : n + ' books'} left untouched for a month`, goals: [1, 3, 5] },
+    { id: 'spooky', c: 5, art: 'pumpkin', name: 'Spooky Season', ask: n => `Read every day of October${n > 1 ? ' in ' + n + ' years' : ''}`, goals: [1, 3] },
+    { id: 'holiday', c: 5, art: 'gift', name: 'Holiday Pages', ask: n => `Read on December 25${n > 1 ? ' in ' + n + ' years' : ''}`, goals: [1, 3, 5] },
+    { id: 'cat', c: 5, art: 'cat', name: 'Lucky Black Cat', ask: n => `Read on ${n === 1 ? 'a Friday the 13th' : n + ' Fridays the 13th'}`, goals: [1, 3, 5] },
+    // hidden: a mystery card until earned
+    { id: 'leap', c: 5, hidden: true, art: 'leap', name: 'Leap Reader', ask: () => 'Read on February 29', goals: [1] },
+    { id: '404', c: 5, hidden: true, art: 'notfound', name: 'Page Not Found', ask: () => 'Stop for the day on page 404', goals: [1] },
+    { id: 'circle', c: 5, hidden: true, art: 'circle', name: 'Full Circle', ask: () => 'Finish a reread on the date you first finished the book', goals: [1] },
+    { id: 'sitting', c: 5, hidden: true, art: 'armchair', name: 'In One Sitting', ask: () => 'Finish a 300-page book in a single day', goals: [1] },
+    { id: 'fresh', c: 5, hidden: true, art: 'firework', name: 'Fresh Start', ask: () => 'Start a new book on January 1', goals: [1] },
+    { id: 'double', c: 5, hidden: true, art: 'twins', name: 'Double Finish', ask: () => 'Finish two books on the same day', goals: [1] },
+    { id: 'b2b', c: 5, hidden: true, art: 'domino', name: 'Back to Back', ask: () => 'Start a new book the same day you finish one', goals: [1] },
+    { id: 'firsts', c: 5, hidden: true, art: 'first1', name: 'First Things First', ask: () => 'Read on the first of every month for a year', goals: [1] },
+    { id: 'bday', c: 5, hidden: true, art: 'cake', name: 'Shelf Birthday', ask: () => 'Read on the anniversary of your first logged day', goals: [1] },
+    { id: 'bookends', c: 5, hidden: true, art: 'bookends', name: 'Bookends', ask: () => 'Read on January 1 and December 31 of the same year', goals: [1] },
+    { id: 'cat13', c: 5, hidden: true, art: 'cat13', name: 'Thirteen Thirteens', ask: () => 'Read on 13 Fridays the 13th', goals: [1] },
+    { id: 'pi', c: 5, hidden: true, art: 'pi', name: 'Slice of Pi', ask: () => 'Read on March 14', goals: [1] },
+    { id: 'one', c: 5, hidden: true, art: 'onepage', name: 'One Small Step', ask: () => 'Log exactly 1 page in a day', goals: [1] },
+    { id: 'seven', c: 5, hidden: true, art: 'seven', name: 'Seventh Heaven', ask: () => 'Log exactly 7 pages in a day', goals: [1] },
+    { id: 'answer', c: 5, hidden: true, art: 'answer', name: 'Don\'t Panic', ask: () => 'Log exactly 42 pages in a day', goals: [1] },
+    { id: 'count', c: 5, hidden: true, art: 'steps', name: 'Easy as 1 2 3', ask: () => 'Stop for the day on page 123', goals: [1] },
+    { id: 'half', c: 5, hidden: true, art: 'half', name: 'Woah, We\'re Halfway There', ask: () => 'Stop for the day on the exact middle page of a book', goals: [1] },
+    { id: 'pace', c: 5, hidden: true, art: 'pace', name: 'Déjà Vu', ask: () => 'Log the same number of pages 3 days in a row', goals: [1] },
+    { id: 'week', c: 5, hidden: true, art: 'week', name: 'Seven Days Later', ask: () => 'Finish a book exactly 7 days after starting it', goals: [1] },
+    { id: 'hour', c: 5, hidden: true, art: 'stopwatch', name: 'Happy Hour', ask: () => 'Listen for exactly 1 hour in a day', goals: [1] },
+    { id: 'boo', c: 5, hidden: true, art: 'ghost', name: 'Trick or Read', ask: () => 'Finish a book on October 31', goals: [1] },
+    { id: 'nye', c: 5, hidden: true, art: 'midnight', name: 'Auld Lang Read', ask: () => 'Finish a book on December 31', goals: [1] },
+    { id: 'f451', c: 5, hidden: true, art: 'f451', name: "Fahrenheit 451", ask: () => "Stop for the day on page 451", goals: [1] },
+    { id: 'room101', c: 5, hidden: true, art: 'door', name: "Room 101", ask: () => "Stop for the day on page 101", goals: [1] },
+    { id: 'catch22', c: 5, hidden: true, art: 'loop22', name: "Catch-22", ask: () => "Log exactly 22 pages in a day", goals: [1] },
+    { id: 'world80', c: 5, hidden: true, art: 'globe', name: "Around the World in 80 Days", ask: () => "Read on 80 different days", goals: [1] },
+    { id: 'may4', c: 5, hidden: true, art: 'stars', name: "May the Fourth Be With You", ask: () => "Read on May 4", goals: [1] },
+    { id: 'ides', c: 5, hidden: true, art: 'dagger', name: "Beware the Ides", ask: () => "Read on March 15", goals: [1] },
+    { id: 'love', c: 5, hidden: true, art: 'loveletter', name: "Love Letters", ask: () => "Read on February 14", goals: [1] },
+    { id: 'groundhog', c: 5, hidden: true, art: 'groundhog', name: "Groundhog Day", ask: () => "Read on February 2", goals: [1] },
+    { id: 'mondays', c: 5, hidden: true, art: 'monday', name: "Case of the Mondays", ask: () => "Finish a book on a Monday", goals: [1] },
+    { id: 'hattrick', c: 5, hidden: true, art: 'tophat', name: "Hat Trick", ask: () => "Finish 3 books within 7 days", goals: [1] },
+    { id: 'lazysun', c: 5, hidden: true, art: 'lazysun', name: "Lazy Sunday", ask: () => "Read 100 pages or more on a Sunday", goals: [1] },
+    { id: 'peas', c: 5, hidden: true, art: 'peas', name: "Two Peas in a Pod", ask: () => "Start two books on the same day", goals: [1] },
+    { id: 'twelve', c: 5, hidden: true, art: 'ornament', name: "Twelve Days of Reading", ask: () => "Read every day from December 25 to January 5", goals: [1] },
+    { id: 'earworm', c: 5, hidden: true, art: 'earworm', name: "Earworm", ask: () => "Listen to an audiobook 3 days in a row", goals: [1] }
+  ];
+
+  // ---------- reading it off the logs ----------
+  const kD = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+  const dK = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const plus = (k, n) => { const d = kD(k); d.setDate(d.getDate() + n); return dK(d); };
+  const span = (a, b) => Math.round((kD(b) - kD(a)) / 864e5);
+  function bdModel(){
+    const reads = [];
+    books.forEach((b, bi) => {
+      const audio = b.format === 'audio', spp = audio ? (b.audioSeconds > 0 && b.pages > 0 ? b.audioSeconds / b.pages : 60) : 1;
+      const add = (days, end, done) => {
+        if(!end || !days || !days.some(v => v > 0)) return;
+        const n = days.length, ent = [];
+        let page = 0;
+        days.forEach((v, i) => { page += v || 0; if(v > 0) ent.push({ k: plus(end, -(n - 1 - i)), v, page }); });
+        reads.push({ b, bi, audio, spp, ent, start: ent[0].k, end: done ? end : null, last: ent[ent.length - 1].k });
+      };
+      (b.reads || []).forEach(r => add(r.days, r.finishedOn, true));
+      add(b.days, lastLogKey(b), bookFinished(b));
+    });
+    const day = new Map();                                            // date → pages read, minutes heard, books touched
+    reads.forEach(r => r.ent.forEach(e => { const o = day.get(e.k) || { p: 0, m: 0, books: new Set(), hits: [] }; day.set(e.k, o);
+      if(r.audio) o.m += e.v * r.spp / 60; else o.p += e.v; o.books.add(r.bi); o.hits.push({ r, e }); }));
+    const keys = [...day.keys()].sort();
+    const fin = reads.filter(r => r.end).sort((a, b) => a.end < b.end ? -1 : a.end > b.end ? 1 : 0);
+    return { reads, day, keys, fin, today: localTodayKey() };
+  }
+  // when each goal was first met: for a running total (sum), or a best-so-far (max), or a best-so-far that's lower is better (min)
+  function reached(events, goals, mode){
+    const out = goals.map(() => null); let acc = mode === 'min' ? Infinity : 0, value = 0;
+    events.forEach(([k, v]) => {
+      acc = mode === 'sum' ? acc + v : mode === 'min' ? Math.min(acc, v) : Math.max(acc, v); value = acc;
+      goals.forEach((g, i) => { if(!out[i] && (mode === 'min' ? acc <= g : acc >= g)) out[i] = k; });
+    });
+    return { value: mode === 'min' && value === Infinity ? null : value, dates: out };
+  }
+  const distinct = (list, keyOf) => { const seen = new Set(); return list.map(r => { const k = keyOf(r); const fresh = k != null && !seen.has(k); if(fresh) seen.add(k); return [r.end, fresh ? 1 : 0]; }); };
+  function bdEval(M){
+    const { reads, day, keys, fin, today } = M, R = {};
+    const bookFin = fin.filter(r => !r.audio), tapeFin = fin.filter(r => r.audio);
+    const dayList = keys.map(k => [k, day.get(k)]);
+    // Streaks
+    { let run = 0, prev = null; R.streak = reached(keys.map(k => { run = prev && span(prev, k) === 1 ? run + 1 : 1; prev = k; return [k, run]; }), BD[0].goals, 'max'); }
+    { const months = new Map(); keys.forEach(k => { const m = k.slice(0, 7); months.set(m, (months.get(m) || 0) + 1); });
+      const ev = [...months].filter(([m, n]) => { const [y, mo] = m.split('-').map(Number), len = new Date(y, mo, 0).getDate(); return n === len; }).map(([m]) => [m + '-' + String(new Date(+m.slice(0, 4), +m.slice(5), 0).getDate()).padStart(2, '0'), 1]);
+      R.month = reached(ev, BD[1].goals, 'sum'); }
+    R.weekend = reached(keys.filter(k => kD(k).getDay() === 0 && day.has(plus(k, -1))).map(k => [k, 1]), BD[2].goals, 'sum');
+    // Pages
+    R.pages = reached(dayList.filter(([, o]) => o.p > 0).map(([k, o]) => [k, o.p]), BD[3].goals, 'sum');
+    R.bigday = reached(dayList.map(([k, o]) => [k, o.p]), BD[4].goals, 'max');
+    R.summit = reached(bookFin.map(r => [r.end, r.b.pages || 0]), BD[5].goals, 'max');
+    R.steady = reached(dayList.filter(([, o]) => o.p >= 30).map(([k]) => [k, 1]), BD[6].goals, 'sum');
+    // Books
+    R.finished = reached(bookFin.map(r => [r.end, 1]), BD[7].goals, 'sum');
+    { const per = new Map(); R.year = reached(bookFin.map(r => { const y = r.end.slice(0, 4); per.set(y, (per.get(y) || 0) + 1); return [r.end, per.get(y)]; }), BD[8].goals, 'max'); }
+    R.quick = reached(bookFin.map(r => [r.end, span(r.start, r.end) + 1]), BD[9].goals, 'min');
+    R.authors = reached(distinct(bookFin, r => (r.b.author || '').trim().toLowerCase() || null), BD[10].goals, 'sum');
+    { const ev = []; if(keys.length){ for(let k = keys[0]; k <= today; k = plus(k, 1)){ const n = new Set(reads.filter(r => r.start <= k && (r.end || today) >= k).map(r => r.bi)).size; if(n) ev.push([k, n]); } }
+      R.busy = reached(ev, BD[11].goals, 'max'); }
+    // Audio
+    R.tapes = reached(tapeFin.map(r => [r.end, 1]), BD[12].goals, 'sum');
+    R.hours = reached(dayList.filter(([, o]) => o.m > 0).map(([k, o]) => [k, o.m]), BD[13].goals, 'sum');
+    R.marathon = reached(dayList.map(([k, o]) => [k, o.m]), BD[14].goals, 'max');
+    // Rereads: a finish beyond a book's first
+    { const count = new Map(), first = new Map(), again = [], tapeAgain = [], most = [], gap = [];
+      fin.forEach(r => { const n = (count.get(r.bi) || 0) + 1; count.set(r.bi, n); if(n === 1) first.set(r.bi, r.end);
+        else { (r.audio ? tapeAgain : again).push([r.end, 1]); gap.push([r.end, Math.floor(span(first.get(r.bi), r.end) / 365.25)]); }
+        most.push([r.end, n]); });
+      R.rereads = reached(again, BD[15].goals, 'sum'); R.friend = reached(most, BD[16].goals, 'max');
+      R.relisten = reached(tapeAgain, BD[17].goals, 'sum'); R.decade = reached(gap, BD[18].goals, 'max');
+      R.circle = reached(fin.filter(r => first.get(r.bi) !== r.end && first.get(r.bi) && first.get(r.bi).slice(5) === r.end.slice(5)).map(r => [r.end, 1]), [1], 'sum'); }
+    // Fun
+    R.alpha = reached(distinct(fin, r => { const c = titleKey(r.b.title).charAt(0).toUpperCase(); return /[A-Z]/.test(c) ? c : null; }), BD[19].goals, 'sum');
+    R.rainbow = reached(distinct(fin, r => bookColor(r.b)), BD[20].goals, 'sum');
+    R.juggle = reached(dayList.map(([k, o]) => [k, o.books.size]), BD[21].goals, 'max');
+    R.dawn = reached(fin.filter(r => r.start === r.end).map(r => [r.end, 1]), BD[22].goals, 'sum');
+    R.bull = reached(dayList.filter(([, o]) => o.hits.some(h => !h.r.audio && Math.round(h.e.v) === 100)).map(([k]) => [k, 1]), BD[23].goals, 'sum');
+    R.pocket = reached(bookFin.filter(r => r.b.pages > 0 && r.b.pages < 150).map(r => [r.end, 1]), BD[24].goals, 'sum');
+    R.comeback = reached(fin.filter(r => r.ent.some((e, i) => i && span(r.ent[i - 1].k, e.k) > 30)).map(r => [r.end, 1]), BD[25].goals, 'sum');
+    { const ys = [...new Set(keys.map(k => k.slice(0, 4)))].filter(y => { for(let d = 1; d <= 31; d++) if(!day.has(`${y}-10-${String(d).padStart(2, '0')}`)) return false; return true; });
+      R.spooky = reached(ys.map(y => [`${y}-10-31`, 1]), BD[26].goals, 'sum'); }
+    R.holiday = reached(keys.filter(k => k.slice(5) === '12-25').map(k => [k, 1]), BD[27].goals, 'sum');
+    R.cat = reached(keys.filter(k => k.slice(8) === '13' && kD(k).getDay() === 5).map(k => [k, 1]), BD[28].goals, 'sum');
+    R.cat13 = reached(keys.filter(k => k.slice(8) === '13' && kD(k).getDay() === 5).map(k => [k, 1]), [13], 'sum');
+    R.leap = reached(keys.filter(k => k.slice(5) === '02-29').map(k => [k, 1]), [1], 'sum');
+    R['404'] = reached(reads.filter(r => !r.audio).flatMap(r => r.ent.filter(e => Math.round(e.page) === 404).map(e => [e.k, 1])).sort(), [1], 'sum');
+    R.sitting = reached(bookFin.filter(r => r.start === r.end && r.b.pages >= 300).map(r => [r.end, 1]), [1], 'sum');
+    R.fresh = reached(reads.filter(r => r.start.slice(5) === '01-01').map(r => [r.start, 1]).sort(), [1], 'sum');
+    { const per = new Map(); fin.forEach(r => per.set(r.end, (per.get(r.end) || 0) + 1)); R.double = reached([...per].filter(([, n]) => n >= 2).map(([k]) => [k, 1]).sort(), [1], 'sum'); }
+    R.b2b = reached(reads.filter(r => fin.some(f => f !== r && f.end === r.start)).map(r => [r.start, 1]).sort(), [1], 'sum');
+    { const ones = new Set(keys.filter(k => k.slice(8) === '01').map(k => k.slice(0, 7))), ev = [];
+      [...ones].sort().forEach(m => { let ok = true, d = kD(m + '-01'); for(let i = 0; i < 12; i++){ if(!ones.has(dK(d).slice(0, 7))){ ok = false; break; } d.setMonth(d.getMonth() - 1); } if(ok) ev.push([m + '-01', 1]); });
+      R.firsts = reached(ev, [1], 'sum'); }
+    R.bday = reached(keys.length ? keys.filter(k => k > keys[0] && k.slice(5) === keys[0].slice(5)).map(k => [k, 1]) : [], [1], 'sum');
+    R.bookends = reached(keys.filter(k => k.slice(5) === '12-31' && day.has(k.slice(0, 4) + '-01-01')).map(k => [k, 1]), [1], 'sum');
+    // more hidden ones: easy, but exact
+    const one = list => reached(list.sort((x, y) => x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0), [1], 'sum');
+    R.pi = one(keys.filter(k => k.slice(5) === '03-14').map(k => [k, 1]));
+    const pagesIs = n => one(dayList.filter(([, o]) => Math.round(o.p) === n).map(([k]) => [k, 1]));
+    R.one = pagesIs(1); R.seven = pagesIs(7); R.answer = pagesIs(42);
+    const paper = reads.filter(r => !r.audio);
+    R.count = one(paper.flatMap(r => r.ent.filter(e => Math.round(e.page) === 123).map(e => [e.k, 1])));
+    R.half = one(paper.filter(r => r.b.pages > 1).flatMap(r => r.ent.filter(e => { const p = Math.round(e.page), h = r.b.pages / 2; return p === Math.floor(h) || p === Math.ceil(h); }).map(e => [e.k, 1])));
+    R.pace = one(keys.filter(k => { const a = day.get(k), b = day.get(plus(k, -1)), c = day.get(plus(k, -2));
+      return a && b && c && a.p > 0 && Math.round(a.p) === Math.round(b.p) && Math.round(b.p) === Math.round(c.p); }).map(k => [k, 1]));
+    R.week = one(fin.filter(r => span(r.start, r.end) === 7).map(r => [r.end, 1]));
+    R.hour = one(dayList.filter(([, o]) => Math.round(o.m) === 60).map(([k]) => [k, 1]));
+    R.boo = one(fin.filter(r => r.end.slice(5) === '10-31').map(r => [r.end, 1]));
+    R.nye = one(fin.filter(r => r.end.slice(5) === '12-31').map(r => [r.end, 1]));
+    // even more hidden ones
+    const onDate = md => one(keys.filter(k => k.slice(5) === md).map(k => [k, 1]));
+    const stopOn = n => one(paper.flatMap(r => r.ent.filter(e => Math.round(e.page) === n).map(e => [e.k, 1])));
+    R.f451 = stopOn(451); R.room101 = stopOn(101); R.catch22 = pagesIs(22);
+    R.world80 = reached(keys.map(k => [k, 1]), [80], 'sum');
+    R.may4 = onDate('05-04'); R.ides = onDate('03-15'); R.love = onDate('02-14'); R.groundhog = onDate('02-02');
+    R.mondays = one(fin.filter(r => kD(r.end).getDay() === 1).map(r => [r.end, 1]));
+    R.hattrick = one(fin.filter(r => fin.filter(f => f.end <= r.end && span(f.end, r.end) <= 6).length >= 3).map(r => [r.end, 1]));
+    R.lazysun = one(dayList.filter(([k, o]) => kD(k).getDay() === 0 && o.p >= 100).map(([k]) => [k, 1]));
+    { const per = new Map(); reads.forEach(r => { const s2 = per.get(r.start) || new Set(); s2.add(r.bi); per.set(r.start, s2); });
+      R.peas = one([...per].filter(([, s2]) => s2.size >= 2).map(([k]) => [k, 1])); }
+    R.twelve = one([...new Set(keys.filter(k => k.slice(5) === '12-25').map(k => +k.slice(0, 4)))].filter(y => {
+      for(let k = `${y}-12-25`; k <= `${y + 1}-01-05`; k = plus(k, 1)) if(!day.has(k)) return false; return true; }).map(y => [`${y + 1}-01-05`, 1]));
+    R.earworm = one(dayList.filter(([k, o]) => o.m > 0 && (day.get(plus(k, -1)) || {}).m > 0 && (day.get(plus(k, -2)) || {}).m > 0).map(([k]) => [k, 1]));
+    return R;
+  }
+  // earned dates are kept: a level earned stays earned, with the day it was first reached
+  const BD_STORE = 'stack-tracker-badges-v3';
+  function bdState(){
+    let saved = {}; try{ saved = JSON.parse(localStorage.getItem(BD_STORE) || '{}') || {}; }catch(e){}
+    const R = bdEval(bdModel()); let changed = false;
+    const out = BD.map(a => { const r = R[a.id] || { value: 0, dates: a.goals.map(() => null) }, keep = saved[a.id] || [];
+      const dates = a.goals.map((_, i) => keep[i] || r.dates[i] || null);
+      if(dates.some((d, i) => d !== (keep[i] || null))) changed = true;
+      saved[a.id] = dates;
+      return Object.assign({}, a, { value: r.value, dates, level: dates.filter(Boolean).length }); });
+    if(changed){ try{ localStorage.setItem(BD_STORE, JSON.stringify(saved)); }catch(e){} }
+    return out;
+  }
+
+  // ---------- Data → Badges: All | Earned | Icons, and each badge's own page ----------
+  const bdMax = a => a.level === a.goals.length;
+  const bdCol = (a, k) => k >= a.goals.length ? 'var(--bd-gold)' : BD_LV[(k - 1) % BD_LV.length];   // the top level is gold
+  function bdSvg(a, k, grey){
+    const n = Math.max(1, k), c = grey ? '#d6d2c8' : bdCol(a, n);
+    let art = ART[a.art](c, n);
+    if(!grey && c === 'var(--bd-gold)') art = art.split('#e8b84a').join('#fff6dc');   // gold art: its gold touches go pale so they still show
+    return `<svg viewBox="1 1 62 62" style="overflow:visible">${art}</svg>`;
+  }
+  const BD_MYSTERY = `<svg viewBox="1 1 62 62"><circle ${S} fill="#fff" cx="32" cy="32" r="22"/><text x="32" y="42" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="28" fill="#000">?</text></svg>`;
+  const bdShort = k => { const [y, m, d] = k.split('-').map(Number); return `${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m - 1]} ${d}, '${String(y).slice(-2)}`; };
+  const bdFmt = (v, a) => v == null ? '—' : a.unit === 'min' ? `${Math.floor(v / 60)}h ${String(Math.round(v % 60)).padStart(2, '0')}m` : Math.round(v).toLocaleString('en-US');
+  const bdNext = a => { const L = a.level; if(bdMax(a)) return 1; if(a.down) return a.value != null ? Math.min(.99, a.goals[L] / a.value) : 0;
+    const lo = L ? a.goals[L - 1] : 0; return Math.max(0, Math.min(1, ((a.value || 0) - lo) / (a.goals[L] - lo))); };
+  let bdView = 'all', bdList = [];
+  const bdWrap = document.getElementById('dt-view-badges');
+  function bdCard(a){
+    const L = a.level, M = bdMax(a), secret = a.hidden && !L, next = M ? a.goals[L - 1] : a.goals[L], one = a.goals.length === 1;
+    return `<button type="button" class="bd-card${L ? ' got' : ''}${M ? ' max' : ''}" data-id="${a.id}">` +
+      `<span class="bd-art">${secret ? BD_MYSTERY : bdSvg(a, L, !L)}${L && !one ? `<b class="bd-lv">${L}</b>` : ''}</span>` +
+      `<span class="bd-mid"><span class="bd-nm">${secret ? 'Hidden badge' : a.name}${a.hidden && L ? '<i class="bd-hid">Hidden</i>' : ''}</span>` +
+      `<span class="bd-ask">${secret ? 'Keep reading to find it' : M ? (one ? '' : 'All levels · ') + a.ask(next) : (L ? 'Next: ' : '') + a.ask(next)}</span></span>` +
+      `<span class="bd-st"><small>${one ? (M ? 'Earned' : 'Not yet') : M ? 'Max level' : `Level ${L} of ${a.goals.length}`}</small>${M ? '★' : one ? '—' : a.down ? (a.value != null ? a.value + ' days' : '—') : bdFmt(a.value, a)}` +
+      `${M ? '' : `<i class="bd-pr"><i style="width:${(bdNext(a) * 100).toFixed(1)}%"></i></i>`}</span></button>`;
+  }
+  function renderBadges(){
+    bdList = bdState();
+    let html = `<div class="bd-seg">${['all', 'earned', 'icons'].map(v => `<button type="button" data-v="${v}" class="${v === bdView ? 'on' : ''}">${v === 'all' ? 'All' : v === 'earned' ? 'Earned' : 'Icons'}</button>`).join('')}</div>`;
+    const got = bdList.filter(a => a.level > 0), latest = a => a.dates.filter(Boolean).sort().pop() || '';
+    if(bdView === 'icons'){
+      html += got.length ? `<div class="bd-icons">${got.sort((x, y) => latest(y) < latest(x) ? -1 : 1).map(a => `<button type="button" class="bd-icon" data-id="${a.id}" aria-label="${a.name}">${bdSvg(a, a.level)}</button>`).join('')}</div>`
+        : `<div class="bd-empty">No badges yet. Log some reading and they'll start to appear.</div>`;
+    } else if(bdView === 'earned'){
+      // newest earned first: by the day each badge last went up a level
+      html += got.length ? `<div class="bd-grid">${got.sort((x, y) => latest(y) < latest(x) ? -1 : latest(y) > latest(x) ? 1 : 0).map(bdCard).join('')}</div>`
+        : `<div class="bd-empty">No badges yet. Log some reading and they'll start to appear.</div>`;
+    } else {
+      html += BD_CATS.map((c, i) => `<div class="bd-strip">${c}</div><div class="bd-grid">${bdList.filter(a => a.c === i).map(bdCard).join('')}</div>`).join('');
+    }
+    bdWrap.innerHTML = html;
+    bdWrap.querySelectorAll('.bd-seg button').forEach(b => b.onclick = () => { bdView = b.dataset.v; renderBadges(); bdWrap.scrollTop = 0; });
+    bdWrap.querySelectorAll('[data-id]').forEach(b => b.onclick = () => bdOpen(bdList.find(a => a.id === b.dataset.id)));
+  }
+  // a badge's own page: the art large, its name and level, the meter, then every level and when it was earned
+  const bdPage = document.getElementById('badge-page');
+  function bdOpen(a){
+    const L = a.level, M = bdMax(a), one = a.goals.length === 1, secret = a.hidden && !L;
+    bdPage.classList.toggle('locked', !L);
+    document.getElementById('bp-cat').textContent = BD_CATS[a.c];
+    document.getElementById('bp-art').innerHTML = secret ? BD_MYSTERY : bdSvg(a, L, !L);
+    document.getElementById('bp-name').textContent = secret ? 'Hidden badge' : L && !one ? `${a.name} · Level ${L}` : a.name;
+    const f = bdNext(a);
+    document.querySelector('#bp-meter i').style.width = (f * 100) + '%';
+    document.querySelector('#bp-meter span').textContent = M ? (one ? 'Earned' : 'Max level') : one ? 'Not earned yet' : a.down ? `Best: ${a.value != null ? a.value + ' days' : 'none yet'} · next ${a.goals[L]} days` : `${bdFmt(a.value, a)} of ${bdFmt(a.goals[L], a)} for level ${L + 1}`;
+    document.getElementById('bp-desc').textContent = secret ? 'A hidden badge. Keep reading to find out what it asks.' : one ? `${a.ask(a.goals[0])}.` : M ? `Every level done. ${a.ask(a.goals[L - 1])}.` : `${a.ask(a.goals[L])} to reach level ${L + 1}.`;
+    document.getElementById('bp-lines').innerHTML = secret ? '' : a.goals.map((g, k) => { const done = !!a.dates[k];
+      return `<div class="bp-row${done ? ' done' : ''}"><span class="bp-lvart">${bdSvg(a, k + 1, !done)}${one ? '' : `<b>${k + 1}</b>`}</span>` +
+        `<span class="bp-tx"><span>${one ? 'Earned' : 'Level ' + (k + 1)}</span>${a.ask(g)}</span><span class="bp-v">${done ? bdShort(a.dates[k]) : '—'}</span></div>`; }).join('');
+    document.getElementById('bp-lines').style.display = secret ? 'none' : '';
+    bdPage.classList.add('open'); bdPage.querySelector('.bp-body').scrollTop = 0;
+  }
+  document.getElementById('bp-back').addEventListener('click', () => bdPage.classList.remove('open'));
+  window.renderBadges = renderBadges;
+
+})();
+
+
+// ===== Developer options: tap the Library tab 5 times quickly; switch features on and off =====
+(function(){
+  const page = document.getElementById('dev-page'), body = document.getElementById('dev-body');
+  const KEY = 'stack-tracker-dev-v1';
+  // each switch: what it's called and what it hides when off (a class on <body>, see the styles)
+  const FEATURES = [
+    { id: 'splash', name: 'Splash screen', note: 'The STACK TRACKER intro when the app opens' },
+    { id: 'badges', name: 'Badges', note: 'The Badges tab in Data' },
+    { id: 'stats', name: 'Stats tab', note: 'The Stats tab in Data' },
+    { id: 'compare', name: 'Compare Past Reads', note: 'In list dropdowns and the open book' },
+    { id: 'pastlog', name: 'Open Log of Past Reads', note: 'The card under Compare' },
+    { id: 'statbars', name: 'Stats bar cards', note: 'Month / year bars in Stats' },
+    { id: 'timeline', name: 'Timeline', note: 'The Timeline tab' },
+    { id: 'haptics', name: 'Haptics', note: 'A small buzz as a wheel clicks past each number' }
+  ];
+  // defaults: Medium shelves, tapes on the right, Shelf and List both, Badges and Haptics off, everything else on (saved choices override these)
+  const DEFAULTS = { badges: true, haptics: true, _tapes: 'side', _lib: 'both' };
+  let off = {}; try{ off = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }catch(e){}
+  off = Object.assign({}, DEFAULTS, off);
+  const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(off)); }catch(e){} };
+  // bookshelf size: Small | Medium | Large
+  const SIZES = [['s', 'Small', .8], ['m', 'Medium', 1], ['l', 'Large', 1.2]];
+  const sizeOf = () => (SIZES.find(z => z[0] === off._size) || SIZES[1]);
+  let sizeNow = null;
+  function applySize(){ const z = sizeOf(); if(z[2] !== sizeNow){ sizeNow = z[2]; window.setShelfScale(z[2]); } }
+  // audiobook shelf: Side (always a one-third tape shelf beside the books) | Current
+  const TAPES = [['side', 'Side'], ['cur', 'Current']];
+  const tapesOf = () => off._tapes === 'side' ? 'side' : 'cur';
+  // Library view: Shelf | List | Both (with just one, the Shelf | List card goes)
+  const LIBS = [['shelf', 'Shelf'], ['list', 'List'], ['both', 'Both']];
+  const libOf = () => off._lib === 'shelf' || off._lib === 'list' ? off._lib : 'both';
+  function applyLib(){
+    const m = libOf(), one = m !== 'both';
+    document.body.classList.toggle('lib-one', one);
+    if(one && prefs.view !== m){ prefs.view = m; applyView(); }
+  }
+  // Data opens on Stats; with Stats hidden it opens on the next tab there is
+  const firstData = () => !off.stats ? 'stats' : !off.badges ? 'badges' : 'backup';
+  const showDataTab0 = showDataTab;
+  showDataTab = name => showDataTab0((name === 'stats' && off.stats) || (name === 'badges' && off.badges) ? firstData() : name);
+  function apply(){
+    FEATURES.forEach(f => document.body.classList.toggle('off-' + f.id, !!off[f.id]));
+    // a hidden tab that's open: go to the first tab there is
+    if((off.badges && document.getElementById('dt-view-badges').classList.contains('active')) ||
+       (off.stats && document.getElementById('dt-view-stats').classList.contains('active'))) showDataTab(firstData());
+    if(off.timeline && document.body.classList.contains('tab-timeline')) document.querySelector('#tabs .tab[data-view="all"]').click();
+  }
+  // haptics: a short buzz each time a wheel clicks onto the next number (phones that can vibrate)
+  window.hapticTick = () => { if(!off.haptics && navigator.vibrate) try{ navigator.vibrate(30); }catch(e){} };
+  const seg = (attr, list, cur, cls) => `<span class="dv-sw${cls ? ' ' + cls : ''}">${list.map(z => `<button type="button" data-${attr}="${z[0]}" class="${cur === z[0] ? 'on' : ''}">${z[1]}</button>`).join('')}</span>`;
+  const ROWS7 = '<div></div><div></div><div></div><div></div><div></div><div></div><div></div>';
+  let testV = 50;
+  function paint(){
+    body.innerHTML =
+      `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Bookshelf size</b><span>Books, tapes and shelves</span></span>${seg('size', SIZES, sizeOf()[0], 'three')}</div></div>` +
+      `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Audiobook shelf</b><span>Side: always a one-third shelf beside the books</span></span>${seg('tapes', TAPES, tapesOf())}</div></div>` +
+      `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Library view</b><span>Just one hides the Shelf | List card</span></span>${seg('lib', LIBS, libOf(), 'three')}</div></div>` +
+      `<div class="dv-c">` + FEATURES.map(f => `<div class="dv-row"><span class="dv-tx"><b>${f.name}</b><span>${f.note}</span></span>` +
+        `<span class="dv-sw" data-id="${f.id}"><button type="button" data-on="1" class="${off[f.id] ? '' : 'on'}">On</button><button type="button" data-on="0" class="${off[f.id] ? 'on' : ''}">Off</button></span></div>`).join('') + `</div>` +
+      `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Haptic tester</b><span>Turn the wheel to feel each click</span></span><span class="dv-wheel"><span class="lw-wheel">${ROWS7}</span></span></div></div>`;
+    body.querySelectorAll('[data-size]').forEach(b => b.onclick = () => { if(b.dataset.size === 'm') delete off._size; else off._size = b.dataset.size; save(); applySize(); paint(); });
+    body.querySelectorAll('[data-tapes]').forEach(b => b.onclick = () => { off._tapes = b.dataset.tapes; save(); window.setTapeSide(off._tapes === 'side'); paint(); });
+    body.querySelectorAll('[data-lib]').forEach(b => b.onclick = () => { off._lib = b.dataset.lib; save(); applyLib(); paint(); });
+    body.querySelectorAll('.dv-sw[data-id] button').forEach(b => b.onclick = () => { off[b.parentElement.dataset.id] = b.dataset.on !== '1'; save(); apply(); paint(); });
+    // the tester: an ordinary page wheel, 0–99, that goes nowhere
+    const w = body.querySelector('.dv-wheel .lw-wheel');
+    w.querySelectorAll('div').forEach(d => d.style.fontSize = '13px');
+    makeTimeWheels([w], { units: [1], offset: 7.5, total: () => 99, get: () => testV, set: T => testV = T, locked: () => false, onLocked(){}, done(){} }).sync(true);
+  }
+  // five quick taps on Library (each within 0.8 s, timed by when each tap happened) open it
+  let taps = 0, last = -1e9;
+  document.querySelector('#tabs .tab[data-view="all"]').addEventListener('pointerdown', e => {
+    const now = e.timeStamp; taps = now - last < 800 ? taps + 1 : 1; last = now;
+    if(taps >= 5){ taps = 0; arm = true; } });
+  // open only once that fifth finger has lifted, so the lift can't land on Back
+  let arm = false, openedAt = -1e9;
+  const fire = () => { if(!arm) return; arm = false; setTimeout(() => { paint(); page.classList.add('open'); openedAt = performance.now(); }, 60); };
+  document.addEventListener('pointerup', fire, true); document.addEventListener('pointercancel', fire, true);
+  document.getElementById('dev-back').addEventListener('click', e => { if(performance.now() - openedAt < 450){ e.preventDefault(); return; } page.classList.remove('open'); });
+  // export / import: the saved choices go out with the library and come back with it
+  window.devState = () => Object.assign({}, off);
+  window.devImport = d => { off = Object.assign({}, DEFAULTS, d); save();
+    apply(); applyLib(); window.setTapeSide(off._tapes === 'side'); applySize(); if(page.classList.contains('open')) paint(); };
+  if(off._tapes === 'side') window.setTapeSide(true);
+  apply(); applyLib(); if(off._size) applySize(); else sizeNow = 1;
+})();
+
+
+// ===== list cards: a picked page / time shows in the finished-book tone until Update confirms it =====
+// Under the card's own fill sits a second fill in the finished look (book: the darkened page; audiobook: the finished
+// tape, curved like the real one) reaching to the further of where you are and the picked value; the card's fill on
+// top reaches to the nearer one. So going forward shows the new stretch dark, going back shows the stretch you'd lose.
+function paintStage(row, b){
+  let el = row.querySelector('.br-stage');
+  const tape = row.classList.contains('tape-simple'), tot = tape ? b.audioSeconds : b.pages, s = row._staged;
+  const now = pct(b), f = s != null && tot ? Math.max(0, Math.min(1, s / tot)) : now;
+  const main = tape ? row.querySelector('canvas.tape-fill:not(.tape-ghost)') : row.querySelector('.br-fill');
+  const fillTo = x => { if(!main) return; if(tape) drawTapeFill(main, x, tapeLook(b.title), bookFinished(b));
+    else main.style.width = `calc(${x * 100}% + ${x >= 1 ? 6 : 3}px)`; };
+  if(s == null || bookFinished(b) || Math.abs(f - now) < 1e-9){
+    if(el && !el.hidden){ el.hidden = true; fillTo(now); }   // back to the card's real progress
+    return;
+  }
+  if(!el){
+    el = document.createElement(tape ? 'canvas' : 'div'); el.className = 'br-stage';   // not .tape-fill: the card's own painting looks for that
+    if(tape) el.dataset.pad = '3';
+    if(main) main.before(el); else row.prepend(el);
+  }
+  el.hidden = false;
+  const a = Math.min(now, f), z = Math.max(now, f);
+  if(tape) drawTapeFill(el, z, tapeLook(b.title), true);
+  else { el.style.width = `calc(${z * 100}% + ${z >= 1 ? 6 : 3}px)`;
+    if(!el._painted){ el._painted = true; paintPageFill(el, styleForBook(b).pageTone, true, b.seed); } }
+  fillTo(a);
+}
+// closing the dropdown drops anything picked but not confirmed
+const _closeRowDDStage = closeRowDD;
+closeRowDD = function(dd){
+  const row = dd.previousElementSibling;
+  _closeRowDDStage(dd);
+  if(row && row._staged != null && row._wheels){ row._staged = null; row._wheels.sync(true); if(row._paintConfirm) row._paintConfirm(); }
+};
 
 
   renderAll();
