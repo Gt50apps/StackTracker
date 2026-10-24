@@ -1622,22 +1622,45 @@
   #splash{position:fixed; inset:0; z-index:100000; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
     transition:opacity .35s ease; overflow:hidden;}
   #splash.gone{opacity:0; pointer-events:none;}
+  /* Fly: seen in depth, so the books can come at you */
+  #splash.fly{perspective:700px; perspective-origin:50% 50%;}
+  #splash.fly .sp-shelf, #splash.fly .sp-row, #splash.fly .sp-spine{transform-style:preserve-3d;}
+  /* a book's body, behind its spine (only while flying): covers either side a shade darker, the page block top, bottom and back */
+  #splash .fx{position:absolute; box-sizing:border-box; border:3px solid var(--cb000000, #000000); pointer-events:none; --d:44px;}
+  #splash .fx.l, #splash .fx.r{top:-3px; bottom:-3px; width:var(--d);}
+  #splash .fx.l{left:-3px; transform-origin:left center; transform:rotateY(90deg); filter:brightness(.72);}
+  #splash .fx.r{right:-3px; transform-origin:right center; transform:rotateY(-90deg); filter:brightness(.72);}
+  #splash .fx.t, #splash .fx.b{left:-3px; right:-3px; height:var(--d); background:var(--cbf1e8d2, #f1e8d2) repeating-linear-gradient(90deg, rgba(0,0,0,.09) 0 1px, transparent 1px 3px);}
+  #splash .fx.t{top:-3px; transform-origin:center top; transform:rotateX(-90deg);}
+  #splash .fx.b{bottom:-3px; transform-origin:center bottom; transform:rotateX(90deg); filter:brightness(.8);}
+  /* rounded in 3d too: the spine rounds all four corners once it's off the shelf, and every face rounds its corners to match */
+  #splash.fly .sp-spine{border-radius:3px;}
+  #splash .fx.l, #splash .fx.r, #splash .fx.t, #splash .fx.b, #splash .fx.k{border-radius:3px;}
+  /* rounded edges, closed: the sides and page faces stop short of each corner, and a bevel strip runs back along
+     each of the four long edges to join them, so the corner reads round from any angle and the box has no gaps */
+  #splash .fx.l, #splash .fx.r{top:0; bottom:0;}
+  #splash .fx.t, #splash .fx.b{left:0; right:0;}
+  #splash .fx.e{width:4.6px; height:var(--d); margin:calc(var(--d) / -2) 0 0 -2.3px; border:0; border-radius:0; background:var(--cb000000, #000000);}
+  #splash .fx.e.tl{left:-1.5px; top:-1.5px; transform:translateZ(calc(var(--d) / -2)) rotateZ(-45deg) rotateX(90deg);}
+  #splash .fx.e.tr{left:calc(100% + 1.5px); top:-1.5px; transform:translateZ(calc(var(--d) / -2)) rotateZ(45deg) rotateX(90deg);}
+  #splash .fx.e.bl{left:-1.5px; top:calc(100% + 1.5px); transform:translateZ(calc(var(--d) / -2)) rotateZ(45deg) rotateX(90deg);}
+  #splash .fx.e.br{left:calc(100% + 1.5px); top:calc(100% + 1.5px); transform:translateZ(calc(var(--d) / -2)) rotateZ(-45deg) rotateX(90deg);}
+  #splash .fx.k{left:-3px; right:-3px; top:-3px; bottom:-3px; transform:translateZ(calc(-1 * var(--d))); background:var(--cbe6dcc2, #e6dcc2) repeating-linear-gradient(0deg, rgba(0,0,0,.08) 0 1px, transparent 1px 3px);}
   #splash .sp-shelf{position:relative; width:250px; height:82px;}
   #splash .sp-plank{position:absolute; left:0; right:0; bottom:0; height:12px; border:3px solid var(--cb000000, #000000); border-radius:4px; background:var(--cb8a6a4f, #8a6a4f);}
-  #splash .sp-row{position:absolute; left:0; right:0; bottom:12px; display:flex; justify-content:center; align-items:flex-end; gap:2px;}
-  #splash .sp-spine{position:relative; width:28px; border:3px solid var(--cb000000, #000000); border-bottom:none; border-radius:3px 3px 0 0; box-sizing:border-box;
+  #splash .sp-row{position:absolute; left:0; right:0; bottom:9px;   /* 3px lower: the plank covers each book's bottom edge */ display:flex; justify-content:center; align-items:flex-end; gap:2px;}
+  #splash .sp-spine{position:relative; width:28px; border:3px solid var(--cb000000, #000000); border-radius:3px 3px 0 0; box-sizing:border-box;   /* square bottom corners, hidden by the plank */
     display:flex; align-items:center; justify-content:center; font:700 1rem Georgia, serif; color:var(--cff4ead2, #f4ead2);}
   #splash .sp-spine::before, #splash .sp-spine::after{content:''; position:absolute; left:0; right:0; height:2px; background:rgba(255,255,255,.35);}
   #splash .sp-spine::before{top:7px;} #splash .sp-spine::after{bottom:7px;}
-  /* CSS-timed (not JS), so the books glide smoothly even while the app is still loading;
-     each book's start is set by its animation-delay */
   #splash .sp-spine{will-change:transform, opacity; opacity:0;}
   #splash.go .sp-drop{animation:spDrop .42s cubic-bezier(.22,1,.36,1) both;}
-  @keyframes spDrop{ 0%{transform:translateY(-110px); opacity:0;} 25%{opacity:1;} 72%{transform:translateY(2px);} 100%{transform:none; opacity:1;} }
+  /* the books come in from off the screen (no fade): STACK from above, TRACKER from the sides */
+  @keyframes spDrop{ 0%{transform:translateY(-100vh); opacity:1;} 72%{transform:translateY(2px); opacity:1;} 100%{transform:none; opacity:1;} }
   #splash.go .sp-slide.l{animation:spSlideL .42s cubic-bezier(.22,1,.36,1) both;}
   #splash.go .sp-slide.r{animation:spSlideR .42s cubic-bezier(.22,1,.36,1) both;}
-  @keyframes spSlideL{ 0%{transform:translateX(-220px); opacity:0;} 30%{opacity:1;} 100%{transform:none; opacity:1;} }
-  @keyframes spSlideR{ 0%{transform:translateX(220px); opacity:0;} 30%{opacity:1;} 100%{transform:none; opacity:1;} }
+  @keyframes spSlideL{ 0%{transform:translateX(-100vw); opacity:1;} 100%{transform:none; opacity:1;} }
+  @keyframes spSlideR{ 0%{transform:translateX(100vw); opacity:1;} 100%{transform:none; opacity:1;} }
   #splash .sp-spine.landed{animation:none !important; opacity:1; transform:none; will-change:auto;}
   #splash .sp-sub{font:600 .6rem Arial, sans-serif; letter-spacing:1.6px; color:var(--cf8a8378, #8a8378); text-transform:uppercase; opacity:0; transition:opacity .4s;}
   #splash .sp-sub.in{opacity:1;}
@@ -1897,8 +1920,58 @@
 </style>
 </head>
 <body>
+<style>
+  /* ===== Released: the Year card in Add / Edit ===== */
+  #book-fields > #pages-card, #book-fields > #year-card, #book-fields > #tags-card, #book-fields.audio > #length-wheels, #book-fields.audio > #tags-card{grid-column:span 2;}
+  /* the length wheels in a third: H / M / S tucked small into each wheel's corner, clear of the numbers */
+  #length-wheels .lw-wheel span{left:3px; top:3px; transform:none; font-size:.5rem;}
+  .yc-row{display:flex; align-items:center; gap:6px; min-width:0;}
+  .yc-row input{flex:1; min-width:0;}
+  #year-era{flex:none; margin:0; padding:2px 5px; height:auto; border:2px solid var(--cb000000, #000000); border-radius:5px; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--cf8a8378, #8a8378);
+    font:700 .58rem/1 Arial, sans-serif; letter-spacing:.3px; cursor:pointer;}
+  #year-era.bc{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
+  /* ===== Released, in the Timeline tab: a dot per release, in three columns that split to suit what's shown ===== */
+  body.off-released #tl-modes button[data-m="released"]{display:none;}
+  #tl-canvas .rl-tick{position:absolute; height:1px; background:var(--line, var(--cbe4ded2, #e4ded2));}
+  #tl-canvas .rl-tl{position:absolute; width:31px; transform:translateY(-50%); text-align:center; font:700 .54rem/1 Arial, sans-serif; letter-spacing:-.2px; color:var(--muted); white-space:nowrap;}
+  #tl-canvas .rl-tl small{display:block; font-size:.44rem; letter-spacing:0;}
+  #tl-canvas .rl-tl.now{color:var(--cfb5342a, #b5342a); background:var(--cbffffff, #ffffff); padding:2px 0;}
+  #tl-canvas .rl-now{position:absolute; height:1px; background:var(--cbb5342a, #b5342a);}
+  #tl-canvas .rl-axis, #tl-canvas .rl-split{position:absolute; top:0; bottom:0; width:3px; background:var(--cb000000, #000000);}
+  #tl-canvas .rl-split{z-index:3;}
+  #tl-canvas .rl-dot{position:absolute; border-radius:50%; background:var(--cb000000, #000000); z-index:2;}
+  #tl-canvas .rl-dot.read{background:var(--cb9a7514, #9a7514);}     /* dark gold: read */
+  #tl-canvas .rl-dot.now{background:var(--cb2f5ea8, #2f5ea8);}      /* blue: being read now */
+  #tl-canvas .rl-dot.unread{background:var(--cb000000, #000000);}   /* black: not started */
+  #tl-canvas .rl-dot.on{box-shadow:0 0 0 1px var(--cbffffff, #ffffff), 0 0 0 2.5px var(--cb000000, #000000); z-index:3;}
+  #tl-canvas .rl-dot.cur{transform:scale(2); box-shadow:0 0 0 1px var(--cbffffff, #ffffff), 0 0 0 2px var(--cb000000, #000000); z-index:4;}
+  #tl-canvas .rl-more{position:absolute; transform:translate(-100%, -50%); padding:0 2px; background:var(--cbffffff, #ffffff); font:700 .5rem/1 Arial, sans-serif; color:var(--ink); z-index:3;}
+  #tl-canvas .rl-tag{position:absolute; transform:translateY(-50%); z-index:5; display:flex; flex-direction:column; padding:3px 6px; border:2px solid var(--cb000000, #000000); border-radius:6px; background:var(--cbffffff, #ffffff);
+    font:600 .7rem/1.15 Georgia, serif; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; pointer-events:none;}
+  #tl-canvas .rl-tag small{font:700 .55rem Arial, sans-serif; color:var(--muted);}
+  #tl-canvas .rl-empty{position:absolute; left:0; right:0; top:45%; text-align:center; font:.72rem Arial, sans-serif; color:var(--muted);}
+  /* the line card: title, author, year (years ago); a year with several turns it into a wheel, one book a notch */
+  #rl-line{display:none; flex:none; position:relative; height:45px; margin:0 4px 4px; box-sizing:border-box; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); overflow:hidden;}
+  body.tl-rel #rl-line{display:block;}
+  body.tl-full #rl-line{display:none;}
+  #rl-wheel{height:100%; overflow-y:auto; scroll-snap-type:y mandatory; overscroll-behavior:contain; scrollbar-width:none;}
+  #rl-wheel::-webkit-scrollbar{display:none;}
+  #rl-wheel > div{height:39px; box-sizing:border-box; scroll-snap-align:start; scroll-snap-stop:always; display:flex; flex-direction:column; justify-content:center; padding:0 10px; white-space:nowrap;
+    font:.58rem/1.12 Arial, sans-serif; color:var(--muted);}
+  #rl-wheel > div > *{max-width:100%; overflow:hidden; text-overflow:ellipsis;}
+  #rl-line.many #rl-wheel > div{padding-right:44px;}
+  #rl-wheel .tt{font:600 .74rem/1.1 Georgia, serif; color:var(--ink);}
+  #rl-wheel .yr{font-weight:700; color:var(--ink);}
+  #rl-wheel .yr span{font-weight:400; color:var(--muted);}
+  #rl-wheel .empty{align-items:center; font-size:.66rem;}
+  #rl-pos{position:absolute; right:0; top:0; bottom:0; width:38px; box-sizing:border-box; border-left:3px solid var(--cb000000, #000000); display:none; flex-direction:column; align-items:center; justify-content:center;
+    font:700 .58rem/1.1 Arial, sans-serif; color:var(--ink); pointer-events:none; background:var(--cbffffff, #ffffff);}
+  #rl-pos i{font-style:normal; font-size:.5rem; color:var(--cfb4ab9b, #b4ab9b);}
+  #rl-pos i.on{color:var(--ink);}
+  #rl-line.many #rl-pos{display:flex;}
+</style>
 <script>
-  window.CSS_HEXES = ["b000000", "b2e4636", "b2f3136", "b3a2213", "b3d2513", "b3f2b1d", "b4a2e18", "b4f3019", "b5a4c40", "b5b6633", "b63401f", "b6b4a32", "b6b6560", "b6e4724", "b77502e", "b7a2f2b", "b845530", "b865a34", "b8a6a4f", "b8c5229", "b996439", "b9a6a42", "ba9825f", "baa3333", "bb07a4b", "bb5342a", "bc9b98f", "bc9c0ad", "bcbc4b1", "bd6d2c8", "be3dccd", "bece7dc", "befe6d3", "bf4efe3", "bf6dcd8", "bf6e3df", "bfaf7f0", "bffffff", "f000000", "f5c4a2e", "f8a8378", "f8f8a80", "faa3333", "fb5342a", "fc4bdb0", "fcfc8ba", "fd6cfc2", "fd6d0c4", "ff4ead2", "fffffff"];
+  window.CSS_HEXES = ["b000000", "b2e4636", "b2f3136", "b2f5ea8", "b3a2213", "b3d2513", "b3f2b1d", "b4a2e18", "b4f3019", "b5a4c40", "b5b6633", "b63401f", "b6b4a32", "b6b6560", "b6e4724", "b77502e", "b7a2f2b", "b845530", "b865a34", "b8a6a4f", "b8c5229", "b996439", "b9a6a42", "b9a7514", "ba9825f", "baa3333", "bb07a4b", "bb5342a", "bc9b98f", "bc9c0ad", "bcbc4b1", "bd6d2c8", "be3dccd", "be4ded2", "be6dcc2", "bece7dc", "befe6d3", "bf1e8d2", "bf4efe3", "bf6dcd8", "bf6e3df", "bfaf7f0", "bffffff", "f000000", "f5c4a2e", "f8a8378", "f8f8a80", "faa3333", "fb4ab9b", "fb5342a", "fc4bdb0", "fcfc8ba", "fd6cfc2", "fd6d0c4", "ff4ead2", "fffffff"];
   // ===== colour themes: every colour in the app taken a set way toward the theme's hue (greys, black and white stay) =====
   // Books keep their colours as picked (in Walnut); everything is shown through the theme, and anything picked
   // under a theme is turned back before it's saved, so switching themes never changes your books.
@@ -1942,52 +2015,216 @@
 </script>
 <div id="splash" aria-hidden="true"></div>
 <script>
-  // splash: built and started before the rest of the page loads; fades once the app is
-  // ready and the last book has landed, then removes itself
+  // splash: built and started before the rest of the page loads. Fresh book heights and (now and then) colours
+  // each time; the shelves fill, and once the app is ready one of the endings clears them — Pull, Reverse, Explode
+  // or Fly — then the splash fades and removes itself
   (function(){
     const el = document.getElementById('splash');
     try{ const dv = JSON.parse(localStorage.getItem('stack-tracker-dev-v1') || '{}');
       if(dv._theme && window.THEME) THEME.set(dv._theme);   // colour theme on before anything paints
       if(dv.splash === true){ el.remove(); return; } }catch(e){}
     const COLORS = ['#7a2f2b', '#86452b', '#8a6a3f', '#857636', '#5b6633', '#2e4636', '#2b5752', '#234a5e', '#303d66', '#3a2f52', '#66304c', '#6b4a32'];
-    const HEIGHTS = [62, 70, 58, 66, 60, 72, 64, 59, 68, 63, 71, 57];
-    let n = 0;
-    const spine = (ch, cls) => { const c = COLORS[n % 12], h = HEIGHTS[n % 12]; n++;
+    const k = 1;   // full speed (the endings below take a speed, from the demo)
+    let timers = [], n = 0;
+    const later = (f, ms) => timers.push(setTimeout(f, ms));
+    // heights (56–74px), neighbours always at least MIN_STEP apart; 1 in 5 a staircase, 1 in 5 two heights taking turns,
+    // 1 in 5 a peak (low ends, tallest middle), otherwise random
+    const MIN_STEP = 5, H = [], roll = Math.random();
+    const pattern = roll < .2 ? 'stairs' : roll < .4 ? 'alternate' : roll < .6 ? 'peak' : 'random', up = Math.random() < .5, lowFirst = Math.random() < .5;
+    [5, 7].forEach(count => { let prev = null;
+      for(let i = 0; i < count; i++){
+        let h;
+        if(pattern === 'stairs'){ const j = up ? i : count - 1 - i; h = Math.round(65 - MIN_STEP * (count - 1) / 2 + j * MIN_STEP); }
+        else if(pattern === 'alternate') h = (i % 2 === 0) === lowFirst ? 58 : 72;
+        else if(pattern === 'peak'){ const mid = (count - 1) / 2; h = Math.round(56 + (mid - Math.abs(i - mid)) * 18 / mid); }
+        else do h = 56 + Math.round(Math.random() * 18); while(prev !== null && Math.abs(h - prev) < MIN_STEP);
+        H.push(h); prev = h;
+      } });
+    const CS = COLORS.slice(); if(Math.random() < .2) for(let i = CS.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [CS[i], CS[j]] = [CS[j], CS[i]]; }   // the usual order 4 times in 5, shuffled 1 in 5
+    const spine = (ch, cls) => { const c = CS[n % 12], h = H[n % 12]; n++;
       return '<div class="sp-spine ' + cls + '" style="height:' + h + 'px; background:' + c + '">' + ch + '</div>'; };
     // TRACKER arrives middle outward, alternating sides, so no book passes over one already placed
     const order = [3, 4, 2, 5, 1, 6, 0], side = {};
-    order.forEach((idx, k) => side[idx] = k % 2 ? 'r' : 'l');
-    const top = 'STACK'.split('').map(ch => spine(ch, 'sp-drop')).join('');
-    const bottom = 'TRACKER'.split('').map((ch, i) => spine(ch, 'sp-slide ' + side[i])).join('');
-    el.innerHTML = '<div class="sp-shelf"><div class="sp-row">' + top + '</div><div class="sp-plank"></div></div>' +
-      '<div class="sp-shelf"><div class="sp-row">' + bottom + '</div><div class="sp-plank"></div></div>' +
+    order.forEach((idx, j) => side[idx] = j % 2 ? 'r' : 'l');
+    el.innerHTML = '<div class="sp-shelf"><div class="sp-row">' + 'STACK'.split('').map(ch => spine(ch, 'sp-drop')).join('') + '</div><div class="sp-plank"></div></div>' +
+      '<div class="sp-shelf"><div class="sp-row">' + 'TRACKER'.split('').map((ch, i) => spine(ch, 'sp-slide ' + side[i])).join('') + '</div><div class="sp-plank"></div></div>' +
       '<div class="sp-sub">Books &amp; audiobooks</div>';
     const drops = el.querySelectorAll('.sp-drop'), slides = el.querySelectorAll('.sp-slide');
-    // the two shelves fill at the same time, each one book at a time (overlapping a little, so
-    // it flows): STACK drops onto the top shelf, TRACKER slides onto the bottom, both full by ~1 s
-    const t0 = performance.now();
-    let done = false, loaded = false;
-    drops.forEach((d, i) => d.style.animationDelay = (60 + i * 115) + 'ms');          // last lands ~0.94 s
-    order.forEach((idx, k) => slides[idx].style.animationDelay = (60 + k * 80) + 'ms'); // last lands ~0.96 s
-    el.querySelector('.sp-sub').style.transitionDelay = '0s';
-    // once a book has landed it is set down for good: its animation and its own GPU layer are dropped and it
-    // simply sits there (fully shown), so nothing the loading app does can make it flicker
+    slides.forEach((b, i) => b.dataset.side = side[i]);
+    drops.forEach((d, i) => d.style.animationDelay = (60 + i * 115) + 'ms');
+    order.forEach((idx, j) => slides[idx].style.animationDelay = (60 + j * 80) + 'ms');
+    // once a book has landed it is set down for good, so nothing the loading app does can make it flicker
     el.querySelectorAll('.sp-spine').forEach(b => b.addEventListener('animationend', () => b.classList.add('landed'), {once: true}));
-    // start on the first painted frame, so the books are seen from the very beginning
+    const t0 = performance.now();
+    let done = false, loaded = false, ended = false;
     requestAnimationFrame(() => {
       el.classList.add('go');
-      setTimeout(() => el.querySelector('.sp-sub').classList.add('in'), 1000);
-      // hold the finished shelves, then fade so the splash ends at about 3 s
-      setTimeout(() => { done = true; tryHide(); }, Math.max(1200, 2650 - (performance.now() - t0)));
+      later(() => el.querySelector('.sp-sub').classList.add('in'), 1000);
+      later(() => { done = true; tryEnd(); }, Math.max(1200, 2650 - (performance.now() - t0)));   // hold the full shelves a moment
     });
     const hide = () => {
       if(el.classList.contains('gone')) return;
       el.classList.add('gone');
-      setTimeout(() => el.remove(), 400);
+      setTimeout(() => { timers.forEach(clearTimeout); cancelAnimationFrame(outroRaf); el.remove(); }, 400);
     };
-    const tryHide = () => { if(loaded && done) hide(); };
-    window.addEventListener('load', () => { loaded = true; requestAnimationFrame(() => requestAnimationFrame(tryHide)); });
-    setTimeout(hide, 6000);                               // never stuck: gone after 6 s whatever happens
+    const tryEnd = () => { if(!loaded || !done || ended) return; ended = true;
+      try{ ending(k, hide); }catch(e){ hide(); } };
+    window.addEventListener('load', () => { loaded = true; requestAnimationFrame(() => requestAnimationFrame(tryEnd)); });
+    setTimeout(hide, 9000);                               // never stuck: gone after 9 s whatever happens
+    // the end of a loop: the bottom shelf is pulled right out, then the top one, each the opposite way (either way round).
+    // A book stays put until the shelf has slid clear of it, then falls with gravity off the screen: half the time tumbling, half straight down.
+    let outroRaf = 0;
+    function outro(k, done){
+      const W = el.clientWidth, H = el.clientHeight, dir = Math.random() < .5 ? 1 : -1, t0 = performance.now();
+      const PULL = 380 / k, G = 2600 * k * k;
+      const tumble = Math.random() < .5;                            // each time, either a tumble (books spin as they fall) or a straight drop                       // pull time; gravity in px/s², faster with the speed
+      el.querySelector('.sp-sub').classList.remove('in');
+      const shelves = [...el.querySelectorAll('.sp-shelf')].map((sh, si) => {
+        const plank = sh.querySelector('.sp-plank'), pr = plank.getBoundingClientRect(), way = si === 0 ? dir : -dir;
+        return { plank, way, left: pr.left, right: pr.right, dist: W + pr.width, start: si === 1 ? 0 : PULL,   // the bottom shelf first, then the top
+          books: [...sh.querySelectorAll('.sp-spine')].map(b => { const r = b.getBoundingClientRect();
+            return { el: b, left: r.left, right: r.right, top: r.top, h: r.height, fall: false, y: 0, v: 0, a: 0, va: 0, x: 0 }; }) };
+      });
+      let last = t0;
+      const step = now => {
+        const dt = Math.min(.05, (now - last) / 1000); last = now;
+        let busy = false;
+        shelves.forEach(sh => {
+          const p = Math.max(0, Math.min(1, (now - t0 - sh.start) / PULL)); if(p < 1) busy = true;
+          const off = sh.way * sh.dist * p * p;                         // pulled from rest, speeding up
+          sh.plank.style.transform = `translateX(${off}px)`;
+          const trail = sh.way > 0 ? sh.left + off : sh.right + off;    // the end of the plank still under the books
+          sh.books.forEach(b => {
+            if(!b.fall && (sh.way > 0 ? trail >= b.right : trail <= b.left)){   // the shelf has cleared it: let go
+              b.fall = true; b.va = tumble ? (Math.random() - .5) * 120 * k : 0; }
+            if(!b.fall) return;
+            b.v += G * dt; b.y += b.v * dt;
+            b.a += b.va * dt;   // tumbling: each spins a little as it goes; dropping: straight down
+            b.el.style.transform = `translateY(${b.y}px) rotate(${b.a}deg)`;
+            if(b.top + b.y < H + 40) busy = true;
+          });
+          if(sh.books.some(b => !b.fall)) busy = true;
+        });
+        if(busy) outroRaf = requestAnimationFrame(step); else done();
+      };
+      outroRaf = requestAnimationFrame(step);
+    }
+    // ---------- the endings: Pull (tumble or drop), Reverse, Explode — picked at random, or the one chosen ----------
+    let endChosen = 'mix';
+    function ending(k, done){
+      const e = endChosen !== 'mix' ? endChosen : ['pull', 'reverse', 'explode', 'fly'][Math.floor(Math.random() * 4)];
+      if(e === 'reverse') endReverse(k, done); else if(e === 'explode') endExplode(k, done); else if(e === 'fly') endFly(k, done); else outro(k, done);
+    }
+    // Fly: the scene opens up into depth, each book lifts off its shelf and comes at you — a solid book, covers, pages
+    // and all — turning outward as it sweeps past the edge of the screen; the outer books go first, the middle ones last.
+    // Meanwhile the emptied shelves sink back into the distance.
+    function endFly(k, done){
+      el.querySelector('.sp-sub').classList.remove('in');
+      el.classList.add('fly');
+      el.animate([{ perspective: '5000px' }, { perspective: '700px' }], { duration: 450 / k, easing: 'ease-out', fill: 'forwards' });   // depth eases in, no jump
+      const box = el.getBoundingClientRect(), ox = box.left + box.width / 2, oy = box.top + box.height / 2;
+      // each book becomes a closed box behind its spine: covers left and right (a shade darker), pages top, bottom and back
+      const books = [...el.querySelectorAll('.sp-spine')].map(b => {
+        if(!b.querySelector('.fx')){ const c = getComputedStyle(b).backgroundColor;
+          b.insertAdjacentHTML('beforeend', ['l', 'r'].map(x => `<i class="fx ${x}" style="background-color:${c}"></i>`).join('') + '<i class="fx t"></i><i class="fx b"></i><i class="fx k"></i>' + ['tl', 'tr', 'bl', 'br'].map(x => `<i class="fx e ${x}"></i>`).join('')); }
+        const r = b.getBoundingClientRect(); return { el: b, dx: r.left + r.width / 2 - ox, dy: r.top + r.height / 2 - oy };
+      }).sort((a, b) => Math.abs(b.dx) - Math.abs(a.dx));          // outer books first, working in to the middle
+      let longest = 0, lastLift = 0;
+      const D = 525 / k, GAP = 43 / k, Z = 520;   // twice as quick as it was
+      books.forEach((bk, i) => {
+        const side = bk.dx < 0 ? -1 : 1, up = bk.dy < 0 ? -1 : 1, jit = () => Math.random() - .5;
+        const tx = side * (150 + Math.abs(bk.dx) * .9 + Math.random() * 40), ty = bk.dy * 1.4 + up * 30 + jit() * 30;
+        const ry = side * (38 + Math.random() * 18), rx = -up * (14 + Math.random() * 12), rz = side * (6 + Math.random() * 10);
+        const delay = 125 / k + i * GAP + jit() * 10 / k; longest = Math.max(longest, delay + D); lastLift = Math.max(lastLift, delay + D * .3);
+        const at = f => `translate3d(${tx * f * f}px, ${ty * f * f}px, ${90 + (Z - 90) * f}px) rotateX(${rx * f * f}deg) rotateY(${ry * f * f}deg) rotateZ(${rz * f * f}deg)`;
+        bk.el.animate([
+          { transform: 'translate3d(0,0,0)', easing: 'cubic-bezier(.5,0,.9,.8)' },
+          { transform: 'translate3d(0,0,90px)', offset: .3, easing: 'linear' },   // slides straight out off the shelf, towards you
+          { transform: at(.25), offset: .45, easing: 'linear' },                   // then eases into its turn outward…
+          { transform: at(.55), offset: .65, easing: 'cubic-bezier(.3,.3,.7,1)' },
+          { transform: at(1) }],                                                   // …and sweeps past the edge
+          { duration: D, delay, fill: 'forwards' });
+        later(() => bk.el.style.visibility = 'hidden', delay + D);  // well off the screen by now
+      });
+      // the shelves, once the last book has slid off them: one out to the left, the other to the right
+      const dir = Math.random() < .5 ? -1 : 1;
+      el.querySelectorAll('.sp-plank').forEach((pl, i) => {
+        const delay = lastLift + i * 80 / k, d = 600 / k; longest = Math.max(longest, delay + d);
+        pl.animate([{ transform: 'none' }, { transform: `translateX(${(i ? -dir : dir) * 100}vw)` }],
+          { duration: d, delay, easing: 'cubic-bezier(.55,0,.75,.3)', fill: 'forwards' });
+        later(() => pl.style.visibility = 'hidden', delay + d);
+      });
+      later(done, longest + 150);
+    }
+    // Reverse: the way they came in, backwards — the last in leaves first; STACK goes up and away, TRACKER out to its side
+    function endReverse(k, done){
+      el.querySelector('.sp-sub').classList.remove('in');
+      const drops = [...el.querySelectorAll('.sp-drop')].reverse(), order = [3, 4, 2, 5, 1, 6, 0].reverse(), slides = el.querySelectorAll('.sp-slide');
+      let longest = 0;
+      const go = (b, to, delay) => { const d = 420 / k; longest = Math.max(longest, delay + d);
+        b.animate([{ transform: 'none' }, { transform: 'translateY(-6px)', offset: .2 }, { transform: to }], { duration: d, delay, easing: 'cubic-bezier(.55,0,.8,.3)', fill: 'forwards' }); };
+      drops.forEach((b, i) => go(b, 'translateY(-100vh)', (i * 115) / k));
+      order.forEach((idx, j) => { const b = slides[idx]; go(b, `translateX(${b.dataset.side === 'l' ? -100 : 100}vw)`, (j * 80) / k); });
+      const planks = el.querySelectorAll('.sp-plank');                 // then the empty shelves slip away
+      planks.forEach(pl => pl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 / k, delay: longest, fill: 'forwards' }));
+      later(done, longest + 300 / k);
+    }
+    // Explode: everything shakes harder and harder, then bang — the books fly every way. The shelves survive:
+    // the bottom one drops away with a slight spin; the top one loses one end, swings from the other like a pendulum, then lets go
+    function endExplode(k, done){
+      el.querySelector('.sp-sub').classList.remove('in');
+      const W = el.clientWidth, H = el.clientHeight, G = 2600 * k * k, SHAKE = 1100 / k, box = el.getBoundingClientRect();
+      const books = [...el.querySelectorAll('.sp-spine')].map(b => { const r = b.getBoundingClientRect(); return { el: b, cx: r.left + r.width / 2, cy: r.top + r.height / 2, x: 0, y: 0, vx: 0, vy: 0, a: 0, va: 0 }; });
+      // the shelves: one of them may lose an end and swing from the other (top, bottom, or neither — never both);
+      // any that doesn't swing just drops away with a slight spin
+      const swinger = ['top', 'bottom', 'none'][Math.floor(Math.random() * 3)];
+      const shelves = [...el.querySelectorAll('.sp-plank')].map((pl, i) => { const hinge = Math.random() < .5 ? 'left' : 'right';
+        const swing = (i === 0 && swinger === 'top') || (i === 1 && swinger === 'bottom');
+        if(swing) pl.style.transformOrigin = `${hinge} center`; else pl.style.transformOrigin = '';
+        return { el: pl, swing, hanging: swing, sign: hinge === 'left' ? 1 : -1, L: pl.getBoundingClientRect().width,
+          phi: 0, w: 0, x: 0, y: 0, vx: swing ? 0 : (Math.random() - .5) * 60 * k, vy: 0, a: 0, va: swing ? 0 : (Math.random() < .5 ? -1 : 1) * (25 + Math.random() * 25) * k }; });
+      const cx = books.reduce((t, b) => t + b.cx, 0) / books.length, cy = books.reduce((t, b) => t + b.cy, 0) / books.length;
+      const SWING = 1700 / k;                                        // how long a swinging shelf hangs before it lets go
+      const t0 = performance.now(); let last = t0, boom = false;
+      const off = (o, x, y, a) => { o.style.transform = `translate(${x}px, ${y}px) rotate(${a}deg)`; };
+      const step = now => {
+        const t = now - t0, dt = Math.min(.04, (now - last) / 1000); last = now;
+        if(t < SHAKE){                                               // the shake, building up
+          const amp = 7 * Math.pow(t / SHAKE, 2), j = () => (Math.random() * 2 - 1) * amp;
+          books.forEach(b => off(b.el, j(), j() * .6, j() * .8));
+          shelves.forEach(sh => off(sh.el, j() * .5, j() * .4, 0));
+          outroRaf = requestAnimationFrame(step); return;
+        }
+        if(!boom){ boom = true;                                      // bang: each book flies out from the middle, up and away, spinning
+          books.forEach(b => { let dx = b.cx - cx, dy = b.cy - cy; const d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d;
+            const sp = (900 + Math.random() * 700) * k;
+            b.vx = dx * sp + (Math.random() - .5) * 300 * k; b.vy = dy * sp - (500 + Math.random() * 500) * k; b.va = (Math.random() - .5) * 1400 * k; });
+          shelves.forEach(sh => off(sh.el, 0, 0, 0));
+        }
+        let busy = false;
+        books.forEach(b => { if(b.gone) return;
+          b.vy += G * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.a += b.va * dt; off(b.el, b.x, b.y, b.a);
+          // once a book has flown off any edge it's gone for good — it never drops back into view
+          const X = b.cx + b.x - box.left, Y = b.cy + b.y - box.top;
+          if(X < -80 || X > W + 80 || Y < -80 || Y > H + 80){ b.gone = true; b.el.style.visibility = 'hidden'; } else busy = true; });
+        shelves.forEach(sh => {
+          if(sh.hanging){                                            // hangs from one end and swings (a rod on a hinge)
+            const acc = (3 * G / (2 * sh.L)) * Math.cos(sh.phi * Math.PI / 180) * 180 / Math.PI;   // gravity's pull round the hinge
+            sh.w += acc * dt; sh.w *= Math.pow(.55, dt * k); sh.phi += sh.w * dt;                 // a little friction in the hinge
+            if(t - SHAKE > SWING){ sh.hanging = false;               // let go: its middle carries on as it was moving
+              const r = sh.phi * Math.PI / 180, wr = sh.w * Math.PI / 180;
+              sh.vx = -Math.sin(r) * wr * sh.L / 2 * sh.sign; sh.vy = Math.cos(r) * wr * sh.L / 2; }
+            off(sh.el, 0, 0, sh.sign * sh.phi); busy = true; return;
+          }
+          sh.vy += G * dt; sh.x += sh.vx * dt; sh.y += sh.vy * dt;
+          if(sh.swing){ sh.phi += sh.w * dt; off(sh.el, sh.x, sh.y, sh.sign * sh.phi); }   // let go: falls, still turning
+          else { sh.a += sh.va * dt; off(sh.el, sh.x, sh.y, sh.a); }                        // drops away with a slight spin
+          if(sh.el.getBoundingClientRect().top < box.bottom + 20) busy = true;
+        });
+        if(busy) outroRaf = requestAnimationFrame(step); else done();
+      };
+      outroRaf = requestAnimationFrame(step);
+    }
   })();
 </script>
 <canvas id="shelf-3d"></canvas>
@@ -2011,7 +2248,7 @@
  </div>
  <!-- Timeline: what to chart, and over what span -->
  <div class="hdr-row hidden" id="timeline-controls">
-  <div class="tl-views" id="tl-modes"><button type="button" data-m="graph" class="on">Pages &amp; Listening</button><button type="button" data-m="timeline">Timeline</button></div>
+  <div class="tl-views" id="tl-modes"><button type="button" data-m="graph" class="on">Pages &amp; Listening</button><button type="button" data-m="timeline">Timeline</button><button type="button" data-m="released">Released</button></div>
   <div class="tl-views" id="tl-ranges"><button type="button" data-v="all">All Time</button><button type="button" data-v="year">This Year</button><button type="button" data-v="month" class="on">This Month</button><button type="button" data-v="week">This Week</button></div>
  </div>
  <!-- Data: Stats | Backup, then Export | Import (opens on Stats) -->
@@ -2064,12 +2301,13 @@
       <div class="fc-half"><input id="author-input" autocomplete="off" placeholder="AUTHOR" aria-label="Author"></div>
       <button type="button" class="fc-more" id="author-more" aria-label="Open author list">Author List</button>
     </div>
-    <div class="field-card span1" id="pages-card"><input id="pages-input" type="number" inputmode="numeric" min="1" placeholder="NUMBER OF PAGES" aria-label="Number of pages"></div>
+    <div class="field-card span1" id="pages-card"><input id="pages-input" type="number" inputmode="numeric" min="1" placeholder="PAGES" aria-label="Number of pages"></div>
   <div id="length-wheels" class="hidden" aria-label="Length">
       <div class="lw-wheel" data-k="0"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>H</span></div>
       <div class="lw-wheel" data-k="1"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>M</span></div>
       <div class="lw-wheel" data-k="2"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>S</span></div>
     </div>
+    <div class="field-card" id="year-card"><div class="yc-row"><input id="year-input" type="number" inputmode="numeric" min="1" placeholder="YEAR" aria-label="Year released"><button type="button" id="year-era" aria-label="AD or BC">AD</button></div></div>
     <div class="field-card" id="tags-card"><label>Lists</label><div id="tags-value">None</div></div>
   </div>
   <div id="customize-footer">
@@ -2233,6 +2471,7 @@
   </div>
   <div id="timeline-body">
     <div class="tl-page"><div class="tl-card"><div id="tl-head"></div><div id="tl-canvas"></div></div></div>
+    <div id="rl-line"><div id="rl-wheel"></div><div id="rl-pos"></div></div>
     <button type="button" id="tl-full">Tap for full window view</button>
     <div class="tl-foot"><div id="tl-info"><span class="hint">Tap a book to see it here</span></div></div>
   </div>
@@ -3309,7 +3548,7 @@
       `<div class="br-main"><div class="br-title"></div><div class="br-author"></div></div>` +
       `<div class="br-prog"><div class="br-pages"></div><div class="br-pct"></div></div>`;
     row.querySelector('.br-title').textContent = b.title;
-    row.querySelector('.br-author').textContent = b.author || '';
+    row.querySelector('.br-author').textContent = (b.author || '') + (typeof b.released === 'number' && !isNaN(b.released) ? ` (released: ${b.released < 0 ? -b.released + ' BC' : b.released})` : '');
     // dropdown: time wheels, graph, Edit / Log / Delete
     const dd = document.createElement('div');
     dd.className = 'row-dd tape-dd';
@@ -3726,7 +3965,7 @@
         `<div class="br-main"><div class="br-title"></div><div class="br-author"></div></div>` +
         `<div class="br-prog"><div class="br-pages"></div><div class="br-pct"></div></div>`;
       row.querySelector('.br-title').textContent = b.title;
-      row.querySelector('.br-author').textContent = b.author || '';
+      row.querySelector('.br-author').textContent = (b.author || '') + (typeof b.released === 'number' && !isNaN(b.released) ? ` (released: ${b.released < 0 ? -b.released + ' BC' : b.released})` : '');
       paintListRow(row, b);
       row._book = b;
       const dd = buildBookDD(row, b);
@@ -7923,7 +8162,7 @@
       pagesInput.type = audio ? 'text' : 'number';
       pagesInput.readOnly = audio;                        // the wheels set it; no keyboard
       showLengthWheels(audio && customizeMode !== 'customize');   // always shown for an audiobook (Add / Edit)
-      pagesInput.placeholder = audio ? 'LENGTH' : 'NUMBER OF PAGES';
+      pagesInput.placeholder = audio ? 'LENGTH' : 'PAGES';
       // carry the number across: pages ↔ minutes of listening
       if(v){
         pagesInput.value = audio ? secsToLength((parseInt(v, 10) || 0) * 60)
@@ -7959,8 +8198,9 @@
       authorInput.value = book.author || '';
       pagesInput.dataset.mode = 'pages'; pagesInput.type = 'number'; pagesInput.readOnly = false;
       showLengthWheels(false);
-      pagesInput.placeholder = 'NUMBER OF PAGES';
+      pagesInput.placeholder = 'PAGES';
       pagesInput.value = book.pages || '';
+      yearSet(book.released);
     }
     customizeTags = bookTags(book).slice();
     sessionTags = customizeTags.slice();   // names offered in the picker this session, even if deselected
@@ -8054,6 +8294,16 @@
     if(on('cover')) b.cover = COVER_TYPE_OPTIONS[customizeCoverIdx].val;
     if(on('shape')) b.bookmarkShape = customizeShapeChoice;
   }
+  // ---- the release year: a number, AD unless the little AD | BC switch says BC; blank is fine ----
+  const yearInput = document.getElementById('year-input'), yearEra = document.getElementById('year-era'), yearCard = document.getElementById('year-card');
+  function yearSet(y){ const has = y != null && y !== '' && !isNaN(y); yearInput.value = has ? Math.abs(y) : ''; yearEra.textContent = has && y < 0 ? 'BC' : 'AD';
+    yearEra.classList.toggle('bc', has && y < 0); yearCard.classList.remove('invalid'); }
+  // the year to save: null when blank, false when it can't be right (0, or in the future)
+  function yearRead(){ const v = yearInput.value.trim(); if(!v) return null; const n = parseInt(v, 10), bc = yearEra.textContent === 'BC';
+    if(!(n > 0) || (!bc && n > new Date().getFullYear()) || (bc && n > 9999)) return false; return bc ? -n : n; }
+  yearEra.addEventListener('click', () => { const bc = yearEra.textContent !== 'BC'; yearEra.textContent = bc ? 'BC' : 'AD'; yearEra.classList.toggle('bc', bc); yearCard.classList.remove('invalid'); });
+  yearInput.addEventListener('input', () => yearCard.classList.remove('invalid'));
+  yearInput.addEventListener('keydown', e => { if(e.key === 'Enter') saveCustomizePage(); });
   function saveCustomizePage(){
     if(!customizingBook) return;
     if(customizeMode === 'customize'){
@@ -8068,11 +8318,13 @@
       const pages = audio ? (secs > 0 ? Math.max(1, Math.round(secs/60)) : 0) : parseInt(pagesInput.value, 10);
       const bad = [!title, !author, !(pages > 0)];
       fieldCards.forEach((c, i)=> c.classList.toggle('invalid', bad[i]));
-      if(bad.some(Boolean)) return;
+      const rel = yearRead(); yearCard.classList.toggle('invalid', rel === false);
+      if(bad.some(Boolean) || rel === false) return;
       if(customizeMode === 'add'){
         const nb = { title, author, pages, tags: customizeTags.slice() };
         if(subtitle) nb.subtitle = subtitle;
         if(audio) nb.audioSeconds = secs;
+        if(rel != null) nb.released = rel;
         applyOptions(nb, false);
         books.push(nb);
       } else {
@@ -8080,6 +8332,7 @@
         b.title = title; b.author = author; b.pages = pages;
         if(subtitle) b.subtitle = subtitle; else delete b.subtitle;
         if(audio) b.audioSeconds = secs; else delete b.audioSeconds;
+        if(rel != null) b.released = rel; else delete b.released;
         b.tags = customizeTags.slice();
         applyOptions(b, true);
         if(b.days) syncBookFinish(b);
@@ -9764,12 +10017,189 @@
     }
     tlTodayBand(today, t0, t1, y, el, LW, false);
   }
+  // ===================== Released: each book read in the span, as a dot at the year it came out =====================
+  // Three columns, always; where they split is worked out from what's shown. A huge empty stretch (a third or more of
+  // the time covered — Homer, then nothing till the 1800s) gives the right column just the old books on its far side,
+  // cropped tight; otherwise the right column runs from the oldest up to a split year. Splits are tried at round years
+  // and the one where the busiest row is least crowded wins, with the books shared out as evenly as that allows.
+  const RL = { picked: null, wheelI: 0, placed: [], shown: [], key: '' }, RL_DOT = [4, 4, 2], RL_LW = 34, RL_NOTCH = 39;
+  const rlNow = () => new Date().getFullYear();
+  const rlYr = y => y < 0 ? (-y).toLocaleString() + ' BC' : String(y);
+  const rlTick = y => y < 0 ? (-y) + '<small>BC</small>' : y === 0 ? '1<small>AD</small>' : String(y);
+  const rlSpan = (lo, hi) => lo < 0 && hi <= 0 ? `${-lo}–${-hi} BC` : lo < 0 ? `${-lo} BC–${hi}` : `${lo}–${hi}`;
+  function rlNice(y, span, up){ const st = span > 1500 ? 100 : span > 400 ? 50 : span > 120 ? 10 : span > 40 ? 5 : 1; return up ? Math.ceil(y / st) * st : Math.floor(y / st) * st; }
+  function rlCrowd(ys, lo, hi, D, H, room){
+    if(!ys.length) return 0; const k = H / Math.max(1, hi - lo), win = (D + 1) / k; let best = 0;
+    for(let i = 0, j = 0; i < ys.length; i++){ while(ys[i] - ys[j] >= win) j++; best = Math.max(best, i - j + 1); }
+    return best / (room / (D * 1.75)); }
+  // N columns (3, or for a short span maybe 1 or 2): returns the columns (newest first), whether the last one is the
+  // old far side of a gap, and how crowded the fullest row gets (1 = just fits at a comfortable spacing)
+  function rlPlan(ys, H, W, N){
+    const NOW = rlNow(), n = ys.length, dots = N === 3 ? [4, 4, 2] : [8, 8], room = Math.floor((W - 3 * (N - 1)) / N) - RL_LW - 8;
+    const out = cols => { const inC = cols.map(([lo, hi], i) => ys.filter(y => i === 0 ? y >= lo : y >= lo && y < cols[i - 1][0]));
+      const c = cols.map(([lo, hi], i) => rlCrowd(inC[i], lo, hi, dots[i], H, room)); return { c, inC }; };
+    const score = (cols, share) => { const { c, inC } = out(cols);
+      const tot = share.reduce((t, i) => t + inC[i].length, 0) || 1, uneven = share.reduce((t, i) => t + Math.abs(inC[i].length / tot - 1 / share.length), 0);
+      return Math.max(...c) + .15 * c.reduce((t, v) => t + v, 0) / c.length + .6 * uneven; };
+    const done = (cols, gap) => ({ cols, gap, dots, crowd: n ? Math.max(...out(cols).c) : 0 });
+    if(!n) return done([[NOW - 50, NOW], [NOW - 150, NOW - 50], [NOW - 400, NOW - 150]].slice(0, N), false);
+    const span = Math.max(1, NOW - ys[0]);
+    let gi = -1, gmax = 0; for(let i = 0; i < n - 1; i++){ const g = ys[i + 1] - ys[i]; if(g > gmax){ gmax = g; gi = i; } }
+    const cands = (from, to) => { const sp = Math.max(1, to - from), o = new Set();
+      ys.forEach(y => { if(y > from && y < to){ o.add(rlNice(y, sp, false)); o.add(rlNice(y, sp, true)); } });
+      for(let t = 1; t < 12; t++) o.add(rlNice(from + sp * t / 12, sp, false));
+      return [...o].filter(y => y > from && y < to - 1).sort((a, b) => a - b); };
+    const bigGap = gi >= 0 && gmax >= span / 3 && n - gi - 1 >= 1;
+    if(N === 1) return bigGap ? null : done([[rlNice(ys[0] - Math.max(2, Math.ceil(span * .03)), span, false), NOW]], false);
+    if(bigGap){
+      const old = ys.slice(0, gi + 1), oSpan = old[old.length - 1] - old[0], pad = Math.max(25, Math.ceil(oSpan * .06)), rs = oSpan + 2 * pad;
+      const right = [rlNice(old[0] - pad, rs, false), rlNice(old[old.length - 1] + pad, rs, true)];
+      const from = rlNice(ys[gi + 1] - Math.max(1, Math.ceil((NOW - ys[gi + 1]) * .03)), NOW - ys[gi + 1], false);
+      if(N === 2) return done([[from, NOW], right], true);
+      let best = null; cands(from, NOW).forEach(sp => { const cols = [[sp, NOW], [from, sp], right], sc = score(cols, [0, 1]); if(!best || sc < best.sc) best = { cols, sc }; });
+      if(!best){ const m = Math.round((from + NOW) / 2); best = { cols: [[m, NOW], [from, m], right] }; }
+      return done(best.cols, true);
+    }
+    const lo = ys[0] - Math.max(5, Math.ceil(span * .02)), cs = cands(lo, NOW);
+    let best = null;
+    if(N === 2) cs.forEach(a => { const cols = [[a, NOW], [lo, a]], sc = score(cols, [0, 1]); if(!best || sc < best.sc) best = { cols, sc }; });
+    else cs.forEach(a => cs.forEach(b => { if(b <= a) return; const cols = [[b, NOW], [a, b], [lo, a]], sc = score(cols, [0, 1, 2]); if(!best || sc < best.sc) best = { cols, sc }; }));
+    if(!best){ const t = (NOW - lo) / N; best = { cols: Array.from({ length: N }, (_, i) => [Math.round(NOW - (i + 1) * t), Math.round(NOW - i * t)]) }; }
+    return done(best.cols, false);
+  }
+  // the books read in the span (a day logged in it, any read of it); All Time: every book with any reading at all
+  function rlRead(R){
+    const all = TL.view === 'all', touched = b => [...(b.reads || []).map(r => [r.days, r.finishedOn]), [b.days, lastLogKey(b)]].some(([days, endKey]) => {
+      if(!Array.isArray(days) || !endKey) return false; const end = keyDate(endKey);
+      for(let j = days.length - 1; j >= 0; j--){ if(!(days[j] > 0)) continue; if(all) return true; const d = tlAdd(end, -(days.length - 1 - j)); if(d >= R.t0 && d < R.t1) return true; }
+      return false; });
+    // All Time also has the books not started yet (black dots); the spans only what was read in them
+    const started = b => (b.reads || []).length > 0 || (b.days || []).some(v => v > 0);
+    const read = books.filter(b => touched(b) || (all && !started(b))), has = b => typeof b.released === 'number' && !isNaN(b.released);
+    return { list: read.filter(has).sort((a, b) => a.released - b.released), without: read.filter(b => !has(b)).length };
+  }
+  // a dot's colour: dark gold read, blue being read now, black not started
+  const rlState = b => bookFinished(b) ? 'read' : (b.days || []).some(v => v > 0) ? 'now' : (b.reads || []).length ? 'read' : 'unread';
+  function relDraw(){
+    const today = tlDay(new Date()), R = tlRange(today), key = TL.view + '|' + TL.off;
+    if(key !== RL.key){ RL.key = key; RL.picked = null; RL.wheelI = 0; }
+    if(document.body.classList.contains('tl-full')) RL.picked = null;
+    const { list, without } = rlRead(R); RL.shown = list;
+    tlCanvas.style.overflowY = 'hidden'; tlCanvas.style.overflowX = 'hidden'; tlCanvas.scrollTop = 0; tlCanvas.scrollLeft = 0;
+    const H = tlCanvas.clientHeight, W = tlCanvas.clientWidth, LW = RL_LW, NOW = rlNow(), TOP = 16, BOT = 16, ys = list.map(b => b.released);
+    // All Time and This Year: always three columns. This Month / This Week: the fewest that sit comfortably — one when
+    // the books are close together, two when there's a big gap (or one column would be crowded), three otherwise
+    let PL = null;
+    // just one book (This Month / This Week): one column, its year in the middle with five years either side
+    if((TL.view === 'month' || TL.view === 'week') && ys.length === 1) PL = { cols: [[ys[0] - 5, ys[0] + 5]], gap: false, dots: [8], crowd: 0 };
+    if(!PL && (TL.view === 'month' || TL.view === 'week')) for(const n of [1, 2]){ const p = rlPlan(ys, H - TOP - BOT, W, n); if(p && p.crowd <= .6){ PL = p; break; } }
+    if(!PL) PL = rlPlan(ys, H - TOP - BOT, W, 3);
+    const N = PL.cols.length, cw = Math.floor((W - 3 * (N - 1)) / N);
+    const panes = PL.cols.map(([lo, hi], i) => ({ x: i * (cw + 3), w: i === N - 1 ? W - i * (cw + 3) : cw, hi, lo, D: PL.dots[i] }));
+    const name = (P, i) => i === 0 && P.hi === NOW ? P.lo + '–Now' : i === 0 ? rlSpan(P.lo, P.hi) : i === N - 1 && !PL.gap ? 'Before ' + (P.hi < 0 ? -P.hi + ' BC' : P.hi) : rlSpan(P.lo, P.hi);
+    tlHead(panes.flatMap((P, i) => [{ x: P.x, end: P.x + LW - 3, text: '', line: P.x - 3 }, { x: P.x + LW, end: P.x + P.w, text: name(P, i), line: P.x + LW - 3 }]));
+    let html = panes.slice(0, -1).map(P => `<div class="rl-split" style="left:${P.x + P.w}px"></div>`).join('');
+    const placed = RL.placed = [];
+    panes.forEach((P, pi) => {
+      const k = (H - TOP - BOT) / Math.max(1, P.hi - P.lo), Y = y => TOP + (P.hi - y) * k, D = P.D;
+      const step = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000].find(st => st * k >= 36) || 1000;
+      for(let t = Math.ceil(P.lo / step) * step; t <= P.hi; t += step){ const ty = Y(t); if(pi === 0 && NOW >= P.lo && NOW <= P.hi && Math.abs(ty - Y(NOW)) < 18) continue;
+        html += `<div class="rl-tick" style="top:${ty}px; left:${P.x + LW}px; width:${P.w - LW}px"></div><div class="rl-tl" style="top:${ty}px; left:${P.x}px">${rlTick(t)}</div>`; }
+      html += `<div class="rl-axis" style="left:${P.x + LW - 3}px"></div>`;
+      if(pi === 0 && NOW >= P.lo && NOW <= P.hi) html += `<div class="rl-now" style="top:${Y(NOW)}px; left:${P.x + LW}px; width:${P.w - LW}px"></div><div class="rl-tl now" style="top:${Y(NOW)}px; left:${P.x}px">${NOW}</div>`;
+      else if(P.hi % step && (Y(Math.floor(P.hi / step) * step) - Y(P.hi)) >= 14) html += `<div class="rl-tl" style="top:${Y(P.hi)}px; left:${P.x}px">${rlTick(P.hi)}</div>`;
+      // the dots: at their year; ones that would touch sit side by side, squeezed closer when the column is crowded;
+      // a row that still won't fit stops at the column's edge with a "+n" (those books are still on the year's wheel)
+      const mine = list.filter(b => (pi === N - 1 || b.released >= P.lo) && (pi === 0 || b.released < panes[pi - 1].lo));
+      const x0 = P.x + LW + 3 + D / 2, xMax = P.x + P.w - 3 - D / 2;   // a dot's edge, not its middle, a little in from each side
+      const lay = gap => { const out = []; mine.forEach(b => { const cy = Y(b.released); let x = x0;
+          while(out.some(p => Math.abs(p.x - x) < gap - .01 && Math.abs(p.y - cy) < D + 1)) x += gap;
+          out.push({ x, y: cy, b, pi }); }); return out; };
+      let pts = null; for(const gap of (D === 2 ? [5, 4, 3.5, 3, 2.5, 2] : D === 4 ? [7, 6, 5.5, 5, 4.5, 4] : [D * 1.5, D * 1.35, D * 1.2, D * 1.1, D])){ pts = lay(gap); if(pts.every(p => p.x <= xMax)) break; }
+      const over = new Map();
+      pts.forEach(p => { if(p.x > xMax){ const kk = Math.round(p.y); over.set(kk, (over.get(kk) || 0) + 1); return; }
+        placed.push(p);
+        html += `<div class="rl-dot ${rlState(p.b)}${RL.picked === p.b.released ? ' on' : ''}" data-i="${list.indexOf(p.b)}" style="left:${p.x}px; top:${p.y}px; width:${D}px; height:${D}px; margin:${-D / 2}px 0 0 ${-D / 2}px"></div>`; });
+      over.forEach((n, y) => html += `<div class="rl-more" style="left:${xMax - 2}px; top:${y}px">+${n}</div>`);
+    });
+    // no tag on the card: the picked dots just get their rings, and the line card under the card names the book
+    if(!list.length) html += `<div class="rl-empty">${without ? 'Add a year to a book (Edit) to see it here' : 'Nothing read'}</div>`;
+    tlCanvas.innerHTML = html;
+    rlLine(); rlFoot(R, list, without);
+  }
+  // the line card: the picked book — title, author, year (years ago); several from one year make it a wheel, opening on 1 of n
+  function rlLine(){
+    const wheel = document.getElementById('rl-wheel'), lc = document.getElementById('rl-line'), NOW = rlNow();
+    const group = RL.picked === null ? [] : RL.shown.filter(b => b.released === RL.picked);
+    const ago = y => { const n = NOW - y; return n === 0 ? 'this year' : n.toLocaleString() + (n === 1 ? ' year ago' : ' years ago'); };
+    wheel.innerHTML = group.length ? group.map(b => `<div><span class="tt">${tlEsc(b.title)}</span><span class="au">${tlEsc(b.author || '')}</span><span class="yr">${rlYr(b.released)} <span>(${ago(b.released)})</span></span></div>`).join('')
+      : '<div class="empty">Tap a dot to see the book here</div>';
+    lc.classList.toggle('many', group.length > 1);
+    RL.wheelI = Math.min(RL.wheelI, Math.max(0, group.length - 1)); wheel.scrollTop = RL.wheelI * RL_NOTCH;
+    rlMark(group);
+  }
+  function rlMark(group){
+    tlCanvas.querySelectorAll('.rl-dot.cur').forEach(d => d.classList.remove('cur'));
+    if(group.length > 1){ const d = tlCanvas.querySelector(`.rl-dot[data-i="${RL.shown.indexOf(group[RL.wheelI])}"]`); if(d) d.classList.add('cur'); }
+    document.getElementById('rl-pos').innerHTML = `<i class="${RL.wheelI > 0 ? 'on' : ''}">▲</i>${RL.wheelI + 1} of ${group.length}<i class="${RL.wheelI < group.length - 1 ? 'on' : ''}">▼</i>`;
+  }
+  { const wheel = document.getElementById('rl-wheel');
+    wheel.addEventListener('scroll', () => { const i = Math.round(wheel.scrollTop / RL_NOTCH);
+      if(RL.picked === null || i === RL.wheelI) return;
+      RL.wheelI = i; if(window.hapticTick) window.hapticTick();
+      rlMark(RL.shown.filter(b => b.released === RL.picked)); }, {passive: true}); }
+  // the footer: as the other views — the span with ◀ ▶ to step back, how many and the years they came out; or the picked one
+  function rlFoot(R, list, without){
+    if(RL.picked === null){
+      const first = TL.reads.length ? new Date(Math.min(...TL.reads.map(r => +r.s))) : new Date(), now = new Date();
+      const minOff = TL.view === 'week' ? Math.round((tlSun(first) - tlSun(now)) / (7 * 864e5))
+                   : TL.view === 'month' ? (first.getFullYear() - now.getFullYear()) * 12 + first.getMonth() - now.getMonth()
+                   : TL.view === 'year' ? first.getFullYear() - now.getFullYear() : 0;
+      const wEnd = tlAdd(R.t1, -1);
+      const title = TL.view === 'week' ? (R.t0.getMonth() === wEnd.getMonth() ? `${TL_MON[R.t0.getMonth()]} ${R.t0.getDate()} – ${wEnd.getDate()}, ${wEnd.getFullYear()}`
+                                          : `${TL_MON[R.t0.getMonth()]} ${R.t0.getDate()} – ${TL_MON[wEnd.getMonth()]} ${wEnd.getDate()}, ${wEnd.getFullYear()}`)
+                  : TL.view === 'month' ? `${TL_MONTH[R.t0.getMonth()]} ${R.t0.getFullYear()}` : TL.view === 'year' ? String(R.t0.getFullYear()) : 'All Time';
+      const unit = TL.view === 'week' ? 'week' : TL.view === 'month' ? 'month' : 'year';
+      const ys = list.map(b => b.released), lo = Math.min(...ys), hi = Math.max(...ys);
+      const tot = list.length ? `<b>${list.length}</b> ${list.length === 1 ? 'book' : 'books'} · released <b>${lo === hi ? rlYr(lo) : rlYr(lo) + ' – ' + hi}</b>` + (without ? ` · ${without} without a year` : '')
+                : without ? `${without} read without a year` : 'Nothing read';
+      tlInfo.classList.add('nav'); tlInfo.classList.remove('pick');
+      tlInfo.innerHTML = `<button type="button" class="tl-nav" data-d="-1" aria-label="Previous ${unit}"${TL.off <= minOff ? ' disabled' : ''}>◀</button>` +
+        `<div class="tl-mid"><div class="t">${title}</div><div class="tot">${tot}</div><div class="hint">Tap a dot to see it here</div></div>` +
+        `<button type="button" class="tl-nav" data-d="1" aria-label="Next ${unit}"${TL.off >= 0 ? ' disabled' : ''}>▶</button>`;
+      return;
+    }
+    const group = list.filter(b => b.released === RL.picked);
+    tlInfo.classList.remove('nav'); tlInfo.classList.add('pick');
+    if(group.length > 1){
+      const show = group.length > 3 ? group.slice(0, 2) : group;
+      const rows = show.map(b => `<div class="tl-bk"><span>${tlEsc(b.title)}</span><b>${tlEsc(b.author || '')}</b></div>`);
+      if(group.length > 3) rows.push(`<div class="tl-bk"><span>+${group.length - 2} more</span></div>`);
+      tlInfo.innerHTML = `<div class="tl-pl"><span class="t">${rlYr(RL.picked)}</span><span class="tot"><b>${group.length}</b> books</span></div><div class="tl-pr">${rows.join('')}</div>`;
+      return;
+    }
+    const b = group[0], rows = [`<div class="tl-bk"><span>Released</span><b>${rlYr(b.released)}</b></div>`];
+    const fin = bookFinished(b) && b.finishedOn ? b.finishedOn : (b.reads || []).length ? b.reads[b.reads.length - 1].finishedOn : null;
+    if(fin){ const d = keyDate(fin), age = d.getFullYear() - b.released;
+      rows.push(`<div class="tl-bk"><span>${b.format === 'audio' ? 'Listened' : 'Read'} ${tlFmt(d)}</span><b>${age.toLocaleString()} ${age === 1 ? 'yr' : 'yrs'} old</b></div>`); }
+    else rows.push(`<div class="tl-bk"><span>${rlState(b) === 'unread' ? 'Not started' : b.format === 'audio' ? 'Listening now' : 'Reading now'}</span><b>${(rlNow() - b.released).toLocaleString()} yrs old</b></div>`);
+    tlInfo.innerHTML = `<div class="tl-pl"><span class="t">${tlEsc(b.title)}</span><span class="tot">${tlEsc(b.author || '')}</span></div><div class="tl-pr">${rows.join('')}</div>`;
+  }
+  // a tap picks the dot nearest the finger, and with it every book from that year; tap it again to let go
+  tlCanvas.addEventListener('click', e => {
+    if(TL.mode !== 'released') return;
+    const r = tlCanvas.getBoundingClientRect(), fx = e.clientX - r.left, fy = e.clientY - r.top;
+    let best = null, bd = 16; RL.placed.forEach(p => { const d = Math.hypot(p.x - fx, p.y - fy); if(d < bd){ bd = d; best = p; } });
+    const y = best ? best.b.released : null; RL.picked = y !== null && y !== RL.picked ? y : null; RL.wheelI = 0; relDraw();
+  });
   function tlDraw(){
     TL.reads = tlCollect();
     TL.reads.forEach(r => r.key = r.title + '|' + (+r.s));
     // name the chart for what's ever been logged: just Pages, just Listening, or both
     const hasB = TL.reads.some(r => r.kind !== 'audio'), hasA = TL.reads.some(r => r.kind === 'audio');
     document.querySelector('#tl-modes button[data-m="graph"]').textContent = hasB && !hasA ? 'Pages' : hasA && !hasB ? 'Listening' : 'Pages & Listening';
+    document.body.classList.toggle('tl-rel', TL.mode === 'released');
+    if(TL.mode === 'released'){ relDraw(); return; }
     if(TL.mode === 'timeline') tlDrawTimeline(); else tlDrawGraph();
     if(!TL.picked && !TL.pickedK) tlIdle();
   }
@@ -9790,6 +10220,7 @@
   }));
   document.querySelectorAll('#tl-modes button').forEach(btn => btn.addEventListener('click', () => {
     TL.mode = btn.dataset.m; document.querySelectorAll('#tl-modes button').forEach(x => x.classList.toggle('on', x === btn));
+    if(TL.mode === 'released'){ TL.view = 'all'; TL.off = 0; document.querySelectorAll('#tl-ranges button').forEach(x => x.classList.toggle('on', x.dataset.v === 'all')); }
     TL.picked = ''; TL.pickedK = ''; tlDraw();
   }));
   window.addEventListener('resize', () => { if(document.getElementById('timeline-page').classList.contains('open')) tlDraw(); });
@@ -11012,6 +11443,7 @@ Object.assign(ART, {
     { id: 'pastlog', name: 'Open Log of Past Reads', note: 'The card under Compare' },
     { id: 'statbars', name: 'Stats bar cards', note: 'Month / year bars in Stats' },
     { id: 'timeline', name: 'Timeline', note: 'The Timeline tab' },
+    { id: 'released', name: 'Released', note: 'Release years, in the Timeline tab' },
     { id: 'haptics', name: 'Haptics', note: 'A small buzz as a wheel clicks past each number' }
   ];
   // defaults: Medium shelves, tapes on the right, Shelf and List both, Badges and Haptics off, everything else on (saved choices override these)
@@ -11063,6 +11495,7 @@ Object.assign(ART, {
     // a hidden tab that's open: go to the first tab there is
     if((off.badges && document.getElementById('dt-view-badges').classList.contains('active')) ||
        (off.stats && document.getElementById('dt-view-stats').classList.contains('active'))) showDataTab(firstData());
+    if(off.released && document.body.classList.contains('tl-rel')) document.querySelector('#tl-modes button[data-m="graph"]').click();
     if(off.timeline && document.body.classList.contains('tab-timeline')) document.querySelector('#tabs .tab[data-view="all"]').click();
   }
   // haptics: a short buzz each time a wheel clicks onto the next number (phones that can vibrate)
