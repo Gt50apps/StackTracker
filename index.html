@@ -25,7 +25,7 @@
     --grid:#e6e0d2;
     --unread:#e3ddce;
   }
-  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   body{
     margin:0;
     font-family:'Georgia', 'Times New Roman', serif;
@@ -41,17 +41,17 @@
   #app-footer{
     position:fixed; left:0; right:0; bottom:0; z-index:9;
     padding:4px 4px calc(4px + env(safe-area-inset-bottom));
-    background:var(--bg); border-top:3px solid #000;
+    background:var(--bg); border-top:3px solid var(--cb000000, #000000);
   }
   #app-footer{display:flex; flex-direction:column; gap:4px;}
   #app-footer #add-card{height:45px;}
   /* page tabs: the header's own top strip, edge to edge, split by black lines */
   body #app-header{padding:0 0 4px;}
   #app-header > .hdr-row{margin:0 4px;}
-  #tabs{display:flex; margin:0; padding-top:env(safe-area-inset-top); border-bottom:3px solid #000;}
+  #tabs{display:flex; margin:0; padding-top:env(safe-area-inset-top); border-bottom:3px solid var(--cb000000, #000000);}
   #tabs .tab{flex:1 1 0; min-width:0; height:42px; padding:0 2px; border-radius:0; background:var(--bg); line-height:1.1; text-align:center;}
-  #tabs .tab + .tab{border-left:3px solid #000;}
-  #tabs .tab.active{background:var(--ink); color:#fff;}
+  #tabs .tab + .tab{border-left:3px solid var(--cb000000, #000000);}
+  #tabs .tab.active{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   body #app-header:not(:has(.hdr-row:not(.hidden))){padding-bottom:0; border-bottom:none;}   /* My Lists: just the tabs, one line under them */
 
   /* frozen header: tabs + Add Book, 4px from the window on every side */
@@ -65,7 +65,7 @@
     gap:4px;
     padding:calc(4px + env(safe-area-inset-top)) 4px 4px;
     background:var(--bg);
-    border-bottom:3px solid #000;
+    border-bottom:3px solid var(--cb000000, #000000);
   }
 
   .hdr-row{display:flex; align-items:stretch; gap:4px;}
@@ -77,7 +77,7 @@
   .hdr-row.hidden{display:none;}
   #sort-card{
     min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.15;
-    background:var(--panel); border:3px solid #000; border-radius:8px; padding:0 10px;
+    background:var(--panel); border:3px solid var(--cb000000, #000000); border-radius:8px; padding:0 10px;
     font-family:Arial, sans-serif; font-size:.78rem; color:var(--ink); cursor:pointer; user-select:none;
     white-space:nowrap; overflow:hidden;
   }
@@ -94,7 +94,7 @@
   #all-books-view.list #shelves-container{display:none;}
   .book-row{
     position:relative; display:flex; align-items:center; gap:8px; height:45px; box-sizing:border-box;
-    padding:0 8px; background:var(--unread); border:3px solid #000; border-radius:8px; cursor:pointer;
+    padding:0 8px; background:var(--unread); border:3px solid var(--cb000000, #000000); border-radius:8px; cursor:pointer;
     overflow:hidden;
   }
   /* progress fill, same colors as the open book's progress card */
@@ -106,16 +106,16 @@
   .br-ghost, .tape-ghost{opacity:.5; transition:opacity 1s linear;}
   .br-ghost.out, .tape-ghost.out{opacity:0;}
   .book-row:active .br-fill{filter:brightness(.95);}
-  .book-row:not(.tape-row){background:#fff;}   /* white, so the page-coloured fill stands out */
+  .book-row:not(.tape-row){background:var(--cbffffff, #ffffff);}   /* white, so the page-coloured fill stands out */
   /* wound tape, drawn per tape; runs a few px past the top and bottom so the card's own
      edge clips it (no sliver of white where the border lands on a part pixel) */
   .book-row .tape-fill{position:absolute; left:-3px; top:-3px; width:calc(100% + 6px); height:calc(100% + 6px); pointer-events:none;}
-  .book-row.tape-simple .br-title, .book-row.tape-simple .br-author{color:#000;}
+  .book-row.tape-simple .br-title, .book-row.tape-simple .br-author{color:var(--cf000000, #000000);}
   .book-row.tape-simple + .tape-dd{background:var(--unread);}   /* light dropdown, like a book's */
   /* finished: dark fill, white text */
-  .book-row.done .br-title, .book-row.done .br-author, .book-row.done .br-pages, .book-row.done .br-pct{color:#fff !important;}
-  #combined-card.locked #combined-count, #combined-card.locked #combined-pct{color:#fff;}
-  #play-pct.done #play-pct-text{color:#fff;}
+  .book-row.done .br-title, .book-row.done .br-author, .book-row.done .br-pages, .book-row.done .br-pct{color:var(--cfffffff, #ffffff) !important;}
+  #combined-card.locked #combined-count, #combined-card.locked #combined-pct{color:var(--cfffffff, #ffffff);}
+  #play-pct.done #play-pct-text{color:var(--cfffffff, #ffffff);}
   .dd-play{display:flex; gap:6px;}
   .dd-play .pick{flex:1 1 0;}
   .dd-play.dual .pick{flex:5 1 0;}                      /* played | Update | remaining = 5/12, 1/6, 5/12 */
@@ -128,18 +128,18 @@
     font:700 .46rem Arial, sans-serif; letter-spacing:.6px; color:var(--muted); line-height:1;}
   .tw-left .tw-tag, #play-left .tw-tag, #page-left .tw-tag{letter-spacing:0; font-size:.4rem; top:3px;}   /* REMAINING: a longer word in the same space */
   .dd-confirm{grid-column:auto; flex:1 1 0; min-width:0; height:45px; margin:0; padding:0; box-sizing:border-box;
-    border:3px solid #000; border-radius:8px; box-shadow:none; font-family:Arial, sans-serif; font-size:.85rem;
+    border:3px solid var(--cb000000, #000000); border-radius:8px; box-shadow:none; font-family:Arial, sans-serif; font-size:.85rem;
     font-weight:700; letter-spacing:.3px; text-transform:none; cursor:pointer;
-    background:var(--bookmark, #a9825f); color:var(--bookmark-ink, #fff);}
+    background:var(--bookmark, var(--cba9825f, #a9825f)); color:var(--bookmark-ink, var(--cfffffff, #ffffff));}
   
-  .dd-confirm:disabled{background:#d6d2c8; color:#8f8a80; cursor:default;}
+  .dd-confirm:disabled{background:var(--cbd6d2c8, #d6d2c8); color:var(--cf8f8a80, #8f8a80); cursor:default;}
   .book-row:not(.tape-row){touch-action:pan-y;}   /* sideways drags scrub the page, up/down still scrolls */
   /* GT50 divider: no card, just a centered line split around the title */
   .list-divider{
     display:flex; align-items:center; gap:10px; height:45px; flex:none; box-sizing:border-box; padding:0 4px;
   }
   .list-divider::before, .list-divider::after{
-    content:''; flex:1; height:3px; background:#000; border-radius:2px;
+    content:''; flex:1; height:3px; background:var(--cb000000, #000000); border-radius:2px;
   }
   .shelf-divider{height:24px; margin:4px 0 -8px;}   /* a slim divider, its line ~18px over the spines below so bookmark tips clear it */
   .shelf-divider:not(:first-child){margin-top:2px;}   /* right under the shelf above it */
@@ -155,7 +155,7 @@
   .br-pct{font-family:Georgia, serif; font-size:.82rem; font-weight:600; color:var(--ink);}
   /* list dropdowns: one open at a time, sized to what's inside */
   .row-dd{flex:none; box-sizing:border-box; width:100%; height:0; margin:-4px 0 0;
-    overflow:hidden; border:0 solid #000; border-width:0 3px; border-radius:0 0 8px 8px;}
+    overflow:hidden; border:0 solid var(--cb000000, #000000); border-width:0 3px; border-radius:0 0 8px 8px;}
   .row-dd.open{border-bottom-width:3px;}
   /* a dropdown open: the window dims behind it (the header and footer sit above the dim, the open card and its dropdown too) */
   #dd-dim{position:fixed; inset:0; z-index:7; background:rgba(0,0,0,.82); opacity:0; pointer-events:none; transition:opacity .32s cubic-bezier(.45,0,.55,1);}   /* eases in and out */
@@ -163,30 +163,30 @@
   body.dd-on .book-row.open, body.dd-on .row-dd.open, .dd-lift{position:relative; z-index:8;}   /* .dd-lift: a card just closed stays above the dim while it fades out */
   .book-row.open{border-radius:8px 8px 0 0;}
   .dd-in{display:flex; flex-direction:column; gap:6px; padding:6px;}
-  .tape-dd{background:#2f3136;}
+  .tape-dd{background:var(--cb2f3136, #2f3136);}
   .book-dd{background:var(--unread);}
   .tape-dd .pick, .book-dd .pick{min-width:0; height:45px; box-sizing:border-box; display:flex;
-    border:3px solid #000; border-radius:8px; overflow:hidden; background:#fff;}
-  .dd-acts{display:flex; height:45px; box-sizing:border-box; border:3px solid #000; border-radius:8px; overflow:hidden; background:#fff;}
+    border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden; background:var(--cbffffff, #ffffff);}
+  .dd-acts{display:flex; height:45px; box-sizing:border-box; border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden; background:var(--cbffffff, #ffffff);}
   .dd-acts button{grid-column:auto; flex:1; margin:0; padding:0; border:none; border-radius:0; box-shadow:none;
-    background:#fff; color:var(--ink); font-family:Arial, sans-serif; font-size:.78rem; font-weight:600;
+    background:var(--cbffffff, #ffffff); color:var(--ink); font-family:Arial, sans-serif; font-size:.78rem; font-weight:600;
     letter-spacing:.3px; text-transform:none; cursor:pointer;}
-  .dd-acts button + button{border-left:3px solid #000;}
+  .dd-acts button + button{border-left:3px solid var(--cb000000, #000000);}
    .dd-acts button:active{background:var(--bg); box-shadow:none;}
-  .dd-acts .dd-del{color:#a33;}
-  .dd-chart{height:45px; box-sizing:border-box; overflow:hidden; background:#fff; border:3px solid #000; border-radius:8px; padding:0;}
+  .dd-acts .dd-del{color:var(--cfaa3333, #aa3333);}
+  .dd-chart{height:45px; box-sizing:border-box; overflow:hidden; background:var(--cbffffff, #ffffff); border:3px solid var(--cb000000, #000000); border-radius:8px; padding:0;}
   .dd-chart svg{display:block; width:100%; overflow:visible;}
   /* top row: square − / + cards either side of the graph, 4px apart */
   .dd-pm-row{display:flex; gap:4px;}
   .dd-pm-row .dd-chart{flex:1 1 0; min-width:0; -webkit-user-select:none; user-select:none;}
   .g-pm{grid-column:auto; flex:none; width:45px; height:45px; margin:0; padding:0; box-sizing:border-box;
-    border:3px solid #000; border-radius:8px; box-shadow:none; font:400 1.4rem/1 Arial, sans-serif; letter-spacing:0;
+    border:3px solid var(--cb000000, #000000); border-radius:8px; box-shadow:none; font:400 1.4rem/1 Arial, sans-serif; letter-spacing:0;
     cursor:pointer; touch-action:manipulation; user-select:none; -webkit-tap-highlight-color:transparent;}
   
   .g-pm:active{filter:brightness(.9);}
   /* days read and the dates they span, above Edit / Log / Delete */
   .dd-stats{display:flex; flex-direction:column; justify-content:center; gap:2px; height:45px; box-sizing:border-box; padding:0 10px;
-    border:3px solid #000; border-radius:8px; background:#fff; font-family:Arial, sans-serif; font-size:.58rem; line-height:1.15; color:var(--muted); text-transform:uppercase; letter-spacing:0;}   /* every stat in capitals */
+    border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); font-family:Arial, sans-serif; font-size:.58rem; line-height:1.15; color:var(--muted); text-transform:uppercase; letter-spacing:0;}   /* every stat in capitals */
   /* two lines in the one card: days + dates, then per day | streak | best day */
   .ds-row{display:flex; justify-content:space-between; gap:8px; white-space:nowrap;}
   .ds-row > span{min-width:0; overflow:hidden; text-overflow:ellipsis;}
@@ -195,7 +195,7 @@
   .ds-row > .ds-span{text-align:right;}
   .dd-stats b{color:var(--ink);}
   /* in the book's cover cloth */
-  .dd-stats.cloth{position:relative; overflow:hidden; background:var(--cloth, #6b4a32); color:var(--ds-muted);}
+  .dd-stats.cloth{position:relative; overflow:hidden; background:var(--cloth, var(--cb6b4a32, #6b4a32)); color:var(--ds-muted);}
   .dd-stats.cloth > canvas.cloth-bg{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
   .dd-stats.cloth > .ds-row{position:relative;}
   .dd-stats.cloth b{color:var(--ds-ink);}
@@ -209,13 +209,13 @@
     opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;
   }
   #tags-page.open, #authors-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
-  #tags-done, #authors-done{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
+  #tags-done, #authors-done{border:3px solid var(--cb000000, #000000); background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff); padding:0;}
   
   .tg-new{display:flex; gap:4px; flex:none; height:45px;}
   .tg-new .field-card{flex:1; height:45px; box-sizing:border-box;}
   #tag-new-add, #author-new-add{
     grid-column:auto; flex:0 0 80px; margin:0; padding:0; height:45px; box-shadow:none;
-    background:var(--ink); color:#fff; border:3px solid #000; border-radius:8px;
+    background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff); border:3px solid var(--cb000000, #000000); border-radius:8px;
     font-family:Arial, sans-serif; font-size:.8rem; font-weight:600; letter-spacing:.3px; text-transform:none;
   }
   
@@ -228,26 +228,26 @@
     opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;   /* quick fade, like every full-window page */
   }
   #sort-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
-  #sort-done{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
+  #sort-done{border:3px solid var(--cb000000, #000000); background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff); padding:0;}
   
   .so-filter{display:flex; height:45px; flex:none; box-sizing:border-box; margin:4px 4px 0;
-    border:3px solid #000; border-radius:8px; overflow:hidden; background:var(--panel);}
+    border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden; background:var(--panel);}
   .so-filter button{grid-column:auto; flex:1; margin:0; padding:0; border:none; border-radius:0; box-shadow:none;
     background:var(--panel); color:var(--ink); font-family:Arial, sans-serif; font-size:.78rem; font-weight:600;
     letter-spacing:.3px; text-transform:none; cursor:pointer;}
-  .so-filter button + button{border-left:3px solid #000;}
+  .so-filter button + button{border-left:3px solid var(--cb000000, #000000);}
   
-  .so-filter button.on{background:var(--ink); color:#fff;}
+  .so-filter button.on{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   .so-empty{padding:40px 12px; text-align:center; font-family:Arial, sans-serif; font-size:.8rem; color:var(--muted);}
   .so-list{flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:4px; padding:4px 4px calc(4px + env(safe-area-inset-bottom));}
   .so-opt{
     display:flex; flex-direction:column; justify-content:center; height:45px; box-sizing:border-box; flex:none;
-    padding:0 8px; background:var(--panel); border:3px solid #000; border-radius:8px; cursor:pointer; line-height:1.15;
+    padding:0 8px; background:var(--panel); border:3px solid var(--cb000000, #000000); border-radius:8px; cursor:pointer; line-height:1.15;
   }
   .so-opt b{font-family:Georgia, serif; font-size:.9rem; font-weight:600; color:var(--ink);}
   .so-opt span{font-family:Arial, sans-serif; font-size:.62rem; color:var(--muted);}
-  .so-opt.on{background:var(--ink);}
-  .so-opt.on b{color:#fff;} .so-opt.on span{color:#cfc8ba;}
+  .so-opt.on{background:var(--ink-bg, var(--ink));}
+  .so-opt.on b{color:var(--cfffffff, #ffffff);} .so-opt.on span{color:var(--cfcfc8ba, #cfc8ba);}
 
   #add-card{
     display:flex;
@@ -256,7 +256,7 @@
     gap:8px;
     width:100%;
     background:var(--panel);
-    border:3px solid #000;
+    border:3px solid var(--cb000000, #000000);
     border-radius:8px;
     padding:0 16px;
     flex-shrink:0;
@@ -295,10 +295,10 @@
     margin:-14px -4px 6px;
     padding-top:calc(4px + env(safe-area-inset-top));
     padding-left:4px; padding-right:4px;
-    background:#fff;
+    background:var(--cbffffff, #ffffff);
     flex-shrink:0;
     padding-bottom:4px;
-    border-bottom:3px solid #000;
+    border-bottom:3px solid var(--cb000000, #000000);
   }
   .customize-header h2{
     font-family:Georgia, serif;
@@ -340,7 +340,7 @@
   #book-fields.hidden{display:none;}
   /* audiobook length: hours / minutes / seconds wheels, dragged up and down */
   #length-wheels{display:flex; min-width:0; height:45px; box-sizing:border-box;
-    background:var(--panel); border:3px solid #000; border-radius:8px; overflow:hidden;}
+    background:var(--panel); border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;}
   #length-wheels.hidden{display:none;}
   /* audiobook play position: the same wheels in place of the progress bar */
   /* time played (3/8) | Update (1/4) | time left (3/8); the percent slider on its own line below.
@@ -353,33 +353,33 @@
   #page-line.hidden{display:none;}
   .play-set.page-set .lw-wheel div, #page-line .lw-wheel div, .page-play .lw-wheel div{font-size:13px;}
   .play-set{flex:5 1 0; min-width:0; display:flex; height:45px; box-sizing:border-box; background:var(--panel);
-    border:3px solid #000; border-radius:10px; overflow:hidden;}
+    border:3px solid var(--cb000000, #000000); border-radius:10px; overflow:hidden;}
   #play-update, #page-update{grid-column:auto; flex:2 1 0; font-size:.74rem !important; letter-spacing:0 !important; min-width:0; height:45px; margin:0; padding:0; box-sizing:border-box;
-    border:3px solid #000; border-radius:10px; box-shadow:none;
+    border:3px solid var(--cb000000, #000000); border-radius:10px; box-shadow:none;
     font-family:Arial, sans-serif; font-size:.85rem; font-weight:700; letter-spacing:.3px; text-transform:none;
-    background:var(--bookmark, #a9825f); color:var(--bookmark-ink, #fff); cursor:pointer;}
+    background:var(--bookmark, var(--cba9825f, #a9825f)); color:var(--bookmark-ink, var(--cfffffff, #ffffff)); cursor:pointer;}
   
   .play-set .lw-wheel div{font-size:13px;}
   /* percent card: − | draggable fill | + ; it stages a time just like the wheels */
   #play-pct{flex:none; width:100%; min-width:0; display:flex; height:45px; box-sizing:border-box;
-    border:3px solid #000; border-radius:10px; overflow:hidden; background:#000;}
+    border:3px solid var(--cb000000, #000000); border-radius:10px; overflow:hidden; background:var(--cb000000, #000000);}
   #play-pct .pp-btn{grid-column:auto; flex:none; width:36px; margin:0; padding:0; border:none; border-radius:0;
     box-shadow:none; font-size:1rem; line-height:1; cursor:pointer; touch-action:manipulation; user-select:none;
-    -webkit-tap-highlight-color:transparent; background:var(--bookmark, #a9825f); color:var(--bookmark-ink, #fff);}
+    -webkit-tap-highlight-color:transparent; background:var(--bookmark, var(--cba9825f, #a9825f)); color:var(--bookmark-ink, var(--cfffffff, #ffffff));}
   
-  #play-pct .pp-btn:first-child{border-right:3px solid #000;}
-  #play-pct .pp-btn:last-child{border-left:3px solid #000;}
+  #play-pct .pp-btn:first-child{border-right:3px solid var(--cb000000, #000000);}
+  #play-pct .pp-btn:last-child{border-left:3px solid var(--cb000000, #000000);}
   #play-pct-bar{position:relative; flex:1; min-width:0; background:var(--unread); touch-action:none; cursor:grab;}
   #play-pct-fill{position:absolute; left:0; top:-3px; width:100%; height:calc(100% + 6px); pointer-events:none;}   /* wound tape, past the edges; the card clips it */
   #play-pct-text{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-family:Georgia, serif; font-size:.8rem; font-weight:600; color:#000; pointer-events:none;}
+    font-family:Georgia, serif; font-size:.8rem; font-weight:600; color:var(--cf000000, #000000); pointer-events:none;}
   #play-pct-text::before{content:attr(data-v);}
 
-  #play-update:disabled, #page-update:disabled{background:#d6d2c8; color:#8f8a80; cursor:default;}
+  #play-update:disabled, #page-update:disabled{background:var(--cbd6d2c8, #d6d2c8); color:var(--cf8f8a80, #8f8a80); cursor:default;}
   .play-set.locked .lw-wheel{cursor:pointer;}
   .lw-wheel{position:relative; flex:1; min-width:0; height:100%; overflow:hidden; touch-action:none; cursor:grab;}
-  .lw-wheel + .lw-wheel{border-left:3px solid #000;}
-  .lw-wheel div{position:absolute; left:0; right:0; top:0; height:16px; text-align:center; color:#000;
+  .lw-wheel + .lw-wheel{border-left:3px solid var(--cb000000, #000000);}
+  .lw-wheel div{position:absolute; left:0; right:0; top:0; height:16px; text-align:center; color:var(--cf000000, #000000);
     font:700 14px/16px Arial, sans-serif; user-select:none; will-change:transform;}
   .lw-wheel span{position:absolute; left:8px; top:50%; transform:translateY(-50%); font:600 .7rem Arial, sans-serif; color:var(--muted); pointer-events:none;}
   #pages-card.wheels-open{background:var(--panel);}
@@ -397,14 +397,14 @@
   #book-fields.audio > #pages-card{display:none;}
   #book-fields.audio > #length-wheels{grid-column:span 4;}
   #book-fields.audio > #tags-card{grid-column:span 2;}
-  #book-fields.audio > #pages-card.invalid + #length-wheels{border-color:#a33;}   /* missing length shows on the wheels */
+  #book-fields.audio > #pages-card.invalid + #length-wheels{border-color:var(--cbaa3333, #aa3333);}   /* missing length shows on the wheels */
   .field-card{
     grid-column:span 3;
     display:flex;
     flex-direction:column;
     justify-content:center;
     background:var(--panel);
-    border:3px solid #000;
+    border:3px solid var(--cb000000, #000000);
     border-radius:8px;
     padding:0 8px;
     min-width:0;
@@ -412,16 +412,16 @@
   .field-card.span2{grid-column:span 2;}
   .field-card.span1{grid-column:span 1;}
   .field-card:focus-within{background:var(--bg);}
-  .field-card.invalid{border-color:#a33;}
+  .field-card.invalid{border-color:var(--cbaa3333, #aa3333);}
   .field-card label{font-family:Arial, sans-serif; font-size:.62rem; color:var(--muted); line-height:1.1;}
-  .field-card.invalid label{color:#a33;}
+  .field-card.invalid label{color:var(--cfaa3333, #aa3333);}
   .field-card input{
     border:none; border-radius:0; padding:0; margin:0; background:transparent; height:20px;
     font-family:Georgia, serif; font-size:.82rem; color:var(--ink); width:100%;
   }
   .field-card input:focus{border:none;}
   .field-card input::placeholder{color:var(--muted); opacity:1; font:700 min(.74rem, 2.95vw) Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
-  .field-card.invalid input::placeholder{color:#a33;}
+  .field-card.invalid input::placeholder{color:var(--cfaa3333, #aa3333);}
   #tags-card{cursor:pointer;}
   /* split cards: Title | Subtitle, and Author | Author List, each one card divided in half */
   .field-card.split{display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); align-items:stretch; padding:0; overflow:hidden;}   /* two exactly equal halves, whatever their padding or divider */
@@ -430,7 +430,7 @@
   .fc-half:focus-within{background:var(--bg);}
   /* Title | Subtitle divider: its own line, so it can be drawn up into the top border as the card moves up (--dv 1 = full, 0 = gone) */
   #author-card{position:relative;}
-  #title-card::before, #author-card::before{content:''; position:absolute; left:50%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:#000; transform-origin:50% 0; transform:scaleY(var(--dv, 1)); pointer-events:none;}
+  #title-card::before, #author-card::before{content:''; position:absolute; left:50%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); transform-origin:50% 0; transform:scaleY(var(--dv, 1)); pointer-events:none;}
   .field-card.split.invalid .fc-half + .fc-half input::placeholder{color:var(--muted);}   /* only the first half (Title) is the required one */
   .fc-more{
     grid-column:auto; flex:1 1 0; min-width:0; width:auto; margin:0; padding:0 2px; box-shadow:none;
@@ -440,7 +440,7 @@
    .fc-more:active{background:var(--bg); box-shadow:none;}
   #tags-value{height:20px; line-height:20px; font-family:Georgia, serif; font-size:.82rem; color:var(--ink);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  #tags-value.none{color:#c4bdb0;}
+  #tags-value.none{color:var(--cfc4bdb0, #c4bdb0);}
 
   /* every look option in one subdivided card: Cover | Binding | Ribbon | Design | Pages
      (audiobook: Body | Spinners | Sticker). Each section: name, swatch, choice. Tap to cycle. */
@@ -452,7 +452,7 @@
     margin-top:4px;
     height:45px;
     box-sizing:border-box;
-    border:3px solid #000;
+    border:3px solid var(--cb000000, #000000);
     border-radius:8px;
     overflow:hidden;
     background:var(--panel);
@@ -461,7 +461,7 @@
     flex:1 1 0; display:flex; flex-direction:column; align-items:stretch; justify-content:center; gap:1px;
     height:100%; border:none; border-radius:0; padding:2px 5px; box-sizing:border-box;
   }
-  #customize-fields > .cycle-card + .cycle-card{border-left:3px solid #000;}
+  #customize-fields > .cycle-card + .cycle-card{border-left:3px solid var(--cb000000, #000000);}
   #customize-fields > #customize-shape-card{display:none;}          /* ribbon tip: always classic */
   #customize-fields > .cycle-card .cycle-title{font-size:.5rem; line-height:1; text-align:center; align-self:auto;}
   #customize-fields > .cycle-card .cycle-preview{width:auto; height:11px; border-radius:3px; flex:none;}
@@ -501,10 +501,10 @@
   #customize-fields > .cycle-card .cycle-subtitle{letter-spacing:0; font-size:.66rem !important;}
   #customize-fields > .cycle-card .cycle-title{display:none;}        /* just the style or colour name */
   #customize-fields > .cycle-card{padding-left:2px; padding-right:2px;}
-  #customize-fields > #customize-border-card{position:relative; color:#fff; background:#000;}
+  #customize-fields > #customize-border-card{position:relative; color:var(--cfffffff, #ffffff); background:var(--cb000000, #000000);}
   #customize-fields > #customize-border-card .cycle-preview{position:absolute; inset:0; width:100%; height:100%; border-radius:0; box-shadow:none;}
   #customize-fields > #customize-border-card .cycle-title,
-  #customize-fields > #customize-border-card .cycle-subtitle{position:relative; z-index:1; color:#fff; text-shadow:0 0 3px #000, 0 0 3px #000, 0 0 2px #000;}
+  #customize-fields > #customize-border-card .cycle-subtitle{position:relative; z-index:1; color:var(--cfffffff, #ffffff); text-shadow:0 0 3px var(--cb000000, #000000), 0 0 3px var(--cb000000, #000000), 0 0 2px var(--cb000000, #000000);}
   #customize-fields > #customize-border-card .cycle-title{opacity:.9; font-size:.55rem;}
   #customize-fields > #customize-border-card .cycle-subtitle{font-weight:700; font-size:.68rem;}
   .cycle-card{
@@ -516,7 +516,7 @@
     align-items:center;
     height:45px;
     background:var(--panel);
-    border:3px solid #000;
+    border:3px solid var(--cb000000, #000000);
     border-radius:8px;
     padding:3px 6px 3px 3px;
     min-width:0;
@@ -553,7 +553,7 @@
     font-family:Arial, sans-serif;
     font-size:.85rem;
     padding:8px 11px;
-    border:3px solid #000;
+    border:3px solid var(--cb000000, #000000);
     border-radius:5px;
     background:var(--bg);
     color:var(--ink);
@@ -561,7 +561,7 @@
     width:100%;
     transition:border-color .15s;
   }
-  input:focus{border-color:#000;}
+  input:focus{border-color:var(--cb000000, #000000);}
   button{
     grid-column:1 / -1;
     font-family:Arial, sans-serif;
@@ -569,8 +569,8 @@
     padding:9px 18px;
     border:none;
     border-radius:5px;
-    background:var(--ink);
-    color:#fff;
+    background:var(--ink-bg, var(--ink));
+    color:var(--cfffffff, #ffffff);
     cursor:pointer;
     letter-spacing:1.5px;
     text-transform:uppercase;
@@ -666,7 +666,7 @@
     top:-7px;
     width:1px;
     height:11px;
-    background:#b5342a;
+    background:var(--cbb5342a, #b5342a);
     border-radius:0;
     transform:translateX(-50%);
     pointer-events:none;
@@ -685,8 +685,8 @@
 
   .tooltip{
     position:fixed;
-    background:var(--ink);
-    color:#fff;
+    background:var(--ink-bg, var(--ink));
+    color:var(--cfffffff, #ffffff);
     font-family:Arial, sans-serif;
     font-size:.75rem;
     padding:6px 10px;
@@ -737,7 +737,7 @@
     z-index:21;
     display:none;
     cursor:pointer;
-    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color:transparent;
     outline:none;
   }
   #book-canvas.active{display:block;}
@@ -748,8 +748,8 @@
     left:0; right:0;
     top:0;
     z-index:22;
-    background:#fff;
-    border-bottom:3px solid #000;
+    background:var(--cbffffff, #ffffff);
+    border-bottom:3px solid var(--cb000000, #000000);
     padding:calc(4px + env(safe-area-inset-top)) 4px 4px;
     /* parked above the top edge; extra 30px clears the shadow */
     transform:translateY(calc(-100% - 30px));
@@ -766,7 +766,7 @@
   #book-actions{
     display:flex;
     height:44px;
-    border:3px solid #000;
+    border:3px solid var(--cb000000, #000000);
     border-radius:10px;
     overflow:hidden;
   }
@@ -778,7 +778,7 @@
     border:none;
     border-radius:0;
     box-shadow:none;
-    background:#fff;
+    background:var(--cbffffff, #ffffff);
     color:var(--ink);
     font-family:Arial, sans-serif;
     font-size:.78rem;
@@ -786,11 +786,11 @@
     letter-spacing:.3px;
     text-transform:none;
   }
-  #book-actions button + button{border-left:3px solid #000;}
+  #book-actions button + button{border-left:3px solid var(--cb000000, #000000);}
   #book-actions button:first-child{border-radius:8px 0 0 8px;}
   #book-actions button:last-child{border-radius:0 8px 8px 0;}
    #book-actions button:active{background:var(--bg); box-shadow:none;}
-  #delete-btn{color:#a33;}
+  #delete-btn{color:var(--cfaa3333, #aa3333);}
   #page-panel{
     position:fixed;
     left:0; right:0;
@@ -799,8 +799,8 @@
     display:flex;
     flex-direction:column;
     gap:0;
-    background:#fff;
-    border-top:3px solid #000;
+    background:var(--cbffffff, #ffffff);
+    border-top:3px solid var(--cb000000, #000000);
     padding:4px 4px calc(4px + env(safe-area-inset-bottom));
     transform:translateY(calc(100% + 30px));
     pointer-events:none;
@@ -817,10 +817,10 @@
     display:flex;
     align-items:stretch;
     height:44px;
-    border:3px solid #000;
+    border:3px solid var(--cb000000, #000000);
     border-radius:10px;
     overflow:hidden;
-    background:#000;   /* any corner sliver shows black, matching the border */
+    background:var(--cb000000, #000000);   /* any corner sliver shows black, matching the border */
   }
   .pm-btn{
     grid-column:auto; margin:0; padding:0; box-shadow:none; border-radius:0;
@@ -828,25 +828,25 @@
     width:40px;
     border:none;
     background:var(--wood);
-    color:#fff;
+    color:var(--cfffffff, #ffffff);
     font-size:1.15rem;
     display:flex;
     align-items:center;
     justify-content:center;
   }
-  .pm-btn:first-child{border-right:3px solid #000;}
-  .pm-btn:last-child{border-left:3px solid #000;}
+  .pm-btn:first-child{border-right:3px solid var(--cb000000, #000000);}
+  .pm-btn:last-child{border-left:3px solid var(--cb000000, #000000);}
      /* the card's rounded corners clip the ends */
   #combined-bar{
     position:relative;
     flex:1;
-    background:#fff;   /* white, so the page-coloured fill stands out */
+    background:var(--cbffffff, #ffffff);   /* white, so the page-coloured fill stands out */
     touch-action:none;
     cursor:grab;
   }
   #combined-bar:active{cursor:grabbing;}
   #combined-bar{overflow:hidden;}
-  #combined-fill{position:absolute; left:0; top:-3px; bottom:-3px; background-color:#a9825f;   /* overridden per book: cover color */
+  #combined-fill{position:absolute; left:0; top:-3px; bottom:-3px; background-color:var(--cba9825f, #a9825f);   /* overridden per book: cover color */
     background-image:var(--page-lines); background-repeat:repeat; background-size:120px 100%;}
   #combined-overlay{
     position:absolute;
@@ -867,7 +867,7 @@
   /* ---- daily reading chart card ---- */
   /* same subdivided graph card as the list dropdowns: 45px, bars on the bottom edge */
   #chart-card{margin:4px 0 0; padding:0; height:45px; box-sizing:border-box; overflow:hidden;
-    background:#fff; border:3px solid #000; border-radius:10px;}
+    background:var(--cbffffff, #ffffff); border:3px solid var(--cb000000, #000000); border-radius:10px;}
   #chart-card svg{display:block; width:100%; overflow:visible;}
 
   /* ---- line(s) under the chart: fixed two-line height in every state so
@@ -887,7 +887,7 @@
      (not a backdrop-filter), so the edges of the screen blur evenly instead of staying sharp */
   #backup-modal{background:transparent;}
   body.bk-blur > *:not(#backup-modal):not(#splash):not(script){filter:blur(7px); transition:filter .2s ease;}
-  #bk-every button.on{background:var(--ink); color:#fff;}
+  #bk-every button.on{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   .rr-note{margin-top:10px; font-family:Arial, sans-serif; font-size:.64rem; color:var(--muted); line-height:1.35;}
   /* Weekly, when picked: label in the top half, the day to ask on in the bottom half */
   #bk-every button[data-every="week"]{display:flex; flex-direction:column; align-items:stretch; justify-content:center;}
@@ -898,21 +898,21 @@
   #bk-every .wk-days i{flex:1; display:flex; align-items:center; justify-content:center; font-style:normal;
     font-size:.6rem; font-weight:700;}
   #bk-every .wk-days i + i{border-left:1.5px solid rgba(255,255,255,.28);}
-  #bk-every .wk-days i.on{background:#5a4c40; background-clip:padding-box;}   /* the picked day: a touch lighter brown; its divider stays as is */
+  #bk-every .wk-days i.on{background:var(--cb5a4c40, #5a4c40); background-clip:padding-box;}   /* the picked day: a touch lighter brown; its divider stays as is */
   .dt-note{font-family:Arial, sans-serif; font-size:.66rem; color:var(--muted); line-height:1.4; padding:2px 4px;}
   .rr-box{
-    width:100%; max-width:320px; background:#fff; border:3px solid #000; border-radius:12px;
+    width:100%; max-width:320px; background:var(--cbffffff, #ffffff); border:3px solid var(--cb000000, #000000); border-radius:12px;
     padding:18px 16px 14px; text-align:center; box-shadow:0 12px 32px rgba(0,0,0,.3);
   }
   .rr-title{font-family:Georgia, serif; font-size:1.05rem; margin-bottom:6px; color:var(--ink);}
   .rr-body{font-family:Arial, sans-serif; font-size:.78rem; color:var(--muted); line-height:1.4; margin-bottom:14px;}
-  .rr-btns{display:flex; height:42px; border:3px solid #000; border-radius:10px; overflow:hidden;}
+  .rr-btns{display:flex; height:42px; border:3px solid var(--cb000000, #000000); border-radius:10px; overflow:hidden;}
   .rr-btns button{
     grid-column:auto; flex:1; margin:0; padding:0; border:none; border-radius:0; box-shadow:none;
-    background:#fff; color:var(--ink); font-family:Arial, sans-serif; font-size:.78rem; font-weight:600;
+    background:var(--cbffffff, #ffffff); color:var(--ink); font-family:Arial, sans-serif; font-size:.78rem; font-weight:600;
     letter-spacing:.3px; text-transform:none;
   }
-  .rr-btns button + button{border-left:3px solid #000; background:var(--ink); color:#fff;}
+  .rr-btns button + button{border-left:3px solid var(--cb000000, #000000); background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   
   
   
@@ -932,20 +932,20 @@
     grid-column:auto; margin:0; box-shadow:none; letter-spacing:.3px; text-transform:none;
     font-family:Arial, sans-serif; font-size:.75rem; font-weight:600; border-radius:8px;
   }
-  #log-add{border:3px solid #000; background:#fff; color:var(--ink); padding:0;}
+  #log-add{border:3px solid var(--cb000000, #000000); background:var(--cbffffff, #ffffff); color:var(--ink); padding:0;}
   
-  #log-done{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
+  #log-done{border:3px solid var(--cb000000, #000000); background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff); padding:0;}
   
   .lg-foot{display:flex; margin-top:auto;}
   .lg-summary{
     display:flex; height:45px; box-sizing:border-box; margin:6px 4px; flex:none;
-    border:3px solid #000; border-radius:8px; overflow:hidden; background:#fff;
+    border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden; background:var(--cbffffff, #ffffff);
   }
   .lg-summary{align-items:center; justify-content:space-between; padding:0 10px;
     font-family:Arial, sans-serif; font-size:.78rem; color:var(--muted);}
   .lg-summary b{color:var(--ink);}
   .lg-warn{
-    margin:0 4px 4px; padding:8px 10px; border-radius:8px; background:#f6e3df; color:#a33;
+    margin:0 4px 4px; padding:8px 10px; border-radius:8px; background:var(--cbf6e3df, #f6e3df); color:var(--cfaa3333, #aa3333);
     font-family:Arial, sans-serif; font-size:.72rem; display:none;
   }
   .lg-warn.show{display:block;}
@@ -958,49 +958,49 @@
   .lg-body{display:flex; gap:4px; align-items:flex-start;}
   .lg-bar{
     width:16px; flex-shrink:0; display:flex; flex-direction:column;
-    border:3px solid #000; border-radius:8px; overflow:hidden; background:var(--unread);
+    border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden; background:var(--unread);
   }
   .lg-slot{flex-shrink:0; background:var(--unread); cursor:pointer;}
-  .lg-slot + .lg-slot{border-top:3px solid #000;}
+  .lg-slot + .lg-slot{border-top:3px solid var(--cb000000, #000000);}
   .lg-slot:last-child{flex:1 0 auto;}   /* lowest slot always fills to the bar's bottom edge */
   .lg-slot.on{background:var(--wood);}
   .lg-slot.locked{background:var(--line); cursor:default;}
   .lg-rows{flex:1; min-width:0; display:flex; flex-direction:column; gap:4px;}
   .lg-row{
     display:grid; grid-template-columns:62px minmax(0, 1fr) minmax(0, 1fr) 40px; gap:4px; align-items:center;
-    background:#fff; border:3px solid #000; border-radius:10px; padding:4px;
+    background:var(--cbffffff, #ffffff); border:3px solid var(--cb000000, #000000); border-radius:10px; padding:4px;
   }
   .lg-row.today{background:var(--bg);}   /* every row is black-bordered now; Today is tinted instead */
   /* Day N + date, in a narrow card (wide enough for Day 120) */
   .lg-day{
     height:40px; display:flex; flex-direction:column; justify-content:center; min-width:0;
-    padding:0 2px; border:3px solid #000; border-radius:8px; background:#fff; align-items:center; text-align:center;   /* up to three digits wide */
+    padding:0 2px; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); align-items:center; text-align:center;   /* up to three digits wide */
     font-family:Arial, sans-serif; font-size:.78rem; color:var(--ink); line-height:1.15;
   }
   .lg-day b{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .lg-day small{display:block; color:var(--muted); font-size:.62rem; white-space:nowrap;}
   .lg-row input{
-    width:100%; height:40px; border:3px solid #000; border-radius:8px; text-align:center;
-    font-family:Georgia, serif; font-size:.9rem; font-weight:600; background:#fff; color:var(--ink);
+    width:100%; height:40px; border:3px solid var(--cb000000, #000000); border-radius:8px; text-align:center;
+    font-family:Georgia, serif; font-size:.9rem; font-weight:600; background:var(--cbffffff, #ffffff); color:var(--ink);
   }
-  .lg-row input:focus{border-color:#000; background:#faf7f0;}
+  .lg-row input:focus{border-color:var(--cb000000, #000000); background:var(--cbfaf7f0, #faf7f0);}
   /* no spinner arrows: they took room on the right and pushed the number off-centre */
   .lg-row input{-moz-appearance:textfield; appearance:textfield; padding:0;}
   .lg-row input::-webkit-inner-spin-button, .lg-row input::-webkit-outer-spin-button{-webkit-appearance:none; margin:0;}
   /* audiobook log: a time wheel per box, three even sections (hours | minutes | seconds) */
-  .lg-tw{display:flex; min-width:0; height:40px; box-sizing:border-box; border:3px solid #000; border-radius:8px;
-    background:#fff; overflow:hidden;}
+  .lg-tw{display:flex; min-width:0; height:40px; box-sizing:border-box; border:3px solid var(--cb000000, #000000); border-radius:8px;
+    background:var(--cbffffff, #ffffff); overflow:hidden;}
   .lg-tw .lw-wheel div{font-family:Georgia, serif; font-size:13px; font-weight:600; color:var(--ink);}
   .lg-del{
-    grid-column:auto; width:40px; height:40px; margin:0; padding:0; border:3px solid #000; border-radius:8px; box-shadow:none;
-    background:#fff; color:#a33; font-size:1rem; font-weight:900; -webkit-text-stroke:1.2px currentColor; letter-spacing:0; text-transform:none;
+    grid-column:auto; width:40px; height:40px; margin:0; padding:0; border:3px solid var(--cb000000, #000000); border-radius:8px; box-shadow:none;
+    background:var(--cbffffff, #ffffff); color:var(--cfaa3333, #aa3333); font-size:1rem; font-weight:900; -webkit-text-stroke:1.2px currentColor; letter-spacing:0; text-transform:none;
   }
      /* not the app-wide button hover */
   /* pale red on hover only with a real mouse: on a phone :hover sticks after a tap */
   @media (hover:hover){  }
-  .lg-del.armed{background:#a33; color:#fff;}   /* tapped once: tap again to delete */
+  .lg-del.armed{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff);}   /* tapped once: tap again to delete */
   /* Today can't be deleted: the same card, greyed out and inert */
-  .lg-del:disabled{background:#d6d2c8; color:#8f8a80; cursor:default;}
+  .lg-del:disabled{background:var(--cbd6d2c8, #d6d2c8); color:var(--cf8f8a80, #8f8a80); cursor:default;}
   /* audiobook rows: Day | Played | Left | ✕, the same grid as a book's */
 
 
@@ -1025,22 +1025,22 @@
     opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;
   }
   #timeline-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
-  #timeline-back{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
+  #timeline-back{border:3px solid var(--cb000000, #000000); background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff); padding:0;}
   
   #timeline-body{flex:1; min-height:0; display:flex; flex-direction:column;}
   /* two one-card choosers (what, and over what span), then the timeline card, then a fixed footer */
-  .tl-views{flex:none; display:flex; gap:3px; margin:4px 4px 0; height:45px; background:#000; border:3px solid #000; border-radius:8px; overflow:hidden;}
-  .tl-views button{grid-column:auto; flex:1 1 0; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:#fff; color:var(--muted);
+  .tl-views{flex:none; display:flex; gap:3px; margin:4px 4px 0; height:45px; background:var(--cb000000, #000000); border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;}
+  .tl-views button{grid-column:auto; flex:1 1 0; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--muted);
     font-family:Arial, sans-serif; font-size:.78rem; font-weight:400; letter-spacing:.5px; text-transform:none; cursor:pointer;}
   
-  .tl-views button.on{background:var(--ink); color:#fff;}
+  .tl-views button.on{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   .tl-views button{transition:none;}   /* switch instantly: no fade from the last choice when the tab reopens */
   .tl-page{flex:1; min-height:0; display:flex; padding:4px;}
-  .tl-card{flex:1; position:relative; border:3px solid #000; border-radius:8px; background:#fff; overflow:hidden;}
+  .tl-card{flex:1; position:relative; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); overflow:hidden;}
   /* under the card: a card the height of the tab cards that opens the chart on its own, full window */
-  #tl-full{flex:none; grid-column:auto; height:21px; margin:0 4px 4px; padding:0; box-sizing:border-box; border:3px solid #000; border-radius:8px;
-    background:#fff; color:var(--ink); box-shadow:none; font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; cursor:pointer;}   /* the tabs' own type */
-   #tl-full:active{background:#fff; box-shadow:none;}
+  #tl-full{flex:none; grid-column:auto; height:21px; margin:0 4px 4px; padding:0; box-sizing:border-box; border:3px solid var(--cb000000, #000000); border-radius:8px;
+    background:var(--cbffffff, #ffffff); color:var(--ink); box-shadow:none; font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; cursor:pointer;}   /* the tabs' own type */
+   #tl-full:active{background:var(--cbffffff, #ffffff); box-shadow:none;}
   /* full window: just the card on the page's ground, 4px from every edge; any tap brings everything back */
   body.tl-full #timeline-page{top:0; z-index:100;}
   body.tl-full #tl-full{display:none;}
@@ -1053,10 +1053,10 @@
   body.tl-full #tl-full-exit{display:block;}
   #tl-canvas{position:absolute; inset:21px 0 0; overflow:hidden; -webkit-user-select:none; user-select:none;}   /* under the header strip */
   /* the card's header strip: what each column is (Date | Books | Audiobooks), split by the same black lines as the columns below */
-  #tl-head{position:absolute; left:0; right:0; top:0; height:21px; box-sizing:border-box; border-bottom:3px solid #000; background:#fff; overflow:hidden;}
+  #tl-head{position:absolute; left:0; right:0; top:0; height:21px; box-sizing:border-box; border-bottom:3px solid var(--cb000000, #000000); background:var(--cbffffff, #ffffff); overflow:hidden;}
   #tl-head > span{position:absolute; top:0; bottom:0; display:flex; align-items:center; justify-content:center; white-space:nowrap; overflow:hidden;
     font:700 min(.62rem, 2.6vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink);}
-  #tl-head > i{position:absolute; top:0; bottom:0; width:3px; background:#000;}
+  #tl-head > i{position:absolute; top:0; bottom:0; width:3px; background:var(--cb000000, #000000);}
   #tl-canvas > div{position:absolute;}
   #tl-canvas > .tl-pin{translate:var(--sx, 0px) 0;}   /* the date column stays put when the bars scroll sideways */
   .tl-lbl{font:800 8px Arial, sans-serif; letter-spacing:-.2px; color:var(--muted); text-transform:uppercase; text-align:center;}
@@ -1065,15 +1065,15 @@
   .tl-lbl.tl-wk .wd{font-size:8px; letter-spacing:.2px;}
   .tl-lbl.tl-wk .dn{font-size:11px; letter-spacing:0;}
   .tl-empty{font:.78rem Arial, sans-serif; color:var(--muted);}
-  .tl-bar{border:2px solid #000; border-radius:4px; z-index:3; cursor:pointer; box-sizing:border-box;}
+  .tl-bar{border:2px solid var(--cb000000, #000000); border-radius:4px; z-index:3; cursor:pointer; box-sizing:border-box;}
   .tl-bar.now{border-top-style:dashed;}
   .tl-bar.on{filter:brightness(.72);}   /* picked: the fill goes darker, no extra border */
-  .tl-gbar{background:#000; border-radius:0 4px 4px 0; z-index:3; cursor:pointer;}
+  .tl-gbar{background:var(--cb000000, #000000); border-radius:0 4px 4px 0; z-index:3; cursor:pointer;}
   .tl-gbar.on{filter:brightness(.72);}
-  .tl-gbar.on.plain{background:#6b6560 !important; filter:none;}   /* All Time's black bars can't go darker: they go grey */
+  .tl-gbar.on.plain{background:var(--cb6b6560, #6b6560) !important; filter:none;}   /* All Time's black bars can't go darker: they go grey */
   .tl-gval{font:800 9px/1 Arial, sans-serif; color:var(--ink); white-space:nowrap; transform:translateY(-50%); z-index:4; pointer-events:none;}
-  .tl-foot{flex:none; padding:4px 4px calc(4px + env(safe-area-inset-bottom)); background:var(--bg); border-top:3px solid #000;}
-  #tl-info{height:45px; box-sizing:border-box; border:3px solid #000; border-radius:8px; background:#fff;
+  .tl-foot{flex:none; padding:4px 4px calc(4px + env(safe-area-inset-bottom)); background:var(--bg); border-top:3px solid var(--cb000000, #000000);}
+  #tl-info{height:45px; box-sizing:border-box; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff);
     display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 10px; font-family:Arial, sans-serif; font-size:.72rem; color:var(--muted); line-height:1.2;}
   #tl-info .hint{flex:1; text-align:center;}
   #tl-info b{color:var(--ink);}
@@ -1090,16 +1090,16 @@
   #tl-info .t{font:600 .85rem Georgia, serif; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   /* This Month, nothing picked: ◀ | the month's totals + hint | ▶ */
   #tl-info.nav{padding:0; gap:0; align-items:stretch;}
-  #tl-info .tl-nav{flex:0 0 42px; box-sizing:border-box; height:auto; border:none; margin:0; padding:0; box-shadow:none; transform:none; background:#fff; color:var(--ink); font:900 15px/1 Arial, sans-serif; cursor:pointer; -webkit-tap-highlight-color:transparent;}
-  #tl-info .tl-nav:first-child{border-right:3px solid #000; border-radius:5px 0 0 5px;}
-  #tl-info .tl-nav:last-child{border-left:3px solid #000; border-radius:0 5px 5px 0;}
-  #tl-info .tl-nav:disabled{color:#d6d0c4; cursor:default;}
+  #tl-info .tl-nav{flex:0 0 42px; box-sizing:border-box; height:auto; border:none; margin:0; padding:0; box-shadow:none; transform:none; background:var(--cbffffff, #ffffff); color:var(--ink); font:900 15px/1 Arial, sans-serif; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  #tl-info .tl-nav:first-child{border-right:3px solid var(--cb000000, #000000); border-radius:5px 0 0 5px;}
+  #tl-info .tl-nav:last-child{border-left:3px solid var(--cb000000, #000000); border-radius:0 5px 5px 0;}
+  #tl-info .tl-nav:disabled{color:var(--cfd6d0c4, #d6d0c4); cursor:default;}
   #tl-info .tl-mid{flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:0 6px; text-align:center; line-height:1.05;}
   #tl-info .tl-mid > *{max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   #tl-info .tl-mid .t{font-size:.78rem;}
   #tl-info .tl-mid .tot{font-size:.66rem;}
   #tl-info .tl-mid .hint{flex:none; font-size:.54rem; letter-spacing:.2px;}
-  #data-done{border:3px solid #000; background:var(--ink); color:#fff; padding:0;}
+  #data-done{border:3px solid var(--cb000000, #000000); background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff); padding:0;}
   
   .dt-view{
     display:none; flex:1; min-height:0; flex-direction:column; gap:4px;
@@ -1108,11 +1108,11 @@
   .dt-view.active{display:flex;}
   /* each Data tab's action card sits in a footer bar at the bottom, like the app's other footers */
   .dt-foot{flex:none; margin:auto -4px calc(-4px - env(safe-area-inset-bottom)); padding:4px 4px calc(4px + env(safe-area-inset-bottom));
-    background:var(--bg); border-top:3px solid #000; border-bottom:3px solid #000;}
+    background:var(--bg); border-top:3px solid var(--cb000000, #000000); border-bottom:3px solid var(--cb000000, #000000);}
   /* Data → Stats: per section a bookcloth card naming it, a month/year bar card, then twelve figures in halves; all fit, nothing scrolls */
   #dt-view-stats.active{display:flex; flex-direction:column; gap:4px; overflow:hidden; font-family:Arial, sans-serif; color:var(--ink);}
   #dt-view-stats *{box-sizing:border-box;}
-  #dt-view-stats .st-c{border:3px solid #000; border-radius:8px; background:var(--panel); overflow:hidden; min-height:0; position:relative;}
+  #dt-view-stats .st-c{border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--panel); overflow:hidden; min-height:0; position:relative;}
   #dt-view-stats .st-k{font:700 min(.62rem, 2.6vw)/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); white-space:nowrap;}
   #dt-view-stats .st-v{font:600 min(.95rem, 4vw)/1.05 Georgia, serif; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;}
   #dt-view-stats .st-sec{flex:none; height:34px; display:flex; align-items:center; justify-content:center;}
@@ -1120,22 +1120,22 @@
   #dt-view-stats .st-sec span{position:relative; font:700 min(1rem, 4vw)/1 Georgia, 'Times New Roman', serif; letter-spacing:.14em; text-transform:uppercase; color:var(--ds-ink);}
   #dt-view-stats .st-list{flex:1 1 0; display:flex; flex-direction:column;}
   #dt-view-stats .st-list > div{flex:1 1 0; display:flex; align-items:stretch; min-height:0;}
-  #dt-view-stats .st-list > div + div{border-top:1px solid #e3dccd;}
+  #dt-view-stats .st-list > div + div{border-top:1px solid var(--cbe3dccd, #e3dccd);}
   #dt-view-stats .st-half{flex:1 1 0; min-width:0; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 10px;}
   #dt-view-stats .st-half:first-child{padding-right:12px;} #dt-view-stats .st-half + .st-half{padding-left:12px;}
   /* the halves' dividing line: one solid line down the whole card */
-  #dt-view-stats .st-list::after{content:''; position:absolute; top:0; bottom:0; left:50%; width:3px; margin-left:-1.5px; background:#000; z-index:1; pointer-events:none;}
+  #dt-view-stats .st-list::after{content:''; position:absolute; top:0; bottom:0; left:50%; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); z-index:1; pointer-events:none;}
   /* the bar card: regular card height; bars in the progress fill's paper (books) or tape (audiobooks), page lines across */
   #dt-view-stats .st-mon{flex:none; height:45px; display:flex; gap:3px; padding:3px 8px 2px;}
   #dt-view-stats .st-m{flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:1px;}
-  #dt-view-stats .st-bar{flex:1 1 0; width:100%; display:flex; align-items:flex-end; border-bottom:2px solid #000;}
+  #dt-view-stats .st-bar{flex:1 1 0; width:100%; display:flex; align-items:flex-end; border-bottom:2px solid var(--cb000000, #000000);}
   #dt-view-stats .st-bar i{display:block; width:100%; border-radius:2px 2px 0 0; background-image:var(--page-lines-h); background-repeat:repeat; background-size:4px 120px;}
-  #dt-view-stats .st-mon.book .st-bar i{background-color:#cbc4b1;}
-  #dt-view-stats .st-mon.tape .st-bar i{background-color:#8c5229;}
+  #dt-view-stats .st-mon.book .st-bar i{background-color:var(--cbcbc4b1, #cbc4b1);}
+  #dt-view-stats .st-mon.tape .st-bar i{background-color:var(--cb8c5229, #8c5229);}
   #dt-view-stats .st-ml{font:700 min(.55rem, 2.4vw)/1 Arial, sans-serif; color:var(--muted);}
   /* two to ten years: ten year slots, each its twelve month bars side by side over one baseline */
   #dt-view-stats .st-mon.years .st-ml{letter-spacing:0;}
-  #dt-view-stats .st-ms{flex:1 1 0; min-height:0; width:100%; display:flex; gap:.5px; border-bottom:2px solid #000;}
+  #dt-view-stats .st-ms{flex:1 1 0; min-height:0; width:100%; display:flex; gap:.5px; border-bottom:2px solid var(--cb000000, #000000);}
   #dt-view-stats .st-ms .st-bar{flex:1 1 0; min-width:0; border-bottom:0;}
   #dt-view-stats .st-ms .st-bar i{border-radius:1px 1px 0 0;}
   /* past ten years: a bar a year, 'xx under each to 25 years; past that the whole span once underneath */
@@ -1147,43 +1147,43 @@
   .dt-text{
     flex:1; min-height:0; width:100%; box-sizing:border-box; resize:none; margin:0;
     padding:8px; background:var(--panel); color:var(--ink);
-    border:3px solid #000; border-radius:8px; outline:none;
+    border:3px solid var(--cb000000, #000000); border-radius:8px; outline:none;
     font-family:ui-monospace, Menlo, Consolas, monospace; font-size:.7rem; line-height:1.4;
     white-space:pre; overflow:auto;
   }
-  .dt-text:focus{border-color:#000;}
+  .dt-text:focus{border-color:var(--cb000000, #000000);}
   /* restore: the three newest backups from the backup folder, one wide card each */
-  #dt-restore{flex:none; display:flex; flex-direction:column; gap:4px; padding:4px; background:var(--bg); border:3px solid #000; border-radius:8px;}
+  #dt-restore{flex:none; display:flex; flex-direction:column; gap:4px; padding:4px; background:var(--bg); border:3px solid var(--cb000000, #000000); border-radius:8px;}
   #dt-restore:empty{display:none;}
   #dt-restore .rs-card{grid-column:auto; display:flex; flex-direction:column; justify-content:center; gap:3px; width:100%; height:45px; margin:0; padding:0 8px; box-sizing:border-box;
-    background:var(--panel); border:3px solid #000; border-radius:8px; box-shadow:none; cursor:pointer; text-align:left;
+    background:var(--panel); border:3px solid var(--cb000000, #000000); border-radius:8px; box-shadow:none; cursor:pointer; text-align:left;
     font:400 .62rem/1.15 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--muted);}
    #dt-restore .rs-card:active{background:var(--bg); box-shadow:none;}
-  #dt-restore .rs-card.on{background:var(--ink); color:#d6cfc2;}
-  #dt-restore .rs-card.on b{color:#fff;}
+  #dt-restore .rs-card.on{background:var(--ink-bg, var(--ink)); color:var(--cfd6cfc2, #d6cfc2);}
+  #dt-restore .rs-card.on b{color:var(--cfffffff, #ffffff);}
   #dt-restore .rs-row{display:flex; justify-content:space-between; gap:8px; white-space:nowrap;}
   #dt-restore .rs-card:has(> .rs-sec){flex-direction:row; align-items:stretch; padding:0;}
   #dt-restore .rs-sec{flex:1 1 0; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:3px; padding:0 6px; white-space:nowrap; overflow:hidden; font-size:min(.6rem, 2.35vw); letter-spacing:-.1px;}
   #dt-restore .rs-sec.rs-date{font-size:.62rem; letter-spacing:0; padding:0 8px;}
   #dt-restore .rs-sec > *{overflow:hidden; text-overflow:ellipsis;}
   #dt-restore .rs-sec.rs-date{flex:1 1 0;}   /* date, books and audiobooks: an even third each */
-  #dt-restore .rs-sec + .rs-sec{border-left:3px solid #000;}
-  #dt-restore .rs-card.on .rs-sec + .rs-sec{border-left-color:#000;}
+  #dt-restore .rs-sec + .rs-sec{border-left:3px solid var(--cb000000, #000000);}
+  #dt-restore .rs-card.on .rs-sec + .rs-sec{border-left-color:var(--cb000000, #000000);}
   #dt-restore .rs-row > span{min-width:0; overflow:hidden; text-overflow:ellipsis;}
   #dt-restore b{color:var(--ink); font-weight:700;}
   #dt-restore .rs-when{font:700 .66rem/1.1 Arial, sans-serif; text-transform:uppercase; color:var(--ink);}
-  #dt-restore .rs-card.on .rs-when{color:#fff;}
+  #dt-restore .rs-card.on .rs-when{color:var(--cfffffff, #ffffff);}
   .dt-card{
     grid-column:1 / -1; display:flex; flex-direction:column; justify-content:center; min-width:0;
     margin:0; padding:0 8px; height:45px; flex:none; box-sizing:border-box;
-    background:var(--panel); border:3px solid #000; border-radius:8px; box-shadow:none;
+    background:var(--panel); border:3px solid var(--cb000000, #000000); border-radius:8px; box-shadow:none;
     font-family:Arial, sans-serif; font-size:.62rem; letter-spacing:0; text-transform:none; text-align:left;
     color:var(--muted); line-height:1.15;
   }
   .dt-card.half{grid-column:span 1;}
   .dt-card.bk-when{flex-direction:row; align-items:stretch; padding:0;}
   .dt-card.bk-when > span{flex:1 1 0; min-width:0; display:flex; flex-direction:column; justify-content:center; padding:0 8px;}
-  .dt-card.bk-when > span + span{border-left:3px solid #000;}
+  .dt-card.bk-when > span + span{border-left:3px solid var(--cb000000, #000000);}
   .dt-card.bk-how{justify-content:center; gap:3px; font-size:min(.62rem, 2.55vw); color:var(--ink);}
   /* the Backup tab: every card's words centred */
 
@@ -1196,7 +1196,7 @@
   #bk-loc-pick{flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; padding:0 8px;
     font-size:.62rem; color:var(--muted); line-height:1.15; text-align:left;}
   #bk-loc-pick b{max-width:100%;}
-  #bk-loc-clear{flex:0 0 39px; padding:0; border-left:3px solid #000; color:#a33; font-size:1rem; font-weight:700;}
+  #bk-loc-clear{flex:0 0 39px; padding:0; border-left:3px solid var(--cb000000, #000000); color:var(--cfaa3333, #aa3333); font-size:1rem; font-weight:700;}
   #bk-loc-clear[hidden]{display:none;}
   .dt-card b{
     font-family:Georgia, serif; font-size:.9rem; font-weight:600; color:var(--ink);
@@ -1204,27 +1204,27 @@
   }
   button.dt-card{cursor:pointer;}
    button.dt-card:active{background:var(--bg); box-shadow:none;}
-  .dt-card.error b{color:#a33;}
+  .dt-card.error b{color:var(--cfaa3333, #aa3333);}
   #dt-status{align-items:center; text-align:center;}   /* the Import card: above the text field, centred */
   #dt-status b{max-width:100%;}
   .dt-split{
     grid-column:1 / -1; display:flex; height:45px; flex:none; box-sizing:border-box;
-    border:3px solid #000; border-radius:8px; overflow:hidden; background:var(--panel);
+    border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden; background:var(--panel);
   }
   .dt-split button{
     grid-column:auto; flex:1; margin:0; padding:0; border:none; border-radius:0; box-shadow:none;
     background:var(--panel); color:var(--ink); font-family:Arial, sans-serif; font-size:.78rem;
     font-weight:600; letter-spacing:.3px; text-transform:none;
   }
-  .dt-split button + button{border-left:3px solid #000;}
+  .dt-split button + button{border-left:3px solid var(--cb000000, #000000);}
    .dt-split button:active{background:var(--bg); box-shadow:none;}
-  #dt-replace:not(.cloth-btn){color:#a33;}
+  #dt-replace:not(.cloth-btn){color:var(--cfaa3333, #aa3333);}
 
   .tabs{
     display:flex;
     gap:3px;               /* dividers: the black card shows through the gaps */
-    background:#000;
-    border:3px solid #000;
+    background:var(--cb000000, #000000);
+    border:3px solid var(--cb000000, #000000);
     border-radius:8px;
     padding:0;
     overflow:hidden;
@@ -1248,8 +1248,8 @@
   }
   .tab[hidden]{display:none;}
   .tab.active{
-    background:var(--ink);
-    color:#fff;
+    background:var(--ink-bg, var(--ink));
+    color:var(--cfffffff, #ffffff);
   }
 
   .view{display:none;width:100%;max-width:900px;}
@@ -1272,14 +1272,14 @@
     top:38%;
     left:50%;
     transform:translate(-50%,-50%) rotate(-1.2deg);
-    background:#efe6d3;
-    border:1px solid #c9b98f;
+    background:var(--cbefe6d3, #efe6d3);
+    border:1px solid var(--cbc9b98f, #c9b98f);
     border-radius:3px;
     padding:8px 22px;
     font-family:Georgia, serif;
     font-size:.9rem;
     letter-spacing:.5px;
-    color:#5c4a2e;
+    color:var(--cf5c4a2e, #5c4a2e);
     box-shadow:0 8px 20px rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.3);
     white-space:nowrap;
     z-index:5;
@@ -1310,8 +1310,8 @@
   #shelf-controls #sort-card{--l:var(--panel); --r:var(--panel); position:relative;
     background:linear-gradient(to right, var(--l) 0 27px, var(--panel) 27px calc(100% - 27px), var(--r) calc(100% - 27px)) border-box;}
   #sort-search, #sort-close{position:absolute; top:0; bottom:0; width:24px; display:flex; align-items:center; justify-content:center; background:none;}
-  #sort-search{left:0; border-right:3px solid #000;}
-  #sort-close{right:0; border-left:3px solid #000; display:none;}
+  #sort-search{left:0; border-right:3px solid var(--cb000000, #000000);}
+  #sort-close{right:0; border-left:3px solid var(--cb000000, #000000); display:none;}
   #sort-search svg, #sort-close svg{width:12px; height:12px; display:block;}
   #shelf-controls #sort-card:has(#sort-search:active){--l:var(--bg);}
   #sort-q{position:absolute; left:24px; right:24px; top:0; bottom:0; width:auto; display:none; margin:0; padding:0 6px; border:0; outline:0; border-radius:0; background:transparent; -webkit-appearance:none; appearance:none;
@@ -1331,55 +1331,55 @@
   /* Lists: small raised wooden buttons on each end of a full collection's board.
      A press sinks one into the board, the shelf turns over, and it rises back out */
   .shelf .wbtn{position:absolute; z-index:3; bottom:-23px; width:18px; height:18px; margin:0; padding:0; border:0; border-radius:3px; cursor:pointer;
-    background:linear-gradient(180deg, #b07a4b 0, #996439 45%, #845530 100%);
-    box-shadow:inset 0 1px 0 rgba(255,228,195,.55), inset 0 -1px 0 rgba(50,28,12,.35), 0 0 0 1px #4a2e18, 0 2px 0 1px #3d2513, 0 3px 4px rgba(0,0,0,.35);
+    background:linear-gradient(180deg, var(--cbb07a4b, #b07a4b) 0, var(--cb996439, #996439) 45%, var(--cb845530, #845530) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,228,195,.55), inset 0 -1px 0 rgba(50,28,12,.35), 0 0 0 1px var(--cb4a2e18, #4a2e18), 0 2px 0 1px var(--cb3d2513, #3d2513), 0 3px 4px rgba(0,0,0,.35);
     display:flex; align-items:center; justify-content:center;}
   #library-container:not(.live3d) .shelf .wbtn{bottom:-21px;}
   
   .shelf .wbtn.prev{left:6px;} .shelf .wbtn.next{right:6px;}
   .shelf .wbtn::after{content:''; width:0; height:0; border-top:4px solid transparent; border-bottom:4px solid transparent; filter:drop-shadow(0 1px 0 rgba(255,228,195,.45));}
-  .shelf .wbtn.prev::after{border-right:6px solid #3a2213; margin-right:1px;}
-  .shelf .wbtn.next::after{border-left:6px solid #3a2213; margin-left:1px;}
-  .shelf .wbtn:disabled{cursor:default; background:linear-gradient(180deg, #9a6a42, #865a34 50%, #77502e);}
+  .shelf .wbtn.prev::after{border-right:6px solid var(--cb3a2213, #3a2213); margin-right:1px;}
+  .shelf .wbtn.next::after{border-left:6px solid var(--cb3a2213, #3a2213); margin-left:1px;}
+  .shelf .wbtn:disabled{cursor:default; background:linear-gradient(180deg, var(--cb9a6a42, #9a6a42), var(--cb865a34, #865a34) 50%, var(--cb77502e, #77502e));}
   .shelf .wbtn:disabled::after{opacity:.28;}
   .shelf .wbtn.down{transition:transform .11s ease-in, box-shadow .11s ease-in, background .11s;
-    transform:translateY(1px); background:linear-gradient(180deg, #4f3019 0, #63401f 55%, #6e4724 100%);
-    box-shadow:inset 0 2px 3px rgba(20,10,4,.75), inset 0 -1px 0 rgba(255,215,170,.18), 0 0 0 0 #4a2e18, 0 0 0 0 #3d2513, 0 1px 0 rgba(255,215,170,.28);}
+    transform:translateY(1px); background:linear-gradient(180deg, var(--cb4f3019, #4f3019) 0, var(--cb63401f, #63401f) 55%, var(--cb6e4724, #6e4724) 100%);
+    box-shadow:inset 0 2px 3px rgba(20,10,4,.75), inset 0 -1px 0 rgba(255,215,170,.18), 0 0 0 0 var(--cb4a2e18, #4a2e18), 0 0 0 0 var(--cb3d2513, #3d2513), 0 1px 0 rgba(255,215,170,.28);}
   .shelf .wbtn.down::after{transform:translateY(1px);}
   .shelf .wbtn.up{animation:wbtn-rise .2s ease-out;}
   @keyframes wbtn-rise{
-    from{transform:translateY(1px); background:linear-gradient(180deg, #4f3019 0, #63401f 55%, #6e4724 100%);
-      box-shadow:inset 0 2px 3px rgba(20,10,4,.75), inset 0 -1px 0 rgba(255,215,170,.18), 0 0 0 0 #4a2e18, 0 0 0 0 #3d2513, 0 1px 0 rgba(255,215,170,.28);}
+    from{transform:translateY(1px); background:linear-gradient(180deg, var(--cb4f3019, #4f3019) 0, var(--cb63401f, #63401f) 55%, var(--cb6e4724, #6e4724) 100%);
+      box-shadow:inset 0 2px 3px rgba(20,10,4,.75), inset 0 -1px 0 rgba(255,215,170,.18), 0 0 0 0 var(--cb4a2e18, #4a2e18), 0 0 0 0 var(--cb3d2513, #3d2513), 0 1px 0 rgba(255,215,170,.28);}
     to{transform:none;}
   }
   /* Add / Edit header: the same strip as the main tabs — 42px cells split by black lines.
      Back and Add are plain cells of equal width at each end (no button cards); the title sits
      in the middle cell, so it's centred on the whole window */
-  .customize-header{align-items:stretch; justify-content:flex-start; gap:0; padding:env(safe-area-inset-top) 0 0; background:#000; margin-bottom:0;}
+  .customize-header{align-items:stretch; justify-content:flex-start; gap:0; padding:env(safe-area-inset-top) 0 0; background:var(--cb000000, #000000); margin-bottom:0;}
   #customize-page > #format-tabs{margin-top:4px;}   /* 4px under the header, like every card under a header */
   .customize-header > *{flex:none;}
   #customize-back-btn, #customize-save-btn{
     flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
     font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; background-clip:padding-box;
   }
-  #customize-back-btn, #customize-back-btn:active{background:#7a2f2b; color:#fff; border-right:3px solid #000; box-shadow:none;}   /* Brick, the cover colour */
-  #customize-save-btn, #customize-save-btn:active{background:#2e4636; color:#fff; border-left:3px solid #000; box-shadow:none;}
+  #customize-back-btn, #customize-back-btn:active{background:var(--cb7a2f2b, #7a2f2b); color:var(--cfffffff, #ffffff); border-right:3px solid var(--cb000000, #000000); box-shadow:none;}   /* Brick, the cover colour */
+  #customize-save-btn, #customize-save-btn:active{background:var(--cb2e4636, #2e4636); color:var(--cfffffff, #ffffff); border-left:3px solid var(--cb000000, #000000); box-shadow:none;}
   .customize-header h2{flex:1 1 0; min-width:0; max-width:none; height:42px; line-height:42px; padding:0 6px; text-align:center; background:var(--bg); color:var(--ink);
     font:700 min(.74rem, 2.95vw)/42px Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}   /* same type as the main tabs */
   /* Sort and Filter: header like Add a Book's (Back cell on the left only, title centred on the window),
      filters as separate cards in a top section, sort cards below; every word inside a card */
-  .sh-head{flex:none; display:flex; align-items:stretch; padding:env(safe-area-inset-top) 0 0; background:#000; border-top:3px solid #000; border-bottom:3px solid #000;}
-  .sh-head #sort-done, .sh-head #sort-done:active{flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-right:3px solid #000; border-radius:0; box-shadow:none;
-    background:#7a2f2b; background-clip:padding-box; color:#fff; font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+  .sh-head{flex:none; display:flex; align-items:stretch; padding:env(safe-area-inset-top) 0 0; background:var(--cb000000, #000000); border-top:3px solid var(--cb000000, #000000); border-bottom:3px solid var(--cb000000, #000000);}
+  .sh-head #sort-done, .sh-head #sort-done:active{flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-right:3px solid var(--cb000000, #000000); border-radius:0; box-shadow:none;
+    background:var(--cb7a2f2b, #7a2f2b); background-clip:padding-box; color:var(--cfffffff, #ffffff); font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
   .sh-head h2{flex:1 1 0; min-width:0; margin:0; height:42px; padding:0 25% 0 0; display:flex; align-items:center; justify-content:center; background:var(--bg);
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink); white-space:nowrap;}
-  #sort-page .so-filter{height:auto; margin:0; padding:0 4px 4px; display:flex; flex-direction:column; gap:4px; border:0; border-bottom:3px solid #000; border-radius:0; overflow:visible; background:var(--bg);}
-  #sort-page .so-filter .so-opt{width:100%; height:45px; box-sizing:border-box; margin:0; padding:0 8px; border:3px solid #000; border-radius:8px; background:var(--panel);
+  #sort-page .so-filter{height:auto; margin:0; padding:0 4px 4px; display:flex; flex-direction:column; gap:4px; border:0; border-bottom:3px solid var(--cb000000, #000000); border-radius:0; overflow:visible; background:var(--bg);}
+  #sort-page .so-filter .so-opt{width:100%; height:45px; box-sizing:border-box; margin:0; padding:0 8px; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--panel);
     display:flex; flex-direction:column; justify-content:center; align-items:flex-start; text-align:left; text-transform:none; letter-spacing:0; line-height:1.15; box-shadow:none; font-weight:400;}
-  #sort-page .so-filter .so-opt + .so-opt{border-left:3px solid #000;}
+  #sort-page .so-filter .so-opt + .so-opt{border-left:3px solid var(--cb000000, #000000);}
   
-  #sort-page .so-filter .so-opt.on{background:var(--ink);}
-  #sort-page .so-filter .so-opt.on b{color:#fff;} #sort-page .so-filter .so-opt.on span{color:#cfc8ba;}
+  #sort-page .so-filter .so-opt.on{background:var(--ink-bg, var(--ink));}
+  #sort-page .so-filter .so-opt.on b{color:var(--cfffffff, #ffffff);} #sort-page .so-filter .so-opt.on span{color:var(--cfcfc8ba, #cfc8ba);}
   #sort-page .so-list{padding-top:0;}
   /* every card on this page: capitals, one height */
   #sort-page .so-opt{height:45px; box-sizing:border-box; flex:none;}
@@ -1387,22 +1387,22 @@
   #sort-page .so-opt span{font:400 .58rem/1.2 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
   #sort-page .list-divider{height:45px;}
   /* every header and footer bar is boxed: 3px black at its top and its bottom */
-  #app-header, #book-toolbar, .lg-head, .customize-header{border-top:3px solid #000;}
-  #app-footer, #page-panel, .tl-foot{border-bottom:3px solid #000;}
+  #app-header, #book-toolbar, .lg-head, .customize-header{border-top:3px solid var(--cb000000, #000000);}
+  #app-footer, #page-panel, .tl-foot{border-bottom:3px solid var(--cb000000, #000000);}
   /* the page never widens past the window, so the frozen header and footer always keep their size */
   html, body{overflow-x:clip; max-width:100%;}
   /* Reading Log, Lists, Authors, Timeline and Data headers: the same strip as Add a Book —
      a brick cell on the left, the title in capitals centred on the window, an optional green cell on the right */
-  .lg-head{display:flex; align-items:stretch; gap:0; padding:env(safe-area-inset-top) 0 0; background:#000; border-bottom:3px solid #000;}
+  .lg-head{display:flex; align-items:stretch; gap:0; padding:env(safe-area-inset-top) 0 0; background:var(--cb000000, #000000); border-bottom:3px solid var(--cb000000, #000000);}
   .lg-head > *{flex:none;}
   .lg-head h2{flex:1 1 0; min-width:0; height:42px; margin:0; padding:0 6px; display:flex; align-items:center; justify-content:center; background:var(--bg);
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink); white-space:nowrap;}
   .lg-head > span{display:none;}
   .lg-head > h2:has(+ span){padding-right:25%;}   /* no right cell: the title still centres on the window */
   .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done), .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done):active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
-    background:#7a2f2b; background-clip:padding-box; color:#fff; border-right:3px solid #000;
+    background:var(--cb7a2f2b, #7a2f2b); background-clip:padding-box; color:var(--cfffffff, #ffffff); border-right:3px solid var(--cb000000, #000000);
     font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
-  .lg-head > h2 + #log-add, .lg-head > h2 + #log-add:active{background:#2e4636; border-right:0; border-left:3px solid #000;}   /* + Add Day: forest, like Add */
+  .lg-head > h2 + #log-add, .lg-head > h2 + #log-add:active{background:var(--cb2e4636, #2e4636); border-right:0; border-left:3px solid var(--cb000000, #000000);}   /* + Add Day: forest, like Add */
   /* every button card reads in capitals, at the main window's size and weight */
   #book-actions button, .dd-acts button, .rr-btns button, .dt-split button, #play-update, .dd-confirm, #tag-new-add, #author-new-add{
     text-transform:uppercase; font-family:Arial, sans-serif; font-weight:700; letter-spacing:.3px;}
@@ -1412,22 +1412,22 @@
   #tabs .tab:not(.active), .customize-header h2, .sh-head h2, .lg-head h2{background:var(--hdr-cell);}
   /* the phone's own strips: black above the tabs (status bar) and below the footer (home bar) */
   html{background:var(--bg);}   /* (the phone strips are black from the tabs and footer themselves) */
-  #tabs{background:#000;}
-  #app-footer{box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 #000;}
+  #tabs{background:var(--cb000000, #000000);}
+  #app-footer{box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 var(--cb000000, #000000);}
   /* a shadow cast by the header / footer onto the page below / above them, always shown */
   #app-header{box-shadow:none;}
   #app-header::after, #app-footer::before{content:''; position:absolute; left:0; right:0; height:14px; pointer-events:none;
     opacity:1;}   /* always on */
   #app-header::after{top:100%; margin-top:3px; background:linear-gradient(180deg, rgba(0,0,0,.32), rgba(0,0,0,.12) 40%, rgba(0,0,0,0));}
   #app-footer::before{bottom:100%; margin-bottom:3px; background:linear-gradient(0deg, rgba(0,0,0,.32), rgba(0,0,0,.12) 40%, rgba(0,0,0,0));}
-  .tl-foot, .dt-foot{box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 #000;}
+  .tl-foot, .dt-foot{box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 var(--cb000000, #000000);}
   /* Timeline and Data have their own footers: the same shadow up onto the page above them */
   .tl-foot, .dt-foot{position:relative; z-index:3;}
   .tl-foot::before, .dt-foot::before{content:''; position:absolute; left:0; right:0; bottom:100%; margin-bottom:3px; height:14px; pointer-events:none;
     background:linear-gradient(0deg, rgba(0,0,0,.32), rgba(0,0,0,.12) 40%, rgba(0,0,0,0));}
-  #page-panel{box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 #000, 0 -8px 24px rgba(0,0,0,.18);}
-  #page-panel::after{content:''; position:absolute; left:0; right:0; top:100%; height:env(safe-area-inset-bottom); background:#000;}   /* under the lifted panel too */
-  #book-toolbar{box-shadow:inset 0 env(safe-area-inset-top) 0 #000, 0 8px 24px rgba(0,0,0,.18);}
+  #page-panel{box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 var(--cb000000, #000000), 0 -8px 24px rgba(0,0,0,.18);}
+  #page-panel::after{content:''; position:absolute; left:0; right:0; top:100%; height:env(safe-area-inset-bottom); background:var(--cb000000, #000000);}   /* under the lifted panel too */
+  #book-toolbar{box-shadow:inset 0 env(safe-area-inset-top) 0 var(--cb000000, #000000), 0 8px 24px rgba(0,0,0,.18);}
   /* tab cards (Shelf | List, Book | Audiobook, the Timeline and Data choices): the unpicked side in the same shade */
   .tabs .tab:not(.active), .tl-views button:not(.on){background:var(--hdr-cell);}
   #tabs .tab:not(.active), .tabs .tab:not(.active), .tl-views button:not(.on){color:var(--ink);}   /* unpicked text: the picked side's dark */
@@ -1437,9 +1437,9 @@
   /* filter / sort card: the tabs' size and weight */
   #shelf-controls #sort-card .sort-k, #shelf-controls #sort-card .sort-v, #sort-q{font-size:min(.74rem, 2.95vw); font-weight:700; letter-spacing:0;}
   /* Add Book: olive, white capitals, bold and a size up */
-  #add-card, #add-card:active{background:#5b6633; color:#fff;
+  #add-card, #add-card:active{background:var(--cb5b6633, #5b6633); color:var(--cfffffff, #ffffff);
     font:700 min(.92rem, 3.7vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
-  #add-card .plus{color:#fff; font-size:1.15em; font-weight:700;}
+  #add-card .plus{color:var(--cfffffff, #ffffff); font-size:1.15em; font-weight:700;}
   /* Add Book in pearlescent bookcloth: the olive weave is drawn on a canvas behind the words */
   #add-card{position:relative; overflow:hidden;}
   #add-card > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
@@ -1450,7 +1450,7 @@
   /* Data › Export: Copy (navy) and Download (plum) as two separate bookcloth cards side by side */
   .dt-pair{display:flex; gap:4px;}
   .cloth-btn, .cloth-btn:active{position:relative; overflow:hidden; flex:1 1 0; min-width:0; height:45px; margin:0; padding:0; box-sizing:border-box;
-    border:3px solid #000; border-radius:8px; background:var(--cloth, #5b6633); box-shadow:none; color:#fff; cursor:pointer;
+    border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cloth, var(--cb5b6633, #5b6633)); box-shadow:none; color:var(--cfffffff, #ffffff); cursor:pointer;
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   .cloth-btn > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
   .cloth-btn > .lbl{position:relative; text-shadow:none;}
@@ -1458,11 +1458,11 @@
   .dt-pair:has(> :nth-child(3)) > .cloth-btn > .lbl{font-size:min(.86rem, 3vw); letter-spacing:.08em; white-space:nowrap;}   /* three across: a touch smaller to fit */
   .cloth-btn:active > canvas{filter:brightness(.92);}
   /* the tab-card rows under the main strip, and the footer bars: walnut */
-  #app-header, #app-footer, .tl-foot, .dt-foot, #book-toolbar, #page-panel{background:#6b4a32;}
+  #app-header, #app-footer, .tl-foot, .dt-foot, #book-toolbar, #page-panel{background:var(--band);}
   /* main tabs: the picked one stays dark with a little book-cloth card round its word (its own colour,
      spine bands at the ends); same font and size, only the text turns white. No fade: it swaps at once */
   #tabs .tab{position:relative; transition:none;}
-  #tabs .tab > .bk{position:absolute; inset:4px; border:2.5px solid #000; border-radius:6px; overflow:hidden; display:none; pointer-events:none; background:var(--cloth);}
+  #tabs .tab > .bk{position:absolute; inset:4px; border:2.5px solid var(--cb000000, #000000); border-radius:6px; overflow:hidden; display:none; pointer-events:none; background:var(--cloth);}
   #tabs .tab > .bk canvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
   #tabs .tab.active > .bk{display:block;}
   #tabs .tab > span{position:relative;}
@@ -1483,9 +1483,9 @@
      its top, split into its sections by black lines (no rounded card); it sits over the picker's bottom edge */
   #customize-footer{position:relative; z-index:41; box-sizing:border-box; width:calc(100% + 8px); max-width:none; flex:none;
     margin:4px -4px calc(-4px - env(safe-area-inset-bottom));
-    padding:4px 4px calc(4px + env(safe-area-inset-bottom)); background:#6b4a32;
-    border-top:3px solid #000; border-bottom:3px solid #000;
-    box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 #000;}
+    padding:4px 4px calc(4px + env(safe-area-inset-bottom)); background:var(--band);
+    border-top:3px solid var(--cb000000, #000000); border-bottom:3px solid var(--cb000000, #000000);
+    box-shadow:inset 0 calc(-1 * env(safe-area-inset-bottom)) 0 var(--cb000000, #000000);}
   #customize-footer > #customize-fields{width:100%; max-width:none; margin:0; height:45px;}
   #customize-fields > .cycle-card{padding-bottom:2px;}
   /* while a picker is open: a gap in the page under the top field card makes room (the 3D book's space shrinks),
@@ -1500,9 +1500,9 @@
   #title-card.ct-prompt{cursor:pointer;}
   #title-card.ct-prompt > *{pointer-events:none;}
   /* the picker: a second footer above it, up to just under the 3D book */
-  #ctray{position:fixed; z-index:40; box-sizing:border-box; border:3px solid #000; overflow:hidden;
-    background:#6b4a32; padding:4px; display:flex; flex-direction:column;}
-  #ctray .ct-floor{position:relative; flex:1; min-height:0; width:100%; box-sizing:border-box; border:3px solid #000; border-radius:8px; overflow:hidden; background:var(--bg);}
+  #ctray{position:fixed; z-index:40; box-sizing:border-box; border:3px solid var(--cb000000, #000000); overflow:hidden;
+    background:var(--band); padding:4px; display:flex; flex-direction:column;}
+  #ctray .ct-floor{position:relative; flex:1; min-height:0; width:100%; box-sizing:border-box; border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden; background:var(--bg);}
   #ctray .ct-grid{position:absolute; inset:0; display:flex; flex-wrap:wrap; padding:8px; box-sizing:border-box; align-content:space-evenly; justify-content:center;}
   #ctray .ct-grid > .ct-book{margin:0 calc(var(--gx, 8px) / 2);}
   #ctray .ct-grid.lined{padding:0; flex-direction:column; flex-wrap:nowrap; justify-content:space-evenly; align-content:stretch;}
@@ -1512,10 +1512,10 @@
   #ctray .ct-book.ct-drop{animation:ct-in .22s cubic-bezier(.2,.8,.3,1) backwards;}   /* only when swapping kinds while open */
   #ctray .ct-book i{position:absolute; box-sizing:border-box; border-radius:3px;}
   /* Cover: a closed book lying on its back: cover colour, a darker spine down the left, the page edge at the right and bottom */
-  #ctray .k-cover .pg{left:3px; top:3px; right:-3px; bottom:-3px; border:2px solid #000; background:#f4efe3;}
-  #ctray .k-cover .cv{inset:0; border:2.5px solid #000; background:linear-gradient(90deg, var(--cd) 0 12%, var(--c) 12%);}
+  #ctray .k-cover .pg{left:3px; top:3px; right:-3px; bottom:-3px; border:2px solid var(--cb000000, #000000); background:var(--cbf4efe3, #f4efe3);}
+  #ctray .k-cover .cv{inset:0; border:2.5px solid var(--cb000000, #000000); background:linear-gradient(90deg, var(--cd) 0 12%, var(--c) 12%);}
   /* Pages: three loose sheets in a neat stack; the picked stack is knocked askew */
-  #ctray .k-paper .sh{width:calc(var(--bw) * .92); height:calc(var(--bw) * .92 * 3 / 2.35); left:0; top:0; border:2px solid #000; border-radius:2px;
+  #ctray .k-paper .sh{width:calc(var(--bw) * .92); height:calc(var(--bw) * .92 * 3 / 2.35); left:0; top:0; border:2px solid var(--cb000000, #000000); border-radius:2px;
     background:var(--pg); box-shadow:inset 0 0 0 2px var(--edge); transition:transform .22s cubic-bezier(.3,1.4,.5,1);}
   #ctray .k-paper .s1{transform:translate(4px, 4px);}
   #ctray .k-paper .s2{transform:translate(2px, 2px);}
@@ -1531,11 +1531,11 @@
   #ctray .k-rib svg{display:block;}
   #ctray .k-rib.on{transform:translateY(var(--high));}
   /* Design: a square brown block, its side showing at the right and bottom, the pattern in white round its edge */
-  #ctray .k-block .pg{background:#3f2b1d;}
-  #ctray .k-block .cv{background:#6b4a32; overflow:hidden;}
+  #ctray .k-block .pg{background:var(--cb3f2b1d, #3f2b1d);}
+  #ctray .k-block .cv{background:var(--band); overflow:hidden;}
   /* only the picked design is inverted: a white block with the pattern in brown */
-  #ctray .k-block.on .pg{background:#c9c0ad;}
-  #ctray .k-block.on .cv{background:#fff;}
+  #ctray .k-block.on .pg{background:var(--cbc9c0ad, #c9c0ad);}
+  #ctray .k-block.on .cv{background:var(--cbffffff, #ffffff);}
   #ctray .k-block .cv canvas.cb, #ctray .k-block.on .cv canvas.cw{display:none;}   /* (written with .cv canvas so it outranks the rule that makes every canvas display:block) */
   #ctray .k-block.on .cv canvas.cb{display:block;}
   #ctray .k-block .cv canvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
@@ -1544,10 +1544,10 @@
   #ctray .k-cover.on{transform:none;}   /* the picked one is the same size and sits flat (SEL_SCALE / SEL_TILT in fillTray still set how much room is left round every icon) */
   #ctray .k-cover.on .cv{border-width:3px;}
   /* a black shape (or an X for none) in the middle of the top sheet; it turns with the sheet */
-  #ctray .k-paper .sh .cs{position:absolute; left:50%; top:50%; width:60%; height:auto; transform:translate(-50%, -50%); display:block; overflow:visible; fill:#000; pointer-events:none;}
+  #ctray .k-paper .sh .cs{position:absolute; left:50%; top:50%; width:60%; height:auto; transform:translate(-50%, -50%); display:block; overflow:visible; fill:var(--cb000000, #000000); pointer-events:none;}
   /* the picked cover carries a large white star, centred on it. Picking another: this one's star shrinks away (.12s),
      then the new one's grows from nothing, overshoots well past its size, and springs back to settle */
-  #ctray .k-book .cv::after{content:''; position:absolute; left:50%; top:50%; width:70%; aspect-ratio:1; background:#fff;
+  #ctray .k-book .cv::after{content:''; position:absolute; left:50%; top:50%; width:70%; aspect-ratio:1; background:var(--cbffffff, #ffffff);
     clip-path:polygon(50% 0%, 61.2% 34.5%, 97.6% 34.5%, 68.2% 55.9%, 79.4% 90.5%, 50% 69.1%, 20.6% 90.5%, 31.8% 55.9%, 2.4% 34.5%, 38.8% 34.5%);
     transform:translate(-50%, -45.25%) scale(0);}
   #ctray .k-book.on .cv::after{transform:translate(-50%, -45.25%) scale(1); animation:star-pop .62s .12s both;}
@@ -1566,24 +1566,24 @@
   }
   /* audiobook items. Body: a blank cassette in its shell colour. Spinners: one reel hub. Sticker: a sticky note with fake text.
      They use .k-cover too, so the picked one tilts in place exactly like a cover */
-  #ctray .k-tape .bd{inset:0; border:2.5px solid #000; border-radius:max(3px, calc(var(--bw) * .07)); background:var(--c);}
-  #ctray .k-tape .gd{left:20%; right:20%; bottom:2.5px; height:30%; border:2px solid #000; border-bottom:0; border-radius:3px 3px 0 0; background:var(--cd);}
+  #ctray .k-tape .bd{inset:0; border:2.5px solid var(--cb000000, #000000); border-radius:max(3px, calc(var(--bw) * .07)); background:var(--c);}
+  #ctray .k-tape .gd{left:20%; right:20%; bottom:2.5px; height:30%; border:2px solid var(--cb000000, #000000); border-bottom:0; border-radius:3px 3px 0 0; background:var(--cd);}
   #ctray .k-hub svg{position:absolute; inset:0; width:100%; height:100%; display:block;}
   /* the picked cassette body carries the same star, in white or dark to suit its shell */
-  #ctray .k-tape .bd::after{content:''; position:absolute; left:50%; top:36%; width:30%; aspect-ratio:1; background:var(--st, #fff);
+  #ctray .k-tape .bd::after{content:''; position:absolute; left:50%; top:36%; width:30%; aspect-ratio:1; background:var(--st, var(--cbffffff, #ffffff));
     clip-path:polygon(50% 0%, 61.2% 34.5%, 97.6% 34.5%, 68.2% 55.9%, 79.4% 90.5%, 50% 69.1%, 20.6% 90.5%, 31.8% 55.9%, 2.4% 34.5%, 38.8% 34.5%);
     transform:translate(-50%, -45.25%) scale(0);}
   #ctray .k-tape.on .bd::after{transform:translate(-50%, -45.25%) scale(1); animation:star-pop .62s .12s both;}
   #ctray .k-tape.gone .bd::after{animation:star-out .12s ease-in both;}
   #ctray.still .k-tape.on .bd::after{animation:none;}
   /* the picked spinner carries the star in its black middle */
-  #ctray .k-hub::after{content:''; position:absolute; left:50%; top:50%; width:34%; aspect-ratio:1; background:#fff; pointer-events:none;
+  #ctray .k-hub::after{content:''; position:absolute; left:50%; top:50%; width:34%; aspect-ratio:1; background:var(--cbffffff, #ffffff); pointer-events:none;
     clip-path:polygon(50% 0%, 61.2% 34.5%, 97.6% 34.5%, 68.2% 55.9%, 79.4% 90.5%, 50% 69.1%, 20.6% 90.5%, 31.8% 55.9%, 2.4% 34.5%, 38.8% 34.5%);
     transform:translate(-50%, -45.25%) scale(0);}
   #ctray .k-hub.on::after{transform:translate(-50%, -45.25%) scale(1); animation:star-pop .62s .12s both;}
   #ctray .k-hub.gone::after{animation:star-out .12s ease-in both;}
   #ctray.still .k-hub.on::after{animation:none;}
-  #ctray .k-note .nt{inset:0; border:2.5px solid #000; border-radius:2px; background:var(--c);}
+  #ctray .k-note .nt{inset:0; border:2.5px solid var(--cb000000, #000000); border-radius:2px; background:var(--c);}
   #ctray .k-note .ln{left:17%; height:max(2px, calc(var(--bw) * .075)); border-radius:2px; background:var(--ln);}
   #ctray .k-note .ln{transform-origin:0 50%; transition:transform .18s ease-out .22s;}                       /* unpicked: the check un-draws first, then the lines grow back */
   #ctray .k-note.on .ln{transform:scaleX(0); transition:transform .18s ease-in;}                          /* picked: the lines shrink away to the left first */
@@ -1599,12 +1599,12 @@
   /* the bar along the tray's back edge */
   #ctray .ct-bar{position:relative; flex:none; height:30px; padding-left:4px; display:flex; align-items:center; gap:8px;}
   #ctray .ct-k{font:700 .62rem/1 Arial, sans-serif; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.7);}
-  #ctray .ct-name{flex:1; text-align:center; font:700 .78rem/1 Arial, sans-serif; text-transform:uppercase; letter-spacing:.04em; color:#fff;}
-  #ctray .ct-done{height:28px; padding:0 14px; margin:0; border:3px solid #000; border-radius:8px; background:#fff; color:var(--ink);
+  #ctray .ct-name{flex:1; text-align:center; font:700 .78rem/1 Arial, sans-serif; text-transform:uppercase; letter-spacing:.04em; color:var(--cfffffff, #ffffff);}
+  #ctray .ct-done{height:28px; padding:0 14px; margin:0; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); color:var(--ink);
     font:700 .62rem/1 Arial, sans-serif; text-transform:uppercase; letter-spacing:.06em; cursor:pointer; box-shadow:none;}
   /* while it lifts out, it still looks like the Cover card it came from */
   #ctray .ct-from{position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center; pointer-events:none;
-    font:700 .7rem/1 Georgia, serif; text-transform:uppercase; color:#fff;}
+    font:700 .7rem/1 Georgia, serif; text-transform:uppercase; color:var(--cfffffff, #ffffff);}
   /* the randomize pin: a round metal badge, top right of the 3D area */
   #rand-pin{position:absolute; right:10px; top:60px; z-index:5; width:58px; height:58px; padding:0; margin:0; border:0; border-radius:50%;
     background:none; box-shadow:none; cursor:pointer; -webkit-tap-highlight-color:transparent;}
@@ -1615,17 +1615,18 @@
   #dt-view-backup .dt-card.bk-when, #dt-view-backup .dt-card.bk-loc{align-items:stretch;}
   #dt-view-backup .dt-card.bk-when > span, #dt-view-backup #bk-loc-pick{align-items:center; text-align:center;}
   #dt-view-backup .dt-card b{max-width:100%;}
+  #dt-view-stats .st-m.now{flex:5 1 0;}   /* this month, a bar a day */
 </style>
 <style>
   /* ---------- splash: STACK drops onto the top shelf, TRACKER slides in one book at a time ---------- */
-  #splash{position:fixed; inset:0; z-index:100000; background:#efeadf; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  #splash{position:fixed; inset:0; z-index:100000; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
     transition:opacity .35s ease; overflow:hidden;}
   #splash.gone{opacity:0; pointer-events:none;}
   #splash .sp-shelf{position:relative; width:250px; height:82px;}
-  #splash .sp-plank{position:absolute; left:0; right:0; bottom:0; height:12px; border:3px solid #000; border-radius:4px; background:#8a6a4f;}
+  #splash .sp-plank{position:absolute; left:0; right:0; bottom:0; height:12px; border:3px solid var(--cb000000, #000000); border-radius:4px; background:var(--cb8a6a4f, #8a6a4f);}
   #splash .sp-row{position:absolute; left:0; right:0; bottom:12px; display:flex; justify-content:center; align-items:flex-end; gap:2px;}
-  #splash .sp-spine{position:relative; width:28px; border:3px solid #000; border-bottom:none; border-radius:3px 3px 0 0; box-sizing:border-box;
-    display:flex; align-items:center; justify-content:center; font:700 1rem Georgia, serif; color:#f4ead2;}
+  #splash .sp-spine{position:relative; width:28px; border:3px solid var(--cb000000, #000000); border-bottom:none; border-radius:3px 3px 0 0; box-sizing:border-box;
+    display:flex; align-items:center; justify-content:center; font:700 1rem Georgia, serif; color:var(--cff4ead2, #f4ead2);}
   #splash .sp-spine::before, #splash .sp-spine::after{content:''; position:absolute; left:0; right:0; height:2px; background:rgba(255,255,255,.35);}
   #splash .sp-spine::before{top:7px;} #splash .sp-spine::after{bottom:7px;}
   /* CSS-timed (not JS), so the books glide smoothly even while the app is still loading;
@@ -1638,14 +1639,14 @@
   @keyframes spSlideL{ 0%{transform:translateX(-220px); opacity:0;} 30%{opacity:1;} 100%{transform:none; opacity:1;} }
   @keyframes spSlideR{ 0%{transform:translateX(220px); opacity:0;} 30%{opacity:1;} 100%{transform:none; opacity:1;} }
   #splash .sp-spine.landed{animation:none !important; opacity:1; transform:none; will-change:auto;}
-  #splash .sp-sub{font:600 .6rem Arial, sans-serif; letter-spacing:1.6px; color:#8a8378; text-transform:uppercase; opacity:0; transition:opacity .4s;}
+  #splash .sp-sub{font:600 .6rem Arial, sans-serif; letter-spacing:1.6px; color:var(--cf8a8378, #8a8378); text-transform:uppercase; opacity:0; transition:opacity .4s;}
   #splash .sp-sub.in{opacity:1;}
 
   /* ===== rereads: log reads, Compare Past Reads, Reset | Reread ===== */
   /* summary card: (with rereads) Read x of x · the read's dates · how far and days logged; with rereads ◀ ▶ step through the reads, like the Timeline */
   #log-sum{padding:0;}
-  #log-sum .lg-nav{display:none; flex:0 0 42px; align-self:stretch; box-sizing:border-box; border:none; margin:0; padding:0; box-shadow:none; transform:none; background:#fff; color:var(--ink); font:900 15px/1 Arial, sans-serif; cursor:pointer; -webkit-tap-highlight-color:transparent;}
-  #log-sum .lg-nav:disabled{color:#d6d0c4; cursor:default;}
+  #log-sum .lg-nav{display:none; flex:0 0 42px; align-self:stretch; box-sizing:border-box; border:none; margin:0; padding:0; box-shadow:none; transform:none; background:var(--cbffffff, #ffffff); color:var(--ink); font:900 15px/1 Arial, sans-serif; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  #log-sum .lg-nav:disabled{color:var(--cfd6d0c4, #d6d0c4); cursor:default;}
   #log-sum .lg-mid{flex:1; min-width:0; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:0 6px; text-align:center; line-height:1.05;}
   #log-sum .lg-mid > span{display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   #log-sum .lg-which{display:none !important; font:700 .62rem/1.05 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink);}
@@ -1654,24 +1655,24 @@
   #log-sum .lg-tot > span + span::before{content:' · '; white-space:pre;}
   #log-sum.nav .lg-nav{display:block;}
   #log-sum.nav .lg-which{display:block !important;}
-  #log-sum.nav #log-prev{border-right:3px solid #000; border-radius:5px 0 0 5px;} #log-sum.nav #log-next{border-left:3px solid #000; border-radius:0 5px 5px 0;}
+  #log-sum.nav #log-prev{border-right:3px solid var(--cb000000, #000000); border-radius:5px 0 0 5px;} #log-sum.nav #log-next{border-left:3px solid var(--cb000000, #000000); border-radius:0 5px 5px 0;}
   /* the top card sits in its own walnut band under the header, 4px all round, casting the header's shadow */
-  .lg-top{flex:none; position:relative; z-index:1; padding:4px; background:#6b4a32; border-bottom:3px solid #000;}
+  .lg-top{flex:none; position:relative; z-index:1; padding:4px; background:var(--band); border-bottom:3px solid var(--cb000000, #000000);}
   .lg-top::after{content:''; position:absolute; left:0; right:0; top:100%; margin-top:2px; height:15px; pointer-events:none;
     background:linear-gradient(180deg, rgba(0,0,0,.32), rgba(0,0,0,.12) 40%, rgba(0,0,0,0));}
   .lg-top .lg-summary{margin:0;}
   /* the column names in one short full-width card (21px, like Tap for full window view), split where the columns
      below are split: Date over the bar and the day cards, then the two value columns, then Delete */
-  .lg-list .lg-heads{height:21px; box-sizing:border-box; margin:4px 0 4px; padding:0; border:3px solid #000; border-radius:8px; overflow:hidden;
-    grid-template-columns:86.5px minmax(0, 1fr) minmax(0, 1fr) 44.5px; gap:3px; background:#000;}
-  .lg-list .lg-heads span{display:flex; align-items:center; justify-content:center; min-width:0; overflow:hidden; white-space:nowrap; background:#fff;
+  .lg-list .lg-heads{height:21px; box-sizing:border-box; margin:4px 0 4px; padding:0; border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;
+    grid-template-columns:86.5px minmax(0, 1fr) minmax(0, 1fr) 44.5px; gap:3px; background:var(--cb000000, #000000);}
+  .lg-list .lg-heads span{display:flex; align-items:center; justify-content:center; min-width:0; overflow:hidden; white-space:nowrap; background:var(--cbffffff, #ffffff);
     font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; color:var(--ink);}
   /* Compare Past Reads: a section left of Edit, the same width as the others; on, it's dark like a picked tab */
   .dd-acts .dd-cmp-btn{line-height:1.1; padding:0 4px;}
   /* even: every section the same width, the 3px black dividers drawn as the gaps between them */
-  .dd-acts{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:3px; background:#000;}
+  .dd-acts{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:3px; background:var(--cb000000, #000000);}
   .dd-acts button, .dd-acts button + button{min-width:0; padding:0 4px; border-left:none;}
-  .dd-acts .dd-cmp-btn.on{background:var(--ink); color:#fff;}
+  .dd-acts .dd-cmp-btn.on{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   /* on: the graph card with − / + gives way to one stretched graph card per read, newest at the top */
   .dd-cmp{display:none; flex-direction:column; gap:6px;}
   .row-dd.cmp .dd-pm-row{display:none;}
@@ -1679,11 +1680,11 @@
   .dd-cmp .dd-chart{-webkit-user-select:none; user-select:none;}
   /* Delete's red eases in and out; Compare's dark switches with the view, at once */
   .dd-acts .dd-del{transition:background-color .32s cubic-bezier(.45,0,.55,1), color .32s cubic-bezier(.45,0,.55,1);}
-  .dd-acts .dd-cmp-btn.on, .dd-acts .dd-cmp-btn.on:active{background:var(--ink); color:#fff;}
+  .dd-acts .dd-cmp-btn.on, .dd-acts .dd-cmp-btn.on:active{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   /* Delete, armed: Confirm? in white on red until it's tapped again or 3 s pass */
-  .dd-acts .dd-del.armed, .dd-acts .dd-del.armed:active{background:#a33; color:#fff;}
+  .dd-acts .dd-del.armed, .dd-acts .dd-del.armed:active{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff);}
   /* no hover or press colours on anything you can tap: a card only changes when what it does changes */
-   .dd-acts button:not(.on):not(.armed):active{background:#fff;}
+   .dd-acts button:not(.on):not(.armed):active{background:var(--cbffffff, #ffffff);}
   
   .book-row:active .br-fill{filter:none;}
    button:active{box-shadow:none !important;}
@@ -1691,7 +1692,7 @@
   /* comparing past reads or listens: just the graphs and the actions, no wheels or stats card */
   .row-dd.cmp .dd-play, .row-dd.cmp .dd-stats{display:none !important;}
   /* more than three reads: the fourth card, in the book's own cloth, opens them all */
-  .cmp-more, .cmp-more:active{position:relative; overflow:hidden; height:45px; margin:0; padding:0 8px; box-sizing:border-box; border:3px solid #000; border-radius:8px; box-shadow:none !important;
+  .cmp-more, .cmp-more:active{position:relative; overflow:hidden; height:45px; margin:0; padding:0 8px; box-sizing:border-box; border:3px solid var(--cb000000, #000000); border-radius:8px; box-shadow:none !important;
     background:var(--cloth); cursor:pointer; -webkit-tap-highlight-color:transparent;}
   .cmp-more > canvas.cloth-bg{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
   .cmp-more span{position:relative; font:700 min(.9rem, 3.6vw)/1 Georgia, 'Times New Roman', serif; letter-spacing:.12em; text-transform:uppercase; color:var(--ds-ink); white-space:nowrap;}
@@ -1700,38 +1701,38 @@
     opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
   #reads-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
   .lg-head > #rw-back, .lg-head > #rw-back:active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
-    background:#7a2f2b; color:#fff; border-right:3px solid #000; font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+    background:var(--cb7a2f2b, #7a2f2b); color:var(--cfffffff, #ffffff); border-right:3px solid var(--cb000000, #000000); font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
   #reads-page .lg-summary{justify-content:space-between; padding:0 10px;}
   #rw-book{color:var(--ink); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;}
   #rw-count{flex:none;}
   #rw-list{flex:1; min-height:0; overflow-y:auto; padding:4px 4px calc(4px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
-  .rw-card{border:3px solid #000; border-radius:8px; overflow:hidden; background:#fff; flex:none;}
-  .rw-card .rw-k{height:21px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; border-bottom:3px solid #000; background:#6b4a32;   /* walnut, like the header bands */
-    font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:#fff;}
+  .rw-card{border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden; background:var(--cbffffff, #ffffff); flex:none;}
+  .rw-card .rw-k{height:21px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; border-bottom:3px solid var(--cb000000, #000000); background:var(--band);   /* walnut, like the header bands */
+    font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--cfffffff, #ffffff);}
   .rw-card .dd-chart{height:39px; border:0; border-radius:0; -webkit-user-select:none; user-select:none;}
   .dd-acts button[hidden]{display:none;}
   /* the read's stats card as the graph card's footer, in the book's cloth */
-  .rw-card .dd-stats{border:0; border-top:3px solid #000; border-radius:0;}
+  .rw-card .dd-stats{border:0; border-top:3px solid var(--cb000000, #000000); border-radius:0;}
   /* finished: Reset | Reread (or Relisten) as one full-width card in place of the wheels, even halves */
-  .dd-fin{display:none; height:45px; box-sizing:border-box; border:3px solid #000; border-radius:8px; overflow:hidden;
-    grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:3px; background:#000;}
+  .dd-fin{display:none; height:45px; box-sizing:border-box; border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;
+    grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:3px; background:var(--cb000000, #000000);}
   .row-dd.fin .dd-play{display:none;}
   .row-dd.fin .dd-fin{display:grid;}
   .row-dd.cmp .dd-fin{display:none !important;}
   .dd-fin button, .dd-fin button:active{grid-column:auto; margin:0; padding:0 4px; min-width:0; border:none; border-radius:0; box-shadow:none !important;
-    background:#fff; color:var(--ink); font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; cursor:pointer;}
-  .dd-fin .fin-reset{color:#a33;}
+    background:var(--cbffffff, #ffffff); color:var(--ink); font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; cursor:pointer;}
+  .dd-fin .fin-reset{color:var(--cfaa3333, #aa3333);}
   .dd-fin .fin-reset, .dd-fin .fin-again{transition:background-color .32s cubic-bezier(.45,0,.55,1), color .32s cubic-bezier(.45,0,.55,1);}
-  .dd-fin button.armed, .dd-fin button.armed:active{background:#a33; color:#fff;}
+  .dd-fin button.armed, .dd-fin button.armed:active{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff);}
   /* open book toolbar: Compare | Edit | Log | Delete (or the three), even sections, 3px black between */
-  #book-actions{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:3px; background:#000;}
+  #book-actions{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:3px; background:var(--cb000000, #000000);}
   #book-actions button, #book-actions button + button, #book-actions button:first-child, #book-actions button:last-child{border:none; border-radius:0; min-width:0; padding:0 4px; line-height:1.1;}
   #book-actions button[hidden]{display:none;}
-   #book-actions button:not(.on):not(.armed):active{background:#fff;}
+   #book-actions button:not(.on):not(.armed):active{background:var(--cbffffff, #ffffff);}
   #cmp-btn{transition:none;}
-  #cmp-btn.on, #cmp-btn.on:active{background:var(--ink); color:#fff;}
+  #cmp-btn.on, #cmp-btn.on:active{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   #delete-btn{transition:background-color .32s cubic-bezier(.45,0,.55,1), color .32s cubic-bezier(.45,0,.55,1);}
-  #delete-btn.armed, #delete-btn.armed:active{background:#a33; color:#fff;}
+  #delete-btn.armed, #delete-btn.armed:active{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff);}
   /* finished: Reset | Reread in place of the wheels */
   #bk-fin{margin-top:4px; border-radius:10px;}
   #page-panel.fin #page-line, #page-panel.fin #play-line{display:none !important;}
@@ -1749,59 +1750,59 @@
   #dt-view-badges.active{display:flex; flex-direction:column; gap:4px; overflow-y:auto; -webkit-overflow-scrolling:touch;}
   #dt-view-badges *, #badge-page *{box-sizing:border-box;}
   /* All | Earned | Icons: one short card in three even parts */
-  .bd-seg{flex:none; height:31px; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:3px; background:#000; border:3px solid #000; border-radius:8px; overflow:hidden;}
-  .bd-seg button, .bd-seg button:active{grid-column:auto; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:#fff; color:var(--ink); font:700 min(.62rem, 2.6vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
-  .bd-seg button.on{background:var(--ink); color:#fff;}
-  .bd-strip{flex:none; height:21px; display:flex; align-items:center; justify-content:center; background:#6b4a32; color:#fff; border:3px solid #000; border-radius:8px;
+  .bd-seg{flex:none; height:31px; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:3px; background:var(--cb000000, #000000); border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;}
+  .bd-seg button, .bd-seg button:active{grid-column:auto; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--ink); font:700 min(.62rem, 2.6vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  .bd-seg button.on{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
+  .bd-strip{flex:none; height:21px; display:flex; align-items:center; justify-content:center; background:var(--band); color:var(--cfffffff, #ffffff); border:3px solid var(--cb000000, #000000); border-radius:8px;
     font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   .bd-grid{display:flex; flex-direction:column; gap:4px;}
   /* a badge: one regular card split by 3px lines — the art, its name and what it asks, then where you are */
-  .bd-card, .bd-card:active{grid-column:auto; letter-spacing:0; text-transform:none; flex:none; width:100%; height:45px; margin:0; padding:0; display:grid; grid-template-columns:39px minmax(0, 1fr) 76px; gap:3px; background:#000;
-    border:3px solid #000; border-radius:8px; overflow:hidden; box-shadow:none; text-align:left; color:var(--ink); cursor:pointer;}
-  .bd-card > span{background:#fff; min-width:0;}
-  .bd-art{position:relative; display:flex; align-items:center; justify-content:center; background:#ece7dc !important; overflow:hidden;}
+  .bd-card, .bd-card:active{grid-column:auto; letter-spacing:0; text-transform:none; flex:none; width:100%; height:45px; margin:0; padding:0; display:grid; grid-template-columns:39px minmax(0, 1fr) 76px; gap:3px; background:var(--cb000000, #000000);
+    border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden; box-shadow:none; text-align:left; color:var(--ink); cursor:pointer;}
+  .bd-card > span{background:var(--cbffffff, #ffffff); min-width:0;}
+  .bd-art{position:relative; display:flex; align-items:center; justify-content:center; background:var(--cbece7dc, #ece7dc) !important; overflow:hidden;}
   .bd-card.got .bd-art{background:var(--bd-paper) !important;}
   .bd-art svg{width:100%; height:100%;}
-  .bd-lv{position:absolute; right:1px; bottom:1px; min-width:15px; height:15px; padding:0 2px; border:2px solid #000; border-radius:4px; background:#fff;
+  .bd-lv{position:absolute; right:1px; bottom:1px; min-width:15px; height:15px; padding:0 2px; border:2px solid var(--cb000000, #000000); border-radius:4px; background:var(--cbffffff, #ffffff);
     display:flex; align-items:center; justify-content:center; font:700 .55rem/1 Arial, sans-serif; color:var(--ink);}
   .bd-mid{display:flex; flex-direction:column; justify-content:center; gap:2px; padding:0 8px;}
   .bd-nm{font:700 min(.62rem, 2.6vw)/1.1 Arial, sans-serif; letter-spacing:.2px; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .bd-card:not(.got) .bd-nm{color:var(--muted);}
-  .bd-hid{display:inline-block; margin-left:6px; padding:1px 4px; border:2px solid #000; border-radius:4px; background:var(--ink); color:#fff; font:700 .48rem/1.1 Arial, sans-serif; font-style:normal; letter-spacing:.3px; vertical-align:1px;}
+  .bd-hid{display:inline-block; margin-left:6px; padding:1px 4px; border:2px solid var(--cb000000, #000000); border-radius:4px; background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff); font:700 .48rem/1.1 Arial, sans-serif; font-style:normal; letter-spacing:.3px; vertical-align:1px;}
   .bd-ask{letter-spacing:0; font:400 .6rem/1.2 Arial, sans-serif; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-transform:none;}
   .bd-st{position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; text-align:center; font:600 .72rem/1 Georgia, serif;}
   .bd-st small{font:700 .5rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted);}
   .bd-card.max .bd-st{color:var(--bd-gold); font-size:1rem;}
-  .bd-pr{position:absolute; left:0; right:0; bottom:0; height:5px; border-top:2px solid #000; background:var(--bg);}
+  .bd-pr{position:absolute; left:0; right:0; bottom:0; height:5px; border-top:2px solid var(--cb000000, #000000); background:var(--bg);}
   .bd-pr i{position:absolute; left:0; top:0; bottom:0; background:var(--bd-gold);}
   /* Icons: every earned badge's art at its level, 4px apart */
   .bd-icons{display:grid; grid-template-columns:repeat(auto-fill, minmax(68px, 1fr)); gap:4px;}
   .bd-icon, .bd-icon:active{grid-column:auto; aspect-ratio:1 / 1; width:100%; margin:0; padding:0; display:flex; align-items:center; justify-content:center; background:var(--bd-paper);
-    border:3px solid #000; border-radius:8px; box-shadow:none; cursor:pointer;}
+    border:3px solid var(--cb000000, #000000); border-radius:8px; box-shadow:none; cursor:pointer;}
   .bd-icon svg{width:76%; height:76%; overflow:visible;}
-  .bd-empty{padding:12px 10px; border:3px solid #000; border-radius:8px; background:#fff; font:400 .74rem/1.4 Arial, sans-serif; text-align:center; color:var(--muted);}
+  .bd-empty{padding:12px 10px; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); font:400 .74rem/1.4 Arial, sans-serif; text-align:center; color:var(--muted);}
   /* a badge's own page: a full window like the Log */
   #badge-page{position:fixed; inset:0; z-index:41; background:var(--bg); display:flex; flex-direction:column; opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
   #badge-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
   .lg-head > #bp-back, .lg-head > #bp-back:active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
-    background:#7a2f2b; color:#fff; border-right:3px solid #000; font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+    background:var(--cb7a2f2b, #7a2f2b); color:var(--cfffffff, #ffffff); border-right:3px solid var(--cb000000, #000000); font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
   .bp-body{flex:1; min-height:0; overflow-y:auto; padding:4px 4px calc(8px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
-  .bp-c{flex:none; border:3px solid #000; border-radius:8px; background:#fff; overflow:hidden;}
+  .bp-c{flex:none; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); overflow:hidden;}
   #bp-art{aspect-ratio:1 / 1; width:100%; max-height:42vh; display:flex; align-items:center; justify-content:center; background:var(--bd-paper);}
-  #badge-page.locked #bp-art{background:#ece7dc;}
+  #badge-page.locked #bp-art{background:var(--cbece7dc, #ece7dc);}
   #bp-art svg{width:min(56%, 34vh); height:auto;}
-  #bp-name{min-height:45px; display:flex; align-items:center; justify-content:center; padding:4px 10px; border-top:3px solid #000; text-align:center;
+  #bp-name{min-height:45px; display:flex; align-items:center; justify-content:center; padding:4px 10px; border-top:3px solid var(--cb000000, #000000); text-align:center;
     font:700 1rem/1.15 Georgia, serif; letter-spacing:.06em; text-transform:uppercase; color:var(--ink);}
-  #bp-meter{position:relative; height:21px; border-top:3px solid #000; background:var(--bg);}
+  #bp-meter{position:relative; height:21px; border-top:3px solid var(--cb000000, #000000); background:var(--bg);}
   #bp-meter i{position:absolute; left:0; top:0; bottom:0; background:var(--bd-gold);}
   #bp-meter span{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font:700 .6rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink);}
   #bp-desc{padding:10px; font:400 .78rem/1.4 Arial, sans-serif; text-align:center; color:var(--ink);}
   .bp-row{display:flex; align-items:center; gap:10px; height:45px; padding-right:10px;}
-  .bp-row + .bp-row{border-top:1px solid #e3dccd;}
-  .bp-lvart{position:relative; flex:none; width:42px; height:42px; display:flex; align-items:center; justify-content:center; border-right:3px solid #000; background:#ece7dc;}
+  .bp-row + .bp-row{border-top:1px solid var(--cbe3dccd, #e3dccd);}
+  .bp-lvart{position:relative; flex:none; width:42px; height:42px; display:flex; align-items:center; justify-content:center; border-right:3px solid var(--cb000000, #000000); background:var(--cbece7dc, #ece7dc);}
   .bp-row.done .bp-lvart{background:var(--bd-paper);}
   .bp-lvart svg{width:34px; height:34px; overflow:visible;}
-  .bp-lvart b{position:absolute; right:1px; bottom:1px; min-width:14px; height:14px; border:2px solid #000; border-radius:4px; background:#fff; font:700 .5rem/10px Arial, sans-serif; text-align:center; color:var(--ink);}
+  .bp-lvart b{position:absolute; right:1px; bottom:1px; min-width:14px; height:14px; border:2px solid var(--cb000000, #000000); border-radius:4px; background:var(--cbffffff, #ffffff); font:700 .5rem/10px Arial, sans-serif; text-align:center; color:var(--ink);}
   .bp-tx{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; font:400 .72rem/1.2 Arial, sans-serif; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .bp-tx > span{font:700 .6rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted);}
   .bp-row:not(.done) .bp-tx{color:var(--muted);}
@@ -1810,29 +1811,29 @@
   #dev-page{position:fixed; inset:0; z-index:45; background:var(--bg); display:flex; flex-direction:column; opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
   #dev-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
   .lg-head > #dev-back, .lg-head > #dev-back:active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
-    background:#7a2f2b; color:#fff; border-right:3px solid #000; font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+    background:var(--cb7a2f2b, #7a2f2b); color:var(--cfffffff, #ffffff); border-right:3px solid var(--cb000000, #000000); font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
   #dev-body{flex:1; min-height:0; overflow-y:auto; padding:4px 4px calc(8px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
   #dev-body *{box-sizing:border-box;}
-  .dv-strip{flex:none; height:21px; display:flex; align-items:center; justify-content:center; background:#6b4a32; color:#fff; border:3px solid #000; border-radius:8px;
+  .dv-strip{flex:none; height:21px; display:flex; align-items:center; justify-content:center; background:var(--band); color:var(--cfffffff, #ffffff); border:3px solid var(--cb000000, #000000); border-radius:8px;
     font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
-  .dv-c{flex:none; border:3px solid #000; border-radius:8px; background:#fff; overflow:hidden;}
+  .dv-c{flex:none; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); overflow:hidden;}
   .dv-line{display:flex; justify-content:space-between; align-items:center; gap:10px; min-height:36px; padding:4px 10px;}
-  .dv-line + .dv-line{border-top:1px solid #e3dccd;}
+  .dv-line + .dv-line{border-top:1px solid var(--cbe3dccd, #e3dccd);}
   .dv-k{font:700 .6rem/1.2 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .dv-v{font:600 .85rem/1.2 Georgia, serif; color:var(--ink); text-align:right; white-space:nowrap;}
-  .dv-btn, .dv-btn:active{flex:none; grid-column:auto; height:45px; margin:0; padding:0 8px; border:3px solid #000; border-radius:8px; box-shadow:none; background:#fff; color:var(--ink);
+  .dv-btn, .dv-btn:active{flex:none; grid-column:auto; height:45px; margin:0; padding:0 8px; border:3px solid var(--cb000000, #000000); border-radius:8px; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--ink);
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; cursor:pointer;}
-  .dv-btn.red{color:#a33; transition:background-color .32s cubic-bezier(.45,0,.55,1), color .32s cubic-bezier(.45,0,.55,1);}
-  #dev-body .dv-btn.armed, #dev-body .dv-btn.armed:active{background:#a33; color:#fff;}
+  .dv-btn.red{color:var(--cfaa3333, #aa3333); transition:background-color .32s cubic-bezier(.45,0,.55,1), color .32s cubic-bezier(.45,0,.55,1);}
+  #dev-body .dv-btn.armed, #dev-body .dv-btn.armed:active{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff);}
   /* a switch per feature: name and what it covers on the left, On | Off on the right */
   .dv-row{display:flex; align-items:center; gap:10px; min-height:52px; padding:4px 4px 4px 10px;}
-  .dv-row + .dv-row{border-top:1px solid #e3dccd;}
+  .dv-row + .dv-row{border-top:1px solid var(--cbe3dccd, #e3dccd);}
   .dv-tx{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;}
   .dv-tx b{font:700 .66rem/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink);}
   .dv-tx span{font:400 .62rem/1.2 Arial, sans-serif; color:var(--muted);}
-  .dv-sw{flex:none; display:grid; grid-template-columns:1fr 1fr; gap:3px; width:110px; height:37px; background:#000; border:3px solid #000; border-radius:8px; overflow:hidden;}
-  .dv-sw button, .dv-sw button:active{grid-column:auto; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:#fff; color:var(--ink); font:700 .62rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; transition:none;}
-  .dv-sw button.on{background:var(--ink); color:#fff;}
+  .dv-sw{flex:none; display:grid; grid-template-columns:1fr 1fr; gap:3px; width:110px; height:37px; background:var(--cb000000, #000000); border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;}
+  .dv-sw button, .dv-sw button:active{grid-column:auto; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--ink); font:700 .62rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; transition:none;}
+  .dv-sw button.on{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   /* what each switch hides when it's off */
   body.off-badges .dt-tabs .tab[data-dt="badges"]{display:none !important;}
   body.off-compare .dd-cmp-btn, body.off-compare #cmp-btn{display:none !important;}
@@ -1844,9 +1845,36 @@
   body.off-stats .dt-tabs .tab[data-dt="stats"]{display:none !important;}
   body.lib-one #view-tabs{display:none !important;}
   /* the haptic tester: one page wheel in a framed box */
-  .dv-wheel{flex:none; display:flex; width:110px; height:37px; border:3px solid #000; border-radius:8px; overflow:hidden; background:#fff;}
+  .dv-wheel{flex:none; display:flex; width:110px; height:37px; border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden; background:var(--cbffffff, #ffffff);}
   /* just one Library view: the Shelf | List card goes, and Search / Filter / Sort grows to fill the row's height (21 + 4 + 21) */
   body.lib-one #shelf-controls #sort-card{height:46px !important; align-items:center;}
+  /* colour themes */
+  :root{--band:#6b4a32;}
+  :root[data-theme="green"]{--bg:#e7ece2; --hdr-cell:#cbd6c4; --unread:#d9e2d2; --line:#d6ddcf; --grid:#d9e0d2; --band:#2e4636;}
+  :root[data-theme="navy"]{--bg:#e8ebf0; --hdr-cell:#cad1de; --unread:#d9dfe9; --line:#d7dce6; --grid:#dadfe8; --band:#303d66;}
+  :root[data-theme="oxblood"]{--bg:#f1e7e3; --hdr-cell:#dcc8c2; --unread:#e7d7d1; --line:#e3d6d1; --grid:#e6d9d4; --band:#7a2f2b;}
+  :root[data-theme="plum"]{--bg:#ece6ee; --hdr-cell:#d4c8d9; --unread:#e1d8e5; --line:#ddd5e1; --grid:#e0d8e3; --band:#3a2f52;}
+  :root[data-theme="slate"]{--bg:#e9e9e7; --hdr-cell:#d0d1cf; --unread:#dedfdc; --line:#dcdcda; --grid:#dfdfdd; --band:#3d4248;}
+  .dv-themes{display:grid; grid-template-columns:repeat(3, 1fr); gap:3px; background:var(--cb000000, #000000); border-top:3px solid var(--cb000000, #000000);}
+  .dv-themes button, .dv-themes button:active{grid-column:auto; height:37px; margin:0; padding:0 4px; border:0; border-radius:0; box-shadow:none; color:var(--cfffffff, #ffffff);
+    font:700 .6rem/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; transition:none;}
+  .dv-themes button.on{box-shadow:inset 0 0 0 3px var(--cbffffff, #ffffff);}
+  /* dark themes: the named surfaces and text, set by hand; every other colour comes from the theme engine */
+  :root[data-theme="midnight"]{--bg:#1e1a16; --panel:#2a251f; --hdr-cell:#3a332b; --unread:#26211c; --line:#3a332b; --grid:#332d26; --ink:#ece4d6; --muted:#a39a8c; --band:#4a3424;}
+  :root[data-theme="nightgreen"]{--bg:#161d18; --panel:#212a23; --hdr-cell:#2e3a31; --unread:#1d251f; --line:#2e3a31; --grid:#29332b; --ink:#e2eadf; --muted:#97a594; --band:#1f3326;}
+  :root[data-theme="nightink"]{--bg:#161a24; --panel:#20263a; --hdr-cell:#2c344b; --unread:#1c2232; --line:#2c344b; --grid:#272e43; --ink:#e0e5f0; --muted:#949db3; --band:#222c4c;}
+  :root[data-theme="midnight"]{--ink-bg:#6b4a32;}
+  :root[data-theme="nightgreen"]{--ink-bg:#2e5a3e;}
+  :root[data-theme="nightink"]{--ink-bg:#34447a;}
+  /* dark themes: words that sit over a light page fill or a dark card at once get a dark edge, so they read on both */
+  html.dark-theme .book-row .br-main, html.dark-theme .book-row .br-prog, html.dark-theme #combined-overlay, html.dark-theme #play-pct-text{
+    text-shadow:0 0 1px var(--cb000000, #000000), 0 0 1px var(--cb000000, #000000), 0 0 2px rgba(0,0,0,.8);}
+  /* the author line is a soft dark grey in the light themes; in a dark theme it's a soft light one, like the title */
+  html.dark-theme .book-row .br-author{color:rgba(236,228,214,.78);}
+  /* dark themes: list cards' words are black until the book is finished (finished cards keep their white words) */
+  html.dark-theme .book-row:not(.done) :is(.br-title, .br-pages, .br-pct){color:rgb(0,0,0) !important; text-shadow:none !important;}   /* rgb(), so the theme never lightens it */
+  html.dark-theme .book-row:not(.done) .br-author{color:rgba(0,0,0,.72) !important; text-shadow:none !important;}
+  html.dark-theme .book-row:not(.done) :is(.br-main, .br-prog){text-shadow:none;}
   /* a picked page / time not yet confirmed: the finished-book tone under the card's fill, out to the picked value */
   div.br-stage{position:absolute; left:-3px; top:-3px; bottom:-3px; pointer-events:none; background-repeat:repeat;}
   .br-stage[hidden]{display:none;}
@@ -1855,6 +1883,13 @@
   #combined-stage{position:absolute; left:0; top:-3px; bottom:-3px; pointer-events:none; background-repeat:repeat;}
   #play-pct-stage{position:absolute; left:0; top:-3px; width:100%; height:calc(100% + 6px); pointer-events:none;}
   #combined-stage[hidden], #play-pct-stage[hidden]{display:none;}
+  /* Timeline: the estimated rest of a book being read */
+  .tl-bar.tl-eta{opacity:.3; pointer-events:none; border-style:dotted; border-bottom:0; border-radius:4px 4px 0 0;}
+  .tl-bar.now.to-eta{border-top:0; border-radius:0 0 4px 4px;}   /* runs straight on into its estimate: no line across at today */
+  /* Timeline: today's label in the date column */
+  #tl-canvas .tl-lbl.tl-today, #tl-canvas .tl-lbl.tl-today *{color:var(--cfb5342a, #b5342a);}
+  #tl-canvas .tl-band{background:var(--cbf6dcd8, #f6dcd8);}
+  #tl-canvas .tl-lbl.tl-today{z-index:6 !important;}   /* over its band */
 
   /* long-press doesn't select text or pop the callout anywhere but the places you type */
   html, body, body *{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
@@ -1862,13 +1897,58 @@
 </style>
 </head>
 <body>
+<script>
+  window.CSS_HEXES = ["b000000", "b2e4636", "b2f3136", "b3a2213", "b3d2513", "b3f2b1d", "b4a2e18", "b4f3019", "b5a4c40", "b5b6633", "b63401f", "b6b4a32", "b6b6560", "b6e4724", "b77502e", "b7a2f2b", "b845530", "b865a34", "b8a6a4f", "b8c5229", "b996439", "b9a6a42", "ba9825f", "baa3333", "bb07a4b", "bb5342a", "bc9b98f", "bc9c0ad", "bcbc4b1", "bd6d2c8", "be3dccd", "bece7dc", "befe6d3", "bf4efe3", "bf6dcd8", "bf6e3df", "bfaf7f0", "bffffff", "f000000", "f5c4a2e", "f8a8378", "f8f8a80", "faa3333", "fb5342a", "fc4bdb0", "fcfc8ba", "fd6cfc2", "fd6d0c4", "ff4ead2", "fffffff"];
+  // ===== colour themes: every colour in the app taken a set way toward the theme's hue (greys, black and white stay) =====
+  // Books keep their colours as picked (in Walnut); everything is shown through the theme, and anything picked
+  // under a theme is turned back before it's saved, so switching themes never changes your books.
+  window.THEME = (function(){
+    const SPECS = { green: {h: 140, f: .45, s: 1}, navy: {h: 222, f: .5, s: 1}, oxblood: {h: 2, f: .4, s: 1.08},
+                    plum: {h: 278, f: .45, s: 1}, slate: {h: 210, f: .3, s: .45},
+                    // dark: the same hue shift, and every light surface turned dark (cards stay a shade lighter than the page)
+                    midnight: {h: 30, f: 0, s: 1, dark: true}, nightgreen: {h: 140, f: .45, s: 1, dark: true}, nightink: {h: 222, f: .5, s: 1, dark: true} };
+    let cur = 'walnut', rev = {};
+    const hsl = hex => { const n = parseInt(hex.slice(1), 16), r = (n >> 16) / 255, g = (n >> 8 & 255) / 255, b = (n & 255) / 255;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn; let h = 0, s = 0;
+      if(d){ s = d / (1 - Math.abs(2 * l - 1)); h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if(h < 0) h += 360; }
+      return [h, s, l]; };
+    const toHex = (h, s, l) => { const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+      const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+      return '#' + [r, g, b].map(v => Math.round(Math.max(0, Math.min(1, v + m)) * 255).toString(16).padStart(2, '0')).join(''); };
+    function T(hex){
+      const sp = SPECS[cur]; if(!sp || typeof hex !== 'string' || !/^#[0-9a-f]{6}$/i.test(hex)) return hex;
+      const [h, s, l] = hsl(hex); if(s < .06) return hex.toLowerCase();
+      const d = ((sp.h - h + 540) % 360) - 180;
+      return toHex((h + d * sp.f + 360) % 360, Math.min(1, s * sp.s), l);
+    }
+    // dark themes, for the styles only: light surfaces go dark (keeping their order), dark text goes light
+    function D(hex, kind){
+      const sp = SPECS[cur]; if(!sp || !sp.dark) return hex;
+      const [h, s, l] = hsl(hex);
+      if(kind === 'f') return l < .45 ? toHex(h, s * .5, .9 - l * .35) : hex;
+      return l > .55 ? toHex(h, s * .55, .07 + (l - .55) * .45) : hex;
+    }
+    const canon = hex => (typeof hex === 'string' && rev[hex.toLowerCase()]) || hex;
+    function set(name){
+      cur = SPECS[name] ? name : 'walnut'; rev = {};
+      const root = document.documentElement;
+      if(cur === 'walnut') delete root.dataset.theme; else root.dataset.theme = cur;
+      root.classList.toggle('dark-theme', !!(SPECS[cur] && SPECS[cur].dark));
+      (window.CSS_HEXES || []).forEach(k => { const kind = k[0], h = '#' + k.slice(1), v = '--c' + k;
+        if(cur === 'walnut') root.style.removeProperty(v); else root.style.setProperty(v, D(T(h), kind)); });
+    }
+    return { T, canon, show: hex => T(canon(hex)), set, learn: (themed, orig) => { rev[String(themed).toLowerCase()] = orig; }, get cur(){ return cur; } };
+  })();
+</script>
 <div id="splash" aria-hidden="true"></div>
 <script>
   // splash: built and started before the rest of the page loads; fades once the app is
   // ready and the last book has landed, then removes itself
   (function(){
     const el = document.getElementById('splash');
-    try{ if(JSON.parse(localStorage.getItem('stack-tracker-dev-v1') || '{}').splash === true){ el.remove(); return; } }catch(e){}
+    try{ const dv = JSON.parse(localStorage.getItem('stack-tracker-dev-v1') || '{}');
+      if(dv._theme && window.THEME) THEME.set(dv._theme);   // colour theme on before anything paints
+      if(dv.splash === true){ el.remove(); return; } }catch(e){}
     const COLORS = ['#7a2f2b', '#86452b', '#8a6a3f', '#857636', '#5b6633', '#2e4636', '#2b5752', '#234a5e', '#303d66', '#3a2f52', '#66304c', '#6b4a32'];
     const HEIGHTS = [62, 70, 58, 66, 60, 72, 64, 59, 68, 63, 71, 57];
     let n = 0;
@@ -2570,7 +2650,7 @@
 
   function bookColor(b){
     if(b.format === 'audio') return tapeColours(b).shell;   // a tape is its shell colour everywhere
-    return b.color || colorForTitle(b.title);
+    return THEME.show(b.color || colorForTitle(b.title));
   }
 
   // Linear, proportional scaling: page count maps directly to width/depth,
@@ -2961,7 +3041,7 @@
     // lighter or darker (same colours as the reels in the list cards)
     const t = document.createElement('canvas'); t.width = 240; t.height = 4;
     const k = t.getContext('2d');
-    k.fillStyle = '#8c5229'; k.fillRect(0, 0, t.width, t.height);
+    k.fillStyle = THEME.show('#8c5229'); k.fillRect(0, 0, t.width, t.height);
     for(let i = 0; i < t.width; i += 2 + Math.floor(rnd()*2)){
       const v = rnd();
       k.fillStyle = v < 0.55 ? `rgba(90,45,15,${0.12 + v*0.3})` : `rgba(240,200,160,${0.12 + (v - 0.55)*0.5})`;
@@ -3013,7 +3093,7 @@
     k.beginPath();
     if(frac >= 1) k.rect(-pad, 0, W, h);                          // full: right out to both sides
     else { k.moveTo(-pad, 0); wrap(xL, false); k.lineTo(-pad, h); k.closePath(); }
-    k.fillStyle = '#8c5229'; k.fill(); k.clip();
+    k.fillStyle = THEME.show('#8c5229'); k.fill(); k.clip();
     for(let n = 0, x = 0.6 - pad; x < xL + (frac >= 1 ? pad : 0); x += look.step, n++){
       const v = look.shades[n % look.shades.length];
       let band = 0; look.bands.forEach(b => { const d = Math.abs(x/w - b.at); if(d < b.wid) band += b.amt * (1 - d/b.wid); });
@@ -4244,12 +4324,13 @@
     return [116 * Y - 16, Math.hypot(A, B), (Math.atan2(B, A) * 180 / Math.PI + 360) % 360];
   }
   function nearestTape(list, hex, table){
-    hex = String(hex).toLowerCase();
-    const exact = list.find(t => t.hex === hex); if(exact) return exact.hex;
+    hex = String(THEME.canon(hex)).toLowerCase();   // matched on the colours as picked; the theme's version is what comes back
+    const H0 = t => t._h0 || t.hex;
+    const exact = list.find(t => H0(t) === hex); if(exact) return exact.hex;
     const named = table && table[hex] && list.find(t => t.name === table[hex]); if(named) return named.hex;
     const [L, C, H] = lchOf(hex);
     let best = list[0], bd = Infinity;
-    list.forEach(t => { const [L2, C2, H2] = lchOf(t.hex); let d;
+    list.forEach(t => { const [L2, C2, H2] = lchOf(H0(t)); let d;
       if(C < 12) d = (L - L2) ** 2 + (C2 * .5) ** 2;                  // a grey: closest in lightness, preferring greys
       else if(C2 < 12) return;                                         // a colour never becomes a grey
       else { const dh = Math.min(Math.abs(H - H2), 360 - Math.abs(H - H2)); d = dh * dh + ((L - L2) * .5) ** 2; }
@@ -4276,7 +4357,7 @@
   // store the converted colours on a tape (load, import, merge); true if anything changed
   function convertTapeColours(b){
     if(b.format !== 'audio') return false;
-    const t = tapeColours(b);
+    const t0 = tapeColours(b), t = { shell: THEME.canon(t0.shell), spin: THEME.canon(t0.spin), label: THEME.canon(t0.label) };   // saved as picked, not themed
     if(b.tapeShell === t.shell && b.tapeSpin === t.spin && b.tapeLabel === t.label) return false;
     b.tapeShell = t.shell; b.tapeSpin = t.spin; b.tapeLabel = t.label;
     return true;
@@ -4328,7 +4409,7 @@
       color: bookColor(book),  // matches the 2D shelf spine
       pageTone: toneOfBook(book, rnd),
       border: (b => b === BORDER_RETIRED ? 0 : b)(book.borderStyle != null ? book.borderStyle : Math.floor(rnd()*BORDER_STYLES)),
-      bookmarkColor: book.format === 'audio' ? tapeColours(book).spin : (book.bookmarkColor || DEFAULT_BOOKMARK_COLOR),
+      bookmarkColor: book.format === 'audio' ? tapeColours(book).spin : THEME.show(book.bookmarkColor || DEFAULT_BOOKMARK_COLOR),
       bookmarkShape: 0,                   // ribbon tip: always classic
       // audiobook label colour
       get sticker(){ return tapeColours(book).label; }
@@ -6038,7 +6119,7 @@
     const st = styleForBook(b);
     // everything that changes the model — including whether it's a book, an audiobook or
     // book + tape — so switching a title's format never reuses the old model
-    const key = JSON.stringify([b.format || 'book', b.title, b.author, b.pages, st.color, b.cover || 'hard',
+    const key = JSON.stringify([THEME.cur, b.format || 'book', b.title, b.author, b.pages, st.color, b.cover || 'hard',
       st.bookmarkColor, st.bookmarkShape, st.pageTone.name, st.border, b.format === 'audio' ? st.sticker : '', b.currentPage || 0, b.audioSeconds || 0]);
     let base = shelfBases.get(key);
     if(!base){
@@ -7961,15 +8042,15 @@
   function applyOptions(b, onlyTouched){
     const on = key => !onlyTouched || touched.has(key);
     if(on('format')) b.format = customizeFormat;
-    if(on('color')) b.color = COVER_COLOR_PRESETS[customizeColorIdx].hex;
-    if(on('bookmarkColor')) b.bookmarkColor = BOOKMARK_COLOR_PRESETS[customizeBookmarkIdx].hex;
+    if(on('color')) b.color = THEME.canon(COVER_COLOR_PRESETS[customizeColorIdx].hex);
+    if(on('bookmarkColor')) b.bookmarkColor = THEME.canon(BOOKMARK_COLOR_PRESETS[customizeBookmarkIdx].hex);
     if(on('border')) b.borderStyle = customizeBorderChoice;
     if(on('tone')){ b.pageToneIdx = customizeToneChoice; b.pagePaper = customizePaper; b.pageGilt = customizeGilt; b.pageCut = customizeCut; b.pageCutSeed = customizeCutSeed; }
     // a tape's colours: written when picked, or all three when it becomes a tape (so it keeps what the preview showed)
     const tapeNow = on('format') && customizeFormat === 'audio';
-    if(tapeNow || on('tapeShell')) b.tapeShell = TAPE_SHELLS[customizeShellIdx].hex;
-    if(tapeNow || on('tapeSpin')) b.tapeSpin = TAPE_SPINNERS[customizeSpinIdx].hex;
-    if(tapeNow || on('tapeLabel')) b.tapeLabel = TAPE_LABELS[customizeLabelIdx].hex;
+    if(tapeNow || on('tapeShell')) b.tapeShell = THEME.canon(TAPE_SHELLS[customizeShellIdx].hex);
+    if(tapeNow || on('tapeSpin')) b.tapeSpin = THEME.canon(TAPE_SPINNERS[customizeSpinIdx].hex);
+    if(tapeNow || on('tapeLabel')) b.tapeLabel = THEME.canon(TAPE_LABELS[customizeLabelIdx].hex);
     if(on('cover')) b.cover = COVER_TYPE_OPTIONS[customizeCoverIdx].val;
     if(on('shape')) b.bookmarkShape = customizeShapeChoice;
   }
@@ -8708,7 +8789,7 @@
       function faceTexture(){
         const N = 512, c = document.createElement('canvas'); c.width = c.height = N;
         const x = c.getContext('2d'), m = N / 2;
-        x.fillStyle = '#7a2f2b'; x.fillRect(0, 0, N, N);
+        x.fillStyle = THEME.show('#7a2f2b'); x.fillRect(0, 0, N, N);
         const g = x.createRadialGradient(m * .7, m * .6, 0, m, m, m);   // a soft sheen across the printed face
         g.addColorStop(0, 'rgba(255,255,255,.16)'); g.addColorStop(.6, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(0,0,0,.18)');
         x.fillStyle = g; x.fillRect(0, 0, N, N);
@@ -8907,7 +8988,7 @@
       ...[...document.querySelectorAll('.cloth-btn')].map(b => [b.querySelector('canvas'), b.dataset.cloth])];
     cards.forEach(([cv, hex]) => {
       if(!cv) return;
-      const go = () => draw(cv, rgb(hex));
+      const go = () => draw(cv, rgb(THEME.show(hex))); (window.__clothGos = window.__clothGos || []).push(go);
       if(window.ResizeObserver) new ResizeObserver(go).observe(cv);
       else { requestAnimationFrame(go); window.addEventListener('resize', go); }
     });
@@ -8921,13 +9002,15 @@
       const next = () => { const h = todo.shift(); if(!h) return; sheet(rgb(h), s0, 0, 0); requestAnimationFrame(next); };
       requestAnimationFrame(next);
     }
-    document.querySelectorAll('.cloth-btn[data-cloth], #tabs .tab[data-cloth]').forEach(e => e.style.setProperty('--cloth', e.dataset.cloth));
+    document.querySelectorAll('.cloth-btn[data-cloth], #tabs .tab[data-cloth]').forEach(e => e.style.setProperty('--cloth', THEME.show(e.dataset.cloth)));
     // the main tabs' cards: each painted ahead of time (shown just long enough to measure), so picking a tab
     // swaps in a finished card at once
     const tabCards = [...document.querySelectorAll('#tabs .tab[data-cloth]')];
     const paintTabs = () => tabCards.forEach(t => { const bk = t.querySelector('.bk'), on = bk.style.display;
-      bk.style.display = 'block'; draw(bk.querySelector('canvas'), rgb(t.dataset.cloth), true, 6); bk.style.display = on; });
+      bk.style.display = 'block'; draw(bk.querySelector('canvas'), rgb(THEME.show(t.dataset.cloth)), true, 6); bk.style.display = on; });
     // repainted whenever the strip changes size (on a phone the first layout can be the 980px desktop width)
+    window.reCloth = () => { document.querySelectorAll('.cloth-btn[data-cloth], #tabs .tab[data-cloth]').forEach(e => e.style.setProperty('--cloth', THEME.show(e.dataset.cloth)));
+      (window.__clothGos || []).forEach(g => g()); paintTabs(); };   // a new theme: every cloth card again
     if(window.ResizeObserver && tabCards.length) new ResizeObserver(paintTabs).observe(tabCards[0].parentElement);
     else { requestAnimationFrame(paintTabs); window.addEventListener('resize', paintTabs); }
     // after the phone has had the app in the background it may throw away what's drawn on canvases (to save
@@ -8936,9 +9019,9 @@
     window.CLOTH.repaintAll = () => {
       sheets.clear();
       const fresh = cv => { cv._drawn = ''; };
-      cards.forEach(([cv, hex]) => { if(cv){ fresh(cv); draw(cv, rgb(hex)); } });
+      cards.forEach(([cv, hex]) => { if(cv){ fresh(cv); draw(cv, rgb(THEME.show(hex))); } });
       tabCards.forEach(t => fresh(t.querySelector('.bk canvas'))); paintTabs();
-      document.querySelectorAll('canvas.cloth-bg').forEach(cv => { fresh(cv); if(cv.dataset.hex) draw(cv, rgb(cv.dataset.hex), false); });
+      document.querySelectorAll('canvas.cloth-bg').forEach(cv => { fresh(cv); if(cv.dataset.hex) draw(cv, rgb(THEME.show(cv.dataset.hex)), false); });
     };
   })();
   // back from the background (or a canvas the browser dropped and has now restored): redraw everything drawn
@@ -9288,7 +9371,32 @@
   const tlDay = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
   const tlAdd = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
   const tlSun = d => tlAdd(tlDay(d), -tlDay(d).getDay());            // the Sunday its week starts on
-  const tlDaily = () => TL.view === 'month' || TL.view === 'week';      // one bar per day
+  const tlDaily = () => TL.view === 'month' || TL.view === 'week';
+  // the date-column label that holds today: the day (month / week), the month (year), the year (all time)
+  function tlTodayBand(today, t0, t1, y, el, LW, pinned){
+    const n = today, a = TL.view === 'year' ? new Date(n.getFullYear(), n.getMonth(), 1) : TL.view === 'all' ? new Date(n.getFullYear(), 0, 1) : n;
+    const b = TL.view === 'year' ? new Date(n.getFullYear(), n.getMonth() + 1, 1) : TL.view === 'all' ? new Date(n.getFullYear() + 1, 0, 1) : tlAdd(n, 1);
+    if(TL.view === 'all'){   // All Time: just the red line at the end of today, as before
+      if(today >= t0 && today < t1) el(`left:${LW + 3}px;right:0;top:${(y(tlAdd(today, 1)) - .5).toFixed(1)}px;height:1px;background:#b5342a;z-index:4`);
+      return;
+    }
+    if(b <= t0 || a >= t1) return;
+    const top = y(b < t1 ? b : t1), bot = y(a > t0 ? a : t0), h = (bot - top).toFixed(1);
+    el(`left:${LW + 3}px;right:0;top:${top.toFixed(1)}px;height:${h}px;z-index:0`, 'tl-band');                       // behind the bars
+    el(`left:0;width:${LW}px;top:${top.toFixed(1)}px;height:${h}px;z-index:${pinned ? 4 : 0}`, 'tl-band' + (pinned ? ' tl-pin' : ''));   // behind its date
+  }
+  // a read's amount done / amount left: pages for a book, hours and minutes for an audiobook
+  function tlDoneLeft(r){
+    if(!r.total) return '';
+    const done = Math.min(r.total, r.daily.reduce((a, v) => a + v, 0)), left = Math.max(0, r.total - done);
+    const hm = sec => { const m = Math.round(sec / 60); return `${String(Math.floor(m / 60)).padStart(2, '0')}H:${String(m % 60).padStart(2, '0')}M`; };
+    if(r.e) return r.kind === 'audio' ? ` · <b>${hm(done)}</b>` : ` · <b>${tlN(done)}</b> pages`;   // finished: just how much it was
+    return r.kind === 'audio' ? ` · <b>${hm(done)}</b>/${hm(left)}` : ` · <b>${tlN(done)}</b>/${tlN(left)}`;
+  }
+  const tlIsToday = m => { const n = new Date(), d = m.mid;
+    return TL.view === 'year' ? d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth()
+         : TL.view === 'all' ? d.getFullYear() === n.getFullYear() && !/\d{4}\D+\d{4}/.test(m.text || '')
+         : d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate(); };      // one bar per day
   const TL_WD = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
   const TL_WDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -9303,11 +9411,18 @@
         if(!Array.isArray(days) || !endKey) return;
         const first = days.findIndex(v => v > 0); if(first < 0) return;
         const end = keyDate(endKey), s = tlAdd(end, -(days.length - 1 - first));
-        out.push({ id: id++, title: b.title, kind: audio ? 'audio' : 'book', reread, page, s, e: finished ? end : null, seed: 1 + (bs + k * 7919) % 2147483000,
+        out.push({ id: id++, title: b.title, kind: audio ? 'audio' : 'book', total: audio ? b.audioSeconds : b.pages, reread, page, s, e: finished ? end : null, seed: 1 + (bs + k * 7919) % 2147483000,
           daily: days.slice(first).map(v => audio ? v * spp : v) });
       };
       (b.reads || []).forEach((r, k) => add(r.days, r.finishedOn, true, k > 0, k));
       add(b.days, lastLogKey(b), bookFinished(b), (b.reads || []).length > 0, (b.reads || []).length);
+      // still going: the day it should finish at its pace so far (the same estimate as the dropdown's "on pace for")
+      const cur = out[out.length - 1];
+      if(cur && !cur.e && !bookFinished(b) && cur.title === b.title){
+        const prev = b.days.slice(0, -1), prevDone = Math.min(prev.reduce((t, v) => t + v, 0), b.pages), perDay = prev.length ? prevDone / prev.length : 0;
+        const done = Math.min(bookRead(b), b.pages);
+        if(done && perDay){ const n = Math.max(0, Math.ceil((b.pages - done) / perDay) - 1); if(n > 0) cur.eta = tlAdd(tlDay(new Date()), n); }
+      }
     });
     return out;
   }
@@ -9417,30 +9532,42 @@
   tlCanvas.addEventListener('scroll', ()=> tlCanvas.style.setProperty('--sx', tlCanvas.scrollLeft + 'px'), {passive: true});
   function tlDrawTimeline(){
     const today = tlDay(new Date()), { R, W, H, LW, y, el } = tlFrame(today), { t0, t1 } = R;
-    R.lines.forEach(l => el(`left:${l.strong ? 0 : LW + 3}px;right:0;top:${(y(l.at) - (l.strong ? 1.5 : 0)).toFixed(1)}px;height:${l.strong ? 3 : 1}px;background:${l.strong ? '#000' : '#efeae0'};z-index:${l.strong ? 2 : 1}`));
-    R.marks.forEach(m => { const e = el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:5`, 'tl-lbl tl-pin' + (m.html ? ' tl-wk' : ''), m.text); if(m.html) e.innerHTML = m.html; });
+    R.lines.forEach(l => el(`left:${l.strong ? 0 : LW + 3}px;right:0;top:${(y(l.at) - (l.strong ? 1.5 : .5)).toFixed(1)}px;height:${l.strong ? 3 : 1}px;background:${l.strong ? '#000' : '#d9d2c4'};z-index:${l.strong ? 2 : 1}`));
+    R.marks.forEach(m => { const e = el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:5`, 'tl-lbl tl-pin' + (m.html ? ' tl-wk' : '') + (tlIsToday(m) ? ' tl-today' : ''), m.text); if(m.html) e.innerHTML = m.html; });
     el(`left:${LW}px;top:0;height:${H}px;width:3px;background:#000;z-index:5`, 'tl-pin');
-    if(today >= t0 && today < t1) el(`left:${LW+3}px;right:0;top:${(y(tlAdd(today, 1)) - .5).toFixed(1)}px;height:1px;background:#b5342a;z-index:4`);
+    tlTodayBand(today, t0, t1, y, el, LW, true);
     const list = TL.reads.filter(r => r.s < t1 && (r.e ? tlAdd(r.e, 1) : tlAdd(today, 1)) > t0).sort((a, b) => a.s - b.s);
     const kB = list.some(r => r.kind !== 'audio'), kA = list.some(r => r.kind === 'audio');
     tlHead([{ x: 0, end: LW, text: 'Date' }, { x: LW + 3, end: W, line: LW, text: kB && kA ? 'Books & Audiobooks' : kA ? 'Audiobooks' : 'Books' }]);
     if(!list.length){ el(`left:${LW+3}px;right:0;top:${H/2}px;transform:translateY(-50%);text-align:center;z-index:2`, 'tl-empty', 'Nothing read here yet'); return; }
     const laneEnds = [];
+    // each bar's top and bottom on the card, worked out the same way it's drawn (a short read is at least 5px tall)
+    const midDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12);
+    const extent = r => { let bt = r.end >= t1 ? -10 : y(tlDaily() && r.e ? midDay(r.e) : r.end), bb = r.s < t0 ? H + 10 : y(tlDaily() ? midDay(r.s) : r.s);
+      if(bb - bt < 5){ const c = (bt + bb) / 2; bt = c - 2.5; bb = c + 2.5; }
+      if(r.eta && r.end < t1) bt = Math.min(bt, tlAdd(r.eta, 1) >= t1 ? -10 : y(tlDaily() ? midDay(r.eta) : tlAdd(r.eta, 1)));
+      return [bt, bb]; };
+    const laneTops = [], LANE_GAP = 4;
     list.forEach(r => {
       r.end = r.e ? tlAdd(r.e, 1) : tlAdd(today, 1);
-      let k = -1; laneEnds.forEach((e, j) => { if(e <= r.s && (k < 0 || e < laneEnds[k])) k = j; });   // free longest
+      const [top, bot] = extent(r);
+      let k = -1; laneTops.forEach((t, j) => { if(t - bot >= LANE_GAP && (k < 0 || t > laneTops[k])) k = j; });   // a lane with room below its last bar
+      if(k < 0){ k = laneTops.length; laneTops.push(0); laneEnds.push(0); }
+      laneTops[k] = top;
       if(k < 0){ k = laneEnds.length; laneEnds.push(0); }
-      laneEnds[k] = r.end; r.lane = k;
+      laneEnds[k] = r.eta ? tlAdd(r.eta, 1) : r.end; r.lane = k;   // the lane stays held to the estimated finish
     });
     const N = laneEnds.length, room = W - LW - 3 - 8;
     // crowded: close the gaps up first; past that the bars keep a readable width and the card scrolls sideways
     let GAP = 10, BW = Math.floor((room - (N - 1) * GAP) / N);
     if(BW < 12){ GAP = 3; BW = Math.floor((room - (N - 1) * GAP) / N); }
-    BW = Math.max(8, Math.min(34, BW));
+    if(BW < 8){ GAP = 2; BW = Math.floor((room - (N - 1) * GAP) / N); }
+    if(BW < 6){ GAP = 1; BW = Math.floor((room - (N - 1) * GAP) / N); }
+    BW = Math.max(5, Math.min(34, BW));          // only past 5px bars does the card scroll sideways
     const groupW = N * BW + (N - 1) * GAP;
     const x0 = LW + 3 + Math.max(4, Math.round((W - LW - 3 - groupW) / 2));
     const fullW = Math.max(W, x0 + groupW + 6);
-    if(fullW > W){
+    if(fullW > W + 2){   // a pixel or two over isn't worth a sideways scroll
       tlCanvas.style.overflowX = 'auto';
       // lines that ran to the card's right edge now run the whole scroll width
       tlCanvas.querySelectorAll(':scope > div').forEach(e => { if(e.style.right === '0px'){ e.style.right = 'auto'; e.style.width = (fullW - (parseFloat(e.style.left) || 0)) + 'px'; } });
@@ -9459,22 +9586,27 @@
           ? (r.kind === 'audio' ? `background:#8c5229 ${tlTapeStraight(r.seed)} repeat;background-size:4px 90px` : `background:#e7dfc9 ${tlPageLines(r.seed)} repeat;background-size:4px 120px`)
           : (r.kind === 'audio' ? `background:#8c5229 ${tlTapeWraps(BW - 4, r.seed)} repeat-y;background-size:${BW - 4}px 90px` : `background:${r.page} ${tlPageLines(r.seed)} repeat;background-size:4px 120px`);
       const bar = el(`left:${bx}px;top:${bt.toFixed(1)}px;width:${BW}px;height:${bh.toFixed(1)}px;${look}`, 'tl-bar' + (r.e ? '' : ' now') + (TL.picked === r.key ? ' on' : ''));
+      // on pace: the rest of the bar, out to the estimated finish, outlined and at 30%
+      if(r.eta && r.end < t1){
+        const et = tlAdd(r.eta, 1) >= t1 ? -10 : y(tlDaily() ? mid(r.eta) : tlAdd(r.eta, 1));
+        if(bt - et > 1){ el(`left:${bx}px;top:${et.toFixed(1)}px;width:${BW}px;height:${(bt - et).toFixed(1)}px;${look}`, 'tl-bar tl-eta'); bar.classList.add('to-eta'); }
+      }
       bar.addEventListener('click', () => {
         tlCanvas.querySelectorAll('.tl-bar.on').forEach(t => t.classList.remove('on'));
         if(TL.picked === r.key){ TL.picked = ''; tlIdle(); return; }
         bar.classList.add('on'); TL.picked = r.key;
         const days = Math.round(((r.e || today) - r.s) / 864e5) + 1;
         tlInfo.classList.remove('nav', 'pick');
-        tlInfo.innerHTML = `<span class="t">${r.kind === 'audio' ? '○ ' : ''}${tlEsc(r.title)}${r.reread ? ' ↺' : ''}</span>` +
-          `<span>${tlFmt(r.s)} – ${r.e ? tlFmt(r.e) : '<b>now</b>'}<br><b>${days}</b> ${days === 1 ? 'day' : 'days'}${r.kind === 'audio' ? ' · audiobook' : ''}</span>`;
+        tlInfo.innerHTML = `<span class="t">${tlEsc(r.title)}${r.reread ? ' ↺' : ''}</span>` +
+          `<span>${tlFmt(r.s)} – ${r.e ? tlFmt(r.e) : r.eta ? `(${tlFmt(r.eta)})` : '<b>now</b>'}<br><b>${days}</b> ${days === 1 ? 'day' : 'days'}${tlDoneLeft(r)}</span>`;
       });
     });
   }
   function tlDrawGraph(){
     const today = tlDay(new Date()), { R, W, H, LW, y, el } = tlFrame(today), { t0, t1 } = R, all = TL.view === 'all';
     R.lines.filter(l => l.strong).forEach(l => el(`left:0;right:0;top:${(y(l.at) - 1.5).toFixed(1)}px;height:3px;background:#000;z-index:2`));
-    if(all) R.lines.filter(l => !l.strong).forEach(l => el(`left:${LW + 3}px;right:0;top:${(y(l.at) - .5).toFixed(1)}px;height:1px;background:#efeae0;z-index:1`));   // month lines
-    R.marks.forEach(m => { const e = el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:2`, 'tl-lbl' + (m.html ? ' tl-wk' : ''), m.text); if(m.html) e.innerHTML = m.html; });
+    if(all) R.lines.filter(l => !l.strong).forEach(l => el(`left:${LW + 3}px;right:0;top:${(y(l.at) - .5).toFixed(1)}px;height:1px;background:#d9d2c4;z-index:1`));   // month lines
+    R.marks.forEach(m => { const e = el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:2`, 'tl-lbl' + (m.html ? ' tl-wk' : '') + (tlIsToday(m) ? ' tl-today' : ''), m.text); if(m.html) e.innerHTML = m.html; });
     el(`left:${LW}px;top:0;height:${H}px;width:3px;background:#000;z-index:2`);
     const x0 = LW + 3;
     const buckets = [];
@@ -9572,7 +9704,7 @@
         if(m === 11){ top += extra; bh -= extra; } else if(m === 0) bh -= extra;
         bh = Math.max(1.5, bh);
       }
-      if(!all) el(`left:${x0}px;right:0;top:${(top + h - .5).toFixed(1)}px;height:1px;background:#efeae0;z-index:1`);
+      if(!all) el(`left:${x0}px;right:0;top:${(top + h - .5).toFixed(1)}px;height:1px;background:#d9d2c4;z-index:1`);
       if(k.a <= today){
         const id = (+k.a) + '|all', when = tlDaily() ? tlFmt(k.a) : yearly ? String(k.a.getFullYear()) : `${TL_MONTH[k.a.getMonth()]} ${k.a.getFullYear()}`;
         const row = el(`left:${all ? x0 : 0}px;right:0;top:${top.toFixed(1)}px;height:${h.toFixed(1)}px;z-index:2`, 'tl-row' + (TL.pickedK === id ? ' on' : ''));
@@ -9630,10 +9762,7 @@
       years.forEach((t, Y) => { const mid = y(new Date(Y, 6, 1));
         cols.forEach(c => t[c.key] && el(`right:${c.r}px;top:${mid.toFixed(1)}px;font-size:10px;background:#fff;padding:1px 3px;border-radius:3px`, 'tl-gval', c.text(t[c.key]))); });
     }
-    if(today >= t0 && today < t1){
-      const ty = (y(tlAdd(today, 1)) - .5).toFixed(1);
-      cols.forEach(c => el(`left:${c.x}px;width:${c.end - c.x}px;top:${ty}px;height:1px;background:#b5342a;z-index:2`));
-    }
+    tlTodayBand(today, t0, t1, y, el, LW, false);
   }
   function tlDraw(){
     TL.reads = tlCollect();
@@ -9981,7 +10110,13 @@
       for(; d <= end; d.setDate(d.getDate() + 1)){ wkN[d.getDay()]++; wk[d.getDay()] += byDate.get(dayKey(d)) || 0; } }
     const last14 = Array.from({ length: 14 }, (_, i) => { const d = keyDate(localTodayKey()); d.setDate(d.getDate() - 13 + i); return byDate.has(dayKey(d)); });
     const longestOne = list.reduce((m, b) => !m || size(b) > size(m) ? b : m, null);
-    return { n: list.length, finished, going, total, onShelf, doneOnShelf, days: byDate.size, best, longest, current, finishedThisYear, rereads,
+    // made only here: how long a finish takes (first logged day to the finish), how many authors, the strongest weekday
+    const fin = []; list.forEach(b => { if(bookFinished(b)){ const n = (b.days || []).length; if(n) fin.push(n); } (b.reads || []).forEach(r => { const n = (r.days || []).length; if(n) fin.push(n); }); });
+    const authors = new Set(list.filter(b => bookFinished(b) || (b.reads || []).length).map(b => (b.author || '').trim().toLowerCase()).filter(Boolean)).size;
+    const WD = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];   // Best weekday: three capitals
+    let topI = -1, topV = 0; wk.forEach((v, i) => { const a = wkN[i] ? v / wkN[i] : 0; if(a > topV){ topV = a; topI = i; } });
+    const topDay = topI >= 0 ? WD[topI] : '—';
+    return { n: list.length, finished, going, total, onShelf, doneOnShelf, days: byDate.size, best, longest, current, finishedThisYear, rereads, fin, authors, topDay, byDate,
       months, byYear, week: wk.map((v, i) => wkN[i] ? v / wkN[i] : 0), last14, longestOne, size };
   }
   function renderDataStats(){
@@ -10002,7 +10137,20 @@
       const yr = new Date().getFullYear(), first = Math.min(yr, ...Object.keys(s.byYear).map(Number)), span = yr - first + 1;
       const sum = a => a.reduce((t, v) => t + v, 0), bar = (v, mx) => `<span class="st-bar"><i style="height:${v > 0 ? `max(${(v / mx * 100).toFixed(1)}%, 2px)` : '0'}"></i></span>`;
       let html, mode = '';
-      if(span > 10){
+      // up to six months logged: a bar a day, each month's days together over its name
+      // every month from the first logged one to this one (quiet months included)
+      const logMonths = (() => { const ks = [...s.byDate.keys()].sort(); if(!ks.length) return [];
+        const out = []; let [y, m] = ks[0].slice(0, 7).split('-').map(Number); const now = new Date(), ey = now.getFullYear(), em = now.getMonth() + 1;
+        while((y < ey || (y === ey && m <= em)) && out.length < 7){ out.push(y + '-' + String(m).padStart(2, '0')); if(++m > 12){ m = 1; y++; } }
+        return out; })();
+      if(logMonths.length && logMonths.length <= 6){
+        mode = 'years days';
+        const MN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const sets = logMonths.map(m => { const [y, mo] = m.split('-').map(Number), n = new Date(y, mo, 0).getDate();
+          return { name: MN[mo - 1], days: Array.from({ length: n }, (_, i) => s.byDate.get(m + '-' + String(i + 1).padStart(2, '0')) || 0) }; });
+        const mx = Math.max(1, ...sets.flatMap(x => x.days));
+        html = sets.map(x => `<span class="st-m"><span class="st-ms">${x.days.map(v => bar(v, mx)).join('')}</span><span class="st-ml">${x.name}</span></span>`).join('');
+      } else if(span > 10){
         mode = 'decades';
         const yrs = Array.from({ length: span }, (_, i) => first + i), tot = yrs.map(y => sum(s.byYear[y] || [])), mx = Math.max(1, ...tot);
         if(span <= 25) html = yrs.map((y, i) => `<span class="st-m">${bar(tot[i], mx)}<span class="st-ml">'${String(y).slice(-2)}</span></span>`).join('');
@@ -10012,18 +10160,27 @@
         const yrs = Array.from({ length: 10 }, (_, i) => yr - 9 + i), sets = yrs.map(y => s.byYear[y] || Array(12).fill(0)), mx = Math.max(1, ...sets.flat());
         html = sets.map((arr, n) => `<span class="st-m"><span class="st-ms">${arr.map(v => bar(v, mx)).join('')}</span><span class="st-ml">${yrs[n]}</span></span>`).join('');
       } else {
-        const arr = s.byYear[yr] || Array(12).fill(0), mx = Math.max(1, ...arr);
-        html = arr.map((v, i) => `<span class="st-m">${bar(v, mx)}<span class="st-ml">${MON1[i]}</span></span>`).join('');
+        // more than six months in the year: a bar a month, but this month as its days (wider, on its own scale)
+        const arr = s.byYear[yr] || Array(12).fill(0), mx = Math.max(1, ...arr), cm = new Date().getMonth();
+        const mk = yr + '-' + String(cm + 1).padStart(2, '0'), nd = new Date(yr, cm + 1, 0).getDate();
+        const dd = Array.from({ length: nd }, (_, i) => s.byDate.get(mk + '-' + String(i + 1).padStart(2, '0')) || 0), dmx = Math.max(1, ...dd);
+        // the months before this one that have reading, then this month on the right, its name in full
+        const FULL = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+        html = arr.slice(0, cm).map((v, i) => v > 0 ? `<span class="st-m">${bar(v, mx)}<span class="st-ml">${MON1[i]}</span></span>` : '').join('') +
+          `<span class="st-m now"><span class="st-ms">${dd.map(x => bar(x, dmx)).join('')}</span><span class="st-ml">${FULL[cm]}</span></span>`;
       }
       el('st-c st-mon ' + (A ? 'tape' : 'book') + (mode ? ' ' + mode : ''), html);
       // twelve, in pairs: each row split in half
       const rows = [
-        [[A ? 'Audiobooks' : 'Books', fmt(s.n)], ['Finished', fmt(s.finished)]],
-        [[A ? 'Listening' : 'Reading', fmt(s.going)], ['Not started', fmt(ns)]],
-        [[A ? 'Listened' : 'Pages read', A ? fmtDur(s.total) : fmt(s.total)], ['Of shelf', Math.round(pct * 100) + '%']],
-        [[A ? 'Days listened' : 'Days read', fmt(s.days)], ['A day', s.days ? amt(perDay) : '—']],
-        [['Streak now', plural(s.current, 'day')], ['Best streak', plural(s.longest, 'day')]],
-        [['Best day', s.best ? amt(s.best.v) : '—'], ['This year', fmt(s.finishedThisYear)]]];
+        [[A ? 'Audiobooks on shelf' : 'Books on shelf', fmt(s.n)], [A ? 'Audiobooks in progress' : 'Books in progress', fmt(s.going)]],
+        [['Not started', fmt(ns)], [A ? 'Shelf heard' : 'Shelf read', Math.round(pct * 100) + '%']],
+        [[A ? 'Audiobooks heard' : 'Books read', fmt(s.finished)], [A ? 'Relistens' : 'Rereads', fmt(s.rereads)]],
+        [[A ? 'Time listened' : 'Pages read', A ? fmtDur(s.total) : fmt(s.total)], [A ? 'Days listened' : 'Days read', fmt(s.days)]],
+        [[A ? 'Time/day' : 'Pages/day', s.days ? amt(perDay) : '—'], ['Best day', s.best ? amt(s.best.v) : '—']],
+        [['Best streak', plural(s.longest, 'day')], [A ? 'Listening streak' : 'Reading streak', plural(s.current, 'day')]],
+        [['Average length', s.n ? (A ? fmtDur(s.onShelf / s.n) : fmt(s.onShelf / s.n)) : '—'], ['Longest', s.longestOne ? (A ? fmtDur(s.size(s.longestOne)) : fmt(s.size(s.longestOne))) : '—']],
+        [['Days to finish', s.fin.length ? plural(Math.round(s.fin.reduce((a, v) => a + v, 0) / s.fin.length), 'day') : '—'], ['Fastest finish', s.fin.length ? plural(Math.min(...s.fin), 'day') : '—']],
+        [[A ? 'Authors heard' : 'Authors read', fmt(s.authors)], ['Best weekday', s.topDay]]];
       el('st-c st-list', rows.map(r => `<div>${r.map(([k, v]) => `<span class="st-half"><span class="st-k">${k}</span><span class="st-v">${v}</span></span>`).join('')}</div>`).join(''));
     });
   }
@@ -10858,7 +11015,7 @@ Object.assign(ART, {
     { id: 'haptics', name: 'Haptics', note: 'A small buzz as a wheel clicks past each number' }
   ];
   // defaults: Medium shelves, tapes on the right, Shelf and List both, Badges and Haptics off, everything else on (saved choices override these)
-  const DEFAULTS = { badges: true, haptics: true, _tapes: 'side', _lib: 'both' };
+  const DEFAULTS = { badges: true, haptics: true, _tapes: 'side', _lib: 'both', _theme: 'walnut' };
   let off = {}; try{ off = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }catch(e){}
   off = Object.assign({}, DEFAULTS, off);
   const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(off)); }catch(e){} };
@@ -10878,6 +11035,25 @@ Object.assign(ART, {
     document.body.classList.toggle('lib-one', one);
     if(one && prefs.view !== m){ prefs.view = m; applyView(); }
   }
+  // colour themes: the page ground, the header bands and the tab / card tans
+  const THEMES = [['walnut', 'Walnut', '#6b4a32'], ['green', 'Library Green', '#2e4636'], ['navy', 'Navy Ink', '#303d66'],
+                  ['oxblood', 'Oxblood', '#7a2f2b'], ['plum', 'Plum', '#3a2f52'], ['slate', 'Slate', '#3d4248'],
+                  ['midnight', 'Midnight', '#16120f'], ['nightgreen', 'Night Green', '#0f1a14'], ['nightink', 'Night Ink', '#10141f']];
+  const themeOf = () => THEMES.some(z => z[0] === off._theme) ? off._theme : 'walnut';
+  // a theme: the CSS colours, every colour list in Add / Edit (covers, ribbons, pages, tape shells, spinners and stickers)
+  // and the cloth cards. Lists keep their own colours (_h0) so books are always saved in them
+  function applyTheme(){
+    THEME.set(themeOf());
+    [COVER_COLOR_PRESETS, BOOKMARK_COLOR_PRESETS, TAPE_SHELLS, TAPE_SPINNERS, TAPE_LABELS].forEach(list => list.forEach(it => {
+      if(it._h0 == null) it._h0 = it.hex; it.hex = THEME.T(it._h0); THEME.learn(it.hex, it._h0); }));
+    PAGE_TONES.forEach(it => {
+      if(it._b0 == null){ it._b0 = it.base; it._t0 = it.tint; it._p0 = it.paper; }
+      it.base = THEME.T(it._b0); THEME.learn(it.base, it._b0);
+      if(typeof it._t0 === 'number') it.tint = parseInt(THEME.T('#' + it._t0.toString(16).padStart(6, '0')).slice(1), 16);
+      if(it._p0) it.paper = THEME.T(it._p0);
+    });
+    if(window.reCloth) window.reCloth();
+  }
   // Data opens on Stats; with Stats hidden it opens on the next tab there is
   const firstData = () => !off.stats ? 'stats' : !off.badges ? 'badges' : 'backup';
   const showDataTab0 = showDataTab;
@@ -10896,6 +11072,8 @@ Object.assign(ART, {
   let testV = 50;
   function paint(){
     body.innerHTML =
+      `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Colour theme</b><span>The whole app's colours</span></span></div>` +
+        `<div class="dv-themes">${THEMES.map(z => `<button type="button" data-theme="${z[0]}" class="${themeOf() === z[0] ? 'on' : ''}" style="background:${z[2]}">${z[1]}</button>`).join('')}</div></div>` +
       `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Bookshelf size</b><span>Books, tapes and shelves</span></span>${seg('size', SIZES, sizeOf()[0], 'three')}</div></div>` +
       `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Audiobook shelf</b><span>Side: always a one-third shelf beside the books</span></span>${seg('tapes', TAPES, tapesOf())}</div></div>` +
       `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Library view</b><span>Just one hides the Shelf | List card</span></span>${seg('lib', LIBS, libOf(), 'three')}</div></div>` +
@@ -10904,6 +11082,7 @@ Object.assign(ART, {
       `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Haptic tester</b><span>Turn the wheel to feel each click</span></span><span class="dv-wheel"><span class="lw-wheel">${ROWS7}</span></span></div></div>`;
     body.querySelectorAll('[data-size]').forEach(b => b.onclick = () => { if(b.dataset.size === 'm') delete off._size; else off._size = b.dataset.size; save(); applySize(); paint(); });
     body.querySelectorAll('[data-tapes]').forEach(b => b.onclick = () => { off._tapes = b.dataset.tapes; save(); window.setTapeSide(off._tapes === 'side'); paint(); });
+    body.querySelectorAll('[data-theme]').forEach(b => b.onclick = () => { off._theme = b.dataset.theme; save(); applyTheme(); renderAll(); paint(); });
     body.querySelectorAll('[data-lib]').forEach(b => b.onclick = () => { off._lib = b.dataset.lib; save(); applyLib(); paint(); });
     body.querySelectorAll('.dv-sw[data-id] button').forEach(b => b.onclick = () => { off[b.parentElement.dataset.id] = b.dataset.on !== '1'; save(); apply(); paint(); });
     // the tester: an ordinary page wheel, 0–99, that goes nowhere
@@ -10924,9 +11103,9 @@ Object.assign(ART, {
   // export / import: the saved choices go out with the library and come back with it
   window.devState = () => Object.assign({}, off);
   window.devImport = d => { off = Object.assign({}, DEFAULTS, d); save();
-    apply(); applyLib(); window.setTapeSide(off._tapes === 'side'); applySize(); if(page.classList.contains('open')) paint(); };
+    apply(); applyLib(); applyTheme(); renderAll(); window.setTapeSide(off._tapes === 'side'); applySize(); if(page.classList.contains('open')) paint(); };
   if(off._tapes === 'side') window.setTapeSide(true);
-  apply(); applyLib(); if(off._size) applySize(); else sizeNow = 1;
+  apply(); applyLib(); applyTheme(); if(off._size) applySize(); else sizeNow = 1;
 })();
 
 
