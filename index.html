@@ -1615,6 +1615,58 @@
   #dt-view-backup .dt-card.bk-when, #dt-view-backup .dt-card.bk-loc{align-items:stretch;}
   #dt-view-backup .dt-card.bk-when > span, #dt-view-backup #bk-loc-pick{align-items:center; text-align:center;}
   #dt-view-backup .dt-card b{max-width:100%;}
+  #tl-canvas .tl-up{color:var(--cf2fb84a, #2fb84a);}
+  #tl-canvas .tl-dn{color:var(--cfe5322b, #e5322b);}
+
+  /* ===== Wishlist ===== */
+  body.off-wishlist #tabs .tab[data-view="wishlist"]{display:none !important;}
+  #wishlist-controls{flex-direction:column; gap:4px;}
+  #wishlist-controls .tl-views{margin:0;}
+  #wl-search{height:21px; box-sizing:border-box; display:flex; align-items:center; background:var(--panel); border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;}
+  #wl-search svg{flex:none; width:12px; height:12px; margin:0 4px 0 9px; stroke:var(--ink);}
+  #wl-q{flex:1; min-width:0; height:100%; border:0; outline:0; margin:0; padding:0 6px 0 4px; border-radius:0; background:transparent; color:var(--ink);
+    font:700 min(.74rem, 2.95vw) Arial, sans-serif;}
+  #wl-q::placeholder{color:var(--muted); opacity:1; text-transform:uppercase;}
+  #wl-q::-webkit-search-cancel-button{display:none;}
+  #wishlist-view{padding:0; margin-top:-12px;}   /* the page's 16px under the header, less 12: the top card sits 4px below it */
+  #wishlist-view.active{display:flex; flex-direction:column; gap:4px;}
+  .wl-card{position:relative; overflow:hidden; height:34px; box-sizing:border-box; border:2.5px solid var(--cb000000, #000000); border-radius:6px; background:var(--cloth); color:var(--cfffffff, #ffffff);
+    display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:0 22px; cursor:pointer; user-select:none; -webkit-user-select:none;}
+  .wl-card > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
+  .wl-card > span{position:relative; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .wl-card .t{font:700 .72rem/1.1 Georgia, serif;}
+  .wl-card .a{font:italic 400 .62rem/1.1 Georgia, serif; color:rgba(255,255,255,.82);}
+  .wl-card:active > canvas{filter:brightness(.92);}
+  #wl-empty{margin:40px 16px; text-align:center; font:700 min(.74rem, 2.95vw)/1.4 Arial, sans-serif; text-transform:uppercase; color:var(--muted);}
+  /* the wishlist window: the Add a Book header, then Title and Author (Delete when editing); Add to My Library in its footer */
+  #wl-page{position:fixed; inset:0; z-index:30; background:var(--bg); display:flex; flex-direction:column; gap:4px;
+    opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
+  #wl-page.active{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  .wl-head{flex:none; display:flex; background:var(--cb000000, #000000); padding-top:env(safe-area-inset-top); border-top:3px solid var(--cb000000, #000000); border-bottom:3px solid var(--cb000000, #000000);}
+  .wl-head button, .wl-head button:active{flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none; color:var(--cfffffff, #ffffff);
+    font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; background-clip:padding-box;}
+  #wl-cancel, #wl-cancel:active{background:var(--cb7a2f2b, #7a2f2b); border-right:3px solid var(--cb000000, #000000);}
+  #wl-save, #wl-save:active{background:var(--cb2e4636, #2e4636); border-left:3px solid var(--cb000000, #000000);}
+  #wl-save:disabled{color:rgba(255,255,255,.4); cursor:default;}
+  .wl-head h2{flex:1 1 0; min-width:0; height:42px; margin:0; padding:0 6px; background:var(--hdr-cell); color:var(--ink); text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    font:700 min(.74rem, 2.95vw)/42px Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+  /* second header: the card as it will look, on the walnut band */
+  .wl-prev-band{flex:none; margin-top:-4px; padding:4px; background:var(--band, var(--cb6b4a32, #6b4a32)); border-bottom:3px solid var(--cb000000, #000000);}
+  #wl-prev .ph{opacity:.55;}
+  .wl-fields{display:flex; flex-direction:column; gap:4px; padding:0 4px;}
+  .wl-fields .field-card{height:45px; flex:none;}
+  .wl-fields .field-card input{height:auto; font-size:.95rem;}
+  #wl-del, #wl-del:active{height:45px; margin:0; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--panel); color:var(--cfaa3333, #aa3333); box-shadow:none;
+    font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  #wl-del.armed{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff);}
+  #wl-del[hidden], #wl-foot[hidden]{display:none;}
+  #wl-foot{position:absolute; left:0; right:0; bottom:0; padding:4px 4px calc(4px + env(safe-area-inset-bottom)); background:var(--band, var(--cb6b4a32, #6b4a32));
+    border-top:3px solid var(--cb000000, #000000); border-bottom:3px solid var(--cb000000, #000000);}
+  #wl-real, #wl-real:active{position:relative; overflow:hidden; height:45px; width:100%; margin:0; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cb5b6633, #5b6633); color:var(--cfffffff, #ffffff); box-shadow:none;
+    display:flex; align-items:center; justify-content:center; padding:0 16px;}
+  #wl-real > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
+  #wl-real > span{position:relative; font:700 min(1rem, 4vw)/1 Georgia, 'Times New Roman', serif; letter-spacing:.14em; text-transform:uppercase; white-space:nowrap;}
+  #wl-real:active > canvas{filter:brightness(.92);}
   #dt-view-stats .st-m.now{flex:5 1 0;}   /* this month, a bar a day */
 </style>
 <style>
@@ -1622,30 +1674,6 @@
   #splash{position:fixed; inset:0; z-index:100000; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
     transition:opacity .35s ease; overflow:hidden;}
   #splash.gone{opacity:0; pointer-events:none;}
-  /* Fly: seen in depth, so the books can come at you */
-  #splash.fly{perspective:700px; perspective-origin:50% 50%;}
-  #splash.fly .sp-shelf, #splash.fly .sp-row, #splash.fly .sp-spine{transform-style:preserve-3d;}
-  /* a book's body, behind its spine (only while flying): covers either side a shade darker, the page block top, bottom and back */
-  #splash .fx{position:absolute; box-sizing:border-box; border:3px solid var(--cb000000, #000000); pointer-events:none; --d:44px;}
-  #splash .fx.l, #splash .fx.r{top:-3px; bottom:-3px; width:var(--d);}
-  #splash .fx.l{left:-3px; transform-origin:left center; transform:rotateY(90deg); filter:brightness(.72);}
-  #splash .fx.r{right:-3px; transform-origin:right center; transform:rotateY(-90deg); filter:brightness(.72);}
-  #splash .fx.t, #splash .fx.b{left:-3px; right:-3px; height:var(--d); background:var(--cbf1e8d2, #f1e8d2) repeating-linear-gradient(90deg, rgba(0,0,0,.09) 0 1px, transparent 1px 3px);}
-  #splash .fx.t{top:-3px; transform-origin:center top; transform:rotateX(-90deg);}
-  #splash .fx.b{bottom:-3px; transform-origin:center bottom; transform:rotateX(90deg); filter:brightness(.8);}
-  /* rounded in 3d too: the spine rounds all four corners once it's off the shelf, and every face rounds its corners to match */
-  #splash.fly .sp-spine{border-radius:3px;}
-  #splash .fx.l, #splash .fx.r, #splash .fx.t, #splash .fx.b, #splash .fx.k{border-radius:3px;}
-  /* rounded edges, closed: the sides and page faces stop short of each corner, and a bevel strip runs back along
-     each of the four long edges to join them, so the corner reads round from any angle and the box has no gaps */
-  #splash .fx.l, #splash .fx.r{top:0; bottom:0;}
-  #splash .fx.t, #splash .fx.b{left:0; right:0;}
-  #splash .fx.e{width:4.6px; height:var(--d); margin:calc(var(--d) / -2) 0 0 -2.3px; border:0; border-radius:0; background:var(--cb000000, #000000);}
-  #splash .fx.e.tl{left:-1.5px; top:-1.5px; transform:translateZ(calc(var(--d) / -2)) rotateZ(-45deg) rotateX(90deg);}
-  #splash .fx.e.tr{left:calc(100% + 1.5px); top:-1.5px; transform:translateZ(calc(var(--d) / -2)) rotateZ(45deg) rotateX(90deg);}
-  #splash .fx.e.bl{left:-1.5px; top:calc(100% + 1.5px); transform:translateZ(calc(var(--d) / -2)) rotateZ(45deg) rotateX(90deg);}
-  #splash .fx.e.br{left:calc(100% + 1.5px); top:calc(100% + 1.5px); transform:translateZ(calc(var(--d) / -2)) rotateZ(-45deg) rotateX(90deg);}
-  #splash .fx.k{left:-3px; right:-3px; top:-3px; bottom:-3px; transform:translateZ(calc(-1 * var(--d))); background:var(--cbe6dcc2, #e6dcc2) repeating-linear-gradient(0deg, rgba(0,0,0,.08) 0 1px, transparent 1px 3px);}
   #splash .sp-shelf{position:relative; width:250px; height:82px;}
   #splash .sp-plank{position:absolute; left:0; right:0; bottom:0; height:12px; border:3px solid var(--cb000000, #000000); border-radius:4px; background:var(--cb8a6a4f, #8a6a4f);}
   #splash .sp-row{position:absolute; left:0; right:0; bottom:9px;   /* 3px lower: the plank covers each book's bottom edge */ display:flex; justify-content:center; align-items:flex-end; gap:2px;}
@@ -1654,16 +1682,18 @@
   #splash .sp-spine::before, #splash .sp-spine::after{content:''; position:absolute; left:0; right:0; height:2px; background:rgba(255,255,255,.35);}
   #splash .sp-spine::before{top:7px;} #splash .sp-spine::after{bottom:7px;}
   #splash .sp-spine{will-change:transform, opacity; opacity:0;}
-  #splash.go .sp-drop{animation:spDrop .42s cubic-bezier(.22,1,.36,1) both;}
+  #splash.go .sp-drop{animation:spDrop .32s cubic-bezier(.22,1,.36,1) both;}
   /* the books come in from off the screen (no fade): STACK from above, TRACKER from the sides */
   @keyframes spDrop{ 0%{transform:translateY(-100vh); opacity:1;} 72%{transform:translateY(2px); opacity:1;} 100%{transform:none; opacity:1;} }
-  #splash.go .sp-slide.l{animation:spSlideL .42s cubic-bezier(.22,1,.36,1) both;}
-  #splash.go .sp-slide.r{animation:spSlideR .42s cubic-bezier(.22,1,.36,1) both;}
+  #splash.go .sp-slide.l{animation:spSlideL .32s cubic-bezier(.22,1,.36,1) both;}
+  #splash.go .sp-slide.r{animation:spSlideR .32s cubic-bezier(.22,1,.36,1) both;}
   @keyframes spSlideL{ 0%{transform:translateX(-100vw); opacity:1;} 100%{transform:none; opacity:1;} }
   @keyframes spSlideR{ 0%{transform:translateX(100vw); opacity:1;} 100%{transform:none; opacity:1;} }
   #splash .sp-spine.landed{animation:none !important; opacity:1; transform:none; will-change:auto;}
   #splash .sp-sub{font:600 .6rem Arial, sans-serif; letter-spacing:1.6px; color:var(--cf8a8378, #8a8378); text-transform:uppercase; opacity:0; transition:opacity .4s;}
   #splash .sp-sub.in{opacity:1;}
+  #splash.ending .sp-sub{opacity:0; transition:opacity .2s;}
+  #splash.ending .sp-spine, #splash.ending .sp-plank{will-change:transform;}
 
   /* ===== rereads: log reads, Compare Past Reads, Reset | Reread ===== */
   /* summary card: (with rereads) Read x of x · the read's dates · how far and days logged; with rereads ◀ ▶ step through the reads, like the Timeline */
@@ -1914,6 +1944,17 @@
   #tl-canvas .tl-band{background:var(--cbf6dcd8, #f6dcd8);}
   #tl-canvas .tl-lbl.tl-today{z-index:6 !important;}   /* over its band */
 
+  /* ===== header tabs: cards on the band ===== */
+  html body #tabs{background:var(--band, var(--cb6b4a32, #6b4a32)); padding-left:2px; padding-right:2px;}
+  html body #tabs .tab, html body #tabs .tab.active, html body #tabs .tab:not(.active){background:transparent; border-left:0; color:rgb(0,0,0);}   /* rgb(): the same in every theme */
+  html body #tabs .tab.active{color:rgb(255,255,255);}
+  html body #tabs .tab > .bk{display:block; inset:4px 2px;}
+  body:not(.off-wishlist) #tabs .tab{font-size:min(.74rem, 2.7vw);}   /* five across: a touch smaller, clear of the bands */
+  html body #tabs .tab:not(.active) > .bk{background:rgb(255,255,255);}
+  html body #tabs .tab > .bk canvas.w{opacity:0;}
+  html body #tabs .tab:not(.active) > .bk canvas.w{opacity:1;}
+  html body #tabs .tab:not(.active) > .bk canvas:not(.w){opacity:0;}   /* still laid out, so it's painted ahead and swaps in at once */
+
   /* long-press doesn't select text or pop the callout anywhere but the places you type */
   html, body, body *{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
   input, textarea, select, [contenteditable], [contenteditable] *{-webkit-user-select:text; user-select:text; -webkit-touch-callout:default;}
@@ -1940,8 +1981,9 @@
   #tl-canvas .rl-axis, #tl-canvas .rl-split{position:absolute; top:0; bottom:0; width:3px; background:var(--cb000000, #000000);}
   #tl-canvas .rl-split{z-index:3;}
   #tl-canvas .rl-dot{position:absolute; border-radius:50%; background:var(--cb000000, #000000); z-index:2;}
-  #tl-canvas .rl-dot.read{background:var(--cb9a7514, #9a7514);}     /* dark gold: read */
-  #tl-canvas .rl-dot.now{background:var(--cb2f5ea8, #2f5ea8);}      /* blue: being read now */
+  #tl-canvas .rl-dot.read{background:var(--cbd9a514, #d9a514);}     /* gold: read */
+  #tl-canvas .rl-dot.now{background:var(--cb2fb84a, #2fb84a);}      /* green: being read now */
+  #tl-canvas .rl-dot.tape{border-radius:0;}       /* audiobooks: squares, the same size as the dots */
   #tl-canvas .rl-dot.unread{background:var(--cb000000, #000000);}   /* black: not started */
   #tl-canvas .rl-dot.on{box-shadow:0 0 0 1px var(--cbffffff, #ffffff), 0 0 0 2.5px var(--cb000000, #000000); z-index:3;}
   #tl-canvas .rl-dot.cur{transform:scale(2); box-shadow:0 0 0 1px var(--cbffffff, #ffffff), 0 0 0 2px var(--cb000000, #000000); z-index:4;}
@@ -1971,7 +2013,7 @@
   #rl-line.many #rl-pos{display:flex;}
 </style>
 <script>
-  window.CSS_HEXES = ["b000000", "b2e4636", "b2f3136", "b2f5ea8", "b3a2213", "b3d2513", "b3f2b1d", "b4a2e18", "b4f3019", "b5a4c40", "b5b6633", "b63401f", "b6b4a32", "b6b6560", "b6e4724", "b77502e", "b7a2f2b", "b845530", "b865a34", "b8a6a4f", "b8c5229", "b996439", "b9a6a42", "b9a7514", "ba9825f", "baa3333", "bb07a4b", "bb5342a", "bc9b98f", "bc9c0ad", "bcbc4b1", "bd6d2c8", "be3dccd", "be4ded2", "be6dcc2", "bece7dc", "befe6d3", "bf1e8d2", "bf4efe3", "bf6dcd8", "bf6e3df", "bfaf7f0", "bffffff", "f000000", "f5c4a2e", "f8a8378", "f8f8a80", "faa3333", "fb4ab9b", "fb5342a", "fc4bdb0", "fcfc8ba", "fd6cfc2", "fd6d0c4", "ff4ead2", "fffffff"];
+  window.CSS_HEXES = ["b000000", "b2e4636", "b2f3136", "b2fb84a", "b3a2213", "b3d2513", "b3f2b1d", "b4a2e18", "b4f3019", "b5a4c40", "b5b6633", "b63401f", "b6b4a32", "b6b6560", "b6e4724", "b77502e", "b7a2f2b", "b845530", "b865a34", "b8a6a4f", "b8c5229", "b996439", "b9a6a42", "ba9825f", "baa3333", "bb07a4b", "bb5342a", "bc9b98f", "bc9c0ad", "bcbc4b1", "bd6d2c8", "bd9a514", "be3dccd", "be4ded2", "bece7dc", "befe6d3", "bf4efe3", "bf6dcd8", "bf6e3df", "bfaf7f0", "bffffff", "f000000", "f2fb84a", "f5c4a2e", "f8a8378", "f8f8a80", "faa3333", "fb4ab9b", "fb5342a", "fc4bdb0", "fcfc8ba", "fd6cfc2", "fd6d0c4", "fe5322b", "ff4ead2", "fffffff"];
   // ===== colour themes: every colour in the app taken a set way toward the theme's hue (greys, black and white stay) =====
   // Books keep their colours as picked (in Walnut); everything is shown through the theme, and anything picked
   // under a theme is turned back before it's saved, so switching themes never changes your books.
@@ -2013,6 +2055,21 @@
     return { T, canon, show: hex => T(canon(hex)), set, learn: (themed, orig) => { rev[String(themed).toLowerCase()] = orig; }, get cur(){ return cur; } };
   })();
 </script>
+<script>
+  // the app waits for the splash: its scripts are held back (type="text/st-later") so the splash runs smoothly on a
+  // quiet phone; once it has finished they run, in order, just as they would have
+  window.__runApp = (() => { let p = null; return () => p || (p = new Promise(done => {
+    const go = () => {
+    const list = [...document.querySelectorAll('script[type="text/st-later"]')];
+    const next = i => { if(i >= list.length){ done(); return; } const o = list[i], s = document.createElement('script');
+      if(o.dataset.src){ s.src = o.dataset.src; s.onload = s.onerror = () => next(i + 1); document.body.appendChild(s); return; }
+      if(o.dataset.fallback){ if(window.THREE){ next(i + 1); return; } s.src = o.dataset.fallback; s.onload = s.onerror = () => next(i + 1); document.body.appendChild(s); return; }
+      s.text = o.text; document.body.appendChild(s); next(i + 1); };
+    next(0); };
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();   // the held-back scripts are all parsed first
+  })); })();
+  setTimeout(() => window.__runApp(), 12000);   // whatever happens, the app starts
+</script>
 <div id="splash" aria-hidden="true"></div>
 <script>
   // splash: built and started before the rest of the page loads. Fresh book heights and (now and then) colours
@@ -2022,9 +2079,9 @@
     const el = document.getElementById('splash');
     try{ const dv = JSON.parse(localStorage.getItem('stack-tracker-dev-v1') || '{}');
       if(dv._theme && window.THEME) THEME.set(dv._theme);   // colour theme on before anything paints
-      if(dv.splash === true){ el.remove(); return; } }catch(e){}
+      if(dv.splash === true){ el.remove(); if(window.__runApp) window.__runApp(); return; } }catch(e){}
     const COLORS = ['#7a2f2b', '#86452b', '#8a6a3f', '#857636', '#5b6633', '#2e4636', '#2b5752', '#234a5e', '#303d66', '#3a2f52', '#66304c', '#6b4a32'];
-    const k = 1;   // full speed (the endings below take a speed, from the demo)
+    const k = 1.8;   // the endings run a little quicker than in the demo
     let timers = [], n = 0;
     const later = (f, ms) => timers.push(setTimeout(f, ms));
     // heights (56–74px), neighbours always at least MIN_STEP apart; 1 in 5 a staircase, 1 in 5 two heights taking turns,
@@ -2051,25 +2108,39 @@
       '<div class="sp-sub">Books &amp; audiobooks</div>';
     const drops = el.querySelectorAll('.sp-drop'), slides = el.querySelectorAll('.sp-slide');
     slides.forEach((b, i) => b.dataset.side = side[i]);
-    drops.forEach((d, i) => d.style.animationDelay = (60 + i * 115) + 'ms');
-    order.forEach((idx, j) => slides[idx].style.animationDelay = (60 + j * 80) + 'ms');
+    drops.forEach((d, i) => d.style.animationDelay = (30 + i * 70) + 'ms');
+    order.forEach((idx, j) => slides[idx].style.animationDelay = (30 + j * 50) + 'ms');
     // once a book has landed it is set down for good, so nothing the loading app does can make it flicker
     el.querySelectorAll('.sp-spine').forEach(b => b.addEventListener('animationend', () => b.classList.add('landed'), {once: true}));
     const t0 = performance.now();
     let done = false, loaded = false, ended = false;
     requestAnimationFrame(() => {
       el.classList.add('go');
-      later(() => el.querySelector('.sp-sub').classList.add('in'), 1000);
-      later(() => { done = true; tryEnd(); }, Math.max(1200, 2650 - (performance.now() - t0)));   // hold the full shelves a moment
+      // the app builds now, hidden behind the splash, while the books glide in (their animation runs on the graphics chip,
+      // so the work doesn't slow it); the ending waits until the app is built and the phone has a quiet moment
+      requestAnimationFrame(() => setTimeout(() => (window.__runApp ? window.__runApp() : Promise.resolve()).then(() => {
+        // the app keeps finishing its 3D shelves in quiet moments for a little while after it starts: wait until the
+        // phone has drawn a run of smooth frames in a row (that work is done) before the ending, at most 3 s
+        const t1 = performance.now(); let last = 0, calm = 0;
+        const watch = t => { if(last) calm = t - last < 34 ? calm + 1 : 0; last = t;
+          if(calm >= 14 || t - t1 > 3000){ loaded = true; tryEnd(); } else requestAnimationFrame(watch); };
+        requestAnimationFrame(watch); }), 30));
+      later(() => el.querySelector('.sp-sub').classList.add('in'), 500);
+      later(() => { done = true; tryEnd(); }, 720);   // ends as soon as the shelves are full (and the app is ready)
     });
+    // the splash has finished: the app is already built behind it, so it just fades away
+    let hiding = false;
     const hide = () => {
-      if(el.classList.contains('gone')) return;
-      el.classList.add('gone');
-      setTimeout(() => { timers.forEach(clearTimeout); cancelAnimationFrame(outroRaf); el.remove(); }, 400);
+      if(hiding) return; hiding = true;
+      timers.forEach(clearTimeout); cancelAnimationFrame(outroRaf);
+      el.classList.add('gone'); setTimeout(() => el.remove(), 400);
+      if(window.__runApp) window.__runApp();   // (only matters if something went wrong: makes sure the app starts)
     };
+    // the ending: the moving pieces get their own layers; whatever happens it's over within 1.6 s
     const tryEnd = () => { if(!loaded || !done || ended) return; ended = true;
+      el.classList.add('ending');
+      later(hide, 1600);
       try{ ending(k, hide); }catch(e){ hide(); } };
-    window.addEventListener('load', () => { loaded = true; requestAnimationFrame(() => requestAnimationFrame(tryEnd)); });
     setTimeout(hide, 9000);                               // never stuck: gone after 9 s whatever happens
     // the end of a loop: the bottom shelf is pulled right out, then the top one, each the opposite way (either way round).
     // A book stays put until the shelf has slid clear of it, then falls with gravity off the screen: half the time tumbling, half straight down.
@@ -2112,49 +2183,8 @@
     // ---------- the endings: Pull (tumble or drop), Reverse, Explode — picked at random, or the one chosen ----------
     let endChosen = 'mix';
     function ending(k, done){
-      const e = endChosen !== 'mix' ? endChosen : ['pull', 'reverse', 'explode', 'fly'][Math.floor(Math.random() * 4)];
-      if(e === 'reverse') endReverse(k, done); else if(e === 'explode') endExplode(k, done); else if(e === 'fly') endFly(k, done); else outro(k, done);
-    }
-    // Fly: the scene opens up into depth, each book lifts off its shelf and comes at you — a solid book, covers, pages
-    // and all — turning outward as it sweeps past the edge of the screen; the outer books go first, the middle ones last.
-    // Meanwhile the emptied shelves sink back into the distance.
-    function endFly(k, done){
-      el.querySelector('.sp-sub').classList.remove('in');
-      el.classList.add('fly');
-      el.animate([{ perspective: '5000px' }, { perspective: '700px' }], { duration: 450 / k, easing: 'ease-out', fill: 'forwards' });   // depth eases in, no jump
-      const box = el.getBoundingClientRect(), ox = box.left + box.width / 2, oy = box.top + box.height / 2;
-      // each book becomes a closed box behind its spine: covers left and right (a shade darker), pages top, bottom and back
-      const books = [...el.querySelectorAll('.sp-spine')].map(b => {
-        if(!b.querySelector('.fx')){ const c = getComputedStyle(b).backgroundColor;
-          b.insertAdjacentHTML('beforeend', ['l', 'r'].map(x => `<i class="fx ${x}" style="background-color:${c}"></i>`).join('') + '<i class="fx t"></i><i class="fx b"></i><i class="fx k"></i>' + ['tl', 'tr', 'bl', 'br'].map(x => `<i class="fx e ${x}"></i>`).join('')); }
-        const r = b.getBoundingClientRect(); return { el: b, dx: r.left + r.width / 2 - ox, dy: r.top + r.height / 2 - oy };
-      }).sort((a, b) => Math.abs(b.dx) - Math.abs(a.dx));          // outer books first, working in to the middle
-      let longest = 0, lastLift = 0;
-      const D = 525 / k, GAP = 43 / k, Z = 520;   // twice as quick as it was
-      books.forEach((bk, i) => {
-        const side = bk.dx < 0 ? -1 : 1, up = bk.dy < 0 ? -1 : 1, jit = () => Math.random() - .5;
-        const tx = side * (150 + Math.abs(bk.dx) * .9 + Math.random() * 40), ty = bk.dy * 1.4 + up * 30 + jit() * 30;
-        const ry = side * (38 + Math.random() * 18), rx = -up * (14 + Math.random() * 12), rz = side * (6 + Math.random() * 10);
-        const delay = 125 / k + i * GAP + jit() * 10 / k; longest = Math.max(longest, delay + D); lastLift = Math.max(lastLift, delay + D * .3);
-        const at = f => `translate3d(${tx * f * f}px, ${ty * f * f}px, ${90 + (Z - 90) * f}px) rotateX(${rx * f * f}deg) rotateY(${ry * f * f}deg) rotateZ(${rz * f * f}deg)`;
-        bk.el.animate([
-          { transform: 'translate3d(0,0,0)', easing: 'cubic-bezier(.5,0,.9,.8)' },
-          { transform: 'translate3d(0,0,90px)', offset: .3, easing: 'linear' },   // slides straight out off the shelf, towards you
-          { transform: at(.25), offset: .45, easing: 'linear' },                   // then eases into its turn outward…
-          { transform: at(.55), offset: .65, easing: 'cubic-bezier(.3,.3,.7,1)' },
-          { transform: at(1) }],                                                   // …and sweeps past the edge
-          { duration: D, delay, fill: 'forwards' });
-        later(() => bk.el.style.visibility = 'hidden', delay + D);  // well off the screen by now
-      });
-      // the shelves, once the last book has slid off them: one out to the left, the other to the right
-      const dir = Math.random() < .5 ? -1 : 1;
-      el.querySelectorAll('.sp-plank').forEach((pl, i) => {
-        const delay = lastLift + i * 80 / k, d = 600 / k; longest = Math.max(longest, delay + d);
-        pl.animate([{ transform: 'none' }, { transform: `translateX(${(i ? -dir : dir) * 100}vw)` }],
-          { duration: d, delay, easing: 'cubic-bezier(.55,0,.75,.3)', fill: 'forwards' });
-        later(() => pl.style.visibility = 'hidden', delay + d);
-      });
-      later(done, longest + 150);
+      const e = endChosen !== 'mix' ? endChosen : ['pull', 'reverse', 'explode'][Math.floor(Math.random() * 3)];
+      if(e === 'reverse') endReverse(k, done); else if(e === 'explode') endExplode(k, done); else outro(k, done);
     }
     // Reverse: the way they came in, backwards — the last in leaves first; STACK goes up and away, TRACKER out to its side
     function endReverse(k, done){
@@ -2181,7 +2211,7 @@
       const shelves = [...el.querySelectorAll('.sp-plank')].map((pl, i) => { const hinge = Math.random() < .5 ? 'left' : 'right';
         const swing = (i === 0 && swinger === 'top') || (i === 1 && swinger === 'bottom');
         if(swing) pl.style.transformOrigin = `${hinge} center`; else pl.style.transformOrigin = '';
-        return { el: pl, swing, hanging: swing, sign: hinge === 'left' ? 1 : -1, L: pl.getBoundingClientRect().width,
+        return { el: pl, top0: pl.getBoundingClientRect().top, swing, hanging: swing, sign: hinge === 'left' ? 1 : -1, L: pl.getBoundingClientRect().width,
           phi: 0, w: 0, x: 0, y: 0, vx: swing ? 0 : (Math.random() - .5) * 60 * k, vy: 0, a: 0, va: swing ? 0 : (Math.random() < .5 ? -1 : 1) * (25 + Math.random() * 25) * k }; });
       const cx = books.reduce((t, b) => t + b.cx, 0) / books.length, cy = books.reduce((t, b) => t + b.cy, 0) / books.length;
       const SWING = 1700 / k;                                        // how long a swinging shelf hangs before it lets go
@@ -2219,7 +2249,7 @@
           sh.vy += G * dt; sh.x += sh.vx * dt; sh.y += sh.vy * dt;
           if(sh.swing){ sh.phi += sh.w * dt; off(sh.el, sh.x, sh.y, sh.sign * sh.phi); }   // let go: falls, still turning
           else { sh.a += sh.va * dt; off(sh.el, sh.x, sh.y, sh.a); }                        // drops away with a slight spin
-          if(sh.el.getBoundingClientRect().top < box.bottom + 20) busy = true;
+          if(sh.top0 + sh.y - sh.L / 2 < box.bottom + 20) busy = true;
         });
         if(busy) outroRaf = requestAnimationFrame(step); else done();
       };
@@ -2233,10 +2263,11 @@
 <div id="app-header">
  <!-- pages: the top of the header itself, split in three; Data opens its own window -->
  <div id="tabs">
-   <div class="tab active" data-view="all" data-cloth="#7a2f2b" style="--cloth:#7a2f2b"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Library</span></div>
-   <div class="tab" data-view="library" data-cloth="#2b5752" style="--cloth:#2b5752"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>My Lists</span></div>
-   <div class="tab" data-view="timeline" data-cloth="#303d66" style="--cloth:#303d66"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Timeline</span></div>
-   <div class="tab" data-view="data" data-cloth="#8a6a3f" style="--cloth:#8a6a3f"><div class="bk" aria-hidden="true"><canvas></canvas></div><span>Data</span></div>
+   <div class="tab active" data-view="all" data-cloth="#7a2f2b" style="--cloth:#7a2f2b"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>Library</span></div>
+   <div class="tab" data-view="library" data-cloth="#2b5752" style="--cloth:#2b5752"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>My Lists</span></div>
+   <div class="tab" data-view="wishlist" data-cloth="#66304c" style="--cloth:#66304c"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>Wishlist</span></div>
+   <div class="tab" data-view="timeline" data-cloth="#303d66" style="--cloth:#303d66"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>Timeline</span></div>
+   <div class="tab" data-view="data" data-cloth="#8a6a3f" style="--cloth:#8a6a3f"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>Data</span></div>
  </div>
  <!-- row 2 (My Library only): shelf/list view and sort -->
  <div class="hdr-row" id="shelf-controls">
@@ -2245,6 +2276,11 @@
     <div class="tab" data-mode="list">List</div>
   </div>
   <div id="sort-card" class="shelf-ctl"><span id="sort-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="sort-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="sort-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="filter-name">All books</span><span class="sort-k">• Sort by:</span><span class="sort-v" id="sort-name">Date added</span></div>
+ </div>
+ <!-- Wishlist: sort, and search -->
+ <div class="hdr-row hidden" id="wishlist-controls">
+  <div class="tl-views" id="wl-sort"><button type="button" data-s="added" class="on">Date Added</button><button type="button" data-s="title">Title</button><button type="button" data-s="author">Author</button></div>
+  <div id="wl-search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg><input id="wl-q" type="search" placeholder="Search wishlist" aria-label="Search wishlist" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div>
  </div>
  <!-- Timeline: what to chart, and over what span -->
  <div class="hdr-row hidden" id="timeline-controls">
@@ -2257,6 +2293,17 @@
   <div class="tabs dt-tabs"><div class="tab" data-dt="export">Export</div><div class="tab" data-dt="import">Import</div></div>
  </div>
  </div>
+<!-- Wishlist window: add a wishlist book, or open one (Save / Delete, and Add to My Library) -->
+<div id="wl-page" aria-hidden="true">
+  <div class="wl-head"><button type="button" id="wl-cancel">Cancel</button><h2 id="wl-title">Add to Wishlist</h2><button type="button" id="wl-save" disabled>Add</button></div>
+  <div class="wl-prev-band"><div class="wl-card" id="wl-prev"><canvas aria-hidden="true"></canvas><span class="t"></span><span class="a"></span></div></div>
+  <div class="wl-fields">
+    <div class="field-card"><input id="wl-t" type="text" placeholder="Title" autocomplete="off" aria-label="Title"></div>
+    <div class="field-card"><input id="wl-a" type="text" placeholder="Author" autocomplete="off" aria-label="Author"></div>
+    <button type="button" id="wl-del" hidden>Delete</button>
+  </div>
+  <div id="wl-foot" hidden><button type="button" id="wl-real"><canvas aria-hidden="true"></canvas><span>Add to My Library</span></button></div>
+</div>
 <!-- footer: Add Book, full width -->
 <div id="app-footer">
  <div class="hdr-row">
@@ -2276,6 +2323,7 @@
   </div>
 </div>
 
+<div class="view" id="wishlist-view"></div>
 <div class="view" id="library-view">
   <div id="library-container"></div>
   <div id="coll-list"></div>
@@ -2582,13 +2630,10 @@
   <div class="tl-foot lg-foot"><button type="button" id="log-add-day" class="cloth-btn" data-cloth="#2b5752" style="--cloth:#2b5752"><canvas aria-hidden="true"></canvas><span class="lbl">Add Day</span></button></div>
 </div>
 
-<script src="three.min.js"></script>   <!-- Three.js r128, bundled so the app works offline -->
-<script>
-  // opened on its own (no three.min.js beside it, e.g. a preview or a downloaded copy): load Three.js from the web instead
-  window.THREE || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
-</script>
+<script type="text/st-later" data-src="three.min.js"></script>   <!-- Three.js r128, bundled so the app works offline -->
+<script type="text/st-later" data-fallback="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-<script>
+<script type="text/st-later">
   const shelvesContainer = document.getElementById('shelves-container');
   const emptyMsg = document.getElementById('empty-msg');
   const countEl = document.getElementById('count');
@@ -4196,6 +4241,11 @@
       document.getElementById('shelf-controls').classList.toggle('hidden', view !== 'all' && view !== 'library');
       document.getElementById('timeline-controls').classList.toggle('hidden', view !== 'timeline');
       document.getElementById('data-controls').classList.toggle('hidden', view !== 'data');
+      document.body.classList.toggle('tab-wishlist', view === 'wishlist');
+      document.getElementById('wishlist-view').classList.toggle('active', view === 'wishlist');
+      document.getElementById('wishlist-controls').classList.toggle('hidden', view !== 'wishlist');
+      { const l = document.querySelector('#add-card .add-lbl'); if(l) l.textContent = view === 'wishlist' ? 'Add New Wishlist Book' : 'Add New Book'; }
+      if(view === 'wishlist' && window.wishRender) window.wishRender();
       window.scrollTo(0, 0);                              // each page opens at its top
       if(view === 'library') renderCollections();
       if(view === 'all' && collEdited){ collEdited = false; render(); }
@@ -6730,7 +6780,7 @@
   }
   function requestShelfRender(){ if(shelfR && !shelfRaf) shelfRaf = requestAnimationFrame(drawShelf); }
   function animateShelf(ms){ shelfAnimUntil = Math.max(shelfAnimUntil, performance.now() + ms); requestShelfRender(); }
-  setTimeout(()=> idleCall(()=>{ if(shelfR && shelfTopOK()){ try{ updateShelfCam(); shelfTopR.compile(shelfScene, shelfCam); }catch(e){} requestShelfRender(); } }), 800);
+  setTimeout(()=> idleCall(()=>{ if(shelfR && shelfTopOK()){ try{ updateShelfCam(); shelfTopR.compile(shelfScene, shelfCam); }catch(e){} requestShelfRender(); } }), 0);
   window.addEventListener('scroll', requestShelfRender, {passive:true});
   // any layout shift under the shelves (fonts settling, header resizing) redraws them
   if(window.ResizeObserver){
@@ -8233,7 +8283,7 @@
     if(customizeFormat === 'audio' && customizeMode !== 'customize' && book.audioSeconds){ pagesInput.value = secsToLength(book.audioSeconds); lwSet(book.audioSeconds); }
     if(customizeMode === 'add'){
       // new books start with a random cover color instead of all Walnut
-      customizeColorIdx = Math.floor(Math.random() * COVER_COLOR_PRESETS.length);
+      customizeColorIdx = book._wishColor != null ? book._wishColor : Math.floor(Math.random() * COVER_COLOR_PRESETS.length);
       customizeShellIdx = Math.floor(Math.random() * TAPE_SHELLS.length);
     }
 
@@ -8271,6 +8321,7 @@
   }
 
   function closeCustomizeModal(){
+    if(window.__wishClosed) window.__wishClosed();
     if(window.__tray) window.__tray.reset();
     customizePage.classList.remove('active');
     if(!heldBookCtl) document.body.classList.remove('book-open');   // a book still in your hand keeps its view
@@ -8327,6 +8378,7 @@
         if(rel != null) nb.released = rel;
         applyOptions(nb, false);
         books.push(nb);
+        if(window.__wishAdded) window.__wishAdded();
       } else {
         const b = customizingBook;
         b.title = title; b.author = author; b.pages = pages;
@@ -8460,7 +8512,7 @@
     openCustomizeModal({ title:'', author:'', pages:0, cover:'hard' }, 'add');
   }
   function openEditModal(book){ openCustomizeModal(book, 'edit'); }
-  addCard.addEventListener('click', openAddModal);
+  addCard.addEventListener('click', () => document.body.classList.contains('tab-wishlist') && window.wishAdd ? window.wishAdd() : openAddModal());
 
   // ===================== option pickers: Cover, Ribbon and Pages (plain shapes drawn with CSS) =====================
   // The option cards are the page's footer. Tapping Cover, Ribbon or Pages raises a picker out of the footer's top
@@ -9260,7 +9312,7 @@
     // swaps in a finished card at once
     const tabCards = [...document.querySelectorAll('#tabs .tab[data-cloth]')];
     const paintTabs = () => tabCards.forEach(t => { const bk = t.querySelector('.bk'), on = bk.style.display;
-      bk.style.display = 'block'; draw(bk.querySelector('canvas'), rgb(THEME.show(t.dataset.cloth)), true, 6); bk.style.display = on; });
+      bk.style.display = 'block'; draw(bk.querySelector('canvas'), rgb(THEME.show(t.dataset.cloth)), true, document.body.classList.contains('off-wishlist') ? 6 : 3); bk.style.display = on; });
     // repainted whenever the strip changes size (on a phone the first layout can be the 980px desktop width)
     window.reCloth = () => { document.querySelectorAll('.cloth-btn[data-cloth], #tabs .tab[data-cloth]').forEach(e => e.style.setProperty('--cloth', THEME.show(e.dataset.cloth)));
       (window.__clothGos || []).forEach(g => g()); paintTabs(); };   // a new theme: every cloth card again
@@ -9560,7 +9612,7 @@
     return b;
   }
   function exportJSON(){
-    return JSON.stringify(Object.assign({ app:'stack-tracker', version:3, exported:new Date().toISOString(), books: books.map(packBook) }, window.devState ? { dev: window.devState() } : {}), null, 2);
+    return JSON.stringify(Object.assign({ app:'stack-tracker', version:3, exported:new Date().toISOString(), books: books.map(packBook) }, window.devState ? { dev: window.devState() } : {}, window.wishState ? { wishlist: window.wishState() } : {}), null, 2);
   }
   function showDataTab(name){
     document.querySelectorAll('.dt-tabs .tab').forEach(t=> t.classList.toggle('active', t.dataset.dt === name));
@@ -9855,6 +9907,27 @@
       });
     });
   }
+  // vs last period: " (+07)" / " (−43)" for a bar's day (or month), or " (no data)" when there's nothing to compare with
+  function tlVs(k, key){
+    if(TL.view === 'all' || document.body.classList.contains('off-vslast')) return '';
+    if(tlVs.src !== TL.reads){   // every logged day, by kind, once per draw
+      tlVs.src = TL.reads; tlVs.day = new Map(); tlVs.first = {};
+      TL.reads.forEach(r => { const kk = r.kind === 'audio' ? 'secs' : 'pages';
+        r.daily.forEach((v, j) => { if(!v) return; const d = tlAdd(r.s, j), t = +d, e = tlVs.day.get(t) || { pages: 0, secs: 0 };
+          e[kk] += v; tlVs.day.set(t, e); if(!(tlVs.first[kk] <= t)) tlVs.first[kk] = t; }); }); }
+    let a, b;
+    if(tlDaily()){ a = tlAdd(k.a, TL.view === 'week' ? -7 : -30); b = tlAdd(a, 1); }
+    else { a = new Date(k.a.getFullYear() - 1, k.a.getMonth(), 1); b = new Date(k.a.getFullYear() - 1, k.a.getMonth() + 1, 1); }
+    if(!(tlVs.first[key] < +b)) return ' (no data)';   // before anything was logged
+    let prev = 0;
+    for(let d = new Date(a); d < b; d = tlAdd(d, 1)){ const e = tlVs.day.get(+d); if(e) prev += e[key]; }
+    if(!tlDaily() && !prev) return ' (no data)';
+    const p2 = n => String(n).padStart(2, '0');
+    let diff = key === 'secs' ? Math.round(k[key] / 60) - Math.round(prev / 60) : Math.round(k[key]) - Math.round(prev);
+    const sign = diff > 0 ? '+' : diff < 0 ? '−' : '±'; diff = Math.abs(diff);
+    const body = key === 'secs' ? (diff >= 60 ? `${Math.floor(diff / 60)}:${p2(diff % 60)}` : p2(diff)) : p2(diff);   // no letters: minutes, or h:mm
+    return ` (${sign}${body})`;
+  }
   function tlDrawGraph(){
     const today = tlDay(new Date()), { R, W, H, LW, y, el } = tlFrame(today), { t0, t1 } = R, all = TL.view === 'all';
     R.lines.filter(l => l.strong).forEach(l => el(`left:0;right:0;top:${(y(l.at) - 1.5).toFixed(1)}px;height:3px;background:#000;z-index:2`));
@@ -9879,7 +9952,7 @@
     }));
     // one column per kind read in this span: pages, listening, or both side by side
     let cols = [
-      { key: 'pages', max: Math.max(1, ...buckets.map(k => k.pages)), text: v => `${tlN(v)} pages`,
+      { key: 'pages', max: Math.max(1, ...buckets.map(k => k.pages)), text: v => `${tlN(v)}P`,
         look: sd => all ? '' : `background:#e7dfc9 ${tlFillLines('page', sd)} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
       { key: 'secs', max: Math.max(1, ...buckets.map(k => k.secs)), text: v => tlHM(v),
         look: sd => all ? '' : `background:#8c5229 ${tlFillLines('tape', sd)} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
@@ -9944,7 +10017,7 @@
       buckets.forEach(k => {
         const v = k[c.key]; if(!v || k.a > today) return;
         tlCtx.font = `800 ${geo(k).size.toFixed(1)}px Arial, sans-serif`;
-        const lw = tlCtx.measureText(c.text(v)).width;
+        const lw = tlCtx.measureText(c.text(v) + tlVs(k, c.key)).width;
         c.scale = Math.min(c.scale, (room - 3 - lw) * c.max / v);
       });
       if(!isFinite(c.scale)) c.scale = room - 84;
@@ -9998,7 +10071,9 @@
           const half = (tlAdd(today, 1) - k.a) / (k.b - k.a) < .5;
           vy = half ? top + pad + size / 2 + 1 : top + h - pad - size / 2 - 1;
         }
-        if(!all) el(`left:${(c.x + w + 3).toFixed(1)}px;top:${vy.toFixed(1)}px;font-size:${size.toFixed(1)}px`, 'tl-gval', c.text(v));
+        if(!all) el(`left:${(c.x + w + 3).toFixed(1)}px;top:${vy.toFixed(1)}px;font-size:${size.toFixed(1)}px`, 'tl-gval', c.text(v) + tlVs(k, c.key));
+        { const gv = tlCanvas.lastElementChild, m = gv && /^(.*) \(([+−])([^)]*)\)$/.exec(gv.textContent);   // up in green, down in red
+          if(m){ gv.textContent = m[1] + ' ('; const sp = document.createElement('span'); sp.className = m[2] === '+' ? 'tl-up' : 'tl-dn'; sp.textContent = m[2] + m[3]; gv.append(sp, ')'); } }
         bar.dataset.c = c.key;
         bar.addEventListener('click', () => show(k, c));
       });
@@ -10078,7 +10153,7 @@
     const read = books.filter(b => touched(b) || (all && !started(b))), has = b => typeof b.released === 'number' && !isNaN(b.released);
     return { list: read.filter(has).sort((a, b) => a.released - b.released), without: read.filter(b => !has(b)).length };
   }
-  // a dot's colour: dark gold read, blue being read now, black not started
+  // a dot's colour: dark gold read, green being read now, black not started; an audiobook's is a square
   const rlState = b => bookFinished(b) ? 'read' : (b.days || []).some(v => v > 0) ? 'now' : (b.reads || []).length ? 'read' : 'unread';
   function relDraw(){
     const today = tlDay(new Date()), R = tlRange(today), key = TL.view + '|' + TL.off;
@@ -10119,7 +10194,7 @@
       const over = new Map();
       pts.forEach(p => { if(p.x > xMax){ const kk = Math.round(p.y); over.set(kk, (over.get(kk) || 0) + 1); return; }
         placed.push(p);
-        html += `<div class="rl-dot ${rlState(p.b)}${RL.picked === p.b.released ? ' on' : ''}" data-i="${list.indexOf(p.b)}" style="left:${p.x}px; top:${p.y}px; width:${D}px; height:${D}px; margin:${-D / 2}px 0 0 ${-D / 2}px"></div>`; });
+        html += `<div class="rl-dot ${rlState(p.b)}${p.b.format === 'audio' ? ' tape' : ''}${RL.picked === p.b.released ? ' on' : ''}" data-i="${list.indexOf(p.b)}" style="left:${p.x}px; top:${p.y}px; width:${D}px; height:${D}px; margin:${-D / 2}px 0 0 ${-D / 2}px"></div>`; });
       over.forEach((n, y) => html += `<div class="rl-more" style="left:${xMax - 2}px; top:${y}px">+${n}</div>`);
     });
     // no tag on the card: the picked dots just get their rings, and the line card under the card names the book
@@ -10467,7 +10542,8 @@
     const valid = (list || []).filter(b => b && typeof b.title === 'string' && b.title.trim() && Number(b.pages) > 0);
     if(!valid.length){ setStatus('Import', 'No books found', true); return; }
     pendingImport = valid.map(b => Object.assign({}, b, { pages: Math.round(Number(b.pages)), author: b.author || '' }));
-    try{ const d = JSON.parse(txt); window._pendingDev = d && !Array.isArray(d) && d.dev && typeof d.dev === 'object' ? d.dev : null; }catch(e){ window._pendingDev = null; }
+    try{ const d = JSON.parse(txt); window._pendingDev = d && !Array.isArray(d) && d.dev && typeof d.dev === 'object' ? d.dev : null;
+      window._pendingWish = d && !Array.isArray(d) && Array.isArray(d.wishlist) ? d.wishlist : null; }catch(e){ window._pendingDev = null; window._pendingWish = null; }
     setStatus('Import', `${plural(pendingImport.length, 'book')} found — merge or replace`);
   }
   let parseTimer = null;
@@ -10484,7 +10560,8 @@
     reader.readAsText(f);
   });
 
-  function finishImport(added, msg){
+  function finishImport(added, msg, replace){
+    if(window._pendingWish && window.wishImport){ window.wishImport(window._pendingWish, !!replace); window._pendingWish = null; }
     if(window._pendingDev && window.devImport){ window.devImport(window._pendingDev); window._pendingDev = null; }
     added.forEach(normalizeBook);
     renderAll();
@@ -10511,7 +10588,7 @@
     const list = pendingImport;
     books.length = 0;
     books.push(...list);
-    finishImport(list, `Library replaced with ${plural(list.length, 'book')}`);
+    finishImport(list, `Library replaced with ${plural(list.length, 'book')}`, true);
   });
 
   // Data → Stats: books, then audiobooks (when there are any), each under its own bookcloth card with a bar card
@@ -11444,6 +11521,8 @@ Object.assign(ART, {
     { id: 'statbars', name: 'Stats bar cards', note: 'Month / year bars in Stats' },
     { id: 'timeline', name: 'Timeline', note: 'The Timeline tab' },
     { id: 'released', name: 'Released', note: 'Release years, in the Timeline tab' },
+    { id: 'wishlist', name: 'Wishlist', note: 'The Wishlist tab' },
+    { id: 'vslast', name: 'Vs last period', note: 'Change on the period before, after each bar in Pages & Listening' },
     { id: 'haptics', name: 'Haptics', note: 'A small buzz as a wheel clicks past each number' }
   ];
   // defaults: Medium shelves, tapes on the right, Shelf and List both, Badges and Haptics off, everything else on (saved choices override these)
@@ -11497,6 +11576,8 @@ Object.assign(ART, {
        (off.stats && document.getElementById('dt-view-stats').classList.contains('active'))) showDataTab(firstData());
     if(off.released && document.body.classList.contains('tl-rel')) document.querySelector('#tl-modes button[data-m="graph"]').click();
     if(off.timeline && document.body.classList.contains('tab-timeline')) document.querySelector('#tabs .tab[data-view="all"]').click();
+    if(window.reCloth && window.__wlOff !== !!off.wishlist){ if(window.__wlOff !== undefined) requestAnimationFrame(() => window.reCloth()); window.__wlOff = !!off.wishlist; }   // tab cards redrawn for four / five tabs
+    if(off.wishlist && document.body.classList.contains('tab-wishlist')) document.querySelector('#tabs .tab[data-view="all"]').click();
   }
   // haptics: a short buzz each time a wheel clicks onto the next number (phones that can vibrate)
   window.hapticTick = () => { if(!off.haptics && navigator.vibrate) try{ navigator.vibrate(30); }catch(e){} };
@@ -11578,12 +11659,162 @@ closeRowDD = function(dd){
 };
 
 
+
+  // ===================== Wishlist =====================
+  (function(){
+    const KEY = 'stack-tracker-wishlist-v1';
+    let list = [];
+    try{ const v = JSON.parse(localStorage.getItem(KEY) || '[]'); if(Array.isArray(v)) list = v; }catch(e){}
+    const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(list)); }catch(e){} };
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    const baseHex = c => (c._h0 || c.hex).toLowerCase();                 // a cover colour as saved (before any theme)
+    const shown = hex => window.THEME && THEME.show ? THEME.show(hex) : hex;
+    // a book's colour from the letters of its title and author: the same words always give the same colour.
+    // Kept to bookcloth tones — never neon, dark enough that white words always read (at least 4.5:1)
+    function wishColor(title, author){
+      const s = (String(title || '').trim() + '|' + String(author || '').trim()).toLowerCase().replace(/\s+/g, ' ');
+      let h1 = 2166136261, h2 = 5381;
+      for(const ch of s){ const c = ch.codePointAt(0); h1 = Math.imul(h1 ^ c, 16777619); h2 = (Math.imul(h2, 33) + c) | 0; }
+      // mixed well, so near-identical words still land far apart
+      const mix = h => { h ^= h >>> 16; h = Math.imul(h, 0x85ebca6b); h ^= h >>> 13; h = Math.imul(h, 0xc2b2ae35); h ^= h >>> 16; return h >>> 0; };
+      h1 = mix(h1); h2 = mix(h2 ^ 0x9e3779b9);
+      // the hue: first one of fourteen colour families, each as likely as the next (greens are only olive, green
+      // and teal — 3 in 14 — rather than the third of the wheel they'd otherwise take), then a spot within it
+      const FAM = [[350, 12], [12, 26], [26, 40], [40, 54], [58, 85], [95, 145], [160, 188], [192, 212], [212, 228], [228, 246], [246, 262], [262, 285], [285, 315], [315, 350]];
+      const [f0, f1] = FAM[h1 % FAM.length], hue = Math.round(f0 + ((h1 >>> 8) % 1000) / 1000 * ((f1 - f0 + 360) % 360)) % 360;
+      const pick = (h1 >>> 20) % 14;
+      let sat = 34 + (h2 % 35);                        // 34–68%: clearly a colour (the greys come only from the 1 in 14 below)
+      let lit = 22 + ((h2 >>> 8) % 21);                // 22–42% (the contrast check below darkens any that are too light)
+      if(pick === 0){ sat = 8 + (h2 >>> 16) % 14; lit = 20 + (h2 >>> 4) % 14; }   // 1 in 14: a near-grey — slate, ash, charcoal
+      else if(pick === 1) lit = 13 + (h2 >>> 4) % 7;   // 1 in 14: very deep — oxblood, ink, bottle green
+      if(pick > 1 && hue >= 10 && hue < 60) sat = Math.max(sat, 50);   // oranges and ochres: rich rust and amber, not mud brown
+      if(hue >= 70 && hue < 160) sat = Math.min(sat, 50);    // greens: never neon
+      if(hue >= 40 && hue < 70){ sat = Math.min(sat, 55); lit = Math.min(lit, 32); }   // yellows: mustard and ochre, never khaki
+      if(hue >= 170 && hue < 200) sat = Math.min(sat, 52);   // cyans: teal, not aqua
+      if(hue >= 255 && hue < 345){ sat = Math.min(sat, 46); lit = Math.min(lit, 34); }   // violets and magentas: plum and berry, not hot pink
+      const rgbOf = L => { const S = sat / 100, l = L / 100, k = n => (n + hue / 30) % 12, a = S * Math.min(l, 1 - l);
+        return [0, 8, 4].map(n => Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1))))); };
+      const lum = c => { const v = c.map(x => { x /= 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); }); return .2126 * v[0] + .7152 * v[1] + .0722 * v[2]; };
+      let rgb = rgbOf(lit);
+      while(lum(rgb) > .18 && lit > 12){ lit -= 1; rgb = rgbOf(lit); }   // white on it: 1.05 / (L + .05) ≥ 4.5
+      return '#' + rgb.map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+    const clean = arr => (Array.isArray(arr) ? arr : []).filter(b => b && typeof b.title === 'string' && b.title.trim())
+      .map(b => ({ title: b.title.trim(), author: typeof b.author === 'string' ? b.author.trim() : '', color: wishColor(b.title, b.author), added: Number(b.added) || Date.now() }));
+    list = clean(list);
+    const view = document.getElementById('wishlist-view'), q = document.getElementById('wl-q');
+    let sortBy = 'added';
+    function render(){
+      if(!list.length){ view.innerHTML = '<div id="wl-empty">No wishlist books yet</div>'; return; }
+      const s = q.value.trim().toLowerCase();
+      const rows = list.map((b, i) => [b, i]).filter(([b]) => !s || (b.title + ' ' + b.author).toLowerCase().includes(s));
+      const by = k => (p, n) => (p[0][k] || '').localeCompare(n[0][k] || '', undefined, { sensitivity: 'base' });
+      if(sortBy === 'title') rows.sort(by('title')); else if(sortBy === 'author') rows.sort(by('author'));
+      if(!rows.length){ view.innerHTML = '<div id="wl-empty">No matches</div>'; return; }
+      view.innerHTML = rows.map(([b, i]) => `<div class="wl-card" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>` +
+        `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>`).join('');
+      view.querySelectorAll('.wl-card').forEach(c => {
+        const cv = c.querySelector('canvas'), hex = list[+c.dataset.i].color;
+        const go = () => { if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown(hex)), true, 6); };
+        if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go);
+        c.addEventListener('click', () => open(+c.dataset.i));
+      });
+    }
+    document.querySelectorAll('#wl-sort button').forEach(b => b.addEventListener('click', () => {
+      sortBy = b.dataset.s; document.querySelectorAll('#wl-sort button').forEach(x => x.classList.toggle('on', x === b)); render(); }));
+    q.addEventListener('input', render);
+    q.addEventListener('keydown', e => { if(e.key === 'Enter') q.blur(); });
+
+    // the window
+    const page = document.getElementById('wl-page'), tIn = document.getElementById('wl-t'), aIn = document.getElementById('wl-a');
+    const saveBtn = document.getElementById('wl-save'), del = document.getElementById('wl-del'), foot = document.getElementById('wl-foot');
+    let editing = -1, delT = 0;
+    // the preview card in the second header: the words as typed, the colour they make (redrawn once typing pauses)
+    const prev = document.getElementById('wl-prev'), pCv = prev.querySelector('canvas'), pT = prev.querySelector('.t'), pA = prev.querySelector('.a');
+    let pHex = '', pTimer = 0;
+    const pDraw = () => { if(window.CLOTH && pHex) CLOTH.draw(pCv, CLOTH.rgb(shown(pHex)), true, 6); };
+    if(window.ResizeObserver) new ResizeObserver(pDraw).observe(pCv);
+    function preview(now){
+      const t = tIn.value.trim(), a = aIn.value.trim();
+      pT.textContent = t || 'Title'; pT.classList.toggle('ph', !t);
+      pA.textContent = a || 'Author'; pA.classList.toggle('ph', !a);
+      const hex = t || a ? wishColor(t, a) : '#6b4a32';
+      if(hex === pHex) return;
+      pHex = hex; prev.style.setProperty('--cloth', shown(hex));   // the flat colour at once; the cloth once typing pauses
+      clearTimeout(pTimer); if(now) pDraw(); else { const ctx = pCv.getContext('2d'); ctx.clearRect(0, 0, pCv.width, pCv.height); pCv._drawn = null; pTimer = setTimeout(pDraw, 160); }
+    }
+    const check = () => { saveBtn.disabled = !tIn.value.trim(); preview(); };
+    aIn.addEventListener('input', check);
+    function open(i){
+      editing = i; const b = i >= 0 ? list[i] : null;
+      document.getElementById('wl-title').textContent = b ? 'Edit Wishlist Book' : 'Add to Wishlist';
+      saveBtn.textContent = b ? 'Save' : 'Add';
+      tIn.value = b ? b.title : ''; aIn.value = b ? b.author : '';
+      del.hidden = !b; foot.hidden = !b; del.classList.remove('armed'); del.textContent = 'Delete'; clearTimeout(delT);
+      check(); preview(true); page.classList.add('active'); page.setAttribute('aria-hidden', 'false');
+      if(b){ const cv = document.querySelector('#wl-real > canvas'); requestAnimationFrame(() => { if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown('#5b6633'))); }); }
+      else setTimeout(() => tIn.focus(), 60);
+    }
+    function close(){ page.classList.remove('active'); page.setAttribute('aria-hidden', 'true'); if(document.activeElement) document.activeElement.blur(); }
+    tIn.addEventListener('input', check);
+    [tIn, aIn].forEach(inp => inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); if(inp === tIn) aIn.focus(); else if(!saveBtn.disabled) saveBtn.click(); } }));
+    document.getElementById('wl-cancel').addEventListener('click', close);
+    saveBtn.addEventListener('click', () => {
+      const title = tIn.value.trim(), author = aIn.value.trim(); if(!title) return;
+      const color = wishColor(title, author);   // its colour, from its words
+      if(editing >= 0) Object.assign(list[editing], { title, author, color });
+      else list.push({ title, author, color, added: Date.now() });
+      save(); render(); close();
+      if(editing < 0) requestAnimationFrame(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }));
+    });
+    del.addEventListener('click', () => {
+      if(!del.classList.contains('armed')){ del.classList.add('armed'); del.textContent = 'Confirm?';
+        delT = setTimeout(() => { del.classList.remove('armed'); del.textContent = 'Delete'; }, 3000); return; }
+      list.splice(editing, 1); save(); render(); close();
+    });
+    // Add to My Library: Add a Book with its title, author and cover colour already in; once it's added there,
+    // it leaves the wishlist (Cancel there keeps it)
+    let pending = null;
+    document.getElementById('wl-real').addEventListener('click', () => {
+      const b = list[editing]; if(!b) return;
+      pending = b; close();
+      openCustomizeModal({ title: b.title, author: b.author, pages: 0, cover: 'hard', _wishColor: closestColorIdx(COVER_COLOR_PRESETS, shown(b.color)) }, 'add');   // the nearest cover colour
+    });
+    window.__wishAdded = () => { if(!pending) return; const i = list.indexOf(pending); if(i >= 0){ list.splice(i, 1); save(); render(); } pending = null; };
+    window.__wishClosed = () => { pending = null; };
+
+    window.wishAdd = () => open(-1);
+    window.wishRender = render;
+    // export / import / backups
+    window.wishState = () => list.map(b => Object.assign({}, b));
+    window.wishImport = (arr, replace) => {
+      const inc = clean(arr);
+      if(replace) list = inc;
+      else { const key = b => (b.title + '|' + b.author).toLowerCase(), have = new Set(list.map(key)); inc.forEach(b => { if(!have.has(key(b))){ have.add(key(b)); list.push(b); } }); }
+      save(); render();
+    };
+    render();
+  })();
+
+
+  // header tabs: the white cloth under every unpicked tab's word
+  (function(){
+    const cvs = [...document.querySelectorAll('#tabs .tab > .bk canvas.w')];
+    const paint = () => { if(!window.CLOTH) return; const band = document.body.classList.contains('off-wishlist') ? 6 : 3;
+      cvs.forEach(cv => { CLOTH.draw(cv, CLOTH.rgb(window.THEME && THEME.show ? '#ffffff' : '#ffffff'), true, band);
+        const k = cv._drawn + '@' + cv.width + 'x' + cv.height;   // lifted toward white once per drawing, so it reads as white cloth
+        if(cv.width && cv._lit !== k){ const x = cv.getContext('2d'); x.fillStyle = 'rgba(255,255,255,.4)'; x.fillRect(0, 0, cv.width, cv.height); cv._lit = k; } }); };
+    if(window.ResizeObserver && cvs.length) new ResizeObserver(paint).observe(cvs[0]); else requestAnimationFrame(paint);
+    const re = window.reCloth; if(re) window.reCloth = () => { re(); paint(); };
+  })();
+
   renderAll();
 </script>
-<script>
+<script type="text/st-later">
   // offline: once visited, the service worker keeps a copy of the app so it opens without a connection
   if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    const reg = () => navigator.serviceWorker.register('sw.js').catch(() => {});
+    if(document.readyState === 'complete') reg(); else window.addEventListener('load', reg);
   }
 </script>
 
