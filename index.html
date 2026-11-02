@@ -1694,6 +1694,14 @@
   #splash .sp-sub.in{opacity:1;}
   #splash.ending .sp-sub{opacity:0; transition:opacity .2s;}
   #splash.ending .sp-spine, #splash.ending .sp-plank{will-change:transform;}
+  /* both shelves fly in first — top from the left, bottom from the right — then the books arrive on them */
+  #splash:not(.go):not(.custom) .sp-plank{visibility:hidden;}
+  #splash.go .sp-shelf:nth-child(1) .sp-plank{animation:spPlankL .36s cubic-bezier(.22,1,.36,1) both;}
+  #splash.go .sp-shelf:nth-child(2) .sp-plank{animation:spPlankR .36s cubic-bezier(.22,1,.36,1) .06s both;}
+  @keyframes spPlankL{ from{transform:translateX(calc(-100vw - 260px));} to{transform:none;} }
+  @keyframes spPlankR{ from{transform:translateX(calc(100vw + 260px));} to{transform:none;} }
+  /* no tagline: taken out of the layout, so the shelves sit centred */
+  #splash .sp-sub, #splash .sk-tag{display:none !important;}
 
   /* ===== rereads: log reads, Compare Past Reads, Reset | Reread ===== */
   /* summary card: (with rereads) Read x of x · the read's dates · how far and days logged; with rereads ◀ ▶ step through the reads, like the Timeline */
@@ -2073,15 +2081,15 @@
 <div id="splash" aria-hidden="true"></div>
 <script>
   // splash: built and started before the rest of the page loads. Fresh book heights and (now and then) colours
-  // each time; the shelves fill, and once the app is ready one of the endings clears them — Pull, Reverse, Explode
-  // or Fly — then the splash fades and removes itself
+  // each time; one of eight splashes (Pull, Reverse, Explode, Shuffle, Lift, Typewriter, Sketch, Garden) plays over
+  // exactly 5 seconds while the app builds behind it; the fade to the app starts only once the splash is empty
   (function(){
     const el = document.getElementById('splash');
     try{ const dv = JSON.parse(localStorage.getItem('stack-tracker-dev-v1') || '{}');
       if(dv._theme && window.THEME) THEME.set(dv._theme);   // colour theme on before anything paints
       if(dv.splash === true){ el.remove(); if(window.__runApp) window.__runApp(); return; } }catch(e){}
     const COLORS = ['#7a2f2b', '#86452b', '#8a6a3f', '#857636', '#5b6633', '#2e4636', '#2b5752', '#234a5e', '#303d66', '#3a2f52', '#66304c', '#6b4a32'];
-    const k = 1.8;   // the endings run a little quicker than in the demo
+    const k = 1.8;   // the motions' speed
     let timers = [], n = 0;
     const later = (f, ms) => timers.push(setTimeout(f, ms));
     // heights (56–74px), neighbours always at least MIN_STEP apart; 1 in 5 a staircase, 1 in 5 two heights taking turns,
@@ -2108,154 +2116,430 @@
       '<div class="sp-sub">Books &amp; audiobooks</div>';
     const drops = el.querySelectorAll('.sp-drop'), slides = el.querySelectorAll('.sp-slide');
     slides.forEach((b, i) => b.dataset.side = side[i]);
-    drops.forEach((d, i) => d.style.animationDelay = (30 + i * 70) + 'ms');
-    order.forEach((idx, j) => slides[idx].style.animationDelay = (30 + j * 50) + 'ms');
+    drops.forEach((d, i) => d.style.animationDelay = (330 + i * 70) + 'ms');   // once the shelves have flown in
+    order.forEach((idx, j) => slides[idx].style.animationDelay = (330 + j * 50) + 'ms');
     // once a book has landed it is set down for good, so nothing the loading app does can make it flicker
     el.querySelectorAll('.sp-spine').forEach(b => b.addEventListener('animationend', () => b.classList.add('landed'), {once: true}));
-    const t0 = performance.now();
-    let done = false, loaded = false, ended = false;
-    requestAnimationFrame(() => {
-      el.classList.add('go');
-      // the app builds now, hidden behind the splash, while the books glide in (their animation runs on the graphics chip,
-      // so the work doesn't slow it); the ending waits until the app is built and the phone has a quiet moment
-      requestAnimationFrame(() => setTimeout(() => (window.__runApp ? window.__runApp() : Promise.resolve()).then(() => {
-        // the app keeps finishing its 3D shelves in quiet moments for a little while after it starts: wait until the
-        // phone has drawn a run of smooth frames in a row (that work is done) before the ending, at most 3 s
-        const t1 = performance.now(); let last = 0, calm = 0;
-        const watch = t => { if(last) calm = t - last < 34 ? calm + 1 : 0; last = t;
-          if(calm >= 14 || t - t1 > 3000){ loaded = true; tryEnd(); } else requestAnimationFrame(watch); };
-        requestAnimationFrame(watch); }), 30));
-      later(() => el.querySelector('.sp-sub').classList.add('in'), 500);
-      later(() => { done = true; tryEnd(); }, 720);   // ends as soon as the shelves are full (and the app is ready)
-    });
-    // the splash has finished: the app is already built behind it, so it just fades away
-    let hiding = false;
-    const hide = () => {
-      if(hiding) return; hiding = true;
-      timers.forEach(clearTimeout); cancelAnimationFrame(outroRaf);
-      el.classList.add('gone'); setTimeout(() => el.remove(), 400);
-      if(window.__runApp) window.__runApp();   // (only matters if something went wrong: makes sure the app starts)
-    };
-    // the ending: the moving pieces get their own layers; whatever happens it's over within 1.6 s
-    const tryEnd = () => { if(!loaded || !done || ended) return; ended = true;
-      el.classList.add('ending');
-      later(hide, 1600);
-      try{ ending(k, hide); }catch(e){ hide(); } };
-    setTimeout(hide, 9000);                               // never stuck: gone after 9 s whatever happens
-    // the end of a loop: the bottom shelf is pulled right out, then the top one, each the opposite way (either way round).
-    // A book stays put until the shelf has slid clear of it, then falls with gravity off the screen: half the time tumbling, half straight down.
-    let outroRaf = 0;
-    function outro(k, done){
-      const W = el.clientWidth, H = el.clientHeight, dir = Math.random() < .5 ? 1 : -1, t0 = performance.now();
-      const PULL = 380 / k, G = 2600 * k * k;
-      const tumble = Math.random() < .5;                            // each time, either a tumble (books spin as they fall) or a straight drop                       // pull time; gravity in px/s², faster with the speed
-      el.querySelector('.sp-sub').classList.remove('in');
-      const shelves = [...el.querySelectorAll('.sp-shelf')].map((sh, si) => {
-        const plank = sh.querySelector('.sp-plank'), pr = plank.getBoundingClientRect(), way = si === 0 ? dir : -dir;
-        return { plank, way, left: pr.left, right: pr.right, dist: W + pr.width, start: si === 1 ? 0 : PULL,   // the bottom shelf first, then the top
-          books: [...sh.querySelectorAll('.sp-spine')].map(b => { const r = b.getBoundingClientRect();
-            return { el: b, left: r.left, right: r.right, top: r.top, h: r.height, fall: false, y: 0, v: 0, a: 0, va: 0, x: 0 }; }) };
+    // ===== the splashes: Pull, Reverse, Explode, Shuffle, Lift, Typewriter, Sketch, Garden — each its own beginning and ending, timed
+    // to the same 5 seconds (all clear by 4.45 s, the fade at 4.6 s, gone at 5 s). Everything is a ready-made animation
+    const CUSTOMS = { shuffle: spShuffle, lift: spLift, type: spType, sketch: spSketch, garden: spGarden };
+    const ALL = ['pull', 'reverse', 'explode', 'shuffle', 'lift', 'type', 'sketch', 'garden'];
+    const PICK = ALL.includes(window.__end) ? window.__end : ALL[Math.floor(Math.random() * ALL.length)];   // each time, one of the eight
+    const custom = CUSTOMS[PICK];
+    // the fade to the app, and the splash taken away: ready-made too, so they happen on time even while the app is busy
+    // building behind it. Every splash is clear of the screen before the fade starts
+    function fadeOut(list){
+      list.push(el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, delay: 4600, easing: 'ease', fill: 'forwards' }));
+      later(() => { el.style.pointerEvents = 'none'; }, 4600);
+      later(() => { list.forEach(a => { try{ a.cancel(); }catch(e){} }); el.remove(); if(window.__runApp) window.__runApp(); }, 5000);
+    }
+    const startApp = () => { if(window.__runApp) requestAnimationFrame(() => setTimeout(() => window.__runApp(), 30)); };   // the app builds behind the splash
+    if(custom){
+      el.classList.add('custom');
+      el.querySelectorAll('.sp-spine').forEach(b => b.classList.add('landed'));
+      const anims = [];
+      const A = (node, kf, o) => anims.push(node.animate(kf, Object.assign({ fill: 'both', easing: 'linear' }, o)));
+      const sub = el.querySelector('.sp-sub'), shelves = [...el.querySelectorAll('.sp-shelf')], planks = [...el.querySelectorAll('.sp-plank')];
+      const rows = shelves.map(s => [...s.querySelectorAll('.sp-spine')]), all = rows[0].concat(rows[1]);
+      const VW = innerWidth + 260, VH = innerHeight;
+      // the shelves fly in (top from the left, bottom from the right) and back out the same way
+      const shelvesIn = (at = 0) => planks.forEach((p, i) => A(p, [{ transform: `translateX(${i ? VW : -VW}px)` }, { transform: 'none' }], { duration: 360, delay: at + i * 60, easing: 'cubic-bezier(.22,1,.36,1)' }));
+      const shelvesOut = at => planks.forEach((p, i) => A(p, [{ transform: 'none' }, { transform: `translateX(${i ? VW : -VW}px)` }], { duration: 420, delay: at + (i ? 0 : 60), easing: 'cubic-bezier(.55,0,.8,.3)', fill: 'forwards' }));
+      const subAt = (inAt, outAt) => { later(() => sub.classList.add('in'), inAt); if(outAt != null) later(() => sub.classList.remove('in'), outAt); };
+      requestAnimationFrame(() => { try{ custom({ A, sub, shelves, planks, rows, all, VW, VH, shelvesIn, shelvesOut, subAt }); }catch(e){ console.error(e); } fadeOut(anims); startApp(); });
+      setTimeout(() => { if(el.isConnected){ el.remove(); if(window.__runApp) window.__runApp(); } }, 9000);   // never stuck
+      return;
+    }
+
+    // 6 · Shuffle — the shelves fly in full but in the wrong order; the books swap places, one hopping over the
+    // other, until they spell STACK / TRACKER. At the end, still in order, they scatter to both sides, and the
+    // shelves fly back out the way they came
+    function spShuffle({ A, rows, shelves, VW, subAt }){
+      const TOT = 4600, SLOT = 30;                                   // one book's width plus the gap
+      shelves.forEach((s, i) => A(s, [{ transform: `translateX(${i ? VW : -VW}px)` }, { transform: 'none' }], { duration: 420, delay: i * 70, easing: 'cubic-bezier(.22,1,.36,1)' }));
+      rows.forEach((books, si) => {
+        const n = books.length, slot = books.map((b, i) => i), tr = books.map(() => []);
+        const pickSwaps = m => { const out = []; while(out.length < m){ const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * n); if(b === a) continue;
+          if(out.some(([x, y]) => (x === a && y === b) || (x === b && y === a))) continue; out.push([a, b]); } return out; };
+        // the scramble they arrive in: some swaps away from the right order (undone in reverse to sort them)
+        const swaps = pickSwaps(si ? 4 : 3);
+        const pos = books.map((b, i) => i);                         // pos[book] = the slot it's in
+        swaps.forEach(([a, b]) => { const ba = pos.indexOf(a), bb = pos.indexOf(b); pos[ba] = b; pos[bb] = a; });
+        books.forEach((b, i) => tr[i].push({ t: 0, s: pos[i], y: 0, a: 0 }));
+        const swapAt = (t, D, sa, sb, hopFirst) => {                // the books in slots sa and sb change places
+          const ia = pos.indexOf(sa), ib = pos.indexOf(sb), hop = hopFirst ? ia : ib, slide = hopFirst ? ib : ia;
+          [ia, ib].forEach(i => tr[i].push({ t, s: pos[i], y: 0, a: 0 }));
+          tr[hop].push({ t: t + D / 2, s: (sa + sb) / 2, y: -44 - Math.abs(sa - sb) * 3, a: 0 });
+          tr[slide].push({ t: t + D / 2, s: (sa + sb) / 2, y: 0, a: 0 });
+          pos[ia] = sb; pos[ib] = sa;
+          [ia, ib].forEach(i => tr[i].push({ t: t + D, s: pos[i], y: 0, a: 0 }));
+        };
+        // sorting: the arrival's swaps undone, newest first
+        let t = 560 + si * 120; const D = 250;
+        swaps.slice().reverse().forEach(([a, b]) => { swapAt(t, D, a, b, Math.random() < .5); t += D + 40; });
+        // the ending: still in order, each book is thrown out to the side nearer it, the outer ones first
+        const S0 = 2950 + si * 80, order = books.map((b, i) => i).sort((p, q) => Math.abs(pos[q] - (n - 1) / 2) - Math.abs(pos[p] - (n - 1) / 2));
+        order.forEach((i, j) => { const dir = pos[i] < (n - 1) / 2 ? -1 : pos[i] > (n - 1) / 2 ? 1 : (si ? 1 : -1), ts = S0 + j * 45;
+          tr[i].push({ t: ts, s: pos[i], y: 0, a: 0 }, { t: ts + 160, s: pos[i] + dir * 1.2, y: -26, a: dir * 12 }, { t: ts + 520, s: pos[i] + dir * (VW / SLOT), y: 40, a: dir * 50 }); });
+        books.forEach((b, i) => { const pts = tr[i].sort((p, q) => p.t - q.t); pts.push(Object.assign({}, pts[pts.length - 1], { t: TOT }));
+          const kf = pts.map(p => ({ transform: `translate(${((p.s - i) * SLOT).toFixed(1)}px, ${p.y.toFixed(1)}px) rotate(${p.a}deg)`, offset: p.t / TOT, easing: 'ease-in-out' }));
+          for(let k = 1; k < kf.length; k++) if(kf[k].offset < kf[k - 1].offset) kf[k].offset = kf[k - 1].offset;
+          A(b, kf, { duration: TOT }); });
+        // the empty shelf flies back out the way it came
+        const outAt = S0 + (n - 1) * 45 + 420;
+        A(shelves[si].querySelector('.sp-plank'), [{ transform: 'none' }, { transform: `translateX(${si ? VW : -VW}px)` }], { duration: 420, delay: Math.min(outAt, 3950), easing: 'cubic-bezier(.55,0,.8,.3)', fill: 'forwards' });
       });
-      let last = t0;
-      const step = now => {
-        const dt = Math.min(.05, (now - last) / 1000); last = now;
-        let busy = false;
-        shelves.forEach(sh => {
-          const p = Math.max(0, Math.min(1, (now - t0 - sh.start) / PULL)); if(p < 1) busy = true;
-          const off = sh.way * sh.dist * p * p;                         // pulled from rest, speeding up
-          sh.plank.style.transform = `translateX(${off}px)`;
-          const trail = sh.way > 0 ? sh.left + off : sh.right + off;    // the end of the plank still under the books
-          sh.books.forEach(b => {
-            if(!b.fall && (sh.way > 0 ? trail >= b.right : trail <= b.left)){   // the shelf has cleared it: let go
-              b.fall = true; b.va = tumble ? (Math.random() - .5) * 120 * k : 0; }
-            if(!b.fall) return;
-            b.v += G * dt; b.y += b.v * dt;
-            b.a += b.va * dt;   // tumbling: each spins a little as it goes; dropping: straight down
-            b.el.style.transform = `translateY(${b.y}px) rotate(${b.a}deg)`;
-            if(b.top + b.y < H + 40) busy = true;
-          });
-          if(sh.books.some(b => !b.fall)) busy = true;
-        });
-        if(busy) outroRaf = requestAnimationFrame(step); else done();
-      };
-      outroRaf = requestAnimationFrame(step);
+      subAt(1700, 2900);
     }
+
+    // ---- shared by the drawn splashes: where a piece sits inside the splash ----
+    function rel(n){ const r = n.getBoundingClientRect(), b = el.getBoundingClientRect(); return { x: r.left - b.left, y: r.top - b.top, w: r.width, h: r.height }; }
+    var NS = 'http://www.w3.org/2000/svg';   // (var and function declarations: ready before the splash's early return)
+    function svgLayer(){ const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('width', '100%'); s.setAttribute('height', '100%');
+      s.style.cssText = 'position:absolute; inset:0; pointer-events:none; overflow:visible;'; el.appendChild(s); return s; }
+    function mkPath(svg, d, attrs){ const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', d);
+      Object.entries(attrs).forEach(([k, v]) => p.setAttribute(k, v)); svg.appendChild(p); return p; }
+
+    // Sketch — drawn like a pencil sketch: the shelves are lined in first, then each book's outline, then quick
+    // hatching, then its colour washes in over the lines. At the end the colour fades back to the sketch and the
+    // pencil lines are rubbed out
+    function spSketch({ A, all, planks, sub, subAt }){
+      const svg = svgLayer(), jit = () => (Math.random() - .5) * 1.6;
+      // a hand-drawn box: four slightly wobbly strokes, each a little past the corner, drawn as one line
+      // a hand-drawn box: slightly wobbly strokes, each a little past the corner. A book's has no bottom line and stops
+      // at the shelf's top, so it stands on the shelf instead of crossing it
+      const box = (r, open) => { const x0 = r.x, y0 = r.y, x1 = r.x + r.w, y1 = r.y + r.h, o = 3;
+        const top = `M${x0 - o + jit()},${y0 + jit()} L${x1 + o + jit()},${y0 + jit()} `, right = `M${x1 + jit()},${y0 - o + jit()} L${x1 + jit()},${y1 + (open ? 0 : o)} `,
+              left = `M${x0 + jit()},${y1 + (open ? 0 : o)} L${x0 + jit()},${y0 - o + jit()}`, bottom = open ? '' : `M${x1 + o + jit()},${y1 + jit()} L${x0 - o + jit()},${y1 + jit()} `;
+        return top + right + bottom + left; };
+      const hatch = r => { let d = '', s = 7; for(let c = -r.h; c < r.w; c += s){ const xa = Math.max(0, c), ya = Math.max(0, -c) , xb = Math.min(r.w, c + r.h), yb = Math.min(r.h, r.w - c);
+        d += `M${(r.x + xa).toFixed(1)},${(r.y + r.h - ya).toFixed(1)} L${(r.x + xb).toFixed(1)},${(r.y + r.h - yb).toFixed(1)} `; } return d; };
+      const pieces = [...planks.map(p => [p, 'plank']), ...all.map(b => [b, 'book'])];
+      const plankTop = planks.map(p => rel(p).y);
+      // the pencil lines are the borders here: each piece's own black border takes its fill colour instead, so the colour
+      // washes in right up to the sketched line
+      pieces.forEach(([n]) => { n.style.borderColor = getComputedStyle(n).backgroundColor; });
+      const drawn = pieces.map(([n, kind], i) => {
+        const isP = kind === 'plank', r = rel(n);
+        if(!isP){ const pt = plankTop[all.indexOf(n) < 5 ? 0 : 1]; r.h = pt - r.y; }   // down to the shelf's top
+        const line = mkPath(svg, box(r, !isP), { fill: 'none', stroke: '#000', 'stroke-width': 2, 'stroke-linecap': 'round', opacity: 1 });
+        const len = line.getTotalLength();
+        line.style.strokeDasharray = len; line.style.strokeDashoffset = len;
+        const h = isP ? null : mkPath(svg, hatch(r), { fill: 'none', stroke: '#000', 'stroke-width': 1, 'stroke-linecap': 'round', opacity: 0 });
+        let hl = 0; if(h){ hl = h.getTotalLength(); h.style.strokeDasharray = hl; h.style.strokeDashoffset = hl; }
+        return { n, line, len, h, hl, isP, j: isP ? i : i - 2 };
+      });
+      drawn.forEach(d => {
+        const at = d.isP ? 60 + d.j * 260 : 520 + d.j * 75, dur = d.isP ? 360 : 300;
+        A(d.line, [{ strokeDashoffset: d.len, opacity: 0 }, { opacity: 1, offset: .03 }, { strokeDashoffset: 0, opacity: 1 }],   // (hidden until drawn: no dots from the pen's round tip)
+          { duration: dur, delay: at, easing: 'cubic-bezier(.4,0,.3,1)', fill: 'both' });
+        if(d.h){ A(d.h, [{ strokeDashoffset: d.hl, opacity: 0 }, { opacity: .45, offset: .03 }, { strokeDashoffset: 0, opacity: .45 }], { duration: 260, delay: at + 260, easing: 'linear', fill: 'both' }); }
+        // the colour washes in over the sketch
+        const wash = d.isP ? 1350 + d.j * 120 : 1450 + d.j * 60;
+        A(d.n, [{ opacity: 0 }, { opacity: 1 }], { duration: 320, delay: wash, easing: 'ease-out', fill: 'both' });
+        if(d.h) A(d.h, [{ opacity: .45 }, { opacity: 0 }], { duration: 300, delay: wash + 80, fill: 'forwards' });
+        // the end: colour fades back to the sketch, then the lines are rubbed out, last drawn first
+        const drain = 2850 + (d.isP ? 11 * 45 + d.j * 60 : (11 - d.j) * 45);
+        A(d.n, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: drain, easing: 'ease-in', fill: 'forwards' });
+        const rub = 3450 + (d.isP ? 12 * 40 + d.j * 80 : (11 - d.j) * 40);
+        A(d.line, [{ strokeDashoffset: 0, opacity: 1 }, { strokeDashoffset: -d.len, opacity: .3 }], { duration: 280, delay: rub, easing: 'ease-in', fill: 'forwards' });
+      });
+      // the tagline, sketched too: its letters outlined in pencil (twice, a hair apart, like a quick hand), then shaded
+      // in; at the end the shading lifts and the outlines are rubbed out
+      const tr = rel(sub), cs = getComputedStyle(sub);
+      const word = sub.textContent.toUpperCase();
+      sub.style.visibility = 'hidden';
+      const mk = (dx, dy, stroke, fill, w) => { const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', (tr.x + tr.w / 2 + dx).toFixed(1)); t.setAttribute('y', (tr.y + tr.h * .78 + dy).toFixed(1)); t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('style', `font:600 ${cs.fontSize} Arial, sans-serif; letter-spacing:${cs.letterSpacing};`);
+        t.setAttribute('fill', fill); t.setAttribute('stroke', stroke); t.setAttribute('stroke-width', w); t.setAttribute('stroke-linejoin', 'round');
+        t.textContent = word; t.classList.add('sk-tag'); svg.appendChild(t); return t; };
+      const tagFill = mk(0, 0, 'none', '#8a8378', 0);
+      const lines = [mk(0, 0, '#000', 'none', .7), mk(.5, -.35, '#000', 'none', .5)];
+      tagFill.style.opacity = 0;
+      lines.forEach((t, i) => { t.style.strokeDasharray = 60; t.style.strokeDashoffset = 60;
+        A(t, [{ strokeDashoffset: 60, opacity: 0 }, { opacity: i ? .55 : 1, offset: .03 }, { strokeDashoffset: 0, opacity: i ? .55 : 1 }], { duration: 560, delay: 1950 + i * 120, easing: 'cubic-bezier(.4,0,.3,1)', fill: 'both' });
+        A(t, [{ strokeDashoffset: 0, opacity: i ? .55 : 1 }, { strokeDashoffset: -60, opacity: 0 }], { duration: 360, delay: 3300 + i * 60, easing: 'ease-in', fill: 'forwards' }); });
+      A(tagFill, [{ opacity: 0 }, { opacity: 1 }], { duration: 320, delay: 2450, fill: 'both' });
+      A(tagFill, [{ opacity: 1 }, { opacity: 0 }], { duration: 260, delay: 2900, fill: 'forwards' });
+    }
+
+    // Garden — seeds drop onto the shelves, a watering can comes along each shelf watering them, and each seed
+    // sprouts and grows up into its book. At the end they wilt and wither down into the shelves, and the shelves
+    // fly out
+    function spGarden({ A, rows, all, planks, shelvesIn, shelvesOut, subAt, VW, VH }){
+      shelvesIn(0);
+      const svg = svgLayer();
+      all.forEach(b => { b.style.transformOrigin = '50% 100%'; b.innerHTML = `<span class="lt" style="display:inline-block">${b.textContent}</span>`; });
+      // seeds, one under each book's place
+      const spots = all.map(b => { const r = rel(b); return { x: r.x + r.w / 2, y: r.y + r.h }; });
+      const seeds = spots.map((p, i) => { const s = document.createElement('div');
+        s.style.cssText = `position:absolute; left:${p.x - 5}px; top:${p.y - 7}px; width:10px; height:7px; border-radius:50%; background:#6b4a32; border:2px solid #000; box-sizing:border-box;`;
+        el.appendChild(s);
+        A(s, [{ transform: `translateY(${-p.y - 20}px)`, opacity: 1 }, { transform: 'translateY(0)', offset: .75 }, { transform: 'translateY(-4px)', offset: .87 }, { transform: 'none' }],
+          { duration: 360, delay: 420 + i * 45, easing: 'cubic-bezier(.5,0,.8,.5)', fill: 'backwards' });
+        return s; });
+      // the watering can: drawn in the app's style, thick black lines
+      const NS = 'http://www.w3.org/2000/svg', can = document.createElementNS(NS, 'g');
+      can.innerHTML = '<path d="M14,-34 Q26,-52 38,-34" fill="none" stroke="#000" stroke-width="3"/>' +
+        '<path d="M8,-30 L44,-30 L41,0 L11,0 Z" fill="#2b5752" stroke="#000" stroke-width="3" stroke-linejoin="round"/>' +
+        '<path d="M10,-12 L-14,-28 L-12,-32 L12,-20" fill="#2b5752" stroke="#000" stroke-width="3" stroke-linejoin="round"/>' +
+        '<path d="M-17,-34 L-9,-26" stroke="#000" stroke-width="4" stroke-linecap="round"/>' +
+        '<path d="M12,-22 L40,-22" stroke="rgba(255,255,255,.35)" stroke-width="2"/>';
+      svg.appendChild(can);
+      const shelfY = rows.map(r => rel(r[0]).y + rel(r[0]).h - 52),   // the can's base, a little above the seeds
+       xs = rows.map(r => [rel(r[0]).x - 10, rel(r[r.length - 1]).x + 40]);
+      const R = rel(el.querySelector('.sp-shelf')), W = el.clientWidth;
+      // its path: in from the right over the top shelf, along it pouring (tipped), down to the bottom shelf, along it, away left
+      const P = [ { t: 650, x: W + 80, y: shelfY[0], a: 0 }, { t: 900, x: xs[0][1], y: shelfY[0], a: 0 }, { t: 980, x: xs[0][1], y: shelfY[0], a: -28 },
+                  { t: 1400, x: xs[0][0], y: shelfY[0], a: -28 }, { t: 1470, x: xs[0][0], y: shelfY[0], a: 0 },
+                  { t: 1620, x: xs[1][1], y: shelfY[1], a: 0 }, { t: 1700, x: xs[1][1], y: shelfY[1], a: -28 },
+                  { t: 2100, x: xs[1][0] - 10, y: shelfY[1], a: -28 }, { t: 2170, x: xs[1][0] - 10, y: shelfY[1], a: 0 }, { t: 2420, x: -120, y: shelfY[1] - 60, a: 0 } ];
+      const TOT = 4600;
+      const kf = [{ transform: `translate(${P[0].x}px, ${P[0].y}px) rotate(0deg)`, offset: 0 }, ...P.map(p => ({ transform: `translate(${p.x}px, ${p.y}px) rotate(${p.a}deg)`, offset: p.t / TOT, easing: 'ease-in-out' })),
+        { transform: `translate(-120px, ${P[P.length - 1].y}px)`, offset: 1 }];
+      A(can, kf, { duration: TOT, fill: 'both' });
+      // water: drops from the spout tip while pouring, each falling to the shelf
+      const tipAt = t => { let i = 0; while(i < P.length - 2 && P[i + 1].t <= t) i++; const a = P[i], b = P[i + 1], f = Math.max(0, Math.min(1, (t - a.t) / (b.t - a.t)));
+        const x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f, ang = (a.a + (b.a - a.a) * f) * Math.PI / 180;
+        const tx = -16, ty = -31; return { x: x + tx * Math.cos(ang) - ty * Math.sin(ang), y: y + tx * Math.sin(ang) + ty * Math.cos(ang) }; };
+      [[990, 1400, 0], [1710, 2100, 1]].forEach(([a, b, si]) => { for(let t = a; t < b; t += 32){
+        const p = tipAt(t), land = rel(rows[si][0]).y + rel(rows[si][0]).h - 2, d = document.createElementNS(NS, 'ellipse');
+        d.setAttribute('cx', 0); d.setAttribute('cy', 0); d.setAttribute('rx', 2.2); d.setAttribute('ry', 3.4); d.setAttribute('fill', '#4f8fc0'); d.setAttribute('opacity', '0'); svg.appendChild(d);   // hidden until it falls
+        const jx = (Math.random() - .5) * 6;
+        A(d, [{ transform: `translate(${p.x}px, ${p.y}px)`, opacity: 1 }, { transform: `translate(${p.x - 8 + jx}px, ${land}px)`, opacity: .9, offset: .92 }, { transform: `translate(${p.x - 8 + jx}px, ${land}px)`, opacity: 0 }],
+          { duration: 300, delay: t, easing: 'cubic-bezier(.5,0,1,1)', fill: 'forwards' }); } });
+      // each seed sprouts once the water reaches it, then grows into its book
+            all.forEach((b, i) => {
+        const si = i < rows[0].length ? 0 : 1, sp = spots[i];
+        let w = null; const [a0, b0] = si ? [1710, 2100] : [990, 1400];
+        for(let t = a0; t < b0; t += 10){ const p = tipAt(t); if(Math.abs(p.x - 8 - sp.x) < 6){ w = t + 280; break; } }
+        if(w == null) w = si ? 1900 : 1200;
+        // the sapling: the book itself as a thin stem in its own colour, two leaves (the book's colour too) at its tip.
+        // The stem grows, then widens and fills out into the book while the leaves fold away into its top
+        const col = getComputedStyle(b).backgroundColor, h = b.offsetHeight;
+        const leaves = document.createElementNS(NS, 'g');
+        leaves.innerHTML = `<path d="M0,0 Q-10,-7 -12,2 Q-4,4 0,0 Z" fill="${col}" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/>` +
+          `<path d="M0,-2 Q10,-10 12,-1 Q4,2 0,-2 Z" fill="${col}" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/>`;
+        svg.appendChild(leaves);
+        // three stages, each resting a moment: the seed; a small sapling (a short stem and its two leaves); then it grows
+        // taller and fills out into the book. Its letter only shows once it's fully grown
+        const K = [ { t: 0, sx: .14, sy: 0, ls: 0 }, { t: 170, sx: .14, sy: .26, ls: 1 }, { t: 340, sx: .14, sy: .26, ls: 1 },
+                    { t: 520, sx: .16, sy: .64, ls: 1.15 }, { t: 700, sx: 1.07, sy: 1.05, ls: 0 }, { t: 790, sx: 1, sy: 1, ls: 0 } ];
+        const DUR = K[K.length - 1].t, ease = ['cubic-bezier(.2,.8,.4,1)', 'linear', 'ease-in-out', 'cubic-bezier(.35,0,.3,1)', 'ease-out'];
+        A(b, K.map((k, j) => ({ transform: `scale(${k.sx}, ${k.sy})`, offset: k.t / DUR, easing: ease[j] || 'linear' })), { duration: DUR, delay: w, fill: 'both' });
+        A(leaves, K.map((k, j) => ({ transform: `translate(${sp.x}px, ${(sp.y - h * k.sy).toFixed(1)}px) scale(${k.ls})`, offset: k.t / DUR, easing: ease[j] || 'linear' })),
+          { duration: DUR, delay: w, fill: 'both' });
+        const letter = b.querySelector('.lt');
+        A(letter, [{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1.15)', offset: .6 }, { opacity: 1, transform: 'none' }], { duration: 200, delay: w + DUR + 90, easing: 'ease-out', fill: 'both' });
+        A(seeds[i], [{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: w + 120, fill: 'forwards' });
+        // the end, in the order they grew: it wilts — a slight lean, creases and wrinkles spreading over it as its colour
+        // dulls — then withers, drawing in narrower and browner, and then shrinks down until it's lost in the shelf
+        const wr = document.createElement('i');
+        const crease = () => { let d = ''; for(let c = 0; c < 6; c++){ const y = 8 + c * 15 + Math.random() * 8; d += `M0,${y.toFixed(1)} `;
+          for(let x = 4; x <= 28; x += 4) d += `L${x},${(y + (Math.random() - .5) * 7).toFixed(1)} `; } return d; };
+        const svgW = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 100' preserveAspectRatio='none'>` +
+          `<path d='${crease()}' fill='none' stroke='rgba(0,0,0,.45)' stroke-width='1.1'/>` +
+          `<path d='${crease()}' fill='none' stroke='rgba(255,255,255,.22)' stroke-width='.9'/>` +
+          `<path d='M${4 + Math.random() * 8},0 L${10 + Math.random() * 6},40 L${6 + Math.random() * 10},100' fill='none' stroke='rgba(0,0,0,.3)' stroke-width='1'/></svg>`;
+        wr.style.cssText = `position:absolute; inset:0; pointer-events:none; opacity:0; background:url("data:image/svg+xml,${encodeURIComponent(svgW)}") 0 0 / 100% 100% no-repeat;`;
+        b.appendChild(wr);
+        const grown = w + DUR + 90 + 200, lean = (Math.random() < .5 ? -1 : 1) * (2 + Math.random() * 3), back = Math.max(3250, grown + 120) + Math.random() * 60;
+        A(b, [{ transform: 'rotate(0deg) scale(1, 1)', filter: 'none', opacity: 1, easing: 'ease-in-out' },
+              { transform: `rotate(${lean}deg) scale(.97, .96)`, filter: 'saturate(.5) brightness(.85) sepia(.2)', opacity: 1, offset: .34, easing: 'ease-in-out' },
+              { transform: `rotate(${lean * 1.2}deg) scale(.74, .86)`, filter: 'saturate(.2) brightness(.66) sepia(.5)', opacity: 1, offset: .62, easing: 'cubic-bezier(.45,0,.75,.6)' },
+              { transform: `rotate(${lean * 1.2}deg) scale(.7, 0)`, filter: 'saturate(.2) brightness(.6) sepia(.5)', opacity: 1, offset: .99 },
+              { transform: `rotate(${lean * 1.2}deg) scale(.7, 0)`, filter: 'saturate(.2) brightness(.6) sepia(.5)', opacity: 0 }],
+          { duration: 660, delay: back, fill: 'forwards' });
+        A(wr, [{ opacity: 0 }, { opacity: .9, offset: .45 }, { opacity: 1 }], { duration: 420, delay: back + 30, fill: 'forwards' });
+        A(letter, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: back + 140, fill: 'forwards' });
+      });
+      subAt(2600, 4050);   // shown through the wilting, gone before the shelves leave
+      shelvesOut(4060);
+    }
+
+    // 8 · Lift — the full shelves rise up from below like a lift and settle; at the end a small dip, then up and out
+    // through the top together, the tagline left behind for a beat
+    function spLift({ A, shelves, rows, sub, VH, subAt }){
+      // each shelf rises and comes to a stop at 560 ms (its top), then sinks the last 10px into place
+      const STOP = 560;
+      shelves.forEach((s, i) => A(s, [{ transform: `translateY(${VH}px)`, easing: 'cubic-bezier(.3,.55,.45,1)' }, { transform: 'translateY(-10px)', offset: STOP / 800, easing: 'ease-in-out' }, { transform: 'none' }],
+        { duration: 800, delay: i * 40 }));
+      // right as the shelf stops, its books carry on up a little — each a slightly different height — and drop back onto it
+      rows.forEach((books, i) => books.forEach(b => { const h = 12 + Math.random() * 10, at = STOP - 30 + i * 40 + Math.random() * 20;
+        A(b, [{ transform: 'none', easing: 'cubic-bezier(.2,.7,.4,1)' }, { transform: `translateY(${-h}px)`, offset: .4, easing: 'cubic-bezier(.6,0,.9,.5)' },
+          { transform: 'none', offset: .78, easing: 'ease-out' }, { transform: 'translateY(-2px)', offset: .88, easing: 'ease-in' }, { transform: 'none' }],
+          { duration: 380, delay: at, fill: 'none' }); }));
+      subAt(900);
+      shelves.forEach((s, i) => A(s, [{ transform: 'none' }, { transform: 'translateY(6px)', offset: .2, easing: 'cubic-bezier(.5,0,.5,1)' }, { transform: `translateY(${-VH - 200}px)` }],
+        { duration: 1500, delay: 2600, easing: 'cubic-bezier(.6,0,.85,.4)', fill: 'forwards' }));
+    }
+
+    // 3 · Typewriter — after the shelves fly in, each letter pops up into place from below the shelf like a key being
+    // struck, then the tagline types on (no cursor). At the end it's a backspace: the tagline deletes, then the books drop out of
+    // sight from the last letter back to the first, and the shelves fly out
+    function spType({ A, rows, all, sub, shelves, shelvesIn, shelvesOut }){
+      shelves.forEach(s => { const r = s.querySelector('.sp-row'); r.style.overflow = 'hidden'; r.style.paddingTop = '10px'; });   // the books hide below the shelf
+      shelvesIn(0);
+      let t = 380;
+      all.forEach((b, i) => { t += 78 + (i === 5 ? 60 : 0) + Math.round(Math.random() * 18);   // a beat between the words
+        A(b, [{ transform: 'translateY(110%)' }, { transform: 'translateY(-7px)', offset: .65 }, { transform: 'none' }], { duration: 170, delay: t, easing: 'cubic-bezier(.2,.9,.4,1)', fill: 'backwards' }); });
+      // the tagline, a letter at a time
+      const text = sub.textContent; sub.textContent = ''; sub.style.opacity = '1'; sub.style.transition = 'none';
+      const chars = [...text].map(c => { const s = document.createElement('span'); s.textContent = c; s.style.visibility = 'hidden'; sub.appendChild(s); return s; });
+      const typeAt = t + 260;
+      chars.forEach((c, i) => later(() => c.style.visibility = 'visible', typeAt + i * 34));
+      // the backspace
+      const B0 = 2650;
+      chars.slice().reverse().forEach((c, i) => later(() => c.style.visibility = 'hidden', B0 + i * 16));
+      const D0 = B0 + chars.length * 16 + 120;
+      all.slice().reverse().forEach((b, i) => A(b, [{ transform: 'none' }, { transform: 'translateY(-5px)', offset: .25 }, { transform: 'translateY(115%)' }],
+        { duration: 150, delay: D0 + i * 58, easing: 'cubic-bezier(.5,0,.9,.6)', fill: 'forwards' }));
+      shelvesOut(D0 + (all.length - 1) * 58 + 170);
+    }
+
+    // ===== a 5 second splash: books in (0–0.7 s), full shelves, the ending (1.6–4.6 s), then the fade (gone at 5 s).
+    // Every ending is worked out in full the moment it starts — the physics run ahead in a few milliseconds — and then
+    // handed to the browser as ready-made animations, so it plays on the graphics chip: nothing runs frame by frame,
+    // and nothing the app does behind it can make it stutter
+    const START = 1600, END = 4600, SPAN = END - START, FADE = 400;
+    let anims = [];
+    requestAnimationFrame(() => {
+      // the ending is worked out now, before anything moves: every book is standing exactly where it will land. Its
+      // animations are handed over at once, timed to start at 1.6 s — the browser starts them itself, right on time
+      try{ ending(); }catch(e){ console.error(e); }
+      el.classList.add('go');
+      startApp();
+      later(() => el.querySelector('.sp-sub').classList.add('in'), 800);
+      later(() => { el.classList.add('ending'); el.querySelector('.sp-sub').classList.remove('in'); }, START);
+      fadeOut(anims);
+    });
+    setTimeout(() => { if(el.isConnected){ el.remove(); if(window.__runApp) window.__runApp(); } }, 9000);   // never stuck
+
+    // ---- helpers: a recorded path becomes one animation over the whole ending ----
+    const FPS = 60, STEP = 1 / 240;                        // simulated finely, kept 60 times a second
+    const xf = f => `translate(${f.x.toFixed(1)}px, ${f.y.toFixed(1)}px) rotate(${f.a.toFixed(2)}deg)`;
+    function play(node, frames, origin){
+      if(origin) node.style.transformOrigin = origin;   // (the shelves only slide on the way in, so this can be set now)
+      const kf = frames.map((f, i) => ({ transform: xf(f), opacity: f.o == null ? 1 : f.o, offset: Math.min(1, f.t / SPAN) }));
+      kf[0].offset = 0; kf[kf.length - 1].offset = 1;
+      for(let i = 1; i < kf.length; i++) if(kf[i].offset <= kf[i - 1].offset) kf[i].offset = Math.min(1, kf[i - 1].offset + 1e-6);
+      anims.push(node.animate(kf, { duration: SPAN, delay: START, easing: 'linear', fill: 'forwards' }));
+    }
+    const later2 = (node, kf, o) => anims.push(node.animate(kf, Object.assign({ fill: 'forwards' }, o, { delay: START + (o.delay || 0) })));
+    // run a simulation from 0 to SPAN ms, calling tick(t, dt) and recording each body's state 60 times a second
+    function simulate(bodies, tick){
+      const rec = bodies.map(() => []); let nextRec = 0;
+      for(let t = 0; t <= SPAN + 1e-6; t += STEP * 1000){
+        if(t >= nextRec - 1e-6){ bodies.forEach((b, i) => rec[i].push({ t, x: b.x, y: b.y, a: b.a, o: b.o })); nextRec += 1000 / FPS; }
+        tick(t, STEP);
+      }
+      return rec;
+    }
+    const G = 2600 * k * k;                                   // gravity, px/s², as in the app
+
     // ---------- the endings: Pull (tumble or drop), Reverse, Explode — picked at random, or the one chosen ----------
-    let endChosen = 'mix';
-    function ending(k, done){
-      const e = endChosen !== 'mix' ? endChosen : ['pull', 'reverse', 'explode'][Math.floor(Math.random() * 3)];
-      if(e === 'reverse') endReverse(k, done); else if(e === 'explode') endExplode(k, done); else outro(k, done);
+    function ending(){
+      const e = PICK;
+      if(e === 'reverse') endReverse(); else if(e === 'explode') endExplode(); else endPull();
     }
-    // Reverse: the way they came in, backwards — the last in leaves first; STACK goes up and away, TRACKER out to its side
-    function endReverse(k, done){
-      el.querySelector('.sp-sub').classList.remove('in');
-      const drops = [...el.querySelectorAll('.sp-drop')].reverse(), order = [3, 4, 2, 5, 1, 6, 0].reverse(), slides = el.querySelectorAll('.sp-slide');
-      let longest = 0;
-      const go = (b, to, delay) => { const d = 420 / k; longest = Math.max(longest, delay + d);
-        b.animate([{ transform: 'none' }, { transform: 'translateY(-6px)', offset: .2 }, { transform: to }], { duration: d, delay, easing: 'cubic-bezier(.55,0,.8,.3)', fill: 'forwards' }); };
-      drops.forEach((b, i) => go(b, 'translateY(-100vh)', (i * 115) / k));
-      order.forEach((idx, j) => { const b = slides[idx]; go(b, `translateX(${b.dataset.side === 'l' ? -100 : 100}vw)`, (j * 80) / k); });
-      const planks = el.querySelectorAll('.sp-plank');                 // then the empty shelves slip away
-      planks.forEach(pl => pl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 / k, delay: longest, fill: 'forwards' }));
-      later(done, longest + 300 / k);
-    }
-    // Explode: everything shakes harder and harder, then bang — the books fly every way. The shelves survive:
-    // the bottom one drops away with a slight spin; the top one loses one end, swings from the other like a pendulum, then lets go
-    function endExplode(k, done){
-      el.querySelector('.sp-sub').classList.remove('in');
-      const W = el.clientWidth, H = el.clientHeight, G = 2600 * k * k, SHAKE = 1100 / k, box = el.getBoundingClientRect();
-      const books = [...el.querySelectorAll('.sp-spine')].map(b => { const r = b.getBoundingClientRect(); return { el: b, cx: r.left + r.width / 2, cy: r.top + r.height / 2, x: 0, y: 0, vx: 0, vy: 0, a: 0, va: 0 }; });
-      // the shelves: one of them may lose an end and swing from the other (top, bottom, or neither — never both);
-      // any that doesn't swing just drops away with a slight spin
-      const swinger = ['top', 'bottom', 'none'][Math.floor(Math.random() * 3)];
-      const shelves = [...el.querySelectorAll('.sp-plank')].map((pl, i) => { const hinge = Math.random() < .5 ? 'left' : 'right';
-        const swing = (i === 0 && swinger === 'top') || (i === 1 && swinger === 'bottom');
-        if(swing) pl.style.transformOrigin = `${hinge} center`; else pl.style.transformOrigin = '';
-        return { el: pl, top0: pl.getBoundingClientRect().top, swing, hanging: swing, sign: hinge === 'left' ? 1 : -1, L: pl.getBoundingClientRect().width,
-          phi: 0, w: 0, x: 0, y: 0, vx: swing ? 0 : (Math.random() - .5) * 60 * k, vy: 0, a: 0, va: swing ? 0 : (Math.random() < .5 ? -1 : 1) * (25 + Math.random() * 25) * k }; });
-      const cx = books.reduce((t, b) => t + b.cx, 0) / books.length, cy = books.reduce((t, b) => t + b.cy, 0) / books.length;
-      const SWING = 1700 / k;                                        // how long a swinging shelf hangs before it lets go
-      const t0 = performance.now(); let last = t0, boom = false;
-      const off = (o, x, y, a) => { o.style.transform = `translate(${x}px, ${y}px) rotate(${a}deg)`; };
-      const step = now => {
-        const t = now - t0, dt = Math.min(.04, (now - last) / 1000); last = now;
-        if(t < SHAKE){                                               // the shake, building up
-          const amp = 7 * Math.pow(t / SHAKE, 2), j = () => (Math.random() * 2 - 1) * amp;
-          books.forEach(b => off(b.el, j(), j() * .6, j() * .8));
-          shelves.forEach(sh => off(sh.el, j() * .5, j() * .4, 0));
-          outroRaf = requestAnimationFrame(step); return;
-        }
-        if(!boom){ boom = true;                                      // bang: each book flies out from the middle, up and away, spinning
-          books.forEach(b => { let dx = b.cx - cx, dy = b.cy - cy; const d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d;
-            const sp = (900 + Math.random() * 700) * k;
-            b.vx = dx * sp + (Math.random() - .5) * 300 * k; b.vy = dy * sp - (500 + Math.random() * 500) * k; b.va = (Math.random() - .5) * 1400 * k; });
-          shelves.forEach(sh => off(sh.el, 0, 0, 0));
-        }
-        let busy = false;
-        books.forEach(b => { if(b.gone) return;
-          b.vy += G * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.a += b.va * dt; off(b.el, b.x, b.y, b.a);
-          // once a book has flown off any edge it's gone for good — it never drops back into view
-          const X = b.cx + b.x - box.left, Y = b.cy + b.y - box.top;
-          if(X < -80 || X > W + 80 || Y < -80 || Y > H + 80){ b.gone = true; b.el.style.visibility = 'hidden'; } else busy = true; });
-        shelves.forEach(sh => {
-          if(sh.hanging){                                            // hangs from one end and swings (a rod on a hinge)
-            const acc = (3 * G / (2 * sh.L)) * Math.cos(sh.phi * Math.PI / 180) * 180 / Math.PI;   // gravity's pull round the hinge
-            sh.w += acc * dt; sh.w *= Math.pow(.55, dt * k); sh.phi += sh.w * dt;                 // a little friction in the hinge
-            if(t - SHAKE > SWING){ sh.hanging = false;               // let go: its middle carries on as it was moving
-              const r = sh.phi * Math.PI / 180, wr = sh.w * Math.PI / 180;
-              sh.vx = -Math.sin(r) * wr * sh.L / 2 * sh.sign; sh.vy = Math.cos(r) * wr * sh.L / 2; }
-            off(sh.el, 0, 0, sh.sign * sh.phi); busy = true; return;
-          }
-          sh.vy += G * dt; sh.x += sh.vx * dt; sh.y += sh.vy * dt;
-          if(sh.swing){ sh.phi += sh.w * dt; off(sh.el, sh.x, sh.y, sh.sign * sh.phi); }   // let go: falls, still turning
-          else { sh.a += sh.va * dt; off(sh.el, sh.x, sh.y, sh.a); }                        // drops away with a slight spin
-          if(sh.top0 + sh.y - sh.L / 2 < box.bottom + 20) busy = true;
-        });
-        if(busy) outroRaf = requestAnimationFrame(step); else done();
+
+    // Pull: the bottom shelf is pulled right out, then the top one, each back out the way it flew in. A book stays put until its
+    // shelf has slid clear of it, then falls off the screen — half the time tumbling, half straight down. The second
+    // pull waits so the whole thing fills its three seconds
+    function endPull(){
+      const W = el.clientWidth, H = el.clientHeight, tumble = Math.random() < .5;
+      const PULL = 900;                                              // each shelf's pull, ms (from rest, speeding up)
+      const sh = [...el.querySelectorAll('.sp-shelf')].map((s, si) => { const plank = s.querySelector('.sp-plank'), pr = plank.getBoundingClientRect();
+        return { plank, way: si === 0 ? -1 : 1, left:   // the way it came in: top from the left, bottom from the right
+         pr.left, right: pr.right, dist: W + pr.width,
+          books: [...s.querySelectorAll('.sp-spine')].map(b => { const r = b.getBoundingClientRect(); return { node: b, left: r.left, right: r.right, top: r.top }; }) }; });
+      // how long one shelf takes, pull to last book off the screen: worked out once, so the top shelf's start can be set
+      const runShelf = (s, start, out) => {
+        const P = { x: 0, y: 0, a: 0 }, B = s.books.map(b => ({ x: 0, y: 0, a: 0, v: 0, va: 0, fall: false, src: b })); let clear = Infinity;
+        const tick = (t, dt) => {
+          const p = Math.max(0, Math.min(1, (t - start) / PULL)), off = s.way * s.dist * p * p; P.x = off;
+          const trail = s.way > 0 ? s.left + off : s.right + off;
+          B.forEach(b => { if(!b.fall && t >= start && (s.way > 0 ? trail >= b.src.right : trail <= b.src.left)){ b.fall = true; b.va = tumble ? (Math.random() - .5) * 120 * k : 0; }
+            if(!b.fall) return; b.v += G * dt; b.y += b.v * dt; b.a += b.va * dt; });
+          if(clear === Infinity && p >= 1 && B.every(b => b.src.top + b.y > H + 40)) clear = t;
+        };
+        const rec = simulate([P, ...B], tick); if(out) out.push(rec); return clear;
       };
-      outroRaf = requestAnimationFrame(step);
+      const tTop = runShelf(sh[0], 0);                               // how long the top shelf takes, from its pull
+      const startTop = Math.max(500, SPAN - 120 - tTop);              // it starts late enough to end just before 3 s…
+      const startBottom = Math.round(startTop * .4);                  // …and the bottom one a little after the ending starts
+      [[sh[1], startBottom], [sh[0], startTop]].forEach(([s, st]) => { const out = []; runShelf(s, st, out);
+        const [pRec, ...bRecs] = out[0]; play(s.plank, pRec); bRecs.forEach((r, i) => play(s.books[i].node, r)); });
+    }
+
+    // Reverse: the way they came in, backwards — the last in leaves first, one at a time across the three seconds;
+    // STACK goes up and away, TRACKER out to its side; then the empty shelves fly back out the way they came
+    function endReverse(){
+      const drops = [...el.querySelectorAll('.sp-drop')].reverse(), order = [3, 4, 2, 5, 1, 6, 0].reverse(), slides = el.querySelectorAll('.sp-slide');
+      const seq = []; for(let i = 0; i < 7; i++){ seq.push(['s', slides[order[i]]]); if(drops[i]) seq.push(['d', drops[i]]); }
+      const D = 420 / k, OUT = 420, CLEAR = 150, gap = (SPAN - CLEAR - OUT - 60 - D) / (seq.length - 1);
+      const vw = innerWidth, vh = innerHeight;
+      seq.forEach(([kind, b], j) => { const t0 = j * gap, to = kind === 'd' ? { x: 0, y: -vh } : { x: b.dataset.side === 'l' ? -vw : vw, y: 0 };
+        later2(b, [{ transform: 'none' }, { transform: 'translateY(-6px)', offset: .2 }, { transform: `translate(${to.x}px, ${to.y}px)` }],
+          { duration: D, delay: t0, easing: 'cubic-bezier(.55,0,.8,.3)' }); });
+      // then the empty shelves fly back out the way they came: top to the left, bottom to the right
+      el.querySelectorAll('.sp-plank').forEach((pl, i) => later2(pl, [{ transform: 'none' }, { transform: `translateX(${i ? '' : '-'}${innerWidth + 260}px)` }],
+        { duration: OUT, delay: SPAN - CLEAR - OUT - (i ? 0 : 60), easing: 'cubic-bezier(.55,0,.8,.3)' }));
+    }
+
+    // Explode: everything shakes harder and harder, then bang — the books fly every way. The shelves survive: one may
+    // lose an end and swing from the other like a pendulum, then let go; the other drops away with a slight spin.
+    // The shake takes whatever time the bang doesn't, so it all fills the three seconds
+    function endExplode(){
+      const W = el.clientWidth, H = el.clientHeight, box = el.getBoundingClientRect();
+      const books = [...el.querySelectorAll('.sp-spine')].map(b => { const r = b.getBoundingClientRect(); return { node: b, cx: r.left + r.width / 2, cy: r.top + r.height / 2 }; });
+      const cx = books.reduce((t, b) => t + b.cx, 0) / books.length, cy = books.reduce((t, b) => t + b.cy, 0) / books.length;
+      const swinger = ['top', 'bottom', 'none'][Math.floor(Math.random() * 3)];
+      const planks = [...el.querySelectorAll('.sp-plank')].map((pl, i) => { const hinge = Math.random() < .5 ? 'left' : 'right', r = pl.getBoundingClientRect();
+        const swing = (i === 0 && swinger === 'top') || (i === 1 && swinger === 'bottom');
+        return { node: pl, origin: swing ? hinge + ' center' : 'center', swing, sign: hinge === 'left' ? 1 : -1, L: r.width, top0: r.top,
+          vx0: swing ? 0 : (Math.random() - .5) * 60 * k, va0: swing ? 0 : (Math.random() < .5 ? -1 : 1) * (25 + Math.random() * 25) * k }; });
+      let SWING = 1700 / k;                                          // how long a swinging shelf hangs (stretched to fill, below)
+      const kick = books.map(b => { let dx = b.cx - cx, dy = b.cy - cy; const d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d; const sp = (900 + Math.random() * 700) * k;
+        return { vx: dx * sp + (Math.random() - .5) * 300 * k, vy: dy * sp - (500 + Math.random() * 500) * k, va: (Math.random() - .5) * 1400 * k }; });
+      const run = (SHAKE, record) => {
+        const B = books.map(() => ({ x: 0, y: 0, a: 0, o: 1, vx: 0, vy: 0, va: 0, gone: false }));
+        const S = planks.map(p => ({ x: 0, y: 0, a: 0, vx: 0, vy: 0, va: 0, phi: 0, w: 0, hanging: p.swing }));
+        let boom = false, over = Infinity;
+        const tick = (t, dt) => {
+          if(t < SHAKE){ const amp = 7 * Math.pow(t / SHAKE, 2), j = () => (Math.random() * 2 - 1) * amp;
+            B.forEach(b => { b.x = j(); b.y = j() * .6; b.a = j() * .8; }); S.forEach(s => { s.x = j() * .5; s.y = j() * .4; s.a = 0; }); return; }
+          if(!boom){ boom = true; B.forEach((b, i) => { b.x = b.y = b.a = 0; b.vx = kick[i].vx; b.vy = kick[i].vy; b.va = kick[i].va; });
+            S.forEach((s, i) => { s.x = s.y = s.a = 0; s.vx = planks[i].vx0; s.va = planks[i].va0; }); }
+          let busy = false;
+          B.forEach((b, i) => { if(b.gone) return; b.vy += G * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.a += b.va * dt;
+            const X = books[i].cx + b.x - box.left, Y = books[i].cy + b.y - box.top;
+            if(X < -80 || X > W + 80 || Y < -80 || Y > H + 80){ b.gone = true; b.o = 0; } else busy = true; });
+          S.forEach((s, i) => { const p = planks[i];
+            if(s.hanging){ const acc = (3 * G / (2 * p.L)) * Math.cos(s.phi * Math.PI / 180) * 180 / Math.PI;
+              s.w += acc * dt; s.w *= Math.pow(.55, dt * k); s.phi += s.w * dt; s.a = p.sign * s.phi;
+              if(t - SHAKE > SWING){ s.hanging = false; const r = s.phi * Math.PI / 180, wr = s.w * Math.PI / 180;
+                s.vx = -Math.sin(r) * wr * p.L / 2 * p.sign; s.vy = Math.cos(r) * wr * p.L / 2; }
+              busy = true; return; }
+            s.vy += G * dt; s.x += s.vx * dt; s.y += s.vy * dt;
+            if(p.swing){ s.phi += s.w * dt; s.a = p.sign * s.phi; } else s.a += s.va * dt;
+            if(p.top0 + s.y - p.L / 2 < box.bottom + 20) busy = true; });
+          if(!busy && over === Infinity) over = t;
+        };
+        const rec = simulate([...B, ...S], tick);
+        if(record){ rec.slice(0, B.length).forEach((r, i) => play(books[i].node, r)); rec.slice(B.length).forEach((r, i) => play(planks[i].node, r, planks[i].origin)); }
+        return over;
+      };
+      // the shake builds, then the bang. With a hanging shelf, the shake takes 1.3 s and the shelf swings for whatever
+      // time is left; with none, the shake itself takes the time the bang doesn't — so it all fills 3 s
+      let SHAKE = 1300;
+      if(swinger !== 'none'){ const after = run(SHAKE); SWING = Math.max(SWING, SWING + (SPAN - 80 - after)); }
+      else SHAKE = Math.max(1300, Math.min(2400, SPAN - 80 - run(0)));
+      run(SHAKE, true);
     }
   })();
+
 </script>
 <canvas id="shelf-3d"></canvas>
 <canvas id="shelf-top"></canvas>
