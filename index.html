@@ -1702,6 +1702,10 @@
   @keyframes spPlankR{ from{transform:translateX(calc(100vw + 260px));} to{transform:none;} }
   /* no tagline: taken out of the layout, so the shelves sit centred */
   #splash .sp-sub, #splash .sk-tag{display:none !important;}
+  /* every moving piece keeps its own layer for the whole splash (none made or dropped mid-animation, which stalls) */
+  #splash, #splash .sp-spine, #splash .sp-spine.landed, #splash .sp-plank, #splash .sp-shelf{will-change:transform, opacity !important;}
+  /* the app is built behind the splash but not drawn until just before the fade, so drawing it never competes */
+  body.splashing > :not(#splash){visibility:hidden !important;}
 
   /* ===== rereads: log reads, Compare Past Reads, Reset | Reread ===== */
   /* summary card: (with rereads) Read x of x · the read's dates · how far and days logged; with rereads ◀ ▶ step through the reads, like the Timeline */
@@ -2129,6 +2133,8 @@
     // the fade to the app, and the splash taken away: ready-made too, so they happen on time even while the app is busy
     // building behind it. Every splash is clear of the screen before the fade starts
     function fadeOut(list){
+      document.body.classList.add('splashing');
+      later(() => document.body.classList.remove('splashing'), 4350);   // shown again just before the fade, already drawn
       list.push(el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, delay: 4600, easing: 'ease', fill: 'forwards' }));
       later(() => { el.style.pointerEvents = 'none'; }, 4600);
       later(() => { list.forEach(a => { try{ a.cancel(); }catch(e){} }); el.remove(); if(window.__runApp) window.__runApp(); }, 5000);
@@ -2147,7 +2153,7 @@
       const shelvesOut = at => planks.forEach((p, i) => A(p, [{ transform: 'none' }, { transform: `translateX(${i ? VW : -VW}px)` }], { duration: 420, delay: at + (i ? 0 : 60), easing: 'cubic-bezier(.55,0,.8,.3)', fill: 'forwards' }));
       const subAt = (inAt, outAt) => { later(() => sub.classList.add('in'), inAt); if(outAt != null) later(() => sub.classList.remove('in'), outAt); };
       requestAnimationFrame(() => { try{ custom({ A, sub, shelves, planks, rows, all, VW, VH, shelvesIn, shelvesOut, subAt }); }catch(e){ console.error(e); } fadeOut(anims); startApp(); });
-      setTimeout(() => { if(el.isConnected){ el.remove(); if(window.__runApp) window.__runApp(); } }, 9000);   // never stuck
+      setTimeout(() => { document.body.classList.remove('splashing'); if(el.isConnected){ el.remove(); if(window.__runApp) window.__runApp(); } }, 9000);   // never stuck
       return;
     }
 
@@ -2203,9 +2209,8 @@
     // Sketch — drawn like a pencil sketch: the shelves are lined in first, then each book's outline, then quick
     // hatching, then its colour washes in over the lines. At the end the colour fades back to the sketch and the
     // pencil lines are rubbed out
-    function spSketch({ A, all, planks, sub, subAt }){
-      const svg = svgLayer(), jit = () => (Math.random() - .5) * 1.6;
-      // a hand-drawn box: four slightly wobbly strokes, each a little past the corner, drawn as one line
+    function spSketch({ A, all, planks, sub }){
+      const jit = () => (Math.random() - .5) * 1.6;
       // a hand-drawn box: slightly wobbly strokes, each a little past the corner. A book's has no bottom line and stops
       // at the shelf's top, so it stands on the shelf instead of crossing it
       const box = (r, open) => { const x0 = r.x, y0 = r.y, x1 = r.x + r.w, y1 = r.y + r.h, o = 3;
@@ -2216,52 +2221,49 @@
         d += `M${(r.x + xa).toFixed(1)},${(r.y + r.h - ya).toFixed(1)} L${(r.x + xb).toFixed(1)},${(r.y + r.h - yb).toFixed(1)} `; } return d; };
       const pieces = [...planks.map(p => [p, 'plank']), ...all.map(b => [b, 'book'])];
       const plankTop = planks.map(p => rel(p).y);
-      // the pencil lines are the borders here: each piece's own black border takes its fill colour instead, so the colour
-      // washes in right up to the sketched line
+      // the pencil lines are the borders here: each piece's own black border takes its fill colour instead
       pieces.forEach(([n]) => { n.style.borderColor = getComputedStyle(n).backgroundColor; });
-      const drawn = pieces.map(([n, kind], i) => {
-        const isP = kind === 'plank', r = rel(n);
+      // pencil work, drawn by a sliding mask: a clipping box slides over it while its contents slide back the other way,
+      // so the lines stay still and appear stroke by stroke as the edge passes — transforms only, so it never stutters
+      const PAD = 6;
+      const pencil = (r, d, w, op) => {
+        const W = r.w + PAD * 2, H = r.h + PAD * 2, o = document.createElement('div'), i = document.createElement('div');
+        o.style.cssText = `position:absolute; left:${(r.x - PAD).toFixed(1)}px; top:${(r.y - PAD).toFixed(1)}px; width:${W.toFixed(1)}px; height:${H.toFixed(1)}px; overflow:hidden; pointer-events:none; will-change:transform, opacity; opacity:${op};`;
+        i.style.cssText = 'position:absolute; inset:0; will-change:transform;';
+        i.innerHTML = `<svg width="${W.toFixed(1)}" height="${H.toFixed(1)}" viewBox="${(r.x - PAD).toFixed(1)} ${(r.y - PAD).toFixed(1)} ${W.toFixed(1)} ${H.toFixed(1)}" style="display:block; overflow:visible">` +
+          `<path d="${d}" fill="none" stroke="#000" stroke-width="${w}" stroke-linecap="round"/></svg>`;
+        o.appendChild(i); el.appendChild(o); return { o, i };
+      };
+      const draw = (p, ax, at, dur, ease) => { const T = ax === 'x' ? 'translateX' : 'translateY';
+        A(p.o, [{ transform: `${T}(-100%)` }, { transform: 'none' }], { duration: dur, delay: at, easing: ease, fill: 'both' });
+        A(p.i, [{ transform: `${T}(100%)` }, { transform: 'none' }], { duration: dur, delay: at, easing: ease, fill: 'both' }); };
+      const rubOut = (p, ax, at, dur) => { const T = ax === 'x' ? 'translateX' : 'translateY';
+        A(p.o, [{ transform: 'none', opacity: 1 }, { transform: `${T}(100%)`, opacity: .3 }], { duration: dur, delay: at, easing: 'ease-in', fill: 'forwards' });
+        A(p.i, [{ transform: 'none' }, { transform: `${T}(-100%)` }], { duration: dur, delay: at, easing: 'ease-in', fill: 'forwards' }); };
+      pieces.forEach(([n, kind], idx) => {
+        const isP = kind === 'plank', r = rel(n), j = isP ? idx : idx - 2;
         if(!isP){ const pt = plankTop[all.indexOf(n) < 5 ? 0 : 1]; r.h = pt - r.y; }   // down to the shelf's top
-        const line = mkPath(svg, box(r, !isP), { fill: 'none', stroke: '#000', 'stroke-width': 2, 'stroke-linecap': 'round', opacity: 1 });
-        const len = line.getTotalLength();
-        line.style.strokeDasharray = len; line.style.strokeDashoffset = len;
-        const h = isP ? null : mkPath(svg, hatch(r), { fill: 'none', stroke: '#000', 'stroke-width': 1, 'stroke-linecap': 'round', opacity: 0 });
-        let hl = 0; if(h){ hl = h.getTotalLength(); h.style.strokeDasharray = hl; h.style.strokeDashoffset = hl; }
-        return { n, line, len, h, hl, isP, j: isP ? i : i - 2 };
+        const line = pencil(r, box(r, !isP), 2, 1), ax = isP ? 'x' : 'y';
+        const at = isP ? 60 + j * 260 : 520 + j * 75, dur = isP ? 360 : 300;
+        draw(line, ax, at, dur, 'cubic-bezier(.4,0,.3,1)');
+        if(!isP){ const h = pencil(r, hatch(r), 1, .45); draw(h, 'x', at + 260, 260, 'linear');
+          A(h.o, [{ opacity: .45 }, { opacity: 0 }], { duration: 300, delay: 1450 + j * 60 + 80, fill: 'forwards' }); }
+        // the colour washes in over the sketch; at the end it fades back to the sketch, then the lines are rubbed out
+        const wash = isP ? 1350 + j * 120 : 1450 + j * 60;
+        A(n, [{ opacity: 0 }, { opacity: 1 }], { duration: 320, delay: wash, easing: 'ease-out', fill: 'both' });
+        const drain = 2850 + (isP ? 11 * 45 + j * 60 : (11 - j) * 45);
+        A(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: drain, easing: 'ease-in', fill: 'forwards' });
+        rubOut(line, ax, 3450 + (isP ? 12 * 40 + j * 80 : (11 - j) * 40), 280);
       });
-      drawn.forEach(d => {
-        const at = d.isP ? 60 + d.j * 260 : 520 + d.j * 75, dur = d.isP ? 360 : 300;
-        A(d.line, [{ strokeDashoffset: d.len, opacity: 0 }, { opacity: 1, offset: .03 }, { strokeDashoffset: 0, opacity: 1 }],   // (hidden until drawn: no dots from the pen's round tip)
-          { duration: dur, delay: at, easing: 'cubic-bezier(.4,0,.3,1)', fill: 'both' });
-        if(d.h){ A(d.h, [{ strokeDashoffset: d.hl, opacity: 0 }, { opacity: .45, offset: .03 }, { strokeDashoffset: 0, opacity: .45 }], { duration: 260, delay: at + 260, easing: 'linear', fill: 'both' }); }
-        // the colour washes in over the sketch
-        const wash = d.isP ? 1350 + d.j * 120 : 1450 + d.j * 60;
-        A(d.n, [{ opacity: 0 }, { opacity: 1 }], { duration: 320, delay: wash, easing: 'ease-out', fill: 'both' });
-        if(d.h) A(d.h, [{ opacity: .45 }, { opacity: 0 }], { duration: 300, delay: wash + 80, fill: 'forwards' });
-        // the end: colour fades back to the sketch, then the lines are rubbed out, last drawn first
-        const drain = 2850 + (d.isP ? 11 * 45 + d.j * 60 : (11 - d.j) * 45);
-        A(d.n, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: drain, easing: 'ease-in', fill: 'forwards' });
-        const rub = 3450 + (d.isP ? 12 * 40 + d.j * 80 : (11 - d.j) * 40);
-        A(d.line, [{ strokeDashoffset: 0, opacity: 1 }, { strokeDashoffset: -d.len, opacity: .3 }], { duration: 280, delay: rub, easing: 'ease-in', fill: 'forwards' });
-      });
-      // the tagline, sketched too: its letters outlined in pencil (twice, a hair apart, like a quick hand), then shaded
-      // in; at the end the shading lifts and the outlines are rubbed out
-      const tr = rel(sub), cs = getComputedStyle(sub);
-      const word = sub.textContent.toUpperCase();
-      sub.style.visibility = 'hidden';
-      const mk = (dx, dy, stroke, fill, w) => { const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        t.setAttribute('x', (tr.x + tr.w / 2 + dx).toFixed(1)); t.setAttribute('y', (tr.y + tr.h * .78 + dy).toFixed(1)); t.setAttribute('text-anchor', 'middle');
-        t.setAttribute('style', `font:600 ${cs.fontSize} Arial, sans-serif; letter-spacing:${cs.letterSpacing};`);
-        t.setAttribute('fill', fill); t.setAttribute('stroke', stroke); t.setAttribute('stroke-width', w); t.setAttribute('stroke-linejoin', 'round');
-        t.textContent = word; t.classList.add('sk-tag'); svg.appendChild(t); return t; };
-      const tagFill = mk(0, 0, 'none', '#8a8378', 0);
-      const lines = [mk(0, 0, '#000', 'none', .7), mk(.5, -.35, '#000', 'none', .5)];
-      tagFill.style.opacity = 0;
-      lines.forEach((t, i) => { t.style.strokeDasharray = 60; t.style.strokeDashoffset = 60;
-        A(t, [{ strokeDashoffset: 60, opacity: 0 }, { opacity: i ? .55 : 1, offset: .03 }, { strokeDashoffset: 0, opacity: i ? .55 : 1 }], { duration: 560, delay: 1950 + i * 120, easing: 'cubic-bezier(.4,0,.3,1)', fill: 'both' });
-        A(t, [{ strokeDashoffset: 0, opacity: i ? .55 : 1 }, { strokeDashoffset: -60, opacity: 0 }], { duration: 360, delay: 3300 + i * 60, easing: 'ease-in', fill: 'forwards' }); });
-      A(tagFill, [{ opacity: 0 }, { opacity: 1 }], { duration: 320, delay: 2450, fill: 'both' });
-      A(tagFill, [{ opacity: 1 }, { opacity: 0 }], { duration: 260, delay: 2900, fill: 'forwards' });
+      // the tagline (when it's shown): outlined in pencil, shaded in, then rubbed out
+      if(getComputedStyle(sub).display !== 'none'){
+        const tr = rel(sub); sub.style.opacity = '0';
+        const t = document.createElement('div'); t.textContent = sub.textContent;
+        t.style.cssText = `position:absolute; left:0; right:0; top:${tr.y}px; text-align:center; font:600 .6rem Arial, sans-serif; letter-spacing:1.6px; text-transform:uppercase; color:#8a8378; -webkit-text-stroke:.5px #000; will-change:transform, opacity;`;
+        el.appendChild(t);
+        A(t, [{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0 0 0 0)' }], { duration: 560, delay: 1950, fill: 'both' });
+        A(t, [{ opacity: 1 }, { opacity: 0 }], { duration: 360, delay: 3300, fill: 'forwards' });
+      }
     }
 
     // Garden — seeds drop onto the shelves, a watering can comes along each shelf watering them, and each seed
@@ -2269,7 +2271,7 @@
     // fly out
     function spGarden({ A, rows, all, planks, shelvesIn, shelvesOut, subAt, VW, VH }){
       shelvesIn(0);
-      const svg = svgLayer();
+      const layer = (html, css) => { const d = document.createElement('div'); d.style.cssText = 'position:absolute; left:0; top:0; width:0; height:0; pointer-events:none; will-change:transform, opacity; transform-origin:0 0;' + (css || ''); d.innerHTML = html; el.appendChild(d); return d; };
       all.forEach(b => { b.style.transformOrigin = '50% 100%'; b.innerHTML = `<span class="lt" style="display:inline-block">${b.textContent}</span>`; });
       // seeds, one under each book's place
       const spots = all.map(b => { const r = rel(b); return { x: r.x + r.w / 2, y: r.y + r.h }; });
@@ -2280,13 +2282,11 @@
           { duration: 360, delay: 420 + i * 45, easing: 'cubic-bezier(.5,0,.8,.5)', fill: 'backwards' });
         return s; });
       // the watering can: drawn in the app's style, thick black lines
-      const NS = 'http://www.w3.org/2000/svg', can = document.createElementNS(NS, 'g');
-      can.innerHTML = '<path d="M14,-34 Q26,-52 38,-34" fill="none" stroke="#000" stroke-width="3"/>' +
+      const can = layer('<svg width="70" height="62" viewBox="-20 -56 70 62" style="position:absolute; left:-20px; top:-56px; overflow:visible">' + '<path d="M14,-34 Q26,-52 38,-34" fill="none" stroke="#000" stroke-width="3"/>' +
         '<path d="M8,-30 L44,-30 L41,0 L11,0 Z" fill="#2b5752" stroke="#000" stroke-width="3" stroke-linejoin="round"/>' +
         '<path d="M10,-12 L-14,-28 L-12,-32 L12,-20" fill="#2b5752" stroke="#000" stroke-width="3" stroke-linejoin="round"/>' +
         '<path d="M-17,-34 L-9,-26" stroke="#000" stroke-width="4" stroke-linecap="round"/>' +
-        '<path d="M12,-22 L40,-22" stroke="rgba(255,255,255,.35)" stroke-width="2"/>';
-      svg.appendChild(can);
+        '<path d="M12,-22 L40,-22" stroke="rgba(255,255,255,.35)" stroke-width="2"/></svg>');
       const shelfY = rows.map(r => rel(r[0]).y + rel(r[0]).h - 52),   // the can's base, a little above the seeds
        xs = rows.map(r => [rel(r[0]).x - 10, rel(r[r.length - 1]).x + 40]);
       const R = rel(el.querySelector('.sp-shelf')), W = el.clientWidth;
@@ -2304,8 +2304,8 @@
         const x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f, ang = (a.a + (b.a - a.a) * f) * Math.PI / 180;
         const tx = -16, ty = -31; return { x: x + tx * Math.cos(ang) - ty * Math.sin(ang), y: y + tx * Math.sin(ang) + ty * Math.cos(ang) }; };
       [[990, 1400, 0], [1710, 2100, 1]].forEach(([a, b, si]) => { for(let t = a; t < b; t += 32){
-        const p = tipAt(t), land = rel(rows[si][0]).y + rel(rows[si][0]).h - 2, d = document.createElementNS(NS, 'ellipse');
-        d.setAttribute('cx', 0); d.setAttribute('cy', 0); d.setAttribute('rx', 2.2); d.setAttribute('ry', 3.4); d.setAttribute('fill', '#4f8fc0'); d.setAttribute('opacity', '0'); svg.appendChild(d);   // hidden until it falls
+        const p = tipAt(t), land = rel(rows[si][0]).y + rel(rows[si][0]).h - 2;
+        const d = layer('<i style="position:absolute; left:-2.2px; top:-3.4px; width:4.4px; height:6.8px; border-radius:50%; background:#4f8fc0; display:block"></i>', 'opacity:0;');   // hidden until it falls
         const jx = (Math.random() - .5) * 6;
         A(d, [{ transform: `translate(${p.x}px, ${p.y}px)`, opacity: 1 }, { transform: `translate(${p.x - 8 + jx}px, ${land}px)`, opacity: .9, offset: .92 }, { transform: `translate(${p.x - 8 + jx}px, ${land}px)`, opacity: 0 }],
           { duration: 300, delay: t, easing: 'cubic-bezier(.5,0,1,1)', fill: 'forwards' }); } });
@@ -2318,10 +2318,8 @@
         // the sapling: the book itself as a thin stem in its own colour, two leaves (the book's colour too) at its tip.
         // The stem grows, then widens and fills out into the book while the leaves fold away into its top
         const col = getComputedStyle(b).backgroundColor, h = b.offsetHeight;
-        const leaves = document.createElementNS(NS, 'g');
-        leaves.innerHTML = `<path d="M0,0 Q-10,-7 -12,2 Q-4,4 0,0 Z" fill="${col}" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/>` +
-          `<path d="M0,-2 Q10,-10 12,-1 Q4,2 0,-2 Z" fill="${col}" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/>`;
-        svg.appendChild(leaves);
+        const leaves = layer(`<svg width="28" height="16" viewBox="-14 -12 28 16" style="position:absolute; left:-14px; top:-12px; overflow:visible"><path d="M0,0 Q-10,-7 -12,2 Q-4,4 0,0 Z" fill="${col}" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/>` +
+          `<path d="M0,-2 Q10,-10 12,-1 Q4,2 0,-2 Z" fill="${col}" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg>`);
         // three stages, each resting a moment: the seed; a small sapling (a short stem and its two leaves); then it grows
         // taller and fills out into the book. Its letter only shows once it's fully grown
         const K = [ { t: 0, sx: .14, sy: 0, ls: 0 }, { t: 170, sx: .14, sy: .26, ls: 1 }, { t: 340, sx: .14, sy: .26, ls: 1 },
@@ -2344,13 +2342,17 @@
           `<path d='M${4 + Math.random() * 8},0 L${10 + Math.random() * 6},40 L${6 + Math.random() * 10},100' fill='none' stroke='rgba(0,0,0,.3)' stroke-width='1'/></svg>`;
         wr.style.cssText = `position:absolute; inset:0; pointer-events:none; opacity:0; background:url("data:image/svg+xml,${encodeURIComponent(svgW)}") 0 0 / 100% 100% no-repeat;`;
         b.appendChild(wr);
+        const tint = document.createElement('i');   // the dulling and browning, as a layer fading in over it (no filters)
+        tint.style.cssText = 'position:absolute; inset:0; pointer-events:none; opacity:0; background:#3b2a16; will-change:opacity;';
+        b.insertBefore(tint, wr);
         const grown = w + DUR + 90 + 200, lean = (Math.random() < .5 ? -1 : 1) * (2 + Math.random() * 3), back = Math.max(3250, grown + 120) + Math.random() * 60;
-        A(b, [{ transform: 'rotate(0deg) scale(1, 1)', filter: 'none', opacity: 1, easing: 'ease-in-out' },
-              { transform: `rotate(${lean}deg) scale(.97, .96)`, filter: 'saturate(.5) brightness(.85) sepia(.2)', opacity: 1, offset: .34, easing: 'ease-in-out' },
-              { transform: `rotate(${lean * 1.2}deg) scale(.74, .86)`, filter: 'saturate(.2) brightness(.66) sepia(.5)', opacity: 1, offset: .62, easing: 'cubic-bezier(.45,0,.75,.6)' },
-              { transform: `rotate(${lean * 1.2}deg) scale(.7, 0)`, filter: 'saturate(.2) brightness(.6) sepia(.5)', opacity: 1, offset: .99 },
-              { transform: `rotate(${lean * 1.2}deg) scale(.7, 0)`, filter: 'saturate(.2) brightness(.6) sepia(.5)', opacity: 0 }],
+        A(b, [{ transform: 'rotate(0deg) scale(1, 1)', opacity: 1, easing: 'ease-in-out' },
+              { transform: `rotate(${lean}deg) scale(.97, .96)`, opacity: 1, offset: .34, easing: 'ease-in-out' },
+              { transform: `rotate(${lean * 1.2}deg) scale(.74, .86)`, opacity: 1, offset: .62, easing: 'cubic-bezier(.45,0,.75,.6)' },
+              { transform: `rotate(${lean * 1.2}deg) scale(.7, 0)`, opacity: 1, offset: .99 },
+              { transform: `rotate(${lean * 1.2}deg) scale(.7, 0)`, opacity: 0 }],
           { duration: 660, delay: back, fill: 'forwards' });
+        A(tint, [{ opacity: 0 }, { opacity: .38, offset: .5 }, { opacity: .6 }], { duration: 420, delay: back, fill: 'forwards' });
         A(wr, [{ opacity: 0 }, { opacity: .9, offset: .45 }, { opacity: 1 }], { duration: 420, delay: back + 30, fill: 'forwards' });
         A(letter, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: back + 140, fill: 'forwards' });
       });
@@ -2414,10 +2416,10 @@
       later(() => { el.classList.add('ending'); el.querySelector('.sp-sub').classList.remove('in'); }, START);
       fadeOut(anims);
     });
-    setTimeout(() => { if(el.isConnected){ el.remove(); if(window.__runApp) window.__runApp(); } }, 9000);   // never stuck
+    setTimeout(() => { document.body.classList.remove('splashing'); if(el.isConnected){ el.remove(); if(window.__runApp) window.__runApp(); } }, 9000);   // never stuck
 
     // ---- helpers: a recorded path becomes one animation over the whole ending ----
-    const FPS = 60, STEP = 1 / 240;                        // simulated finely, kept 60 times a second
+    const FPS = 30, STEP = 1 / 120;                        // simulated finely enough, kept 30 times a second (the browser joins them smoothly)
     const xf = f => `translate(${f.x.toFixed(1)}px, ${f.y.toFixed(1)}px) rotate(${f.a.toFixed(2)}deg)`;
     function play(node, frames, origin){
       if(origin) node.style.transformOrigin = origin;   // (the shelves only slide on the way in, so this can be set now)
