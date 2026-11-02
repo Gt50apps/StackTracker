@@ -2091,7 +2091,7 @@
     const el = document.getElementById('splash');
     // work the app would rather do after the splash (it waits here, then runs the moment the splash is removed)
     const afterQ = []; window.__afterSplash = f => { if(!document.getElementById('splash')) f(); else afterQ.push(f); };
-    const flushAfter = () => { afterQ.splice(0).forEach(f => { try{ f(); }catch(e){ console.error(e); } }); };
+    const flushAfter = () => setTimeout(() => afterQ.splice(0).forEach(f => { try{ f(); }catch(e){ console.error(e); } }), 1200);
     try{ const dv = JSON.parse(localStorage.getItem('stack-tracker-dev-v1') || '{}');
       if(dv._theme && window.THEME) THEME.set(dv._theme);   // colour theme on before anything paints
       if(dv.splash === true){ el.remove(); if(window.__runApp) window.__runApp(); return; } }catch(e){}
@@ -2137,7 +2137,7 @@
     // building behind it. Every splash is clear of the screen before the fade starts
     function fadeOut(list){
       document.body.classList.add('splashing');
-      later(() => document.body.classList.remove('splashing'), 4350);   // shown again just before the fade, already drawn
+      later(() => document.body.classList.remove('splashing'), 4350);   // (at the latest)
       list.push(el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, delay: 4600, easing: 'ease', fill: 'forwards' }));
       later(() => { el.style.pointerEvents = 'none'; }, 4600);
       later(() => { list.forEach(a => { try{ a.cancel(); }catch(e){} }); el.remove(); if(window.__runApp) window.__runApp(); flushAfter(); }, 5000);
@@ -2146,7 +2146,10 @@
     // flying about — so the brief pause while it starts can't make anything on screen stutter. It's still ready well
     // before the fade
     const APP_AT = { pull: 1000, reverse: 1000, explode: 1000, lift: 1000, shuffle: 1850, type: 1700, sketch: 2000, garden: 2450 };
-    const startApp = () => { if(window.__runApp) setTimeout(() => window.__runApp(), APP_AT[PICK] || 1000); };
+    // once it's built, it's drawn straight away (still hidden under the splash) in that same quiet moment, so nothing
+    // is left to draw when the splash fades
+    const startApp = () => { if(window.__runApp) setTimeout(() => Promise.resolve(window.__runApp()).then(() =>
+      requestAnimationFrame(() => document.body.classList.remove('splashing'))), APP_AT[PICK] || 1000); };
     if(custom){
       el.classList.add('custom');
       el.querySelectorAll('.sp-spine').forEach(b => b.classList.add('landed'));
@@ -7030,14 +7033,17 @@
     syncCase();
     const dt = shelfLastTs ? Math.min(100, ts - shelfLastTs) : 16;
     shelfLastTs = ts;
-    let any = false, settling = false;
+    let any = false, settling = false, built = 0, more = false;
+    const buildUntil = performance.now() + 6;
     shelfEntries.forEach(en=>{
       if(en.held){ any = true; return; }   // off the shelf: openBook moves it
       const el = en.el;
       let show = el.offsetParent !== null && el.style.visibility !== 'hidden';
       let r = null;
       if(show){ r = el.getBoundingClientRect(); show = r.width > 0 && r.bottom > shelfWin.a - 150 && r.top < shelfWin.a + shelfWin.h + 60; }
-      if(!en.group){ if(!show || !ensureShelfEntry(en)) return; }   // build on first sight
+      if(!en.group){ if(!show) return;
+        if(built && performance.now() > buildUntil){ settling = true; more = true; return; }   // the rest next frame
+        if(!ensureShelfEntry(en)) return; built++; }   // build on first sight
       en.group.visible = show;
       if(!show) return;
       any = true;
@@ -7056,6 +7062,7 @@
         en.blank.visible = en.blankOp > 0.001;
       }
     });
+    if(more) return true;   // still building: drawn once they're all ready
     if(anyCaseVisible()) any = true;
     shelfCanvas.style.visibility = any ? 'visible' : 'hidden';
     shelfCam.layers.set(0);
