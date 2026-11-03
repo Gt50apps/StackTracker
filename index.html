@@ -1643,14 +1643,14 @@
   .wl-card .t + .a{margin-top:-3px;}
   .wl-card.two .t{white-space:normal; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; flex:none;}
   .wl-card.two .a{flex:none;}
-  /* found at the library? a ✓ and a ✗ card to the right of each book (the one not picked faint; neither is fine) */
+  /* at the library? a ✓ (found it), ! (waiting on it) and ✗ (not there) card to the right of each book (the ones not picked faint; none is fine) */
   .wl-row{display:flex; gap:4px; align-items:stretch;}
   .wl-row > .wl-card{flex:1 1 auto; min-width:0;}
   .wl-mark, .wl-mark:active{flex:none; width:34px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none; background:var(--panel);
     display:flex; align-items:center; justify-content:center; opacity:.35; transition:opacity .15s, background .15s;}
   .wl-mark svg{width:16px; height:16px; stroke:var(--ink);}
   .wl-mark.on{opacity:1;}
-  .wl-mark.yes.on{background:var(--cb2e6b4a, #2e6b4a);} .wl-mark.no.on{background:var(--cbaa3333, #aa3333);}
+  .wl-mark.yes.on{background:var(--cb2e6b4a, #2e6b4a);} .wl-mark.no.on{background:var(--cbaa3333, #aa3333);} .wl-mark.wait.on{background:var(--cbb07a1e, #b07a1e);}
   .wl-mark.on svg{stroke:var(--cfffffff, #ffffff);}
   #wl-empty{margin:40px 16px; text-align:center; font:700 min(.74rem, 2.95vw)/1.4 Arial, sans-serif; text-transform:uppercase; color:var(--muted);}
   /* the wishlist window: the Add a Book header, then Title and Author (Delete when editing); Add to My Library in its footer */
@@ -12022,14 +12022,14 @@ closeRowDD = function(dd){
     }
     const clean = arr => (Array.isArray(arr) ? arr : []).filter(b => b && typeof b.title === 'string' && b.title.trim())
       .map(b => ({ title: b.title.trim(), author: typeof b.author === 'string' ? b.author.trim() : '', color: wishColor(b.title, b.author), added: Number(b.added) || Date.now(),
-        lib: b.lib === 'yes' || b.lib === 'no' ? b.lib : '' }));
+        lib: ['yes', 'wait', 'no'].includes(b.lib) ? b.lib : '' }));
     list = clean(list);
     const view = document.getElementById('wishlist-view'), q = document.getElementById('wl-q');
     let sortBy = 'added';
     // a title too long for one line takes two
     const fit = c => { const t = c.querySelector('.t'); c.classList.remove('two'); if(t && t.scrollWidth > t.clientWidth + 1) c.classList.add('two'); };
     const MARK = (k, on, label, d) => `<button type="button" class="wl-mark ${k}${on ? ' on' : ''}" data-k="${k}" aria-label="${label}" aria-pressed="${on}">` +
-      `<svg viewBox="0 0 24 24" fill="none" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg></button>`;
+      `<svg viewBox="0 0 24 24" fill="none" stroke-width="${k === 'wait' ? 4 : 3.6}" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg></button>`;
     function render(){
       if(!list.length){ view.innerHTML = '<div id="wl-empty">No wishlist books yet</div>'; return; }
       const s = q.value.trim().toLowerCase();
@@ -12039,7 +12039,7 @@ closeRowDD = function(dd){
       if(!rows.length){ view.innerHTML = '<div id="wl-empty">No matches</div>'; return; }
       view.innerHTML = rows.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>` +
         `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
-        MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>').join('');
+        MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('wait', b.lib === 'wait', 'Waiting on it', 'M12 4v10M12 19.8v.01') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>').join('');
       view.querySelectorAll('.wl-mark').forEach(m => m.addEventListener('click', () => {
         const row = m.parentNode, b = list[+row.dataset.i]; if(!b) return;
         b.lib = b.lib === m.dataset.k ? '' : m.dataset.k; save();
