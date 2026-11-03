@@ -1646,6 +1646,7 @@
   /* at the library? a ✓ (found it), ! (waiting on it) and ✗ (not there) card to the right of each book (the ones not picked faint; none is fine) */
   .wl-row{display:flex; gap:4px; align-items:stretch;}
   .wl-row > .wl-card{flex:1 1 auto; min-width:0;}
+  #wishlist-view > .list-divider{height:24px;}   /* Status: a slim divider over each group */
   .wl-mark, .wl-mark:active{flex:none; width:34px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none; background:var(--panel);
     display:flex; align-items:center; justify-content:center; opacity:.35; transition:opacity .15s, background .15s;}
   .wl-mark svg{width:16px; height:16px; stroke:var(--ink);}
@@ -2590,7 +2591,7 @@
  </div>
  <!-- Wishlist: sort, and search -->
  <div class="hdr-row hidden" id="wishlist-controls">
-  <div class="tl-views" id="wl-sort"><button type="button" data-s="added" class="on">Date Added</button><button type="button" data-s="title">Title</button><button type="button" data-s="author">Author</button></div>
+  <div class="tl-views" id="wl-sort"><button type="button" data-s="added" class="on">Date Added</button><button type="button" data-s="title">Title</button><button type="button" data-s="author">Author</button><button type="button" data-s="status">Status</button></div>
   <div id="wl-search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg><input id="wl-q" type="search" placeholder="Search wishlist" aria-label="Search wishlist" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div>
  </div>
  <!-- Timeline: what to chart, and over what span -->
@@ -12025,7 +12026,8 @@ closeRowDD = function(dd){
         lib: ['yes', 'wait', 'no'].includes(b.lib) ? b.lib : '' }));
     list = clean(list);
     const view = document.getElementById('wishlist-view'), q = document.getElementById('wl-q');
-    let sortBy = 'added';
+    let sortBy = 'added', regroupT = 0;
+    const GROUPS = [['', 'To Check'], ['yes', 'Found'], ['wait', 'Waiting'], ['no', 'Not There']];
     // a title too long for one line takes two
     const fit = c => { const t = c.querySelector('.t'); c.classList.remove('two'); if(t && t.scrollWidth > t.clientWidth + 1) c.classList.add('two'); };
     const MARK = (k, on, label, d) => `<button type="button" class="wl-mark ${k}${on ? ' on' : ''}" data-k="${k}" aria-label="${label}" aria-pressed="${on}">` +
@@ -12037,13 +12039,16 @@ closeRowDD = function(dd){
       const by = k => (p, n) => (p[0][k] || '').localeCompare(n[0][k] || '', undefined, { sensitivity: 'base' });
       if(sortBy === 'title') rows.sort(by('title')); else if(sortBy === 'author') rows.sort(by('author'));
       if(!rows.length){ view.innerHTML = '<div id="wl-empty">No matches</div>'; return; }
-      view.innerHTML = rows.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>` +
+      // Status: each group (in Date Added order) under its own divider; empty groups left out
+      const grouped = sortBy === 'status' ? GROUPS.map(([k, name]) => [name, rows.filter(([b]) => (b.lib || '') === k)]).filter(g => g[1].length) : [[null, rows]];
+      view.innerHTML = grouped.map(([name, rs]) => (name ? `<div class="list-divider"><span class="ld-name">${name}</span></div>` : '') + rs.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>` +
         `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
-        MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('wait', b.lib === 'wait', 'Waiting on it', 'M12 4v10M12 19.8v.01') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>').join('');
+        MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('wait', b.lib === 'wait', 'Waiting on it', 'M12 4v10M12 19.8v.01') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>').join('')).join('');
       view.querySelectorAll('.wl-mark').forEach(m => m.addEventListener('click', () => {
         const row = m.parentNode, b = list[+row.dataset.i]; if(!b) return;
         b.lib = b.lib === m.dataset.k ? '' : m.dataset.k; save();
         row.querySelectorAll('.wl-mark').forEach(x => { const on = x.dataset.k === b.lib; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
+        if(sortBy === 'status'){ clearTimeout(regroupT); regroupT = setTimeout(render, 650); }   // moves to its group once the taps settle
       }));
       view.querySelectorAll('.wl-card').forEach(c => {
         const cv = c.querySelector('canvas'), hex = list[+c.dataset.i].color;
