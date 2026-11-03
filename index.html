@@ -430,7 +430,11 @@
   .fc-half:focus-within{background:var(--bg);}
   /* Title | Subtitle divider: its own line, so it can be drawn up into the top border as the card moves up (--dv 1 = full, 0 = gone) */
   #author-card{position:relative;}
-  #title-card::before, #author-card::before{content:''; position:absolute; left:50%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); transform-origin:50% 0; transform:scaleY(var(--dv, 1)); pointer-events:none;}
+  #title-card::before, #author-card::before, #author-card::after{content:''; position:absolute; left:50%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); transform-origin:50% 0; transform:scaleY(var(--dv, 1)); pointer-events:none;}
+  /* Author: First Name | Last Name | Author List, in thirds */
+  #author-card{grid-template-columns:repeat(3, minmax(0, 1fr));}
+  #author-card::before{left:33.333%;} #author-card::after{left:66.667%;}
+  #author-card.invalid .fc-half input::placeholder{color:var(--cfaa3333, #aa3333);}   /* either name will do */
   .field-card.split.invalid .fc-half + .fc-half input::placeholder{color:var(--muted);}   /* only the first half (Title) is the required one */
   .fc-more{
     grid-column:auto; flex:1 1 0; min-width:0; width:auto; margin:0; padding:0 2px; box-shadow:none;
@@ -1672,6 +1676,8 @@
   .wl-fields{display:flex; flex-direction:column; gap:4px; padding:0 4px;}
   .wl-fields .field-card{height:45px; flex:none;}
   .wl-fields .field-card input{height:auto; font-size:.95rem;}
+  .wl-names{position:relative;}
+  .wl-names::before{content:''; position:absolute; left:50%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); pointer-events:none;}
   #wl-del, #wl-del:active{height:45px; margin:0; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--panel); color:var(--cfaa3333, #aa3333); box-shadow:none;
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   #wl-del.armed{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff);}
@@ -2611,7 +2617,7 @@
   <div class="wl-prev-band"><div class="wl-card" id="wl-prev"><canvas aria-hidden="true"></canvas><span class="t"></span><span class="a"></span></div></div>
   <div class="wl-fields">
     <div class="field-card"><input id="wl-t" type="text" placeholder="Title" autocomplete="off" aria-label="Title"></div>
-    <div class="field-card"><input id="wl-a" type="text" placeholder="Author" autocomplete="off" aria-label="Author"></div>
+    <div class="field-card split wl-names"><div class="fc-half"><input id="wl-af" type="text" placeholder="First Name" autocomplete="off" aria-label="Author first name"></div><div class="fc-half"><input id="wl-a" type="text" placeholder="Last Name" autocomplete="off" aria-label="Author last name"></div></div>
     <button type="button" id="wl-del" hidden>Delete</button>
   </div>
   <div id="wl-foot" hidden><button type="button" id="wl-real"><canvas aria-hidden="true"></canvas><span>Add to My Library</span></button></div>
@@ -2658,7 +2664,8 @@
       <div class="fc-half"><input id="subtitle-input" autocomplete="off" placeholder="SUBTITLE (OPTIONAL)" aria-label="Subtitle (optional)"></div>
     </div>
     <div class="field-card split" id="author-card">
-      <div class="fc-half"><input id="author-input" autocomplete="off" placeholder="AUTHOR" aria-label="Author"></div>
+      <div class="fc-half"><input id="author-first" autocomplete="off" placeholder="FIRST NAME" aria-label="Author first name"></div>
+      <div class="fc-half"><input id="author-input" autocomplete="off" placeholder="LAST NAME" aria-label="Author last name"></div>
       <button type="button" class="fc-more" id="author-more" aria-label="Open author list">Author List</button>
     </div>
     <div class="field-card span1" id="pages-card"><input id="pages-input" type="number" inputmode="numeric" min="1" placeholder="PAGES" aria-label="Number of pages"></div>
@@ -2952,7 +2959,12 @@
   const tooltip = document.getElementById('tooltip');
   const titleInput = document.getElementById('title-input');
   const subtitleInput = document.getElementById('subtitle-input');
-  const authorInput = document.getElementById('author-input');
+  const authorInput = document.getElementById('author-input');         // the last name
+  const authorFirstInput = document.getElementById('author-first');
+  // the author as written on the book, "First Last"; old books keep their whole name in Last until it's fixed
+  const authorTyped = ()=> [authorFirstInput.value.trim(), authorInput.value.trim()].filter(Boolean).join(' ');
+  const setAuthorFields = b=>{ const has = b && typeof b.authorLast === 'string';
+    authorFirstInput.value = has ? (b.authorFirst || '') : ''; authorInput.value = has ? b.authorLast : ((b && b.author) || ''); };
   const pagesInput = document.getElementById('pages-input');
   // audiobook length: accepts 10:24:05, 10:24, or plain digits read right to left as
   // seconds, minutes, hours (102405 → 10:24:05, 4500 → 45:00)
@@ -3534,6 +3546,19 @@
     while(parts.length > 1 && PARTICLES.includes(parts[parts.length-1].toLowerCase())) last = parts.pop() + ' ' + last;
     return [last.toLowerCase(), parts.join(' ').toLowerCase()];
   }
+  // a book's author key: its own Last / First when they've been typed in separately, else worked out from the name
+  const authorKeyOf = b => typeof b.authorLast === 'string' && (b.authorLast || b.authorFirst)
+    ? [(b.authorLast || b.authorFirst).trim().toLowerCase(), b.authorLast ? (b.authorFirst || '').trim().toLowerCase() : ''] : authorKey(b.author);
+  // a book's author as "Last, First": its split names where typed, else the same split the sort works out
+  function authorLastFirst(b){
+    if(typeof b.authorLast === 'string' && (b.authorLast || b.authorFirst)){
+      const l = b.authorLast.trim(), f = (b.authorFirst || '').trim(); return l && f ? `${l}, ${f}` : l || f; }
+    const a = (b.author || '').trim();
+    if(!a || a.includes(',')) return a;
+    const k = authorKey(a), n = k[0].length;   // same split, original casing
+    const last = a.slice(a.length - n), first = a.slice(0, a.length - n).trim();
+    return first ? `${last}, ${first}` : last;
+  }
   const cmp = (a, b) => a < b ? -1 : a > b ? 1 : 0;
   const pct = b => b.pages ? Math.min(1, bookRead(b) / b.pages) : 0;
   const STATUS_NAMES = ['In progress', 'Unread', 'Read'];
@@ -3545,13 +3570,9 @@
     { id:'title',    name:'Title',          desc:'A–Z, ignoring “The”, “A” and “An”',
       fn: (a,b)=> cmp(titleKey(a.title), titleKey(b.title)) },
     { id:'author',   name:'Author',         desc:'Library order: last name, first name, then title',
-      fn: (a,b)=>{ const x = authorKey(a.author), y = authorKey(b.author);
+      fn: (a,b)=>{ const x = authorKeyOf(a), y = authorKeyOf(b);
                    return cmp(x[0], y[0]) || cmp(x[1], y[1]) || cmp(titleKey(a.title), titleKey(b.title)); },
-      group: b => { const a = (b.author || '').trim(); if(!a) return 'Unknown author';
-                    if(a.includes(',')) return a;
-                    const k = authorKey(a), n = k[0].length;   // same split, original casing
-                    const last = a.slice(a.length - n), first = a.slice(0, a.length - n).trim();
-                    return first ? `${last}, ${first}` : last; } },
+      group: b => (b.author || '').trim() || (b.authorLast || b.authorFirst) ? authorLastFirst(b) : 'Unknown author' },
     { id:'status',   name:'Status',         desc:'In progress, then unread, then read',
       fn: (a,b)=> cmp(statusRank(a), statusRank(b)) || cmp(titleKey(a.title), titleKey(b.title)),
       group: b => STATUS_NAMES[statusRank(b)] },
@@ -7962,7 +7983,7 @@
   const customizePageTitle = document.getElementById('customize-page-title');
   // Author / Title / Subtitle: once the keyboard is up, ask the browser to bring the Pages card into view —
   // the same move it makes on its own when you tap Pages, so every field leaves the cards in the same place
-  ['author-input', 'title-input', 'subtitle-input'].forEach(id=>{
+  ['author-first', 'author-input', 'title-input', 'subtitle-input'].forEach(id=>{
     const inp = document.getElementById(id);
     inp.addEventListener('focus', ()=>{
       const show = ()=> { if(document.activeElement === inp) document.getElementById('pages-card').scrollIntoView({block: 'nearest', inline: 'nearest'}); };
@@ -8443,7 +8464,7 @@
     if(customizeMode !== 'customize'){
       previewBook.title = titleInput.value.trim() || 'Title';
       previewBook.subtitle = subtitleInput.value.trim();
-      previewBook.author = authorInput.value.trim() || 'Author';
+      previewBook.author = authorTyped() || 'Author';
       if(customizeFormat === 'audio'){
         const secs = lengthToSecs(pagesInput.value) || 36000;
         previewBook.audioSeconds = secs;
@@ -8562,7 +8583,7 @@
     if(customizeMode !== 'customize'){
       titleInput.value = book.title || '';
       subtitleInput.value = book.subtitle || '';
-      authorInput.value = book.author || '';
+      setAuthorFields(book);
       pagesInput.dataset.mode = 'pages'; pagesInput.type = 'number'; pagesInput.readOnly = false;
       showLengthWheels(false);
       pagesInput.placeholder = 'PAGES';
@@ -8679,7 +8700,7 @@
     } else {
       const title = titleInput.value.trim();
       const subtitle = subtitleInput.value.trim();
-      const author = authorInput.value.trim();
+      const author = authorTyped(), authorFirst = authorFirstInput.value.trim(), authorLast = authorInput.value.trim();
       const audio = customizeFormat === 'audio';
       const secs = audio ? lengthToSecs(pagesInput.value) : 0;
       // an audiobook's progress counts minutes of listening, so its "pages" are its minutes
@@ -8689,7 +8710,7 @@
       const rel = yearRead(); yearCard.classList.toggle('invalid', rel === false);
       if(bad.some(Boolean) || rel === false) return;
       if(customizeMode === 'add'){
-        const nb = { title, author, pages, tags: customizeTags.slice() };
+        const nb = { title, author, authorFirst, authorLast, pages, tags: customizeTags.slice() };
         if(subtitle) nb.subtitle = subtitle;
         if(audio) nb.audioSeconds = secs;
         if(rel != null) nb.released = rel;
@@ -8698,7 +8719,7 @@
         if(window.__wishAdded) window.__wishAdded();
       } else {
         const b = customizingBook;
-        b.title = title; b.author = author; b.pages = pages;
+        b.title = title; b.author = author; b.authorFirst = authorFirst; b.authorLast = authorLast; b.pages = pages;
         if(subtitle) b.subtitle = subtitle; else delete b.subtitle;
         if(audio) b.audioSeconds = secs; else delete b.audioSeconds;
         if(rel != null) b.released = rel; else delete b.released;
@@ -8729,21 +8750,23 @@
   const authorNewInput = document.getElementById('author-new-input');
   function allAuthors(){
     const seen = new Map();
-    books.forEach(b=>{ const a = (b.author || '').trim(); if(a && !seen.has(a.toLowerCase())) seen.set(a.toLowerCase(), a); });
+    books.forEach(b=>{ const a = (b.author || '').trim(); if(a && !seen.has(a.toLowerCase())) seen.set(a.toLowerCase(), b); });
     return [...seen.values()].sort((x, y)=>{
-      const kx = authorKey(x), ky = authorKey(y);   // library order, same as the Author sort
+      const kx = authorKeyOf(x), ky = authorKeyOf(y);   // library order, same as the Author sort
       return cmp(kx[0], ky[0]) || cmp(kx[1], ky[1]);
-    });
+    }).map(b => b.author.trim());
   }
   function pickAuthor(name){
-    authorInput.value = name;
+    // a name picked from the list: its first / last as some book already has them, else all in Last
+    const k = name.toLowerCase(), had = books.find(b => (b.author || '').trim().toLowerCase() === k && typeof b.authorLast === 'string');
+    setAuthorFields(had || { author: name });
     document.getElementById('author-card').classList.remove('invalid');
     authorsPage.classList.remove('open');
     clearTimeout(fieldPreviewTimer);
     rebuildCustomizePreview();
   }
   function renderAuthorOptions(){
-    const cur = authorInput.value.trim().toLowerCase();
+    const cur = authorTyped().toLowerCase();
     const names = allAuthors();
     authorsList.innerHTML = '';
     if(!names.length){
@@ -8755,7 +8778,9 @@
       o.className = 'so-opt' + (n.toLowerCase() === cur ? ' on' : '');
       const count = books.filter(b => (b.author || '').trim().toLowerCase() === n.toLowerCase()).length;
       o.innerHTML = '<b></b><span></span>';
-      o.querySelector('b').textContent = n;
+      // shown "Last, First", the same way it's sorted: by the split names where a book has them, else worked out from the name
+      const sp = books.find(b => (b.author || '').trim().toLowerCase() === n.toLowerCase() && typeof b.authorLast === 'string' && (b.authorLast || b.authorFirst));
+      o.querySelector('b').textContent = authorLastFirst(sp || { author: n });
       o.querySelector('span').textContent = plural(count, 'book');
       o.addEventListener('click', ()=> pickAuthor(n));
       authorsList.appendChild(o);
@@ -9672,7 +9697,7 @@
 
   // typing updates the 3D preview (title on the cover, thickness from pages)
   let fieldPreviewTimer = null;
-  [titleInput, subtitleInput, authorInput, pagesInput].forEach(inp=>{
+  [titleInput, subtitleInput, authorFirstInput, authorInput, pagesInput].forEach(inp=>{
     inp.addEventListener('input', ()=>{
       inp.closest('.field-card').classList.remove('invalid');
       clearTimeout(fieldPreviewTimer);
@@ -12023,6 +12048,7 @@ closeRowDD = function(dd){
     }
     const clean = arr => (Array.isArray(arr) ? arr : []).filter(b => b && typeof b.title === 'string' && b.title.trim())
       .map(b => ({ title: b.title.trim(), author: typeof b.author === 'string' ? b.author.trim() : '', color: wishColor(b.title, b.author), added: Number(b.added) || Date.now(),
+        ...(typeof b.authorLast === 'string' ? { authorFirst: String(b.authorFirst || '').trim(), authorLast: b.authorLast.trim() } : {}),
         lib: ['yes', 'wait', 'no'].includes(b.lib) ? b.lib : '' }));
     list = clean(list);
     const view = document.getElementById('wishlist-view'), q = document.getElementById('wl-q');
@@ -12037,7 +12063,10 @@ closeRowDD = function(dd){
       const s = q.value.trim().toLowerCase();
       const rows = list.map((b, i) => [b, i]).filter(([b]) => !s || (b.title + ' ' + b.author).toLowerCase().includes(s));
       const by = k => (p, n) => (p[0][k] || '').localeCompare(n[0][k] || '', undefined, { sensitivity: 'base' });
-      if(sortBy === 'title') rows.sort(by('title')); else if(sortBy === 'author') rows.sort(by('author'));
+      const lc = (x, y) => x.localeCompare(y, undefined, { sensitivity: 'base' });
+      if(sortBy === 'title') rows.sort(by('title'));
+      else if(sortBy === 'author') rows.sort((p, n) => {   // by last name, then first, as the library sorts
+        const x = authorKeyOf(p[0]), y = authorKeyOf(n[0]); return lc(x[0], y[0]) || lc(x[1], y[1]) || by('title')(p, n); });
       if(!rows.length){ view.innerHTML = '<div id="wl-empty">No matches</div>'; return; }
       // Status: each group (in Date Added order) under its own divider; empty groups left out
       const grouped = sortBy === 'status' ? GROUPS.map(([k, name]) => [name, rows.filter(([b]) => (b.lib || '') === k)]).filter(g => g[1].length) : [[null, rows]];
@@ -12064,7 +12093,8 @@ closeRowDD = function(dd){
     q.addEventListener('keydown', e => { if(e.key === 'Enter') q.blur(); });
 
     // the window
-    const page = document.getElementById('wl-page'), tIn = document.getElementById('wl-t'), aIn = document.getElementById('wl-a');
+    const page = document.getElementById('wl-page'), tIn = document.getElementById('wl-t'), aIn = document.getElementById('wl-a'), afIn = document.getElementById('wl-af');
+    const typedAuthor = () => [afIn.value.trim(), aIn.value.trim()].filter(Boolean).join(' ');   // "First Last" (aIn: the last name)
     const saveBtn = document.getElementById('wl-save'), del = document.getElementById('wl-del'), foot = document.getElementById('wl-foot');
     let editing = -1, delT = 0;
     // the preview card in the second header: the words as typed, the colour they make (redrawn once typing pauses)
@@ -12073,7 +12103,7 @@ closeRowDD = function(dd){
     const pDraw = () => { if(window.CLOTH && pHex) CLOTH.draw(pCv, CLOTH.rgb(shown(pHex)), true, 6); };
     if(window.ResizeObserver) new ResizeObserver(pDraw).observe(pCv);
     function preview(now){
-      const t = tIn.value.trim(), a = aIn.value.trim();
+      const t = tIn.value.trim(), a = typedAuthor();
       pT.textContent = t || 'Title'; pT.classList.toggle('ph', !t);
       pA.textContent = a || 'Author'; pA.classList.toggle('ph', !a);
       fit(prev);
@@ -12083,12 +12113,14 @@ closeRowDD = function(dd){
       clearTimeout(pTimer); if(now) pDraw(); else { const ctx = pCv.getContext('2d'); ctx.clearRect(0, 0, pCv.width, pCv.height); pCv._drawn = null; pTimer = setTimeout(pDraw, 160); }
     }
     const check = () => { saveBtn.disabled = !tIn.value.trim(); preview(); };
-    aIn.addEventListener('input', check);
+    aIn.addEventListener('input', check); afIn.addEventListener('input', check);
     function open(i){
       editing = i; const b = i >= 0 ? list[i] : null;
       document.getElementById('wl-title').textContent = b ? 'Edit Wishlist Book' : 'Add to Wishlist';
       saveBtn.textContent = b ? 'Save' : 'Add';
-      tIn.value = b ? b.title : ''; aIn.value = b ? b.author : '';
+      tIn.value = b ? b.title : '';
+      const split = b && typeof b.authorLast === 'string';   // older entries: the whole name in Last, to fix by hand
+      afIn.value = split ? b.authorFirst || '' : ''; aIn.value = split ? b.authorLast : (b ? b.author : '');
       del.hidden = !b; foot.hidden = !b; del.classList.remove('armed'); del.textContent = 'Delete'; clearTimeout(delT);
       check(); preview(true); page.classList.add('active'); page.setAttribute('aria-hidden', 'false');
       if(b){ const cv = document.querySelector('#wl-real > canvas'); requestAnimationFrame(() => { if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown('#5b6633'))); }); }
@@ -12096,13 +12128,13 @@ closeRowDD = function(dd){
     }
     function close(){ page.classList.remove('active'); page.setAttribute('aria-hidden', 'true'); if(document.activeElement) document.activeElement.blur(); }
     tIn.addEventListener('input', check);
-    [tIn, aIn].forEach(inp => inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); if(inp === tIn) aIn.focus(); else if(!saveBtn.disabled) saveBtn.click(); } }));
+    [tIn, afIn, aIn].forEach(inp => inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); if(inp === tIn) afIn.focus(); else if(inp === afIn) aIn.focus(); else if(!saveBtn.disabled) saveBtn.click(); } }));
     document.getElementById('wl-cancel').addEventListener('click', close);
     saveBtn.addEventListener('click', () => {
-      const title = tIn.value.trim(), author = aIn.value.trim(); if(!title) return;
+      const title = tIn.value.trim(), author = typedAuthor(), authorFirst = afIn.value.trim(), authorLast = aIn.value.trim(); if(!title) return;
       const color = wishColor(title, author);   // its colour, from its words
-      if(editing >= 0) Object.assign(list[editing], { title, author, color });
-      else list.push({ title, author, color, added: Date.now() });
+      if(editing >= 0) Object.assign(list[editing], { title, author, authorFirst, authorLast, color });
+      else list.push({ title, author, authorFirst, authorLast, color, added: Date.now() });
       save(); render(); close();
       if(editing < 0) requestAnimationFrame(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }));
     });
@@ -12117,7 +12149,7 @@ closeRowDD = function(dd){
     document.getElementById('wl-real').addEventListener('click', () => {
       const b = list[editing]; if(!b) return;
       pending = b; close();
-      openCustomizeModal({ title: b.title, author: b.author, pages: 0, cover: 'hard', _wishColor: closestColorIdx(COVER_COLOR_PRESETS, shown(b.color)) }, 'add');   // the nearest cover colour
+      openCustomizeModal({ title: b.title, author: b.author, ...(typeof b.authorLast === 'string' ? { authorFirst: b.authorFirst, authorLast: b.authorLast } : {}), pages: 0, cover: 'hard', _wishColor: closestColorIdx(COVER_COLOR_PRESETS, shown(b.color)) }, 'add');   // the nearest cover colour
     });
     window.__wishAdded = () => { if(!pending) return; const i = list.indexOf(pending); if(i >= 0){ list.splice(i, 1); save(); render(); } pending = null; };
     window.__wishClosed = () => { pending = null; };
