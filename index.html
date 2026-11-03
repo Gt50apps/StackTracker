@@ -1630,13 +1630,28 @@
   #wl-q::-webkit-search-cancel-button{display:none;}
   #wishlist-view{padding:0; margin-top:-12px;}   /* the page's 16px under the header, less 12: the top card sits 4px below it */
   #wishlist-view.active{display:flex; flex-direction:column; gap:4px;}
-  .wl-card{position:relative; overflow:hidden; height:34px; box-sizing:border-box; border:2.5px solid var(--cb000000, #000000); border-radius:6px; background:var(--cloth); color:var(--cfffffff, #ffffff);
-    display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:0 22px; cursor:pointer; user-select:none; -webkit-user-select:none;}
+  .wl-card{position:relative; overflow:hidden; height:46px; box-sizing:border-box; border:2.5px solid var(--cb000000, #000000); border-radius:6px; background:var(--cloth); color:var(--cfffffff, #ffffff);
+    display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:2px 22px; cursor:pointer; user-select:none; -webkit-user-select:none;}
   .wl-card > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
   .wl-card > span{position:relative; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .wl-card .t{font:700 .72rem/1.1 Georgia, serif;}
   .wl-card .a{font:italic 400 .62rem/1.1 Georgia, serif; color:rgba(255,255,255,.82);}
   .wl-card:active > canvas{filter:brightness(.92);}
+  /* the author sits on the bottom, the title centred above it; a long title takes two lines (room kept for g, y, p) */
+  .wl-card .t, .wl-card .a{padding-bottom:3px; margin-bottom:-3px;}
+  .wl-card .t{margin-top:auto; margin-bottom:auto;}
+  .wl-card .t + .a{margin-top:-3px;}
+  .wl-card.two .t{white-space:normal; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; flex:none;}
+  .wl-card.two .a{flex:none;}
+  /* found at the library? a ✓ and a ✗ card to the right of each book (the one not picked faint; neither is fine) */
+  .wl-row{display:flex; gap:4px; align-items:stretch;}
+  .wl-row > .wl-card{flex:1 1 auto; min-width:0;}
+  .wl-mark, .wl-mark:active{flex:none; width:34px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none; background:var(--panel);
+    display:flex; align-items:center; justify-content:center; opacity:.35; transition:opacity .15s, background .15s;}
+  .wl-mark svg{width:16px; height:16px; stroke:var(--ink);}
+  .wl-mark.on{opacity:1;}
+  .wl-mark.yes.on{background:var(--cb2e6b4a, #2e6b4a);} .wl-mark.no.on{background:var(--cbaa3333, #aa3333);}
+  .wl-mark.on svg{stroke:var(--cfffffff, #ffffff);}
   #wl-empty{margin:40px 16px; text-align:center; font:700 min(.74rem, 2.95vw)/1.4 Arial, sans-serif; text-transform:uppercase; color:var(--muted);}
   /* the wishlist window: the Add a Book header, then Title and Author (Delete when editing); Add to My Library in its footer */
   #wl-page{position:fixed; inset:0; z-index:30; background:var(--bg); display:flex; flex-direction:column; gap:4px;
@@ -12006,10 +12021,15 @@ closeRowDD = function(dd){
       return '#' + rgb.map(x => x.toString(16).padStart(2, '0')).join('');
     }
     const clean = arr => (Array.isArray(arr) ? arr : []).filter(b => b && typeof b.title === 'string' && b.title.trim())
-      .map(b => ({ title: b.title.trim(), author: typeof b.author === 'string' ? b.author.trim() : '', color: wishColor(b.title, b.author), added: Number(b.added) || Date.now() }));
+      .map(b => ({ title: b.title.trim(), author: typeof b.author === 'string' ? b.author.trim() : '', color: wishColor(b.title, b.author), added: Number(b.added) || Date.now(),
+        lib: b.lib === 'yes' || b.lib === 'no' ? b.lib : '' }));
     list = clean(list);
     const view = document.getElementById('wishlist-view'), q = document.getElementById('wl-q');
     let sortBy = 'added';
+    // a title too long for one line takes two
+    const fit = c => { const t = c.querySelector('.t'); c.classList.remove('two'); if(t && t.scrollWidth > t.clientWidth + 1) c.classList.add('two'); };
+    const MARK = (k, on, label, d) => `<button type="button" class="wl-mark ${k}${on ? ' on' : ''}" data-k="${k}" aria-label="${label}" aria-pressed="${on}">` +
+      `<svg viewBox="0 0 24 24" fill="none" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg></button>`;
     function render(){
       if(!list.length){ view.innerHTML = '<div id="wl-empty">No wishlist books yet</div>'; return; }
       const s = q.value.trim().toLowerCase();
@@ -12017,11 +12037,18 @@ closeRowDD = function(dd){
       const by = k => (p, n) => (p[0][k] || '').localeCompare(n[0][k] || '', undefined, { sensitivity: 'base' });
       if(sortBy === 'title') rows.sort(by('title')); else if(sortBy === 'author') rows.sort(by('author'));
       if(!rows.length){ view.innerHTML = '<div id="wl-empty">No matches</div>'; return; }
-      view.innerHTML = rows.map(([b, i]) => `<div class="wl-card" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>` +
-        `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>`).join('');
+      view.innerHTML = rows.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>` +
+        `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
+        MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>').join('');
+      view.querySelectorAll('.wl-mark').forEach(m => m.addEventListener('click', () => {
+        const row = m.parentNode, b = list[+row.dataset.i]; if(!b) return;
+        b.lib = b.lib === m.dataset.k ? '' : m.dataset.k; save();
+        row.querySelectorAll('.wl-mark').forEach(x => { const on = x.dataset.k === b.lib; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
+      }));
       view.querySelectorAll('.wl-card').forEach(c => {
         const cv = c.querySelector('canvas'), hex = list[+c.dataset.i].color;
-        const go = () => { if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown(hex)), true, 6); };
+        fit(c);
+        const go = () => { fit(c); if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown(hex)), true, 6); };
         if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go);
         c.addEventListener('click', () => open(+c.dataset.i));
       });
@@ -12044,6 +12071,7 @@ closeRowDD = function(dd){
       const t = tIn.value.trim(), a = aIn.value.trim();
       pT.textContent = t || 'Title'; pT.classList.toggle('ph', !t);
       pA.textContent = a || 'Author'; pA.classList.toggle('ph', !a);
+      fit(prev);
       const hex = t || a ? wishColor(t, a) : '#6b4a32';
       if(hex === pHex) return;
       pHex = hex; prev.style.setProperty('--cloth', shown(hex));   // the flat colour at once; the cloth once typing pauses
