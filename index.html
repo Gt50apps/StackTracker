@@ -1626,12 +1626,6 @@
   body.off-wishlist #tabs .tab[data-view="wishlist"]{display:none !important;}
   #wishlist-controls{flex-direction:column; gap:4px;}
   #wishlist-controls .tl-views{margin:0;}
-  #wl-search{height:21px; box-sizing:border-box; display:flex; align-items:center; background:var(--panel); border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;}
-  #wl-search svg{flex:none; width:12px; height:12px; margin:0 4px 0 9px; stroke:var(--ink);}
-  #wl-q{flex:1; min-width:0; height:100%; border:0; outline:0; margin:0; padding:0 6px 0 4px; border-radius:0; background:transparent; color:var(--ink);
-    font:700 min(.74rem, 2.95vw) Arial, sans-serif;}
-  #wl-q::placeholder{color:var(--muted); opacity:1; text-transform:uppercase;}
-  #wl-q::-webkit-search-cancel-button{display:none;}
   #wishlist-view{padding:0; margin-top:-12px;}   /* the page's 16px under the header, less 12: the top card sits 4px below it */
   #wishlist-view.active{display:flex; flex-direction:column; gap:4px;}
   .wl-card{position:relative; overflow:hidden; height:46px; box-sizing:border-box; border:2.5px solid var(--cb000000, #000000); border-radius:6px; background:var(--cloth); color:var(--cfffffff, #ffffff);
@@ -1649,6 +1643,37 @@
   .wl-card.two .a{flex:none;}
   /* at the library? a ✓ (found it), ! (waiting on it) and ✗ (not there) card to the right of each book (the ones not picked faint; none is fine) */
   .wl-row{display:flex; gap:4px; align-items:stretch;}
+  /* the Library's search | filter | sort card: the same as Home's */
+  #lb-card{flex:none; height:21px; box-sizing:border-box; display:flex; flex-direction:row; align-items:baseline; justify-content:center; gap:5px; line-height:15px;
+    min-width:0; border:3px solid var(--cb000000, #000000); border-radius:8px; padding:0 10px; color:var(--ink); cursor:pointer; user-select:none; white-space:nowrap; overflow:hidden;
+    --l:var(--panel); --r:var(--panel); position:relative;
+    background:linear-gradient(to right, var(--l) 0 27px, var(--panel) 27px calc(100% - 27px), var(--r) calc(100% - 27px)) border-box;}
+  #lb-card .sort-k, #lb-card .sort-v{font:700 min(.74rem, 2.95vw) Arial, sans-serif; letter-spacing:0; text-transform:uppercase; white-space:nowrap;}
+  #lb-card .sort-k{color:var(--muted);} #lb-card .sort-v{color:var(--ink); overflow:hidden; text-overflow:ellipsis;}
+  #lb-card .sort-v + .sort-k{margin-left:2px;}
+  #lb-search, #lb-close{position:absolute; top:0; bottom:0; width:24px; display:flex; align-items:center; justify-content:center; background:none;}
+  #lb-search{left:0; border-right:3px solid var(--cb000000, #000000);}
+  #lb-close{right:0; border-left:3px solid var(--cb000000, #000000); display:none;}
+  #lb-search svg, #lb-close svg{width:12px; height:12px; display:block;}
+  #lb-card:has(#lb-search:active){--l:var(--bg);}
+  #lb-card #wl-q{position:absolute; left:24px; right:24px; top:0; bottom:0; width:auto; height:auto; display:none; margin:0; padding:0 6px; border:0; outline:0; border-radius:0; background:transparent;
+    -webkit-appearance:none; appearance:none; font:700 min(.74rem, 2.95vw) Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink); text-align:left;}
+  #lb-card.searching{--l:var(--ink); --r:#7a2f2b; cursor:text;}
+  #lb-card.searching:has(#lb-close:active){--r:#5e2421;}
+  #lb-card.searching .sort-k, #lb-card.searching .sort-v{visibility:hidden;}
+  #lb-card.searching #lb-search svg{stroke:var(--panel);}
+  #lb-card.searching #lb-close{display:flex;}
+  #lb-card.searching #wl-q{display:block;}
+  #sort-page.lb #filter-row, #sort-page.lb #sort-list{display:none;}
+  #sort-page #lb-opts[hidden]{display:none;}
+  /* the Library's options: filters and sorts together in one scrolling column (the window may be too short for them all) */
+  #sort-page #lb-opts{flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; display:flex; flex-direction:column;}
+  #sort-page #lb-opts .so-list{flex:none; overflow:visible;}
+  /* a wishlist card: its year, if it has one, sideways in the left end, the bands moved in to make room */
+  .wl-card.wl-wish{padding-left:30px; padding-right:30px;}
+  .wl-card .wl-yr{position:absolute; left:2px; top:0; bottom:0; width:13px; display:flex; align-items:center; justify-content:center; pointer-events:none;
+    writing-mode:vertical-rl; transform:rotate(180deg); font:normal 700 .5rem/1 Arial, sans-serif; letter-spacing:.4px; color:rgba(255,255,255,.85); white-space:nowrap;}
+  .wl-card .wl-yr[hidden]{display:none;}
   /* Library tab: Wishlist | Checked Out | Returned */
   .lb-tabs{height:21px; box-sizing:border-box; flex:none;} .lb-tabs .tab{padding:0; line-height:1; height:auto;}
   #wl-sort{display:none !important;}   /* the wishlist: always by status, no sort tabs */
@@ -2650,7 +2675,7 @@
  <div class="hdr-row hidden" id="wishlist-controls">
   <div class="tabs lb-tabs" id="lb-tabs"><div class="tab active" data-m="wish">Wishlist</div><div class="tab" data-m="out">Checked Out</div><div class="tab" data-m="ret">Returned</div></div>
   <div class="tl-views" id="wl-sort"><button type="button" data-s="added" class="on">Date Added</button><button type="button" data-s="title">Title</button><button type="button" data-s="author">Author</button><button type="button" data-s="status">Status</button></div>
-  <div id="wl-search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg><input id="wl-q" type="search" placeholder="Search wishlist" aria-label="Search wishlist" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div>
+  <div id="lb-card"><span id="lb-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="wl-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="lb-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="lb-filter-name">All</span><span class="sort-k">• Sort by:</span><span class="sort-v" id="lb-sort-name">Status</span></div>
  </div>
  <!-- Timeline: what to chart, and over what span -->
  <div class="hdr-row hidden" id="timeline-controls">
@@ -2666,7 +2691,7 @@
 <!-- Wishlist window: add a wishlist book, or open one (Save / Delete, and Add to My Library) -->
 <div id="wl-page" aria-hidden="true">
   <div class="wl-head"><button type="button" id="wl-cancel">Cancel</button><h2 id="wl-title">Add to Wishlist</h2><button type="button" id="wl-save" disabled>Add</button></div>
-  <div class="wl-prev-band"><div class="wl-card" id="wl-prev"><canvas aria-hidden="true"></canvas><span class="t"></span><span class="a"></span></div></div>
+  <div class="wl-prev-band"><div class="wl-card wl-wish" id="wl-prev"><canvas aria-hidden="true"></canvas><i class="wl-yr" hidden></i><span class="t"></span><span class="a"></span></div></div>
   <div class="wl-fields">
     <div class="field-card"><input id="wl-t" type="text" placeholder="Title" autocomplete="off" aria-label="Title"></div>
     <div class="field-card split wl-names"><div class="fc-half"><input id="wl-af" type="text" placeholder="First Name" autocomplete="off" aria-label="Author first name"></div><div class="fc-half"><input id="wl-a" type="text" placeholder="Last Name" autocomplete="off" aria-label="Author last name"></div></div>
@@ -2883,6 +2908,7 @@
   </div>
   <!-- bottom section: the sort cards -->
   <div class="so-list" id="sort-list"></div>
+  <div id="lb-opts" hidden></div>
 </div>
 
 <!-- data: import / export / stats -->
@@ -3639,6 +3665,9 @@
       fn: (a,b)=> cmp(readDaySpan(b).last, readDaySpan(a).last) || cmp(titleKey(a.title), titleKey(b.title)) },
     { id:'progress', name:'Progress',       desc:'Furthest along first',
       fn: (a,b)=> cmp(pct(b), pct(a)) || cmp(titleKey(a.title), titleKey(b.title)) },
+    { id:'year',     name:'Year',           desc:'Oldest released first; no year last',
+      fn: (a,b)=>{ const ha = typeof a.released === 'number', hb = typeof b.released === 'number';
+                   return (hb - ha) || (ha ? a.released - b.released : 0) || cmp(titleKey(a.title), titleKey(b.title)); } },
     { id:'length',   name:'Length',         desc:'Longest book first',
       fn: (a,b)=> cmp(b.pages, a.pages) || cmp(titleKey(a.title), titleKey(b.title)) }
   ];
@@ -10468,17 +10497,24 @@
     loans.forEach(r => {
       const bx = x0 + r.lane * (BW + GAP), hex = bookColor(r.b), page = paperOf(styleForBook(r.b).pageTone), sd = 1 + ((parseInt(r.b.seed, 10) || 7) % 9973);
       const fillEnd = r.back ? r.end : tlAdd(r.last < today ? r.last : today, 1);   // filled through today (or to the day it went back)
+      // day by day (This Month / This Week), as the Timeline card: from the middle of the day it went out to the middle of the
+      // day it's due (or went back); still out, the filled part runs on to the end of today
+      const mid = d => tlDaily() ? new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12) : d;
+      const dueAt = tlDaily() ? mid(r.due) : tlAdd(r.due, 1), topAt = r.back ? (tlDaily() ? mid(r.back) : r.end) : fillEnd;
       // the days still to come: dotted, faint, its cover's cloth
-      if(!r.back && r.end > fillEnd){
-        const ft = clampY(r.end), fb = clampY(fillEnd);
-        if(fb - ft > 1) el(`left:${bx}px;top:${ft.toFixed(1)}px;width:${BW}px;height:${(fb - ft).toFixed(1)}px;background:${hex} ${tlCover(hex, sd)} repeat`, 'tl-bar tl-eta');
+      let toEta = false;
+      if(!r.back && dueAt > fillEnd){
+        const ft = clampY(dueAt), fb = clampY(fillEnd);
+        if(fb - ft > 1){ el(`left:${bx}px;top:${ft.toFixed(1)}px;width:${BW}px;height:${(fb - ft).toFixed(1)}px;background:${hex} ${tlCover(hex, sd)} repeat`, 'tl-bar tl-eta'); toEta = true; }
       }
-      const bt = clampY(fillEnd), bb = clampY(r.s); if(bb - bt < 1) return;
-      const bar = el(`left:${bx}px;top:${bt.toFixed(1)}px;width:${BW}px;height:${(bb - bt).toFixed(1)}px;overflow:hidden;background:${hex} ${tlCover(hex, sd)} repeat`, 'tl-bar' + (!r.back ? ' now' : '') + (TL.picked === r.key ? ' on' : ''));
+      let bt = clampY(topAt), bb = clampY(mid(r.s));
+      if(bb - bt < 5){ const c = (bt + bb) / 2; bt = c - 2.5; bb = c + 2.5; }      // out and back the same day: a short bar centred on it
+      const bar = el(`left:${bx}px;top:${bt.toFixed(1)}px;width:${BW}px;height:${(bb - bt).toFixed(1)}px;overflow:hidden;background:${hex} ${tlCover(hex, sd)} repeat`, 'tl-bar' + (!r.back ? ' now' : '') + (toEta ? ' to-eta' : '') + (TL.picked === r.key ? ' on' : ''));   // runs straight on into the days to come, as a read into its estimate
+      const bIn = toEta ? 0 : 2;   // its top border (none when it runs on into the dotted part)
       // read days: page texture over the cloth, a run of read days as one piece
       let runA = null;
       const flush = d => { if(!runA) return; const a = clampY(d), z = clampY(runA);
-        const seg = document.createElement('div'); seg.style.cssText = `position:absolute;left:0;right:0;top:${(a - bt - 2).toFixed(1)}px;height:${(z - a).toFixed(1)}px;background:${page} ${tlPageLines(sd + (+runA % 97))} repeat;background-size:4px 120px`;
+        const seg = document.createElement('div'); seg.style.cssText = `position:absolute;left:0;right:0;top:${(a - bt - bIn).toFixed(1)}px;height:${(z - a).toFixed(1)}px;background:${page} ${tlPageLines(sd + (+runA % 97))} repeat;background-size:4px 120px;box-shadow:${[d < fillEnd ? 'inset 0 4px 4px -3px rgba(0,0,0,.55)' : '', runA > r.s ? 'inset 0 -4px 4px -3px rgba(0,0,0,.55)' : ''].filter(Boolean).join(', ') || 'none'}`;   // where the cover's cloth meets the pages it casts a shadow on them: the cloth sits higher
         bar.appendChild(seg); runA = null; };
       for(let d = new Date(r.s); d < fillEnd; d = tlAdd(d, 1)){
         const read = readOn.get(r.b.title + '|' + (+d)) > 0;
@@ -10486,7 +10522,7 @@
       }
       flush(fillEnd);
       // overdue: a red line where it was due
-      if(!r.back && today > r.due){ const dy = clampY(tlAdd(r.due, 1)) - bt - 2;
+      if(!r.back && today > r.due){ const dy = clampY(dueAt) - bt - bIn;
         const ln = document.createElement('div'); ln.style.cssText = `position:absolute;left:0;right:0;top:${(dy - 1).toFixed(1)}px;height:2px;background:#aa3333`; bar.appendChild(ln); }
       bar.addEventListener('click', () => {
         tlCanvas.querySelectorAll('.tl-bar.on').forEach(t => t.classList.remove('on'));
@@ -12302,6 +12338,22 @@ closeRowDD = function(dd){
     list = clean(list);
     const view = document.getElementById('wishlist-view'), q = document.getElementById('wl-q');
     let sortBy = 'status', regroupT = 0;
+    const wlYr = y => y < 0 ? (-y) + ' BC' : String(y);
+    // ---- the Library's Sort and Filter: its own for each tab card (kept between visits) ----
+    const LB = {
+      wish: { f: [['all', 'All', 'Every wishlist book'], ['', 'To Check', 'Not looked for yet'], ['yes', 'Found', 'Found at the library'], ['wait', 'Waiting', 'On hold, or on its way'], ['no', 'Not There', 'The library doesn\'t have it']],
+              s: [['status', 'Status', 'Grouped by status, authors A–Z by last name'], ['author', 'Author', 'Last name, first name, then title'], ['title', 'Title', 'A–Z'], ['added', 'Date Added', 'The order they went on the list'], ['year', 'Year', 'Oldest released first; no year last']] },
+      out:  { f: [['all', 'All', 'Every book checked out'], ['late', 'Overdue', 'Past its due date'], ['week', 'Due This Week', 'Due in the next 7 days'], ['renewed', 'Renewed', 'Renewed at least once']],
+              s: [['due', 'Due Date', 'Soonest first, grouped by when'], ['title', 'Title', 'A–Z'], ['author', 'Author', 'Last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first'], ['year', 'Year', 'Oldest released first; no year last']] },
+      ret:  { f: [['all', 'All', 'Every book returned'], ['done', 'Finished', 'Read to the end'], ['part', 'Not Finished', 'Went back before the end'], ['late', 'Returned Late', 'Went back after its due date']],
+              s: [['back', 'Returned', 'Most recently returned first'], ['title', 'Title', 'A–Z'], ['author', 'Author', 'Last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first'], ['year', 'Year', 'Oldest released first; no year last']] } };
+    let lbSel = { wish: { f: 'all', s: 'status' }, out: { f: 'all', s: 'due' }, ret: { f: 'all', s: 'back' } };
+    try{ const v = JSON.parse(localStorage.getItem('stack-tracker-lb-sort') || 'null'); if(v) ['wish', 'out', 'ret'].forEach(k => { if(v[k]) Object.assign(lbSel[k], v[k]); }); }catch(e){}
+    const lbSave = () => { try{ localStorage.setItem('stack-tracker-lb-sort', JSON.stringify(lbSel)); }catch(e){} };
+    const lbName = (m, k, id) => (LB[m][k].find(o => o[0] === id) || LB[m][k][0])[1];
+    const lbShow = () => { document.getElementById('lb-filter-name').textContent = lbName(mode, 'f', lbSel[mode].f); document.getElementById('lb-sort-name').textContent = lbName(mode, 's', lbSel[mode].s); };
+    const lc2 = (x, y) => String(x || '').localeCompare(String(y || ''), undefined, { sensitivity: 'base' });
+    const byAuthor = (a, b) => { const x = authorKeyOf(a), y = authorKeyOf(b); return lc2(x[0], y[0]) || lc2(x[1], y[1]) || lc2(a.title, b.title); };
     const GROUPS = [['', 'To Check'], ['yes', 'Found'], ['wait', 'Waiting'], ['no', 'Not There']];
     // a title too long for one line takes two
     const fit = c => { const t = c.querySelector('.t'); c.classList.remove('two'); if(t && t.scrollWidth > t.clientWidth + 1) c.classList.add('two'); };
@@ -12336,24 +12388,32 @@ closeRowDD = function(dd){
       view.dataset.lm = mode;
       const s = q.value.trim().toLowerCase(), t0 = today();
       loans = books.filter(b => b.loan);
-      const rows = loans.map((b, i) => [b, i]).filter(([b]) => (mode === 'ret' ? !!b.loan.returned : !b.loan.returned) && (!s || (b.title + ' ' + b.author).toLowerCase().includes(s)));
+      const left = b => { const d = new Date(b.loan.due); d.setHours(0, 0, 0, 0); return Math.round((d.getTime() - t0) / DAY); };
+      const dayOf = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
+      const F = lbSel[mode].f, S = lbSel[mode].s;
+      const pass = b => F === 'all' ? true : mode === 'out' ? (F === 'late' ? left(b) < 0 : F === 'week' ? left(b) >= 0 && left(b) <= 7 : (b.loan.renewed || 0) > 0)
+        : (F === 'done' ? bookFinished(b) : F === 'part' ? !bookFinished(b) : dayOf(b.loan.returned) > dayOf(b.loan.due));
+      const rows = loans.map((b, i) => [b, i]).filter(([b]) => (mode === 'ret' ? !!b.loan.returned : !b.loan.returned) && pass(b) && (!s || (b.title + ' ' + b.author).toLowerCase().includes(s)));
+      const yr = b => typeof b.released === 'number' ? b.released : null;
+      const sorter = S === 'year' ? (p, n) => (yr(p[0]) == null) - (yr(n[0]) == null) || (yr(p[0]) || 0) - (yr(n[0]) || 0) || lc2(p[0].title, n[0].title) : S === 'title' ? (p, n) => lc2(p[0].title, n[0].title) : S === 'author' ? (p, n) => byAuthor(p[0], n[0]) : S === 'out' ? (p, n) => n[0].loan.out - p[0].loan.out
+        : mode === 'out' ? (p, n) => p[0].loan.due - n[0].loan.due : (p, n) => n[0].loan.returned - p[0].loan.returned;
+      rows.sort(sorter);
       let html = '';
       if(mode === 'out'){
-        rows.sort((p, n) => p[0].loan.due - n[0].loan.due);
-        const left = b => { const d = new Date(b.loan.due); d.setHours(0, 0, 0, 0); return Math.round((d.getTime() - t0) / DAY); };
-        [['Overdue', b => left(b) < 0], ['Due This Week', b => left(b) >= 0 && left(b) <= 7], ['Later', b => left(b) > 7]].forEach(([name, f]) => {
-          const g = rows.filter(([b]) => f(b)); if(!g.length) return;
-          html += `<div class="list-divider"><span class="ld-name">${name}</span></div>`;
+        [['Overdue', b => left(b) < 0], ['Due This Week', b => left(b) >= 0 && left(b) <= 7], ['Later', b => left(b) > 7]].forEach(([name, f], gi) => {
+          // Due Date: grouped under dividers; any other sort: one list, in that order
+          const g = S === 'due' ? rows.filter(([b]) => f(b)) : gi ? [] : rows; if(!g.length) return;
+          if(S === 'due') html += `<div class="list-divider"><span class="ld-name">${name}</span></div>`;
           g.forEach(([b, i]) => { const n = left(b);
             const [big, small, cls] = n < 0 ? [-n, -n === 1 ? 'Day Late' : 'Days Late', 'late'] : n === 0 ? ['Today', '', 'soon'] : [n, n === 1 ? 'Day Left' : 'Days Left', n <= 3 ? 'soon' : n <= 7 ? 'week' : 'ok'];
             html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ${cls}" data-li="${i}"><b${typeof big === 'string' ? ' class="w"' : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</button></div>` + ddHTML(b, i);
           });
         });
       } else {
-        rows.sort((p, n) => n[0].loan.returned - p[0].loan.returned);
         rows.forEach(([b, i]) => { const d = new Date(b.loan.returned);
           html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ret" data-li="${i}"><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></button></div>` + ddHTML(b, i); });
       }
+      if(!html && (s || F !== 'all')) html = '<div id="wl-empty">No matches</div>';
       view.innerHTML = html;
       view.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex; fit(c);
         const go = () => { fit(c); if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(hex), true, 6); };
@@ -12388,14 +12448,16 @@ closeRowDD = function(dd){
     const lbLabel = () => { const l = document.querySelector('#add-card .add-lbl'); if(l && document.body.classList.contains('tab-wishlist')) l.textContent = mode === 'wish' ? 'Add New Wishlist Book' : 'Check Out a Book'; };
     document.querySelectorAll('#lb-tabs .tab').forEach(t => t.addEventListener('click', () => {
       mode = t.dataset.m; openLoan = -1; document.querySelectorAll('#lb-tabs .tab').forEach(x => x.classList.toggle('active', x === t));
-      document.body.classList.toggle('lb-loans', mode !== 'wish'); q.placeholder = mode === 'wish' ? 'Search wishlist' : 'Search library books';
+      document.body.classList.toggle('lb-loans', mode !== 'wish'); lbShow();
       lbLabel(); render(); window.dispatchEvent(new Event('resize')); window.scrollTo(0, 0); }));
     window.__lbLabel = lbLabel;
     function render(){
       if(mode !== 'wish') return renderLoans();
       if(!list.length){ view.innerHTML = '<div id="wl-empty">No wishlist books yet</div>'; return; }
       const s = q.value.trim().toLowerCase();
-      const rows = list.map((b, i) => [b, i]).filter(([b]) => !s || (b.title + ' ' + b.author).toLowerCase().includes(s));
+      sortBy = lbSel.wish.s; const wf = lbSel.wish.f;
+      const rows = list.map((b, i) => [b, i]).filter(([b]) => (wf === 'all' || (b.lib || '') === wf) && (!s || (b.title + ' ' + b.author).toLowerCase().includes(s)));
+      if(sortBy === 'year') rows.sort((p, n) => (p[0].released == null) - (n[0].released == null) || (p[0].released || 0) - (n[0].released || 0) || lc2(p[0].title, n[0].title));
       const by = k => (p, n) => (p[0][k] || '').localeCompare(n[0][k] || '', undefined, { sensitivity: 'base' });
       const lc = (x, y) => x.localeCompare(y, undefined, { sensitivity: 'base' });
       if(sortBy === 'title') rows.sort(by('title'));
@@ -12404,19 +12466,19 @@ closeRowDD = function(dd){
       if(!rows.length){ view.innerHTML = '<div id="wl-empty">No matches</div>'; return; }
       // Status: each group (in Date Added order) under its own divider; empty groups left out
       const grouped = sortBy === 'status' ? GROUPS.map(([k, name]) => [name, rows.filter(([b]) => (b.lib || '') === k)]).filter(g => g[1].length) : [[null, rows]];
-      view.innerHTML = grouped.map(([name, rs]) => (name ? `<div class="list-divider"><span class="ld-name">${name}</span></div>` : '') + rs.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>` +
+      view.innerHTML = grouped.map(([name, rs]) => (name ? `<div class="list-divider"><span class="ld-name">${name}</span></div>` : '') + rs.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card wl-wish" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>${b.released != null ? `<i class="wl-yr">${wlYr(b.released)}</i>` : ''}` +
         `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
         MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('wait', b.lib === 'wait', 'Waiting on it', 'M12 4v10M12 19.8v.01') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>').join('')).join('');
       view.querySelectorAll('.wl-mark').forEach(m => m.addEventListener('click', () => {
         const row = m.parentNode, b = list[+row.dataset.i]; if(!b) return;
         b.lib = b.lib === m.dataset.k ? '' : m.dataset.k; save();
         row.querySelectorAll('.wl-mark').forEach(x => { const on = x.dataset.k === b.lib; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
-        if(sortBy === 'status'){ clearTimeout(regroupT); regroupT = setTimeout(render, 650); }   // moves to its group once the taps settle
+        if(sortBy === 'status' || lbSel.wish.f !== 'all'){ clearTimeout(regroupT); regroupT = setTimeout(render, 650); }   // moves to its group (or out of the filter) once the taps settle
       }));
       view.querySelectorAll('.wl-card').forEach(c => {
         const cv = c.querySelector('canvas'), hex = list[+c.dataset.i].color;
         fit(c);
-        const go = () => { fit(c); if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown(hex)), true, 6); };
+        const go = () => { fit(c); if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown(hex)), true, 16); };   // bands in a little, the year (if any) in the left end
         if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go);
         c.addEventListener('click', () => open(+c.dataset.i));
       });
@@ -12425,12 +12487,27 @@ closeRowDD = function(dd){
       sortBy = b.dataset.s; document.querySelectorAll('#wl-sort button').forEach(x => x.classList.toggle('on', x === b)); render(); }));
     q.addEventListener('input', render);
     q.addEventListener('keydown', e => { if(e.key === 'Enter') q.blur(); });
+    // the card: tap the magnifier to search (the card becomes the field, X closes it); tap the rest for Sort and Filter
+    { const card = document.getElementById('lb-card'), page = document.getElementById('sort-page'), opts = document.getElementById('lb-opts');
+      document.getElementById('lb-search').addEventListener('click', e => { e.stopPropagation(); card.classList.add('searching'); q.focus(); window.scrollTo(0, 0); });
+      document.getElementById('lb-close').addEventListener('click', e => { e.stopPropagation(); card.classList.remove('searching'); q.value = ''; q.blur(); render(); });
+      const paint = () => {
+        const opt = (k, [id, name, desc]) => `<button type="button" class="so-opt${lbSel[mode][k] === id ? ' on' : ''}" data-k="${k}" data-id="${id}"><b>${name}</b><span>${desc}</span></button>`;
+        opts.innerHTML = `<div class="so-filter"><div class="list-divider"><span class="ld-name">Filter</span></div>${LB[mode].f.map(o => opt('f', o)).join('')}</div>` +
+          `<div class="so-list"><div class="list-divider"><span class="ld-name">Sort</span></div>${LB[mode].s.map(o => opt('s', o)).join('')}</div>`;
+        opts.querySelectorAll('.so-opt').forEach(b => b.addEventListener('click', () => { lbSel[mode][b.dataset.k] = b.dataset.id; lbSave(); lbShow(); render();
+          opts.querySelectorAll(`.so-opt[data-k="${b.dataset.k}"]`).forEach(x => x.classList.toggle('on', x === b)); }));   // just the pick moves: nothing redrawn; stays open, like Home's
+      };
+      card.addEventListener('click', () => { if(card.classList.contains('searching')){ q.focus(); return; }
+        paint(); opts.hidden = false; opts.scrollTop = 0; page.classList.add('lb', 'open'); });
+      document.getElementById('sort-done').addEventListener('click', () => { if(page.classList.contains('lb')) setTimeout(() => { page.classList.remove('lb'); opts.hidden = true; }, 200); });   // after it's faded
+      lbShow(); }
 
     // the window
     const page = document.getElementById('wl-page'), tIn = document.getElementById('wl-t'), aIn = document.getElementById('wl-a'), afIn = document.getElementById('wl-af');
     const wYear = document.getElementById('wl-year'), wEra = document.getElementById('wl-era'), wYearCard = document.getElementById('wl-year-card');
-    wEra.addEventListener('click', () => { const bc = wEra.textContent !== 'BC'; wEra.textContent = bc ? 'BC' : 'AD'; wEra.classList.toggle('bc', bc); wYearCard.classList.remove('invalid'); });
-    wYear.addEventListener('input', () => wYearCard.classList.remove('invalid'));
+    wEra.addEventListener('click', () => { const bc = wEra.textContent !== 'BC'; wEra.textContent = bc ? 'BC' : 'AD'; wEra.classList.toggle('bc', bc); wYearCard.classList.remove('invalid'); preview(); });
+    wYear.addEventListener('input', () => { wYearCard.classList.remove('invalid'); preview(); });
     // the year: null when blank, false when it can't be right (0, or in the future)
     const wYearRead = () => { const v = wYear.value.trim(); if(!v) return null; const n = parseInt(v, 10), bc = wEra.textContent === 'BC';
       if(!(n > 0) || (!bc && n > new Date().getFullYear()) || (bc && n > 9999)) return false; return bc ? -n : n; };
@@ -12440,12 +12517,13 @@ closeRowDD = function(dd){
     // the preview card in the second header: the words as typed, the colour they make (redrawn once typing pauses)
     const prev = document.getElementById('wl-prev'), pCv = prev.querySelector('canvas'), pT = prev.querySelector('.t'), pA = prev.querySelector('.a');
     let pHex = '', pTimer = 0;
-    const pDraw = () => { if(window.CLOTH && pHex) CLOTH.draw(pCv, CLOTH.rgb(shown(pHex)), true, 6); };
+    const pDraw = () => { if(window.CLOTH && pHex) CLOTH.draw(pCv, CLOTH.rgb(shown(pHex)), true, 16); };
     if(window.ResizeObserver) new ResizeObserver(pDraw).observe(pCv);
     function preview(now){
       const t = tIn.value.trim(), a = typedAuthor();
       pT.textContent = t || 'Title'; pT.classList.toggle('ph', !t);
       pA.textContent = a || 'Author'; pA.classList.toggle('ph', !a);
+      { const y = wYearRead(), yEl = prev.querySelector('.wl-yr'); yEl.hidden = !(y != null && y !== false); if(!yEl.hidden) yEl.textContent = wlYr(y); }
       fit(prev);
       const hex = t || a ? wishColor(t, a) : '#6b4a32';
       if(hex === pHex) return;
