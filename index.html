@@ -2029,6 +2029,12 @@
   /* the length wheels in a third: H / M / S tucked small into each wheel's corner, clear of the numbers */
   #length-wheels .lw-wheel span{left:3px; top:3px; transform:none; font-size:.5rem;}
   .yc-row{display:flex; align-items:center; gap:6px; min-width:0;}
+  /* the year on wheels: its first two numbers | its last two | AD / BC (the first wheel's – is no year) */
+  #year-card{display:flex; flex-direction:row; padding:0; overflow:hidden; background:var(--panel);}
+  #year-card .lw-wheel{flex:1 1 0;}
+  #year-card .lw-wheel div{font-size:13px;}
+  #year-card.blank .lw-wheel div{color:var(--cfc4bdb0, #c4bdb0);}   /* no year yet: all three faint */
+  #year-card #year-era[hidden]{display:none;}
   /* optional: Library Book Data opens Out | Due (month / day / year wheels, like the length wheels) | ✕ (not a library book after all) */
   #book-fields > #loan-card, #book-fields > #loan-add{grid-column:span 6; position:relative;}
   #loan-card[hidden], #loan-add[hidden], #loan-card > [hidden]{display:none;}
@@ -2721,7 +2727,7 @@
       <div class="lw-wheel" data-k="1"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>M</span></div>
       <div class="lw-wheel" data-k="2"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>S</span></div>
     </div>
-    <div class="field-card" id="year-card"><div class="yc-row"><input id="year-input" type="number" inputmode="numeric" min="1" placeholder="YEAR" aria-label="Year released"><button type="button" id="year-era" aria-label="AD or BC">AD</button></div></div>
+    <div class="field-card" id="year-card" aria-label="Year released"><input type="hidden" id="year-input"><button type="button" id="year-era" hidden>AD</button><div class="lw-wheel" data-k="c"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">YEAR</span></div><div class="lw-wheel" data-k="e"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
     <div class="field-card" id="tags-card"><label>Lists</label><div id="tags-value">None</div></div>
     <button type="button" class="field-card" id="loan-add"><b>Library Book Data</b><i>Optional</i></button>
     <div id="loan-card" hidden><input type="hidden" id="loan-out"><input type="hidden" id="loan-due">
@@ -8830,13 +8836,29 @@
     return { out, due, back }; };
   const yearInput = document.getElementById('year-input'), yearEra = document.getElementById('year-era'), yearCard = document.getElementById('year-card');
   function yearSet(y){ const has = y != null && y !== '' && !isNaN(y); yearInput.value = has ? Math.abs(y) : ''; yearEra.textContent = has && y < 0 ? 'BC' : 'AD';
-    yearEra.classList.toggle('bc', has && y < 0); yearCard.classList.remove('invalid'); }
+    yearEra.classList.toggle('bc', has && y < 0); yearCard.classList.remove('invalid'); yearWheels(); }
+  // the wheels keep the year in the (hidden) input and AD / BC
+  const yearWheels = (() => {
+    const W = k => yearCard.querySelector(`.lw-wheel[data-k="${k}"]`), n = () => yearInput.value === '' ? null : parseInt(yearInput.value, 10);
+    const put = v => { yearInput.value = v == null ? '' : String(v); yearCard.classList.remove('invalid'); yearCard.classList.toggle('blank', v == null); };
+    const sy = [
+      // – (no year) at the very top, then 00 … 99. With no year yet the wheels rest, faint, on 19 | 00 | AD: turning any of them sets it
+      dateWheel(W('c'), { count: () => 101, wrap: false, text: i => i ? String(i - 1).padStart(2, '0') : '–',
+        get: () => n() == null ? 20 : Math.floor(n() / 100) + 1,
+        set: i => { const v = n(), cur = v == null ? 20 : Math.floor(v / 100) + 1; if(cur === i && v != null) return; if(v == null && i === 20) return;
+          put(i ? (i - 1) * 100 + (v == null ? 0 : v % 100) : null); if(!i) sy.forEach(f => f()); } }),
+      dateWheel(W('y'), { cut: true, count: () => 100, wrap: true, text: i => String(i).padStart(2, '0'), get: () => n() == null ? 0 : n() % 100,
+        set: i => { const v = n(); if(v != null && v % 100 === i) return; if(v == null && i === 0) return; put((v == null ? 1900 : Math.floor(v / 100) * 100) + i); } }),
+      dateWheel(W('e'), { count: () => 2, wrap: false, text: i => i ? 'BC' : 'AD', get: () => yearEra.textContent === 'BC' ? 1 : 0,
+        set: i => { const bc = i === 1; if((yearEra.textContent === 'BC') === bc) return; yearEra.textContent = bc ? 'BC' : 'AD'; yearEra.classList.toggle('bc', bc); yearCard.classList.remove('invalid');
+          if(n() == null) put(1900); } })];
+    return () => { yearCard.classList.toggle('blank', n() == null); sy.forEach(f => f()); };
+  })();
   // the year to save: null when blank, false when it can't be right (0, or in the future)
   function yearRead(){ const v = yearInput.value.trim(); if(!v) return null; const n = parseInt(v, 10), bc = yearEra.textContent === 'BC';
     if(!(n > 0) || (!bc && n > new Date().getFullYear()) || (bc && n > 9999)) return false; return bc ? -n : n; }
   yearEra.addEventListener('click', () => { const bc = yearEra.textContent !== 'BC'; yearEra.textContent = bc ? 'BC' : 'AD'; yearEra.classList.toggle('bc', bc); yearCard.classList.remove('invalid'); });
   yearInput.addEventListener('input', () => yearCard.classList.remove('invalid'));
-  yearInput.addEventListener('keydown', e => { if(e.key === 'Enter') saveCustomizePage(); });
   function saveCustomizePage(){
     if(!customizingBook) return;
     if(customizeMode === 'customize'){
