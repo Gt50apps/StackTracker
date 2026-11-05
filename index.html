@@ -2046,9 +2046,9 @@
   #loan-x, #loan-x:active{flex:none; width:34px; grid-column:auto; height:auto; margin:0; padding:0; box-shadow:none; color:var(--muted); display:flex; align-items:center; justify-content:center;}
   #loan-x svg{width:13px; height:13px;}
   .yc-row input{flex:1; min-width:0;}
-  #year-era{flex:none; margin:0; padding:2px 5px; height:auto; border:2px solid var(--cb000000, #000000); border-radius:5px; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--cf8a8378, #8a8378);
+  #year-era, #wl-era{flex:none; margin:0; padding:2px 5px; height:auto; border:2px solid var(--cb000000, #000000); border-radius:5px; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--cf8a8378, #8a8378);
     font:700 .58rem/1 Arial, sans-serif; letter-spacing:.3px; cursor:pointer;}
-  #year-era.bc{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
+  #year-era.bc, #wl-era.bc{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   /* ===== Released, in the Timeline tab: a dot per release, in three columns that split to suit what's shown ===== */
   body.off-released #tl-modes button[data-m="released"]{display:none;}
   #tl-canvas .rl-tick{position:absolute; height:1px; background:var(--line, var(--cbe4ded2, #e4ded2));}
@@ -2063,6 +2063,7 @@
   #tl-canvas .rl-dot.now{background:var(--cb2fb84a, #2fb84a);}      /* green: being read now */
   #tl-canvas .rl-dot.tape{border-radius:0;}       /* audiobooks: squares, the same size as the dots */
   #tl-canvas .rl-dot.unread{background:var(--cb000000, #000000);}   /* black: not started */
+  #tl-canvas .rl-dot.wish{background:var(--cbc2278f, #c2278f);}     /* magenta: on the wishlist (with a year) */
   #tl-canvas .rl-dot.on{box-shadow:0 0 0 1px var(--cbffffff, #ffffff), 0 0 0 2.5px var(--cb000000, #000000); z-index:3;}
   #tl-canvas .rl-dot.cur{transform:scale(2); box-shadow:0 0 0 1px var(--cbffffff, #ffffff), 0 0 0 2px var(--cb000000, #000000); z-index:4;}
   #tl-canvas .rl-more{position:absolute; transform:translate(-100%, -50%); padding:0 2px; background:var(--cbffffff, #ffffff); font:700 .5rem/1 Arial, sans-serif; color:var(--ink); z-index:3;}
@@ -2663,6 +2664,7 @@
   <div class="wl-fields">
     <div class="field-card"><input id="wl-t" type="text" placeholder="Title" autocomplete="off" aria-label="Title"></div>
     <div class="field-card split wl-names"><div class="fc-half"><input id="wl-af" type="text" placeholder="First Name" autocomplete="off" aria-label="Author first name"></div><div class="fc-half"><input id="wl-a" type="text" placeholder="Last Name" autocomplete="off" aria-label="Author last name"></div></div>
+    <div class="field-card" id="wl-year-card"><div class="yc-row"><input id="wl-year" type="number" inputmode="numeric" min="1" placeholder="Year (optional)" aria-label="Year released (optional)"><button type="button" id="wl-era" aria-label="AD or BC">AD</button></div></div>
     <button type="button" id="wl-del" hidden>Delete</button>
   </div>
   <div id="wl-foot" hidden><button type="button" id="wl-real"><canvas aria-hidden="true"></canvas><span>Add to My Library</span></button></div>
@@ -10720,10 +10722,12 @@
     // All Time also has the books not started yet (black dots); the spans only what was read in them
     const started = b => (b.reads || []).length > 0 || (b.days || []).some(v => v > 0);
     const read = books.filter(b => touched(b) || (all && !started(b))), has = b => typeof b.released === 'number' && !isNaN(b.released);
-    return { list: read.filter(has).sort((a, b) => a.released - b.released), without: read.filter(b => !has(b)).length };
+    // All Time: the wishlist too, any with a year (magenta)
+    const wish = all && window.wishState ? window.wishState().filter(has).map(w => Object.assign(w, { _wish: true })) : [];
+    return { list: read.filter(has).concat(wish).sort((a, b) => a.released - b.released), without: read.filter(b => !has(b)).length };
   }
   // a dot's colour: dark gold read, green being read now, black not started; an audiobook's is a square
-  const rlState = b => bookFinished(b) ? 'read' : (b.days || []).some(v => v > 0) ? 'now' : (b.reads || []).length ? 'read' : 'unread';
+  const rlState = b => b._wish ? 'wish' : bookFinished(b) ? 'read' : (b.days || []).some(v => v > 0) ? 'now' : (b.reads || []).length ? 'read' : 'unread';
   function relDraw(){
     const today = tlDay(new Date()), R = tlRange(today), key = TL.view + '|' + TL.off;
     if(key !== RL.key){ RL.key = key; RL.picked = null; RL.wheelI = 0; }
@@ -10788,7 +10792,7 @@
     const wheel = document.getElementById('rl-wheel'), lc = document.getElementById('rl-line'), NOW = rlNow();
     const group = RL.picked === null ? [] : RL.shown.filter(b => b.released === RL.picked);
     const ago = y => { const n = NOW - y; return n === 0 ? 'this year' : n.toLocaleString() + (n === 1 ? ' year ago' : ' years ago'); };
-    wheel.innerHTML = group.length ? group.map(b => `<div><span class="tt">${tlEsc(b.title)}</span><span class="au">${tlEsc(b.author || '')}</span><span class="yr">${rlYr(b.released)} <span>(${ago(b.released)})</span></span></div>`).join('')
+    wheel.innerHTML = group.length ? group.map(b => `<div><span class="tt">${tlEsc(b.title)}</span><span class="au">${tlEsc(b.author || '')}</span><span class="yr">${rlYr(b.released)} <span>(${ago(b.released)}${b._wish ? ' · wishlist' : ''})</span></span></div>`).join('')
       : '<div class="empty">Tap a dot to see the book here</div>';
     lc.classList.toggle('many', group.length > 1);
     RL.wheelI = Math.min(RL.wheelI, Math.max(0, group.length - 1)); wheel.scrollTop = RL.wheelI * RL_NOTCH;
@@ -10817,7 +10821,8 @@
                   : TL.view === 'month' ? `${TL_MONTH[R.t0.getMonth()]} ${R.t0.getFullYear()}` : TL.view === 'year' ? String(R.t0.getFullYear()) : 'All Time';
       const unit = TL.view === 'week' ? 'week' : TL.view === 'month' ? 'month' : 'year';
       const ys = list.map(b => b.released), lo = Math.min(...ys), hi = Math.max(...ys);
-      const tot = list.length ? `<b>${list.length}</b> ${list.length === 1 ? 'book' : 'books'} · released <b>${lo === hi ? rlYr(lo) : rlYr(lo) + ' – ' + hi}</b>` + (without ? ` · ${without} without a year` : '')
+      const nw = list.filter(b => b._wish).length, nb = list.length - nw;
+      const tot = list.length ? `<b>${nb}</b> ${nb === 1 ? 'book' : 'books'}${nw ? ` + <b>${nw}</b> wishlist` : ''} · released <b>${lo === hi ? rlYr(lo) : rlYr(lo) + ' – ' + hi}</b>` + (without ? ` · ${without} without a year` : '')
                 : without ? `${without} read without a year` : '';
       tlInfo.classList.add('nav'); tlInfo.classList.remove('pick');
       tlInfo.innerHTML = `<button type="button" class="tl-nav" data-d="-1" aria-label="Previous ${unit}"${TL.off <= minOff ? ' disabled' : ''}>◀</button>` +
@@ -12270,7 +12275,8 @@ closeRowDD = function(dd){
     const clean = arr => (Array.isArray(arr) ? arr : []).filter(b => b && typeof b.title === 'string' && b.title.trim())
       .map(b => ({ title: b.title.trim(), author: typeof b.author === 'string' ? b.author.trim() : '', color: wishColor(b.title, b.author), added: Number(b.added) || Date.now(),
         ...(typeof b.authorLast === 'string' ? { authorFirst: String(b.authorFirst || '').trim(), authorLast: b.authorLast.trim() } : {}),
-        lib: ['yes', 'wait', 'no'].includes(b.lib) ? b.lib : '' }));
+        lib: ['yes', 'wait', 'no'].includes(b.lib) ? b.lib : '',
+        ...(typeof b.released === 'number' && !isNaN(b.released) && b.released !== 0 ? { released: Math.round(b.released) } : {}) }));
     list = clean(list);
     const view = document.getElementById('wishlist-view'), q = document.getElementById('wl-q');
     let sortBy = 'status', regroupT = 0;
@@ -12400,6 +12406,12 @@ closeRowDD = function(dd){
 
     // the window
     const page = document.getElementById('wl-page'), tIn = document.getElementById('wl-t'), aIn = document.getElementById('wl-a'), afIn = document.getElementById('wl-af');
+    const wYear = document.getElementById('wl-year'), wEra = document.getElementById('wl-era'), wYearCard = document.getElementById('wl-year-card');
+    wEra.addEventListener('click', () => { const bc = wEra.textContent !== 'BC'; wEra.textContent = bc ? 'BC' : 'AD'; wEra.classList.toggle('bc', bc); wYearCard.classList.remove('invalid'); });
+    wYear.addEventListener('input', () => wYearCard.classList.remove('invalid'));
+    // the year: null when blank, false when it can't be right (0, or in the future)
+    const wYearRead = () => { const v = wYear.value.trim(); if(!v) return null; const n = parseInt(v, 10), bc = wEra.textContent === 'BC';
+      if(!(n > 0) || (!bc && n > new Date().getFullYear()) || (bc && n > 9999)) return false; return bc ? -n : n; };
     const typedAuthor = () => [afIn.value.trim(), aIn.value.trim()].filter(Boolean).join(' ');   // "First Last" (aIn: the last name)
     const saveBtn = document.getElementById('wl-save'), del = document.getElementById('wl-del'), foot = document.getElementById('wl-foot');
     let editing = -1, delT = 0;
@@ -12427,6 +12439,8 @@ closeRowDD = function(dd){
       tIn.value = b ? b.title : '';
       const split = b && typeof b.authorLast === 'string';   // older entries: the whole name in Last, to fix by hand
       afIn.value = split ? b.authorFirst || '' : ''; aIn.value = split ? b.authorLast : (b ? b.author : '');
+      { const y = b && typeof b.released === 'number' ? b.released : null; wYear.value = y == null ? '' : Math.abs(y);
+        wEra.textContent = y != null && y < 0 ? 'BC' : 'AD'; wEra.classList.toggle('bc', y != null && y < 0); wYearCard.classList.remove('invalid'); }
       del.hidden = !b; foot.hidden = !b; del.classList.remove('armed'); del.textContent = 'Delete'; clearTimeout(delT);
       check(); preview(true); page.classList.add('active'); page.setAttribute('aria-hidden', 'false');
       if(b){ const cv = document.querySelector('#wl-real > canvas'); requestAnimationFrame(() => { if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown('#5b6633'))); }); }
@@ -12438,9 +12452,10 @@ closeRowDD = function(dd){
     document.getElementById('wl-cancel').addEventListener('click', close);
     saveBtn.addEventListener('click', () => {
       const title = tIn.value.trim(), author = typedAuthor(), authorFirst = afIn.value.trim(), authorLast = aIn.value.trim(); if(!title) return;
+      const released = wYearRead(); if(released === false){ wYearCard.classList.add('invalid'); return; }
       const color = wishColor(title, author);   // its colour, from its words
-      if(editing >= 0) Object.assign(list[editing], { title, author, authorFirst, authorLast, color });
-      else list.push({ title, author, authorFirst, authorLast, color, added: Date.now() });
+      if(editing >= 0){ Object.assign(list[editing], { title, author, authorFirst, authorLast, color }); if(released != null) list[editing].released = released; else delete list[editing].released; }
+      else list.push({ title, author, authorFirst, authorLast, color, added: Date.now(), ...(released != null ? { released } : {}) });
       save(); render(); close();
       if(editing < 0) requestAnimationFrame(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }));
     });
@@ -12455,7 +12470,7 @@ closeRowDD = function(dd){
     document.getElementById('wl-real').addEventListener('click', () => {
       const b = list[editing]; if(!b) return;
       pending = b; close();
-      openCustomizeModal({ title: b.title, author: b.author, ...(typeof b.authorLast === 'string' ? { authorFirst: b.authorFirst, authorLast: b.authorLast } : {}), pages: 0, cover: 'hard', _wishColor: closestColorIdx(COVER_COLOR_PRESETS, shown(b.color)) }, 'add');   // the nearest cover colour
+      openCustomizeModal({ title: b.title, author: b.author, ...(typeof b.authorLast === 'string' ? { authorFirst: b.authorFirst, authorLast: b.authorLast } : {}), ...(b.released != null ? { released: b.released } : {}), pages: 0, cover: 'hard', _wishColor: closestColorIdx(COVER_COLOR_PRESETS, shown(b.color)) }, 'add');   // the nearest cover colour
     });
     window.__wishAdded = () => { if(!pending) return; const i = list.indexOf(pending); if(i >= 0){ list.splice(i, 1); save(); render(); } pending = null; };
     window.__wishClosed = () => { pending = null; };
