@@ -1666,6 +1666,12 @@
   body.dd-on .wl-row.open{position:relative; z-index:8;}
   .wl-row.open > .wl-card, .wl-row.open > .ln-due{border-bottom-left-radius:0; border-bottom-right-radius:0;}
   .ln-dd .dd-acts .rt{color:var(--cf2e6b4a, #2e6b4a);}
+  .ln-dd .dd-acts[hidden], .ln-back[hidden]{display:none;}
+  .ln-back{display:flex; gap:4px; height:45px;}
+  .ln-back .ld-set{border-width:2.5px; border-radius:6px; background:var(--cbffffff, #ffffff);}
+  .ln-back .lw-wheel + .lw-wheel{border-left-width:2.5px;}
+  .ln-back .ln-ok, .ln-back .ln-ok:active{flex:none; width:96px; grid-column:auto; height:auto; margin:0; padding:0; box-shadow:none; border-width:2.5px; border-radius:6px;
+    background:var(--cb2e6b4a, #2e6b4a); color:#fff; font:700 .78rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   /* the same 2.5px borders as the loan's own cards, all round: the dropdown's edges, its two cards, the lines between buttons */
   .row-dd.ln-dd{border-width:0 2.5px;} .row-dd.ln-dd.open{border-bottom-width:2.5px;}
   .ln-dd .dd-stats, .ln-dd .dd-acts{border-width:2.5px; border-radius:6px;}
@@ -2025,16 +2031,20 @@
   .yc-row{display:flex; align-items:center; gap:6px; min-width:0;}
   /* optional: Library Book Data opens Out | Due (month / day / year wheels, like the length wheels) | ✕ (not a library book after all) */
   #book-fields > #loan-card, #book-fields > #loan-add{grid-column:span 6; position:relative;}
-  #loan-card[hidden], #loan-add[hidden]{display:none;}
-  #loan-add, #loan-add:active{margin:0; box-shadow:none; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; cursor:pointer;
+  #loan-card[hidden], #loan-add[hidden], #loan-card > [hidden]{display:none;}
+  #loan-add, #loan-add:active, #ret-add, #ret-add:active{margin:0; box-shadow:none; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; cursor:pointer;
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
-  #loan-add b{color:var(--ink);} #loan-add i{font:normal 700 .5rem/1 Arial, sans-serif; letter-spacing:.4px; color:var(--muted);}
+  #loan-add b, #ret-add b{color:var(--ink);} #loan-add i, #ret-add i{font:normal 700 .5rem/1 Arial, sans-serif; letter-spacing:.4px; color:var(--muted);}
   /* Out and Due: two cards side by side (and a small ✕ card) */
+  /* Out | Due | Back (or Returned · Optional) side by side, then ✕ */
   #loan-card{display:flex; gap:4px; height:45px;}
+  #loan-card .ld-set .lw-wheel div{font-size:13px;}
+  #ret-add{flex:1 1 0; min-width:0; padding:0;}
+  #ret-add b{font-size:min(.66rem, 2.6vw);} #ret-add i{font-size:.46rem;}
   .ld-set{position:relative; flex:1 1 0; min-width:0; display:flex; flex-direction:row; padding:0; overflow:hidden; background:var(--panel);}
   .ld-set .lw-wheel{flex:1 1 0;}   /* three equal wheels: the day (and its tag) dead centre in the card */
-  #loan-x, #loan-x:active{flex:none; width:45px; grid-column:auto; height:auto; margin:0; padding:0; box-shadow:none; color:var(--muted); display:flex; align-items:center; justify-content:center;}
-  #loan-x svg{width:14px; height:14px;}
+  #loan-x, #loan-x:active{flex:none; width:34px; grid-column:auto; height:auto; margin:0; padding:0; box-shadow:none; color:var(--muted); display:flex; align-items:center; justify-content:center;}
+  #loan-x svg{width:13px; height:13px;}
   .yc-row input{flex:1; min-width:0;}
   #year-era{flex:none; margin:0; padding:2px 5px; height:auto; border:2px solid var(--cb000000, #000000); border-radius:5px; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--cf8a8378, #8a8378);
     font:700 .58rem/1 Arial, sans-serif; letter-spacing:.3px; cursor:pointer;}
@@ -2714,7 +2724,7 @@
     <button type="button" class="field-card" id="loan-add"><b>Library Book Data</b><i>Optional</i></button>
     <div id="loan-card" hidden><input type="hidden" id="loan-out"><input type="hidden" id="loan-due">
       <div class="field-card ld-set" data-f="out" aria-label="Out"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">OUT</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
-      <div class="field-card ld-set" data-f="due" aria-label="Due"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">DUE</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card" id="loan-x" aria-label="Not a library book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="field-card ld-set" data-f="due" aria-label="Due"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">DUE</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><input type="hidden" id="loan-back"><div class="field-card ld-set" data-f="back" hidden aria-label="Returned"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">BACK</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ld-add" id="ret-add"><b>Returned</b><i>Optional</i></button><button type="button" class="field-card" id="loan-x" aria-label="Not a library book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   </div>
   <div id="customize-footer">
   <div id="customize-fields">
@@ -8634,6 +8644,8 @@
       loanCard.hidden = !ln; loanAdd.hidden = !!ln; loanCard.classList.remove('invalid'); loanTouched = !!book._loan; loanDropped = false;
       const ymd = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
       if(ln){ loanOut.value = ymd(ln.out); loanDue.value = ymd(ln.due); loanWheelsSync(); }
+      retAuto = false; retDropped = false; retCard.classList.remove('invalid');
+      if(ln && ln.returned){ loanBack.value = ymd(ln.returned); showRet(true); retSync(); } else showRet(false);
       if(book._loan && customizeMode === 'add') customizePageTitle.textContent = 'Check Out a Book';
     }
     customizeTags = bookTags(book).slice();
@@ -8734,8 +8746,10 @@
   let loanTouched = false, loanDropped = false;   // dates typed in this time / the loan taken off
   const ymdOf = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
   loanAdd.addEventListener('click', () => { loanOut.value = ymdOf(Date.now()); loanDue.value = ymdOf(Date.now() + 21 * 864e5);
-    loanAdd.hidden = true; loanCard.hidden = false; loanTouched = true; loanDropped = false; loanWheelsSync(); });
-  document.getElementById('loan-x').addEventListener('click', () => { loanCard.hidden = true; loanAdd.hidden = false; loanCard.classList.remove('invalid'); loanDropped = true; });
+    loanAdd.hidden = true; loanCard.hidden = false; loanTouched = true; loanDropped = false; loanWheelsSync(); showRet(false); });
+  // ✕ takes off the last card first: the Back date (not returned after all), then the library data itself
+  document.getElementById('loan-x').addEventListener('click', e => { if(!retCard.hidden){ e.stopImmediatePropagation(); retAuto = false; retDropped = true; retCard.classList.remove('invalid'); showRet(false); return; } }, true);
+  document.getElementById('loan-x').addEventListener('click', () => { if(loanCard.hidden) return; loanCard.hidden = true; loanAdd.hidden = false; loanCard.classList.remove('invalid'); loanDropped = true; });
   // ---- the date wheels: month and day roll round, the year stops at its ends; a day past the month's end comes back to its last day ----
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], Y0 = 2000, YN = 100;
   const dim = (y, m) => new Date(y, m + 1, 0).getDate();
@@ -8774,24 +8788,44 @@
     w.addEventListener('wheel', e => { e.preventDefault(); cancelAnimationFrame(af); pos = Math.round(pos) + (e.deltaY > 0 ? 1 : -1); commit(); snap(); }, { passive: false });
     return () => { cancelAnimationFrame(af); pos = spec.get(); render(); };
   }
-  document.querySelectorAll('#loan-card .ld-set').forEach(set => {
-    const inp = set.dataset.f === 'out' ? loanOut : loanDue;
+  // one date on three wheels, kept in a yyyy-mm-dd input; returns a sync (call it after the input's value is set)
+  function dateSet(set, inp, changed){
     const st = () => { const [y, m, d] = (inp.value || ymdOf(Date.now())).split('-').map(Number); return { y, m: m - 1, d }; };
     const put = (o, again) => { o.d = Math.min(o.d, dim(o.y, o.m)); inp.value = o.y + '-' + String(o.m + 1).padStart(2, '0') + '-' + String(o.d).padStart(2, '0');
-      loanTouched = true; loanCard.classList.remove('invalid'); if(again) syncs[1](); };   // (the day wheel, when its month's length changed)
+      if(changed) changed(); if(again) syncs[1](); };   // (the day wheel, when its month's length changed)
     const W = k => set.querySelector(`.lw-wheel[data-k="${k}"]`);
     const syncs = [
       dateWheel(W('m'), { count: () => 12, wrap: true, text: i => MON[i], get: () => st().m, set: i => { const o = st(); if(o.m === i) return; o.m = i; put(o, true); } }),
       dateWheel(W('d'), { cut: true, count: () => { const o = st(); return dim(o.y, o.m); }, wrap: true, text: i => String(i + 1), get: () => st().d - 1, set: i => { const o = st(); if(o.d === i + 1) return; o.d = i + 1; put(o); } }),
-      dateWheel(W('y'), { count: () => YN, wrap: false, text: i => String(Y0 + i), get: () => st().y - Y0, set: i => { const o = st(); if(o.y === Y0 + i) return; o.y = Y0 + i; put(o, true); } })];
-    ldSyncs.push(...syncs);
+      dateWheel(W('y'), { count: () => YN, wrap: false, text: i => '’' + String(i).padStart(2, '0'), get: () => st().y - Y0, set: i => { const o = st(); if(o.y === Y0 + i) return; o.y = Y0 + i; put(o, true); } })];
+    return () => syncs.forEach(f => f());
+  }
+  window.__dateSet = dateSet;
+  // Returned: optional; shown once there's library data. A due date already past fills it in with that date (until you take it off)
+  const retCard = document.querySelector('#loan-card .ld-set[data-f="back"]'), retAdd = document.getElementById('ret-add'), loanBack = document.getElementById('loan-back');
+  let retAuto = false, retDropped = false;
+  const showRet = on => { retCard.hidden = !on; retAdd.hidden = on; };
+  const atNoon = v => { if(!v) return NaN; const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d, 12).getTime(); };
+  const autoBack = () => {
+    const t = new Date(); t.setHours(0, 0, 0, 0); const due = atNoon(loanDue.value);
+    if(due < t.getTime() && retCard.hidden && !retDropped){ loanBack.value = loanDue.value; retAuto = true; showRet(true); retSync(); }
+    else if(retAuto && due < t.getTime()){ loanBack.value = loanDue.value; retSync(); }   // still following the due date
+    else if(retAuto && !(due < t.getTime())){ retAuto = false; showRet(false); }
+  };
+  document.querySelectorAll('#loan-card .ld-set:not([data-f="back"])').forEach(set => {
+    ldSyncs.push(dateSet(set, set.dataset.f === 'out' ? loanOut : loanDue, () => { loanTouched = true; loanCard.classList.remove('invalid'); retCard.classList.remove('invalid'); autoBack(); }));
   });
+  const retSync = dateSet(retCard, loanBack, () => { retAuto = false; retCard.classList.remove('invalid'); });
+  retAdd.addEventListener('click', () => { loanBack.value = ymdOf(Date.now()); retAuto = false; retDropped = false; showRet(true); retSync(); });
   const loanWheelsSync = () => ldSyncs.forEach(f => f());
   // dates that are already over: the book went back on its end date (the Returned tab); still to come: it's checked out
-  const loanSettle = (L) => { const t = new Date(); t.setHours(0, 0, 0, 0);
-    if(L.due < t.getTime()) L.returned = L.due; else delete L.returned; return L; };
-  const loanRead = () => { if(loanCard.hidden) return null; const at = v => { if(!v) return NaN; const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d, 12).getTime(); };
-    const out = at(loanOut.value), due = at(loanDue.value); return isNaN(out) || isNaN(due) || due < out ? false : { out, due }; };
+  // the loan as set in the window: the Returned card, when it's showing, is the day it went back
+  const loanSettle = (L, back) => { if(back) L.returned = back; else delete L.returned; return L; };
+  const loanRead = () => { if(loanCard.hidden) return null;
+    const out = atNoon(loanOut.value), due = atNoon(loanDue.value), back = retCard.hidden ? null : atNoon(loanBack.value);
+    if(isNaN(out) || isNaN(due) || due < out) return false;
+    if(back != null && (isNaN(back) || back < out)){ retCard.classList.add('invalid'); return false; }
+    return { out, due, back }; };
   const yearInput = document.getElementById('year-input'), yearEra = document.getElementById('year-era'), yearCard = document.getElementById('year-card');
   function yearSet(y){ const has = y != null && y !== '' && !isNaN(y); yearInput.value = has ? Math.abs(y) : ''; yearEra.textContent = has && y < 0 ? 'BC' : 'AD';
     yearEra.classList.toggle('bc', has && y < 0); yearCard.classList.remove('invalid'); }
@@ -8816,14 +8850,14 @@
       const bad = [!title, !author, !(pages > 0)];
       fieldCards.forEach((c, i)=> c.classList.toggle('invalid', bad[i]));
       const rel = yearRead(); yearCard.classList.toggle('invalid', rel === false);
-      const loan = loanRead(); loanCard.classList.toggle('invalid', loan === false);
+      const loan = loanRead(); loanCard.classList.toggle('invalid', loan === false && !retCard.classList.contains('invalid'));
       if(bad.some(Boolean) || rel === false || loan === false) return;
       if(customizeMode === 'add'){
         const nb = { title, author, authorFirst, authorLast, pages, tags: customizeTags.slice() };
         if(subtitle) nb.subtitle = subtitle;
         if(audio) nb.audioSeconds = secs;
         if(rel != null) nb.released = rel;
-        if(loan) nb.loan = loanSettle(loan);
+        if(loan){ const { back, ...L } = loan; nb.loan = loanSettle(L, back); }
         applyOptions(nb, false);
         books.push(nb);
         if(window.__wishAdded) window.__wishAdded();
@@ -8833,7 +8867,7 @@
         if(subtitle) b.subtitle = subtitle; else delete b.subtitle;
         if(audio) b.audioSeconds = secs; else delete b.audioSeconds;
         if(rel != null) b.released = rel; else delete b.released;
-        if(loan){ const L = Object.assign(b.loan || {}, loan); b.loan = loanTouched ? loanSettle(L) : L; }
+        if(loan){ const { back, ...L0 } = loan; b.loan = loanSettle(Object.assign(b.loan || {}, L0), back); }
         else if(loanDropped) delete b.loan;
         b.tags = customizeTags.slice();
         applyOptions(b, true);
@@ -12265,7 +12299,9 @@ closeRowDD = function(dd){
       return `<div class="row-dd book-dd ln-dd" data-li="${i}"><div class="dd-in">` +
         `<div class="dd-stats"><div class="ds-row"><span>Out <b>${md(L.out)}</b> · Due <b>${md(L.due)}</b></span><span>${L.returned ? `Back <b>${md(L.returned)}</b>` : L.renewed ? `Renewed <b>${L.renewed}×</b>` : ''}</span></div>` +
         `<div class="ds-row"><span>Read on <b>${rd}</b> ${rd === 1 ? 'day' : 'days'}</span><span>${amt}</span></div></div>` +
-        `<div class="dd-acts">${acts}</div></div></div>`;
+        `<div class="dd-acts">${acts}</div>` +
+        (L.returned ? '' : `<div class="ln-back" hidden><input type="hidden"><div class="field-card ld-set" aria-label="Returned"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">BACK</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ln-ok">Done</button></div>`) +
+        `</div></div>`;
     }
     function renderLoans(){
       if(view.dataset.lm === mode){ const was = view.querySelector('.ln-dd.open'); openLoan = was ? +was.dataset.li : -1; }   // keep the open one open (unless it was closed)
@@ -12306,7 +12342,17 @@ closeRowDD = function(dd){
         if(+row.dataset.li === openLoan) ddOpen(row, true); });
       const after = (x, f) => x.addEventListener('click', e => { e.stopPropagation(); const b = loans[+x.closest('.ln-dd').dataset.li]; if(b) f(b); });
       view.querySelectorAll('.ln-dd .rn').forEach(x => after(x, b => { b.loan.due += 21 * DAY; b.loan.renewed = (b.loan.renewed || 0) + 1; saveBooks(); renderLoans(); }));
-      view.querySelectorAll('.ln-dd .rt').forEach(x => after(x, b => { b.loan.returned = Date.now(); openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
+      // Returned: the day it went back on wheels (today to start with), then Done
+      view.querySelectorAll('.ln-dd .rt').forEach(x => after(x, b => {
+        const dd = x.closest('.ln-dd'), row = dd.querySelector('.ln-back'), inp = row.querySelector('input');
+        const d = new Date(); inp.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        if(!row._sync) row._sync = window.__dateSet(row.querySelector('.ld-set'), inp, null);
+        dd.querySelector('.dd-acts').hidden = true; row.hidden = false; row._sync();
+        dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px'; }));
+      view.querySelectorAll('.ln-dd .ln-back').forEach(r => r.addEventListener('click', e => e.stopPropagation()));
+      view.querySelectorAll('.ln-dd .ln-ok').forEach(x => after(x, b => {
+        const [y, m, d] = x.closest('.ln-back').querySelector('input').value.split('-').map(Number);
+        b.loan.returned = Math.max(b.loan.out, new Date(y, m - 1, d, 12).getTime()); openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
       view.querySelectorAll('.ln-dd .ag').forEach(x => after(x, b => { delete b.loan.returned; delete b.loan.renewed; b.loan.out = Date.now(); b.loan.due = Date.now() + 21 * DAY; openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
       view.querySelectorAll('.ln-dd .ed').forEach(x => after(x, b => { closeAll(); openLoan = -1; openCustomizeModal(b, 'edit'); }));   // the same Edit a Book window as Home
     }
