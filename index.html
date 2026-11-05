@@ -1662,12 +1662,15 @@
   .ln-due.soon{background:var(--cbc0621f, #c0621f); color:#fff;}
   .ln-due.late{background:var(--cbaa3333, #aa3333); color:#fff;}
   .ln-due.ret{color:var(--muted);}
-  .ln-act{display:flex; gap:4px; height:34px;}
-  .ln-act > div{flex:1 1 auto; min-width:0; display:flex; align-items:center; justify-content:center; border:2.5px solid var(--cb000000, #000000); border-radius:6px; background:var(--panel);
-    font:700 .56rem/1.2 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); text-align:center; padding:0 6px;}
-  .ln-act button, .ln-act button:active{flex:none; width:80px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none;
-    font:700 .62rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:#fff;}
-  .ln-act .rn{background:var(--cb303d66, #303d66);} .ln-act .rt{background:var(--cb2e6b4a, #2e6b4a);}
+  /* a loan's dropdown (tap its card): the dates and what was read, then Renew | Returned | Edit (Returned: Check Out Again | Edit) */
+  body.dd-on .wl-row.open{position:relative; z-index:8;}
+  .wl-row.open > .wl-card, .wl-row.open > .ln-due{border-bottom-left-radius:0; border-bottom-right-radius:0;}
+  .ln-dd .dd-acts .rt{color:var(--cf2e6b4a, #2e6b4a);}
+  /* the same 2.5px borders as the loan's own cards, all round: the dropdown's edges, its two cards, the lines between buttons */
+  .row-dd.ln-dd{border-width:0 2.5px;} .row-dd.ln-dd.open{border-bottom-width:2.5px;}
+  .ln-dd .dd-stats, .ln-dd .dd-acts{border-width:2.5px; border-radius:6px;}
+  .ln-dd .dd-acts button + button{border-left-width:2.5px;}
+  .row-dd.ln-dd{border-radius:0 0 6px 6px;}
   .wl-row > .wl-card{flex:1 1 auto; min-width:0;}
   #wishlist-view > .list-divider{height:24px;}   /* Status: a slim divider over each group */
   .wl-mark, .wl-mark:active{flex:none; width:34px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none; background:var(--panel);
@@ -12249,7 +12252,24 @@ closeRowDD = function(dd){
     const md = t => new Date(t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     function cardHTML(b, i){ const hex = bookColor(b);   // its own cover colour, as on the shelf
       return `<div class="wl-card" data-li="${i}" data-hex="${hex}" style="--cloth:${hex}"><canvas aria-hidden="true"></canvas><span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>`; }
+    // the dropdown under a loan: out / due (or back) and renewals, then days read and pages, then its actions
+    function ddHTML(b, i){
+      const L = b.loan, a = new Date(L.out); a.setHours(0, 0, 0, 0);
+      const z = L.returned ? new Date(L.returned) : new Date(); z.setHours(0, 0, 0, 0);
+      const end = keyDate(lastLogKey(b)), start = new Date(end); start.setDate(start.getDate() - ((b.days || []).length - 1));
+      let rd = 0, pages = 0; (b.days || []).forEach((v, j) => { if(!(v > 0)) return; const d = new Date(start); d.setDate(d.getDate() + j); if(d >= a && d <= z){ rd++; pages += v; } });
+      const audio = b.format === 'audio' && b.audioSeconds > 0 && b.pages > 0;
+      const amt = audio ? `<b>${Math.round(pages)}</b> min` : `<b>${Math.round(pages)}</b> ${Math.round(pages) === 1 ? 'page' : 'pages'}`;
+      const acts = L.returned ? `<button type="button" class="ag">Check Out Again</button><button type="button" class="ed">Edit</button>`
+                              : `<button type="button" class="rn">Renew</button><button type="button" class="rt">Returned</button><button type="button" class="ed">Edit</button>`;
+      return `<div class="row-dd book-dd ln-dd" data-li="${i}"><div class="dd-in">` +
+        `<div class="dd-stats"><div class="ds-row"><span>Out <b>${md(L.out)}</b> · Due <b>${md(L.due)}</b></span><span>${L.returned ? `Back <b>${md(L.returned)}</b>` : L.renewed ? `Renewed <b>${L.renewed}×</b>` : ''}</span></div>` +
+        `<div class="ds-row"><span>Read on <b>${rd}</b> ${rd === 1 ? 'day' : 'days'}</span><span>${amt}</span></div></div>` +
+        `<div class="dd-acts">${acts}</div></div></div>`;
+    }
     function renderLoans(){
+      if(view.dataset.lm === mode){ const was = view.querySelector('.ln-dd.open'); openLoan = was ? +was.dataset.li : -1; }   // keep the open one open (unless it was closed)
+      view.dataset.lm = mode;
       const s = q.value.trim().toLowerCase(), t0 = today();
       loans = books.filter(b => b.loan);
       const rows = loans.map((b, i) => [b, i]).filter(([b]) => (mode === 'ret' ? !!b.loan.returned : !b.loan.returned) && (!s || (b.title + ' ' + b.author).toLowerCase().includes(s)));
@@ -12262,26 +12282,35 @@ closeRowDD = function(dd){
           html += `<div class="list-divider"><span class="ld-name">${name}</span></div>`;
           g.forEach(([b, i]) => { const n = left(b);
             const [big, small, cls] = n < 0 ? [-n, -n === 1 ? 'Day Late' : 'Days Late', 'late'] : n === 0 ? ['Today', '', 'soon'] : [n, n === 1 ? 'Day Left' : 'Days Left', n <= 3 ? 'soon' : n <= 7 ? 'week' : 'ok'];
-            html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ${cls}" data-li="${i}"><b${typeof big === 'string' ? ' class="w"' : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</button></div>`;
-            if(openLoan === i) html += `<div class="ln-act"><div>Out ${md(b.loan.out)} · Due ${md(b.loan.due)}${b.loan.renewed ? ` · Renewed ${b.loan.renewed}×` : ''}</div><button type="button" class="rn" data-li="${i}">Renew</button><button type="button" class="rt" data-li="${i}">Returned</button></div>`;
+            html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ${cls}" data-li="${i}"><b${typeof big === 'string' ? ' class="w"' : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</button></div>` + ddHTML(b, i);
           });
         });
       } else {
         rows.sort((p, n) => n[0].loan.returned - p[0].loan.returned);
         rows.forEach(([b, i]) => { const d = new Date(b.loan.returned);
-          html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ret" data-li="${i}"><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></button></div>`; });
+          html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ret" data-li="${i}"><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></button></div>` + ddHTML(b, i); });
       }
       view.innerHTML = html;
       view.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex; fit(c);
         const go = () => { fit(c); if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(hex), true, 6); };
         if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go);
-        c.addEventListener('click', () => openCustomizeModal(loans[+c.dataset.li], 'edit')); });   // the same Edit a Book window as Home
-      if(mode === 'out'){
-        view.querySelectorAll('.ln-due').forEach(d => d.addEventListener('click', () => { const i = +d.dataset.li; openLoan = openLoan === i ? -1 : i; renderLoans(); }));
-        view.querySelectorAll('.ln-act .rn').forEach(x => x.addEventListener('click', () => { const b = loans[+x.dataset.li]; b.loan.due += 21 * DAY; b.loan.renewed = (b.loan.renewed || 0) + 1; saveBooks(); renderLoans(); }));
-        view.querySelectorAll('.ln-act .rt').forEach(x => x.addEventListener('click', () => { loans[+x.dataset.li].loan.returned = Date.now(); openLoan = -1; saveBooks(); renderLoans(); }));
-      }
+      });
+      // tapping a loan (its card or its days card) opens its dropdown; one open at a time
+      const ddOpen = (row, on) => { const dd = row.nextElementSibling; if(!dd || !dd.classList.contains('ln-dd')) return;
+        if(!on){ closeRowDD(dd); return; }
+        view.querySelectorAll('.ln-dd.open').forEach(o => { if(o !== dd) closeRowDD(o); });
+        dd.classList.add('open'); row.classList.add('open'); dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px';
+        openLoan = +row.dataset.li; };
+      view.querySelectorAll('.wl-row').forEach(row => {
+        row.addEventListener('click', () => ddOpen(row, !row.classList.contains('open')));
+        if(+row.dataset.li === openLoan) ddOpen(row, true); });
+      const after = (x, f) => x.addEventListener('click', e => { e.stopPropagation(); const b = loans[+x.closest('.ln-dd').dataset.li]; if(b) f(b); });
+      view.querySelectorAll('.ln-dd .rn').forEach(x => after(x, b => { b.loan.due += 21 * DAY; b.loan.renewed = (b.loan.renewed || 0) + 1; saveBooks(); renderLoans(); }));
+      view.querySelectorAll('.ln-dd .rt').forEach(x => after(x, b => { b.loan.returned = Date.now(); openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
+      view.querySelectorAll('.ln-dd .ag').forEach(x => after(x, b => { delete b.loan.returned; delete b.loan.renewed; b.loan.out = Date.now(); b.loan.due = Date.now() + 21 * DAY; openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
+      view.querySelectorAll('.ln-dd .ed').forEach(x => after(x, b => { closeAll(); openLoan = -1; openCustomizeModal(b, 'edit'); }));   // the same Edit a Book window as Home
     }
+    const closeAll = () => view.querySelectorAll('.ln-dd.open').forEach(closeRowDD);
     const lbLabel = () => { const l = document.querySelector('#add-card .add-lbl'); if(l && document.body.classList.contains('tab-wishlist')) l.textContent = mode === 'wish' ? 'Add New Wishlist Book' : 'Check Out a Book'; };
     document.querySelectorAll('#lb-tabs .tab').forEach(t => t.addEventListener('click', () => {
       mode = t.dataset.m; openLoan = -1; document.querySelectorAll('#lb-tabs .tab').forEach(x => x.classList.toggle('active', x === t));
