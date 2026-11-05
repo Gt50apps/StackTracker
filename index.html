@@ -1649,6 +1649,25 @@
   .wl-card.two .a{flex:none;}
   /* at the library? a ✓ (found it), ! (waiting on it) and ✗ (not there) card to the right of each book (the ones not picked faint; none is fine) */
   .wl-row{display:flex; gap:4px; align-items:stretch;}
+  /* Library tab: Wishlist | Checked Out | Returned */
+  .lb-tabs{height:21px; box-sizing:border-box; flex:none;} .lb-tabs .tab{padding:0; line-height:1; height:auto;}
+  #wl-sort{display:none !important;}   /* the wishlist: always by status, no sort tabs */
+  /* a loan: its book card, then the due card — days left, coloured by how soon it's due */
+  .ln-due, .ln-due:active{flex:none; width:62px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none; background:var(--panel); color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer;}
+  .ln-due b{font:700 1.15rem/1 Arial, sans-serif;} .ln-due b.w{font-size:.78rem; letter-spacing:.3px; text-transform:uppercase;} .ln-due i{font:normal 700 .48rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  /* days left: green with plenty of time, yellow inside a week, orange inside 3 days (and due today), red once late */
+  .ln-due.ok{background:var(--cb2e6b4a, #2e6b4a); color:#fff;}
+  .ln-due.week{background:var(--cba88a12, #a88a12); color:#fff;}
+  .ln-due.soon{background:var(--cbc0621f, #c0621f); color:#fff;}
+  .ln-due.late{background:var(--cbaa3333, #aa3333); color:#fff;}
+  .ln-due.ret{color:var(--muted);}
+  .ln-act{display:flex; gap:4px; height:34px;}
+  .ln-act > div{flex:1 1 auto; min-width:0; display:flex; align-items:center; justify-content:center; border:2.5px solid var(--cb000000, #000000); border-radius:6px; background:var(--panel);
+    font:700 .56rem/1.2 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); text-align:center; padding:0 6px;}
+  .ln-act button, .ln-act button:active{flex:none; width:80px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none;
+    font:700 .62rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:#fff;}
+  .ln-act .rn{background:var(--cb303d66, #303d66);} .ln-act .rt{background:var(--cb2e6b4a, #2e6b4a);}
   .wl-row > .wl-card{flex:1 1 auto; min-width:0;}
   #wishlist-view > .list-divider{height:24px;}   /* Status: a slim divider over each group */
   .wl-mark, .wl-mark:active{flex:none; width:34px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none; background:var(--panel);
@@ -2001,6 +2020,18 @@
   /* the length wheels in a third: H / M / S tucked small into each wheel's corner, clear of the numbers */
   #length-wheels .lw-wheel span{left:3px; top:3px; transform:none; font-size:.5rem;}
   .yc-row{display:flex; align-items:center; gap:6px; min-width:0;}
+  /* optional: Library Book Data opens Out | Due (month / day / year wheels, like the length wheels) | ✕ (not a library book after all) */
+  #book-fields > #loan-card, #book-fields > #loan-add{grid-column:span 6; position:relative;}
+  #loan-card[hidden], #loan-add[hidden]{display:none;}
+  #loan-add, #loan-add:active{margin:0; box-shadow:none; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; cursor:pointer;
+    font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  #loan-add b{color:var(--ink);} #loan-add i{font:normal 700 .5rem/1 Arial, sans-serif; letter-spacing:.4px; color:var(--muted);}
+  /* Out and Due: two cards side by side (and a small ✕ card) */
+  #loan-card{display:flex; gap:4px; height:45px;}
+  .ld-set{position:relative; flex:1 1 0; min-width:0; display:flex; flex-direction:row; padding:0; overflow:hidden; background:var(--panel);}
+  .ld-set .lw-wheel{flex:1 1 0;}   /* three equal wheels: the day (and its tag) dead centre in the card */
+  #loan-x, #loan-x:active{flex:none; width:45px; grid-column:auto; height:auto; margin:0; padding:0; box-shadow:none; color:var(--muted); display:flex; align-items:center; justify-content:center;}
+  #loan-x svg{width:14px; height:14px;}
   .yc-row input{flex:1; min-width:0;}
   #year-era{flex:none; margin:0; padding:2px 5px; height:auto; border:2px solid var(--cb000000, #000000); border-radius:5px; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--cf8a8378, #8a8378);
     font:700 .58rem/1 Arial, sans-serif; letter-spacing:.3px; cursor:pointer;}
@@ -2581,9 +2612,9 @@
 <div id="app-header">
  <!-- pages: the top of the header itself, split in three; Data opens its own window -->
  <div id="tabs">
-   <div class="tab active" data-view="all" data-cloth="#7a2f2b" style="--cloth:#7a2f2b"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>Library</span></div>
+   <div class="tab active" data-view="all" data-cloth="#7a2f2b" style="--cloth:#7a2f2b"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>Home</span></div>
    <div class="tab" data-view="library" data-cloth="#2b5752" style="--cloth:#2b5752"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>My Lists</span></div>
-   <div class="tab" data-view="wishlist" data-cloth="#66304c" style="--cloth:#66304c"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>Wishlist</span></div>
+   <div class="tab" data-view="wishlist" data-cloth="#66304c" style="--cloth:#66304c"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>Library</span></div>
    <div class="tab" data-view="timeline" data-cloth="#303d66" style="--cloth:#303d66"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>Timeline</span></div>
    <div class="tab" data-view="data" data-cloth="#8a6a3f" style="--cloth:#8a6a3f"><div class="bk" aria-hidden="true"><canvas></canvas><canvas class="w"></canvas></div><span>Data</span></div>
  </div>
@@ -2597,12 +2628,13 @@
  </div>
  <!-- Wishlist: sort, and search -->
  <div class="hdr-row hidden" id="wishlist-controls">
+  <div class="tabs lb-tabs" id="lb-tabs"><div class="tab active" data-m="wish">Wishlist</div><div class="tab" data-m="out">Checked Out</div><div class="tab" data-m="ret">Returned</div></div>
   <div class="tl-views" id="wl-sort"><button type="button" data-s="added" class="on">Date Added</button><button type="button" data-s="title">Title</button><button type="button" data-s="author">Author</button><button type="button" data-s="status">Status</button></div>
   <div id="wl-search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg><input id="wl-q" type="search" placeholder="Search wishlist" aria-label="Search wishlist" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div>
  </div>
  <!-- Timeline: what to chart, and over what span -->
  <div class="hdr-row hidden" id="timeline-controls">
-  <div class="tl-views" id="tl-modes"><button type="button" data-m="graph" class="on">Pages &amp; Listening</button><button type="button" data-m="timeline">Timeline</button><button type="button" data-m="released">Released</button></div>
+  <div class="tl-views" id="tl-modes"><button type="button" data-m="graph" class="on">Activity</button><button type="button" data-m="timeline">Timeline</button><button type="button" data-m="released">Released</button><button type="button" data-m="library">Library</button></div>
   <div class="tl-views" id="tl-ranges"><button type="button" data-v="all">All Time</button><button type="button" data-v="year">This Year</button><button type="button" data-v="month" class="on">This Month</button><button type="button" data-v="week">This Week</button></div>
  </div>
  <!-- Data: Stats | Backup, then Export | Import (opens on Stats) -->
@@ -2676,6 +2708,10 @@
     </div>
     <div class="field-card" id="year-card"><div class="yc-row"><input id="year-input" type="number" inputmode="numeric" min="1" placeholder="YEAR" aria-label="Year released"><button type="button" id="year-era" aria-label="AD or BC">AD</button></div></div>
     <div class="field-card" id="tags-card"><label>Lists</label><div id="tags-value">None</div></div>
+    <button type="button" class="field-card" id="loan-add"><b>Library Book Data</b><i>Optional</i></button>
+    <div id="loan-card" hidden><input type="hidden" id="loan-out"><input type="hidden" id="loan-due">
+      <div class="field-card ld-set" data-f="out" aria-label="Out"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">OUT</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
+      <div class="field-card ld-set" data-f="due" aria-label="Due"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">DUE</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card" id="loan-x" aria-label="Not a library book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   </div>
   <div id="customize-footer">
   <div id="customize-fields">
@@ -4579,6 +4615,7 @@
       document.getElementById('wishlist-controls').classList.toggle('hidden', view !== 'wishlist');
       { const l = document.querySelector('#add-card .add-lbl'); if(l) l.textContent = view === 'wishlist' ? 'Add New Wishlist Book' : 'Add New Book'; }
       if(view === 'wishlist' && window.wishRender) window.wishRender();
+      if(view === 'wishlist' && window.__lbLabel) window.__lbLabel();
       window.scrollTo(0, 0);                              // each page opens at its top
       if(view === 'library') renderCollections();
       if(view === 'all' && collEdited){ collEdited = false; render(); }
@@ -8589,6 +8626,12 @@
       pagesInput.placeholder = 'PAGES';
       pagesInput.value = book.pages || '';
       yearSet(book.released);
+      // a library book (or one being checked out now): its loan dates
+      const ln = book.loan || (book._loan ? { out: Date.now(), due: Date.now() + 21 * 864e5 } : null);
+      loanCard.hidden = !ln; loanAdd.hidden = !!ln; loanCard.classList.remove('invalid'); loanTouched = !!book._loan; loanDropped = false;
+      const ymd = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+      if(ln){ loanOut.value = ymd(ln.out); loanDue.value = ymd(ln.due); loanWheelsSync(); }
+      if(book._loan && customizeMode === 'add') customizePageTitle.textContent = 'Check Out a Book';
     }
     customizeTags = bookTags(book).slice();
     sessionTags = customizeTags.slice();   // names offered in the picker this session, even if deselected
@@ -8684,6 +8727,68 @@
     if(on('shape')) b.bookmarkShape = customizeShapeChoice;
   }
   // ---- the release year: a number, AD unless the little AD | BC switch says BC; blank is fine ----
+  const loanCard = document.getElementById('loan-card'), loanOut = document.getElementById('loan-out'), loanDue = document.getElementById('loan-due'), loanAdd = document.getElementById('loan-add');
+  let loanTouched = false, loanDropped = false;   // dates typed in this time / the loan taken off
+  const ymdOf = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  loanAdd.addEventListener('click', () => { loanOut.value = ymdOf(Date.now()); loanDue.value = ymdOf(Date.now() + 21 * 864e5);
+    loanAdd.hidden = true; loanCard.hidden = false; loanTouched = true; loanDropped = false; loanWheelsSync(); });
+  document.getElementById('loan-x').addEventListener('click', () => { loanCard.hidden = true; loanAdd.hidden = false; loanCard.classList.remove('invalid'); loanDropped = true; });
+  // ---- the date wheels: month and day roll round, the year stops at its ends; a day past the month's end comes back to its last day ----
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], Y0 = 2000, YN = 100;
+  const dim = (y, m) => new Date(y, m + 1, 0).getDate();
+  const ldSyncs = [];
+  function dateWheel(w, spec){
+    const rows = [...w.querySelectorAll('div')], mod = (a, n) => ((a % n) + n) % n;
+    let pos = spec.get(), af = 0, hc = null, hit = false;
+    const val = p => { const r = Math.round(p), n = spec.count(); return spec.wrap ? mod(r, n) : Math.max(0, Math.min(n - 1, r)); };
+    function render(){ const c = Math.round(pos), n = spec.count();
+      if(hc !== c){ if(hc != null && window.hapticTick) window.hapticTick(); hc = c; }
+      rows.forEach((row, i) => { const idx = c - 3 + i;
+        const txt = spec.wrap ? spec.text(mod(idx, n)) : (idx >= 0 && idx < n ? spec.text(idx) : '');
+        if(row._t !== txt){ row.textContent = txt; row._t = txt; }
+        row.style.transform = 'translateY(' + (11.5 + (idx - pos) * 16).toFixed(2) + 'px)';
+        // fade like the other wheels; the day wheel (its tag on top) cuts off sharply above the centre
+        const y = (idx - pos) * 16, t = Math.min(1, Math.abs(y) / 20); let op = 1 - 0.8 * t * t * (3 - 2 * t);
+        if(spec.cut){ const q = Math.max(0, Math.min(1, (y + 16 * .45) / (16 * .25))); op *= q * q * (3 - 2 * q); }
+        row.style.opacity = op.toFixed(3); }); }
+    function commit(){ if(!spec.wrap){ const n = spec.count(), c = Math.max(0, Math.min(n - 1, pos)); if(c !== pos){ pos = c; hit = true; } } spec.set(val(pos)); render(); }
+    function snap(){ const from = pos, to = Math.round(from); let st = null;
+      const f = ts => { if(st === null) st = ts; const t = Math.min(1, (ts - st) / 110); pos = from + (to - from) * (1 - Math.pow(1 - t, 3)); commit();
+        if(t < 1) af = requestAnimationFrame(f); else { pos = spec.get(); render(); } };
+      af = requestAnimationFrame(f); }
+    function glide(v){ if(Math.abs(v) < 2){ snap(); return; } let last = null;
+      const step = ts => { if(last === null){ last = ts; af = requestAnimationFrame(step); return; }
+        const dt = Math.min(.04, (ts - last) / 1000); last = ts; pos += v * dt; v *= Math.exp(-5 * dt); hit = false; commit();
+        if(hit) v = 0; if(Math.abs(v) < 2){ snap(); return; } af = requestAnimationFrame(step); };
+      af = requestAnimationFrame(step); }
+    let drag = null;
+    w.addEventListener('pointerdown', e => { cancelAnimationFrame(af); drag = { y: e.clientY, pos, s: [{ t: e.timeStamp, y: e.clientY }] }; w.setPointerCapture(e.pointerId); e.preventDefault(); });
+    w.addEventListener('pointermove', e => { if(!drag) return; pos = drag.pos - (e.clientY - drag.y) / 16; commit();
+      drag.s.push({ t: e.timeStamp, y: e.clientY }); while(drag.s.length > 1 && e.timeStamp - drag.s[0].t > 100) drag.s.shift(); });
+    const up = () => { if(!drag) return; const a = drag.s[0], b = drag.s[drag.s.length - 1];
+      const v = b.t > a.t ? -((b.y - a.y) / (b.t - a.t)) * 1000 / 16 : 0; drag = null; glide(v); };
+    w.addEventListener('pointerup', up); w.addEventListener('pointercancel', up);
+    w.addEventListener('wheel', e => { e.preventDefault(); cancelAnimationFrame(af); pos = Math.round(pos) + (e.deltaY > 0 ? 1 : -1); commit(); snap(); }, { passive: false });
+    return () => { cancelAnimationFrame(af); pos = spec.get(); render(); };
+  }
+  document.querySelectorAll('#loan-card .ld-set').forEach(set => {
+    const inp = set.dataset.f === 'out' ? loanOut : loanDue;
+    const st = () => { const [y, m, d] = (inp.value || ymdOf(Date.now())).split('-').map(Number); return { y, m: m - 1, d }; };
+    const put = (o, again) => { o.d = Math.min(o.d, dim(o.y, o.m)); inp.value = o.y + '-' + String(o.m + 1).padStart(2, '0') + '-' + String(o.d).padStart(2, '0');
+      loanTouched = true; loanCard.classList.remove('invalid'); if(again) syncs[1](); };   // (the day wheel, when its month's length changed)
+    const W = k => set.querySelector(`.lw-wheel[data-k="${k}"]`);
+    const syncs = [
+      dateWheel(W('m'), { count: () => 12, wrap: true, text: i => MON[i], get: () => st().m, set: i => { const o = st(); if(o.m === i) return; o.m = i; put(o, true); } }),
+      dateWheel(W('d'), { cut: true, count: () => { const o = st(); return dim(o.y, o.m); }, wrap: true, text: i => String(i + 1), get: () => st().d - 1, set: i => { const o = st(); if(o.d === i + 1) return; o.d = i + 1; put(o); } }),
+      dateWheel(W('y'), { count: () => YN, wrap: false, text: i => String(Y0 + i), get: () => st().y - Y0, set: i => { const o = st(); if(o.y === Y0 + i) return; o.y = Y0 + i; put(o, true); } })];
+    ldSyncs.push(...syncs);
+  });
+  const loanWheelsSync = () => ldSyncs.forEach(f => f());
+  // dates that are already over: the book went back on its end date (the Returned tab); still to come: it's checked out
+  const loanSettle = (L) => { const t = new Date(); t.setHours(0, 0, 0, 0);
+    if(L.due < t.getTime()) L.returned = L.due; else delete L.returned; return L; };
+  const loanRead = () => { if(loanCard.hidden) return null; const at = v => { if(!v) return NaN; const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d, 12).getTime(); };
+    const out = at(loanOut.value), due = at(loanDue.value); return isNaN(out) || isNaN(due) || due < out ? false : { out, due }; };
   const yearInput = document.getElementById('year-input'), yearEra = document.getElementById('year-era'), yearCard = document.getElementById('year-card');
   function yearSet(y){ const has = y != null && y !== '' && !isNaN(y); yearInput.value = has ? Math.abs(y) : ''; yearEra.textContent = has && y < 0 ? 'BC' : 'AD';
     yearEra.classList.toggle('bc', has && y < 0); yearCard.classList.remove('invalid'); }
@@ -8708,12 +8813,14 @@
       const bad = [!title, !author, !(pages > 0)];
       fieldCards.forEach((c, i)=> c.classList.toggle('invalid', bad[i]));
       const rel = yearRead(); yearCard.classList.toggle('invalid', rel === false);
-      if(bad.some(Boolean) || rel === false) return;
+      const loan = loanRead(); loanCard.classList.toggle('invalid', loan === false);
+      if(bad.some(Boolean) || rel === false || loan === false) return;
       if(customizeMode === 'add'){
         const nb = { title, author, authorFirst, authorLast, pages, tags: customizeTags.slice() };
         if(subtitle) nb.subtitle = subtitle;
         if(audio) nb.audioSeconds = secs;
         if(rel != null) nb.released = rel;
+        if(loan) nb.loan = loanSettle(loan);
         applyOptions(nb, false);
         books.push(nb);
         if(window.__wishAdded) window.__wishAdded();
@@ -8723,6 +8830,8 @@
         if(subtitle) b.subtitle = subtitle; else delete b.subtitle;
         if(audio) b.audioSeconds = secs; else delete b.audioSeconds;
         if(rel != null) b.released = rel; else delete b.released;
+        if(loan){ const L = Object.assign(b.loan || {}, loan); b.loan = loanTouched ? loanSettle(L) : L; }
+        else if(loanDropped) delete b.loan;
         b.tags = customizeTags.slice();
         applyOptions(b, true);
         if(b.days) syncBookFinish(b);
@@ -8740,6 +8849,7 @@
       }
     }
     renderAll();
+    if(window.wishRender) window.wishRender();   // the Library tab's loans too
     closeCustomizeModal();
   }
   customizeSaveBtn.addEventListener('click', saveCustomizePage);
@@ -8854,7 +8964,7 @@
     openCustomizeModal({ title:'', author:'', pages:0, cover:'hard' }, 'add');
   }
   function openEditModal(book){ openCustomizeModal(book, 'edit'); }
-  addCard.addEventListener('click', () => document.body.classList.contains('tab-wishlist') && window.wishAdd ? window.wishAdd() : openAddModal());
+  addCard.addEventListener('click', () => document.body.classList.contains('tab-wishlist') && document.body.classList.contains('lb-loans') ? openCustomizeModal({ title:'', author:'', pages:0, cover:'hard', _loan:true }, 'add') : document.body.classList.contains('tab-wishlist') && window.wishAdd ? window.wishAdd() : openAddModal());
 
   // ===================== option pickers: Cover, Ribbon and Pages (plain shapes drawn with CSS) =====================
   // The option cards are the page's footer. Tapping Cover, Ribbon or Pages raises a picker out of the footer's top
@@ -10010,7 +10120,7 @@
                                         : `${TL_MON[R.t0.getMonth()]} ${R.t0.getDate()} – ${TL_MON[wEnd.getMonth()]} ${wEnd.getDate()}, ${wEnd.getFullYear()}`)
                 : TL.view === 'month' ? `${TL_MONTH[R.t0.getMonth()]} ${R.t0.getFullYear()}` : TL.view === 'year' ? String(R.t0.getFullYear()) : 'All Time';
     const unit = TL.view === 'week' ? 'week' : TL.view === 'month' ? 'month' : 'year';
-    const hint = TL.mode === 'timeline' ? 'Tap a book to see it here' : tlDaily() ? 'Tap a bar, or a date for the whole day' : TL.view === 'all' && R.t1.getFullYear() - R.t0.getFullYear() > 9 ? 'Tap a bar, or a year for all of it' : TL.view === 'all' ? 'Tap a bar, or a year for all of it' : 'Tap a bar, or a month for all of it';
+    const hint = TL.mode === 'timeline' || TL.mode === 'library' ? 'Tap a book to see it here' : tlDaily() ? 'Tap a bar, or a date for the whole day' : TL.view === 'all' && R.t1.getFullYear() - R.t0.getFullYear() > 9 ? 'Tap a bar, or a year for all of it' : TL.view === 'all' ? 'Tap a bar, or a year for all of it' : 'Tap a bar, or a month for all of it';
     tlInfo.classList.add('nav'); tlInfo.classList.remove('pick');
     tlInfo.innerHTML = `<button type="button" class="tl-nav" data-d="-1" aria-label="Previous ${unit}"${TL.off <= minOff ? ' disabled' : ''}>◀</button>` +
       `<div class="tl-mid"><div class="t">${title}</div><div class="tot">${tot}</div><div class="hint">${hint}</div></div>` +
@@ -10170,7 +10280,7 @@
     tlCanvas.innerHTML = '';
     const R = tlRange(today), W = tlCanvas.clientWidth, LW = 39;   // a 45px square with the card's edge and the 3px rule, lined up with the footer card's ◀ section
     // All Time on the Timeline: each year gets at least 240px and the card scrolls, so short reads stay readable
-    const tall = TL.view === 'all' && TL.mode === 'timeline';
+    const tall = TL.view === 'all' && (TL.mode === 'timeline' || TL.mode === 'library');
     const years = (R.t1 - R.t0) / (365.25 * 864e5);
     const H = Math.max(tlCanvas.getBoundingClientRect().height, tall ? Math.round(years * 240) : 0);
     tlCanvas.style.overflowY = tall ? 'auto' : 'hidden';
@@ -10254,6 +10364,79 @@
         tlInfo.classList.remove('nav', 'pick');
         tlInfo.innerHTML = `<span class="t">${tlEsc(r.title)}${r.reread ? ' ↺' : ''}</span>` +
           `<span>${tlFmt(r.s)} – ${r.e ? tlFmt(r.e) : r.eta ? `(${tlFmt(r.eta)})` : '<b>now</b>'}<br><b>${days}</b> ${days === 1 ? 'day' : 'days'}${tlDoneLeft(r)}</span>`;
+      });
+    });
+  }
+  // ---- Library: each library book from the day it went out to the day it's due (or went back). Up to today it's filled in,
+  // day by day — page texture on the days it was read, its cover's cloth on the days it wasn't; the days still to come,
+  // out to the due date, dotted and faint like a read's estimated finish ----
+  function tlCover(hex, seed = 3){
+    const key = 'cv' + hex + seed;
+    if(TL.tex[key]) return TL.tex[key];
+    const c = document.createElement('canvas'); c.width = 6; c.height = 6; const x = c.getContext('2d'), rnd = tlRnd(seed);
+    x.fillStyle = hex; x.fillRect(0, 0, 6, 6);
+    for(let i = 0; i < 6; i++) for(let j = 0; j < 6; j++){ const v = rnd(), over = (i + j) % 2;   // a fine weave: threads over and under
+      x.fillStyle = over ? `rgba(255,255,255,${.05 + v * .08})` : `rgba(0,0,0,${.08 + v * .12})`; x.fillRect(i, j, 1, 1); }
+    return TL.tex[key] = `url(${c.toDataURL()})`;
+  }
+  function tlDrawLibrary(){
+    const today = tlDay(new Date()), { R, W, H, LW, y, el } = tlFrame(today), { t0, t1 } = R;
+    R.lines.forEach(l => el(`left:${l.strong ? 0 : LW + 3}px;right:0;top:${(y(l.at) - (l.strong ? 1.5 : .5)).toFixed(1)}px;height:${l.strong ? 3 : 1}px;background:${l.strong ? '#000' : '#d9d2c4'};z-index:${l.strong ? 2 : 1}`));
+    R.marks.forEach(m => { const e = el(`left:0;width:${LW}px;top:${y(m.mid).toFixed(1)}px;transform:translateY(-50%);z-index:5`, 'tl-lbl tl-pin' + (m.html ? ' tl-wk' : '') + (tlIsToday(m) ? ' tl-today' : ''), m.text); if(m.html) e.innerHTML = m.html; });
+    el(`left:${LW}px;top:0;height:${H}px;width:3px;background:#000;z-index:5`, 'tl-pin');
+    tlTodayBand(today, t0, t1, y, el, LW, true);
+    tlHead([{ x: 0, end: LW, text: 'Date' }, { x: LW + 3, end: W, line: LW, text: 'Library Books' }]);
+    // each loan: out (its first day) to its last day — the day it went back, or the due date
+    const loans = books.filter(b => b.loan).map(b => { const L = b.loan, s = tlDay(new Date(L.out)), due = tlDay(new Date(L.due)), back = L.returned ? tlDay(new Date(L.returned)) : null;
+      const last = back || (today > due ? today : due);   // overdue: it runs on to today
+      return { b, s, due, back, last, end: tlAdd(last, 1), key: 'ln|' + b.title + '|' + (+s) }; })
+      .filter(r => r.s < t1 && r.end > t0).sort((a, b) => a.s - b.s);
+    if(!loans.length) return;
+    // the pages read each day, from the book's own reading log
+    const readOn = new Map();
+    TL.reads.forEach(r => r.daily.forEach((v, j) => { if(v > 0){ const k = r.title + '|' + (+tlAdd(r.s, j)); readOn.set(k, (readOn.get(k) || 0) + v); } }));
+    // lanes: side by side where loans overlap
+    const laneEnd = [];
+    loans.forEach(r => { let k = laneEnd.findIndex(e => e <= r.s); if(k < 0){ k = laneEnd.length; laneEnd.push(0); } laneEnd[k] = tlAdd(r.end, 1); r.lane = k; });
+    const N = laneEnd.length, room = W - LW - 3 - 8;
+    let GAP = 10, BW = Math.floor((room - (N - 1) * GAP) / N);
+    if(BW < 12){ GAP = 3; BW = Math.floor((room - (N - 1) * GAP) / N); }
+    BW = Math.max(6, Math.min(34, BW));
+    const x0 = LW + 3 + Math.max(4, Math.round((W - LW - 3 - (N * BW + (N - 1) * GAP)) / 2));
+    const clampY = d => d >= t1 ? -10 : d <= t0 ? H + 10 : y(d);
+    loans.forEach(r => {
+      const bx = x0 + r.lane * (BW + GAP), hex = bookColor(r.b), page = paperOf(styleForBook(r.b).pageTone), sd = 1 + ((parseInt(r.b.seed, 10) || 7) % 9973);
+      const fillEnd = r.back ? r.end : tlAdd(r.last < today ? r.last : today, 1);   // filled through today (or to the day it went back)
+      // the days still to come: dotted, faint, its cover's cloth
+      if(!r.back && r.end > fillEnd){
+        const ft = clampY(r.end), fb = clampY(fillEnd);
+        if(fb - ft > 1) el(`left:${bx}px;top:${ft.toFixed(1)}px;width:${BW}px;height:${(fb - ft).toFixed(1)}px;background:${hex} ${tlCover(hex, sd)} repeat`, 'tl-bar tl-eta');
+      }
+      const bt = clampY(fillEnd), bb = clampY(r.s); if(bb - bt < 1) return;
+      const bar = el(`left:${bx}px;top:${bt.toFixed(1)}px;width:${BW}px;height:${(bb - bt).toFixed(1)}px;overflow:hidden;background:${hex} ${tlCover(hex, sd)} repeat`, 'tl-bar' + (!r.back ? ' now' : '') + (TL.picked === r.key ? ' on' : ''));
+      // read days: page texture over the cloth, a run of read days as one piece
+      let runA = null;
+      const flush = d => { if(!runA) return; const a = clampY(d), z = clampY(runA);
+        const seg = document.createElement('div'); seg.style.cssText = `position:absolute;left:0;right:0;top:${(a - bt - 2).toFixed(1)}px;height:${(z - a).toFixed(1)}px;background:${page} ${tlPageLines(sd + (+runA % 97))} repeat;background-size:4px 120px`;
+        bar.appendChild(seg); runA = null; };
+      for(let d = new Date(r.s); d < fillEnd; d = tlAdd(d, 1)){
+        const read = readOn.get(r.b.title + '|' + (+d)) > 0;
+        if(read && !runA) runA = new Date(d); else if(!read) flush(d);
+      }
+      flush(fillEnd);
+      // overdue: a red line where it was due
+      if(!r.back && today > r.due){ const dy = clampY(tlAdd(r.due, 1)) - bt - 2;
+        const ln = document.createElement('div'); ln.style.cssText = `position:absolute;left:0;right:0;top:${(dy - 1).toFixed(1)}px;height:2px;background:#aa3333`; bar.appendChild(ln); }
+      bar.addEventListener('click', () => {
+        tlCanvas.querySelectorAll('.tl-bar.on').forEach(t => t.classList.remove('on'));
+        if(TL.picked === r.key){ TL.picked = ''; tlIdle(); return; }
+        bar.classList.add('on'); TL.picked = r.key;
+        let pages = 0, rd = 0; for(let d = new Date(r.s); d < fillEnd; d = tlAdd(d, 1)){ const v = readOn.get(r.b.title + '|' + (+d)) || 0; pages += v; if(v > 0) rd++; }
+        const n = Math.round((r.due - today) / 864e5);
+        const state = r.back ? `back <b>${tlFmt(r.back)}</b>` : n < 0 ? `<b>${-n}</b> ${-n === 1 ? 'day' : 'days'} late` : n === 0 ? `due <b>today</b>` : `<b>${n}</b> ${n === 1 ? 'day' : 'days'} left`;
+        tlInfo.classList.remove('nav', 'pick');
+        tlInfo.innerHTML = `<span class="t">${tlEsc(r.b.title)}</span>` +
+          `<span>${tlFmt(r.s)} – ${tlFmt(r.due)} · ${state}<br>read on <b>${rd}</b> ${rd === 1 ? 'day' : 'days'} · <b>${tlN(pages)}</b> ${Math.round(pages) === 1 ? 'page' : 'pages'}</span>`;
       });
     });
   }
@@ -10618,9 +10801,10 @@
     TL.reads.forEach(r => r.key = r.title + '|' + (+r.s));
     // name the chart for what's ever been logged: just Pages, just Listening, or both
     const hasB = TL.reads.some(r => r.kind !== 'audio'), hasA = TL.reads.some(r => r.kind === 'audio');
-    document.querySelector('#tl-modes button[data-m="graph"]').textContent = hasB && !hasA ? 'Pages' : hasA && !hasB ? 'Listening' : 'Pages & Listening';
+    document.querySelector('#tl-modes button[data-m="graph"]').textContent = hasB && !hasA ? 'Pages' : hasA && !hasB ? 'Listening' : 'Activity';   // both: one short word, so four tab cards fit
     document.body.classList.toggle('tl-rel', TL.mode === 'released');
     if(TL.mode === 'released'){ relDraw(); return; }
+    if(TL.mode === 'library'){ tlDrawLibrary(); if(!TL.picked) tlIdle(); return; }
     if(TL.mode === 'timeline') tlDrawTimeline(); else tlDrawGraph();
     if(!TL.picked && !TL.pickedK) tlIdle();
   }
@@ -10642,7 +10826,7 @@
   document.querySelectorAll('#tl-modes button').forEach(btn => btn.addEventListener('click', () => {
     TL.mode = btn.dataset.m; document.querySelectorAll('#tl-modes button').forEach(x => x.classList.toggle('on', x === btn));
     if(TL.mode === 'released'){ TL.view = 'month'; TL.off = 0; document.querySelectorAll('#tl-ranges button').forEach(x => x.classList.toggle('on', x.dataset.v === 'month')); }   // opens on This Month
-    if(TL.mode === 'timeline'){ TL.view = 'month'; TL.off = 0; document.querySelectorAll('#tl-ranges button').forEach(x => x.classList.toggle('on', x.dataset.v === 'month')); }   // the Timeline card always opens on This Month
+    if(TL.mode === 'timeline' || TL.mode === 'library'){ TL.view = 'month'; TL.off = 0; document.querySelectorAll('#tl-ranges button').forEach(x => x.classList.toggle('on', x.dataset.v === 'month')); }   // the Timeline (and Library) card always opens on This Month
     TL.picked = ''; TL.pickedK = ''; tlDraw();
   }));
   window.addEventListener('resize', () => { if(document.getElementById('timeline-page').classList.contains('open')) tlDraw(); });
@@ -12052,20 +12236,67 @@ closeRowDD = function(dd){
         lib: ['yes', 'wait', 'no'].includes(b.lib) ? b.lib : '' }));
     list = clean(list);
     const view = document.getElementById('wishlist-view'), q = document.getElementById('wl-q');
-    let sortBy = 'added', regroupT = 0;
+    let sortBy = 'status', regroupT = 0;
     const GROUPS = [['', 'To Check'], ['yes', 'Found'], ['wait', 'Waiting'], ['no', 'Not There']];
     // a title too long for one line takes two
     const fit = c => { const t = c.querySelector('.t'); c.classList.remove('two'); if(t && t.scrollWidth > t.clientWidth + 1) c.classList.add('two'); };
     const MARK = (k, on, label, d) => `<button type="button" class="wl-mark ${k}${on ? ' on' : ''}" data-k="${k}" aria-label="${label}" aria-pressed="${on}">` +
       `<svg viewBox="0 0 24 24" fill="none" stroke-width="${k === 'wait' ? 4 : 3.6}" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg></button>`;
+    // ---- the Library tab: Wishlist | Checked Out | Returned (loans are the books with library data) ----
+    let mode = 'wish', openLoan = -1;
+    const DAY = 864e5, today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
+    let loans = [];   // the library books: every book with a loan
+    const md = t => new Date(t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    function cardHTML(b, i){ const hex = bookColor(b);   // its own cover colour, as on the shelf
+      return `<div class="wl-card" data-li="${i}" data-hex="${hex}" style="--cloth:${hex}"><canvas aria-hidden="true"></canvas><span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>`; }
+    function renderLoans(){
+      const s = q.value.trim().toLowerCase(), t0 = today();
+      loans = books.filter(b => b.loan);
+      const rows = loans.map((b, i) => [b, i]).filter(([b]) => (mode === 'ret' ? !!b.loan.returned : !b.loan.returned) && (!s || (b.title + ' ' + b.author).toLowerCase().includes(s)));
+      let html = '';
+      if(mode === 'out'){
+        rows.sort((p, n) => p[0].loan.due - n[0].loan.due);
+        const left = b => { const d = new Date(b.loan.due); d.setHours(0, 0, 0, 0); return Math.round((d.getTime() - t0) / DAY); };
+        [['Overdue', b => left(b) < 0], ['Due This Week', b => left(b) >= 0 && left(b) <= 7], ['Later', b => left(b) > 7]].forEach(([name, f]) => {
+          const g = rows.filter(([b]) => f(b)); if(!g.length) return;
+          html += `<div class="list-divider"><span class="ld-name">${name}</span></div>`;
+          g.forEach(([b, i]) => { const n = left(b);
+            const [big, small, cls] = n < 0 ? [-n, -n === 1 ? 'Day Late' : 'Days Late', 'late'] : n === 0 ? ['Today', '', 'soon'] : [n, n === 1 ? 'Day Left' : 'Days Left', n <= 3 ? 'soon' : n <= 7 ? 'week' : 'ok'];
+            html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ${cls}" data-li="${i}"><b${typeof big === 'string' ? ' class="w"' : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</button></div>`;
+            if(openLoan === i) html += `<div class="ln-act"><div>Out ${md(b.loan.out)} · Due ${md(b.loan.due)}${b.loan.renewed ? ` · Renewed ${b.loan.renewed}×` : ''}</div><button type="button" class="rn" data-li="${i}">Renew</button><button type="button" class="rt" data-li="${i}">Returned</button></div>`;
+          });
+        });
+      } else {
+        rows.sort((p, n) => n[0].loan.returned - p[0].loan.returned);
+        rows.forEach(([b, i]) => { const d = new Date(b.loan.returned);
+          html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ret" data-li="${i}"><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></button></div>`; });
+      }
+      view.innerHTML = html;
+      view.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex; fit(c);
+        const go = () => { fit(c); if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(hex), true, 6); };
+        if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go);
+        c.addEventListener('click', () => openCustomizeModal(loans[+c.dataset.li], 'edit')); });   // the same Edit a Book window as Home
+      if(mode === 'out'){
+        view.querySelectorAll('.ln-due').forEach(d => d.addEventListener('click', () => { const i = +d.dataset.li; openLoan = openLoan === i ? -1 : i; renderLoans(); }));
+        view.querySelectorAll('.ln-act .rn').forEach(x => x.addEventListener('click', () => { const b = loans[+x.dataset.li]; b.loan.due += 21 * DAY; b.loan.renewed = (b.loan.renewed || 0) + 1; saveBooks(); renderLoans(); }));
+        view.querySelectorAll('.ln-act .rt').forEach(x => x.addEventListener('click', () => { loans[+x.dataset.li].loan.returned = Date.now(); openLoan = -1; saveBooks(); renderLoans(); }));
+      }
+    }
+    const lbLabel = () => { const l = document.querySelector('#add-card .add-lbl'); if(l && document.body.classList.contains('tab-wishlist')) l.textContent = mode === 'wish' ? 'Add New Wishlist Book' : 'Check Out a Book'; };
+    document.querySelectorAll('#lb-tabs .tab').forEach(t => t.addEventListener('click', () => {
+      mode = t.dataset.m; openLoan = -1; document.querySelectorAll('#lb-tabs .tab').forEach(x => x.classList.toggle('active', x === t));
+      document.body.classList.toggle('lb-loans', mode !== 'wish'); q.placeholder = mode === 'wish' ? 'Search wishlist' : 'Search library books';
+      lbLabel(); render(); window.dispatchEvent(new Event('resize')); window.scrollTo(0, 0); }));
+    window.__lbLabel = lbLabel;
     function render(){
+      if(mode !== 'wish') return renderLoans();
       if(!list.length){ view.innerHTML = '<div id="wl-empty">No wishlist books yet</div>'; return; }
       const s = q.value.trim().toLowerCase();
       const rows = list.map((b, i) => [b, i]).filter(([b]) => !s || (b.title + ' ' + b.author).toLowerCase().includes(s));
       const by = k => (p, n) => (p[0][k] || '').localeCompare(n[0][k] || '', undefined, { sensitivity: 'base' });
       const lc = (x, y) => x.localeCompare(y, undefined, { sensitivity: 'base' });
       if(sortBy === 'title') rows.sort(by('title'));
-      else if(sortBy === 'author') rows.sort((p, n) => {   // by last name, then first, as the library sorts
+      else if(sortBy === 'author' || sortBy === 'status') rows.sort((p, n) => {   // by last name, then first, as the library sorts
         const x = authorKeyOf(p[0]), y = authorKeyOf(n[0]); return lc(x[0], y[0]) || lc(x[1], y[1]) || by('title')(p, n); });
       if(!rows.length){ view.innerHTML = '<div id="wl-empty">No matches</div>'; return; }
       // Status: each group (in Date Added order) under its own divider; empty groups left out
