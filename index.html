@@ -12345,8 +12345,8 @@ closeRowDD = function(dd){
     const view = document.getElementById('wishlist-view'), q = document.getElementById('wl-q');
     let sortBy = 'status', regroupT = 0;
     const wlYr = y => y < 0 ? (-y) + ' BC' : String(y);
-    // a word count in full (sized so seven digits fit the card's height)
-    const wlWords = n => String(Math.min(9999999, n));
+    // a word count in full, with commas (sized so seven digits, 9,999,999, fit the card's height)
+    const wlWords = n => Math.min(9999999, n).toLocaleString('en-US');
     // ---- the Library's Sort and Filter: its own for each tab card (kept between visits) ----
     const LB = {
       wish: { f: [['all', 'All', 'Every wishlist book'], ['', 'To Check', 'Not looked for yet'], ['yes', 'Found', 'Found at the library'], ['wait', 'Waiting', 'On hold, or on its way'], ['no', 'Not There', 'The library doesn\'t have it']],
