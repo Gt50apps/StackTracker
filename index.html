@@ -106,7 +106,16 @@
   .br-ghost, .tape-ghost{opacity:.5; transition:opacity 1s linear;}
   .br-ghost.out, .tape-ghost.out{opacity:0;}
   .book-row:active .br-fill{filter:brightness(.95);}
-  .book-row:not(.tape-row){background:var(--cbffffff, #ffffff);}   /* white, so the page-coloured fill stands out */
+  .book-row:not(.tape-row){background:var(--cbffffff, #ffffff);}
+  /* a short piece of the book's spine at each end, in its cover cloth, raised: it casts a shadow onto the pages */
+  .book-row.spined{padding:0 24px;}
+  .book-row.spined .br-anchor{left:24px;}
+  .book-row.spined .tape-fill{left:13px; width:calc(100% - 26px);}   /* an audiobook's tape winds between the spines */
+  .br-spine{position:absolute; top:0; bottom:0; width:16px; z-index:1; overflow:hidden; pointer-events:none; background:var(--cloth, #6b4a32);}
+  .br-spine.l{left:0; box-shadow:3px 0 5px -1px rgba(0,0,0,.5);} .br-spine.r{right:0; box-shadow:-3px 0 5px -1px rgba(0,0,0,.5);}
+  .br-spine > canvas.cloth-bg{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  .br-spine > i{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; writing-mode:vertical-rl; transform:rotate(180deg);
+    font:normal 700 .46rem/1 Arial, sans-serif; letter-spacing:.2px; color:var(--ds-ink, #fff); white-space:nowrap;}   /* white, so the page-coloured fill stands out */
   /* wound tape, drawn per tape; runs a few px past the top and bottom so the card's own
      edge clips it (no sliver of white where the border lands on a part pixel) */
   .book-row .tape-fill{position:absolute; left:-3px; top:-3px; width:calc(100% + 6px); height:calc(100% + 6px); pointer-events:none;}
@@ -389,14 +398,14 @@
   #customize-fields.audio #customize-shape-card,
   #customize-fields.audio #customize-border-card{display:none;}
   /* two per row: Title | Author, then Pages | Lists */
-  #book-fields{grid-template-columns:repeat(6, minmax(0, 1fr));}
+  #book-fields{grid-template-columns:repeat(12, minmax(0, 1fr));}   /* twelfths: rows across, or quarters */
   #book-fields > .field-card{grid-column:span 3;}
-  #book-fields > #title-card, #book-fields > #author-card{grid-column:span 6;}   /* Title | Subtitle across, then Author | Author List */
+  #book-fields > #title-card, #book-fields > #author-card{grid-column:1 / -1;}   /* Title | Subtitle across, then Author | Author List */
   /* audiobook: Length on the left (a third), its wheels beside it (two thirds), Lists below */
   /* audiobook: no length readout — the wheels (two thirds) then Lists on the same line */
   #book-fields.audio > #pages-card{display:none;}
-  #book-fields.audio > #length-wheels{grid-column:span 4;}
-  #book-fields.audio > #tags-card{grid-column:span 2;}
+  #book-fields.audio > #length-wheels{grid-column:span 3;}
+  #book-fields.audio > #tags-card{grid-column:span 3;}
   #book-fields.audio > #pages-card.invalid + #length-wheels{border-color:var(--cbaa3333, #aa3333);}   /* missing length shows on the wheels */
   .field-card{
     grid-column:span 3;
@@ -2052,7 +2061,8 @@
 <body>
 <style>
   /* ===== Released: the Year card in Add / Edit ===== */
-  #book-fields > #pages-card, #book-fields > #year-card, #book-fields > #tags-card, #book-fields.audio > #length-wheels, #book-fields.audio > #tags-card{grid-column:span 2;}
+  /* Pages (or the length wheels) | Year | Words | Lists: a quarter each */
+  #book-fields > #pages-card, #book-fields > #year-card, #book-fields > #words-card, #book-fields > #tags-card, #book-fields.audio > #length-wheels, #book-fields.audio > #tags-card{grid-column:span 3;}
   /* the length wheels in a third: H / M / S tucked small into each wheel's corner, clear of the numbers */
   #length-wheels .lw-wheel span{left:3px; top:3px; transform:none; font-size:.5rem;}
   .yc-row{display:flex; align-items:center; gap:6px; min-width:0;}
@@ -2063,7 +2073,7 @@
   #year-card.blank .lw-wheel div{color:var(--cfc4bdb0, #c4bdb0);}   /* no year yet: all three faint */
   #year-card #year-era[hidden]{display:none;}
   /* optional: Library Book Data opens Out | Due (month / day / year wheels, like the length wheels) | ✕ (not a library book after all) */
-  #book-fields > #loan-card, #book-fields > #loan-add{grid-column:span 6; position:relative;}
+  #book-fields > #loan-card, #book-fields > #loan-add{grid-column:1 / -1; position:relative;}
   #loan-card[hidden], #loan-add[hidden], #loan-card > [hidden]{display:none;}
   #loan-add, #loan-add:active, #ret-add, #ret-add:active{margin:0; box-shadow:none; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; cursor:pointer;
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
@@ -2758,6 +2768,7 @@
       <div class="lw-wheel" data-k="2"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>S</span></div>
     </div>
     <div class="field-card" id="year-card" aria-label="Year released"><input type="hidden" id="year-input"><button type="button" id="year-era" hidden>AD</button><div class="lw-wheel" data-k="c"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">YEAR</span></div><div class="lw-wheel" data-k="e"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
+    <div class="field-card" id="words-card"><input id="words-input" type="text" inputmode="numeric" placeholder="WORDS" autocomplete="off" aria-label="Word count (optional)"></div>
     <div class="field-card" id="tags-card"><label>Lists</label><div id="tags-value">None</div></div>
     <button type="button" class="field-card" id="loan-add"><b>Library Book Data</b><i>Optional</i></button>
     <div id="loan-card" hidden><input type="hidden" id="loan-out"><input type="hidden" id="loan-due">
@@ -3873,7 +3884,8 @@
       return;
     }
     const fill = row.querySelector('.br-fill');
-    fill.style.width = `calc(${pct(b)*100}% + ${pct(b) >= 1 ? 6 : 3}px)`;   // +3px for the overhang on the left (+3 more at 100%)
+    if(row.classList.contains('spined')) fill.style.width = pct(b) >= 1 ? 'calc(100% + 6px)' : `calc(${pct(b)} * (100% - 32px) + 19px)`;   // from under the left spine; at 100% right out under the right one
+    else fill.style.width = `calc(${pct(b)*100}% + ${pct(b) >= 1 ? 6 : 3}px)`;   // +3px for the overhang on the left (+3 more at 100%)
     // the book's page colour, a shade deeper; finished books go much darker with white text
     paintPageFill(fill, styleForBook(b).pageTone, bookFinished(b), b.seed);
     // unstarted: the whole fill at half strength shows it's a book; it fades out (1 s) once reading starts, back in at 0
@@ -4007,17 +4019,26 @@
     };
   }
 
+  // the two short spine pieces on a list card: its year on the left, a number on the right (words, or an audiobook's seconds)
+  function spinesFor(row, b, n){
+    const [sl, sr] = row.querySelectorAll('.br-spine'), hex = bookColor(b);
+    clothBehind(sl, hex); clothBehind(sr, hex);
+    sl.querySelector('i').textContent = typeof b.released === 'number' && !isNaN(b.released) ? (b.released < 0 ? -b.released + ' BC' : String(b.released)) : '';
+    sr.querySelector('i').textContent = n > 0 ? Math.min(9999999, n).toLocaleString('en-US') : '';
+  }
   function buildSimpleTapeRow(b){
     const row = document.createElement('div');
-    row.className = 'book-row tape-simple';
+    row.className = 'book-row tape-simple spined';
     row._book = b;
     row.innerHTML =
       `<canvas class="tape-fill tape-ghost" data-pad="3"></canvas><canvas class="tape-fill" data-pad="3"></canvas>` +
+      `<div class="br-spine l"><i></i></div><div class="br-spine r"><i></i></div>` +
       `<div class="br-anchor"></div>` +
       `<div class="br-main"><div class="br-title"></div><div class="br-author"></div></div>` +
       `<div class="br-prog"><div class="br-pages"></div><div class="br-pct"></div></div>`;
     row.querySelector('.br-title').textContent = b.title;
-    row.querySelector('.br-author').textContent = (b.author || '') + (typeof b.released === 'number' && !isNaN(b.released) ? ` (released: ${b.released < 0 ? -b.released + ' BC' : b.released})` : '');
+    row.querySelector('.br-author').textContent = b.author || '';   // (its year is on the spine now)
+    spinesFor(row, b, b.audioSeconds > 0 ? Math.round(b.audioSeconds) : 0);   // an audiobook: its length in seconds at the right
     // dropdown: time wheels, graph, Edit / Log / Delete
     const dd = document.createElement('div');
     dd.className = 'row-dd tape-dd';
@@ -4427,14 +4448,17 @@
         return;
       }
       const row = document.createElement('div');
-      row.className = 'book-row';
+      row.className = 'book-row spined';
       row.innerHTML =
         `<div class="br-ghost"></div><div class="br-fill"></div>` +
+        `<div class="br-spine l"><i></i></div><div class="br-spine r"><i></i></div>` +
         `<div class="br-anchor"></div>` +
         `<div class="br-main"><div class="br-title"></div><div class="br-author"></div></div>` +
         `<div class="br-prog"><div class="br-pages"></div><div class="br-pct"></div></div>`;
       row.querySelector('.br-title').textContent = b.title;
-      row.querySelector('.br-author').textContent = (b.author || '') + (typeof b.released === 'number' && !isNaN(b.released) ? ` (released: ${b.released < 0 ? -b.released + ' BC' : b.released})` : '');
+      row.querySelector('.br-author').textContent = b.author || '';   // (its year is on the spine now)
+      // a short piece of its spine at each end, in its cover cloth: the year on the left, the word count on the right
+      spinesFor(row, b, b.words > 0 ? b.words : 0);
       paintListRow(row, b);
       row._book = b;
       const dd = buildBookDD(row, b);
@@ -4455,8 +4479,8 @@
           scrub.live = true;
           try{ row.setPointerCapture(scrub.id); }catch(err){}
         }
-        const r = row.getBoundingClientRect();
-        const frac = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+        const r = row.getBoundingClientRect(), sp = row.classList.contains('spined') ? 16 : 0;
+        const frac = Math.max(0, Math.min(1, (e.clientX - r.left - sp) / (r.width - 2 * sp)));
         if(finishedToday(b)){ setBookPage(b, Math.round(frac * b.pages)); paintListRow(row, b); refreshRowChart(row); scrub.direct = true; return; }   // wheels hidden: straight in
         row._staged = Math.max(sumDays(b.days.slice(0, -1)), Math.min(b.pages, Math.round(frac * b.pages)));
         row._wheels.put(row._staged); row._paintConfirm();
@@ -8681,6 +8705,7 @@
       pagesInput.placeholder = 'PAGES';
       pagesInput.value = book.pages || '';
       yearSet(book.released);
+      wordsInput.value = book.words > 0 ? book.words.toLocaleString('en-US') : ''; wordsCard.classList.remove('invalid');
       // a library book (or one being checked out now): its loan dates
       const ln = book.loan || (book._loan ? { out: Date.now(), due: Date.now() + 21 * 864e5 } : null);
       loanCard.hidden = !ln; loanAdd.hidden = !!ln; loanCard.classList.remove('invalid'); loanTouched = !!book._loan; loanDropped = false;
@@ -8784,6 +8809,11 @@
     if(on('shape')) b.bookmarkShape = customizeShapeChoice;
   }
   // ---- the release year: a number, AD unless the little AD | BC switch says BC; blank is fine ----
+  // Words: optional; "92000", "92,000" or "92k"
+  const wordsCard = document.getElementById('words-card'), wordsInput = document.getElementById('words-input');
+  wordsInput.addEventListener('input', () => wordsCard.classList.remove('invalid'));
+  const wordsRead = () => { const v = wordsInput.value.trim().toLowerCase().replace(/[,\s]/g, ''); if(!v) return null;
+    const m = v.match(/^(\d+(?:\.\d+)?)(k|m)?$/); if(!m) return false; const n = Math.round(parseFloat(m[1]) * (m[2] === 'k' ? 1e3 : m[2] === 'm' ? 1e6 : 1)); return n > 0 ? Math.min(n, 9999999) : false; };
   const loanCard = document.getElementById('loan-card'), loanOut = document.getElementById('loan-out'), loanDue = document.getElementById('loan-due'), loanAdd = document.getElementById('loan-add');
   let loanTouched = false, loanDropped = false;   // dates typed in this time / the loan taken off
   const ymdOf = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
@@ -8908,6 +8938,7 @@
       const bad = [!title, !author, !(pages > 0)];
       fieldCards.forEach((c, i)=> c.classList.toggle('invalid', bad[i]));
       const rel = yearRead(); yearCard.classList.toggle('invalid', rel === false);
+      const words = wordsRead(); wordsCard.classList.toggle('invalid', words === false); if(words === false) bad.push(true);
       const loan = loanRead(); loanCard.classList.toggle('invalid', loan === false && !retCard.classList.contains('invalid'));
       if(bad.some(Boolean) || rel === false || loan === false) return;
       if(customizeMode === 'add'){
@@ -8915,6 +8946,7 @@
         if(subtitle) nb.subtitle = subtitle;
         if(audio) nb.audioSeconds = secs;
         if(rel != null) nb.released = rel;
+        if(words) nb.words = words;
         if(loan){ const { back, ...L } = loan; nb.loan = loanSettle(L, back); }
         applyOptions(nb, false);
         books.push(nb);
@@ -8925,6 +8957,7 @@
         if(subtitle) b.subtitle = subtitle; else delete b.subtitle;
         if(audio) b.audioSeconds = secs; else delete b.audioSeconds;
         if(rel != null) b.released = rel; else delete b.released;
+        if(words) b.words = words; else delete b.words;
         if(loan){ const { back, ...L0 } = loan; b.loan = loanSettle(Object.assign(b.loan || {}, L0), back); }
         else if(loanDropped) delete b.loan;
         b.tags = customizeTags.slice();
@@ -12589,7 +12622,7 @@ closeRowDD = function(dd){
     document.getElementById('wl-real').addEventListener('click', () => {
       const b = list[editing]; if(!b) return;
       pending = b; close();
-      openCustomizeModal({ title: b.title, author: b.author, ...(typeof b.authorLast === 'string' ? { authorFirst: b.authorFirst, authorLast: b.authorLast } : {}), ...(b.released != null ? { released: b.released } : {}), pages: 0, cover: 'hard', _wishColor: closestColorIdx(COVER_COLOR_PRESETS, shown(b.color)) }, 'add');   // the nearest cover colour
+      openCustomizeModal({ title: b.title, author: b.author, ...(typeof b.authorLast === 'string' ? { authorFirst: b.authorFirst, authorLast: b.authorLast } : {}), ...(b.released != null ? { released: b.released } : {}), ...(b.words ? { words: b.words } : {}), pages: 0, cover: 'hard', _wishColor: closestColorIdx(COVER_COLOR_PRESETS, shown(b.color)) }, 'add');   // the nearest cover colour
     });
     window.__wishAdded = () => { if(!pending) return; const i = list.indexOf(pending); if(i >= 0){ list.splice(i, 1); save(); render(); } pending = null; };
     window.__wishClosed = () => { pending = null; };
