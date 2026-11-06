@@ -12383,7 +12383,7 @@ closeRowDD = function(dd){
     // ---- the Library's Sort and Filter: its own for each tab card (kept between visits) ----
     const LB = {
       wish: { f: [['all', 'All', 'Every wishlist book'], ['', 'To Check', 'Not looked for yet'], ['yes', 'Found', 'Found at the library'], ['wait', 'Waiting', 'On hold, or on its way'], ['no', 'Not There', 'The library doesn\'t have it']],
-              s: [['status', 'Status', 'Grouped by status, authors A–Z by last name'], ['author', 'Author', 'Last name, first name, then title'], ['title', 'Title', 'A–Z'], ['added', 'Date Added', 'The order they went on the list'], ['year', 'Year', 'Oldest released first; no year last'], ['length', 'Length', 'Most words first; no word count last']] },
+              s: [['status', 'Status', 'Grouped by status, authors A–Z by last name'], ['author', 'Author', 'Last name, first name, then title'], ['title', 'Title', 'A–Z'], ['added', 'Date Added', 'The order they went on the list'], ['year', 'Year', 'Oldest released first; no year last'], ['length', 'Length', 'Short, Medium, Long, Epic by word count']] },
       out:  { f: [['all', 'All', 'Every book checked out'], ['late', 'Overdue', 'Past its due date'], ['week', 'Due This Week', 'Due in the next 7 days'], ['renewed', 'Renewed', 'Renewed at least once']],
               s: [['due', 'Due Date', 'Soonest first, grouped by when'], ['title', 'Title', 'A–Z'], ['author', 'Author', 'Last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first'], ['year', 'Year', 'Oldest released first; no year last']] },
       ret:  { f: [['all', 'All', 'Every book returned'], ['done', 'Finished', 'Read to the end'], ['part', 'Not Finished', 'Went back before the end'], ['late', 'Returned Late', 'Went back after its due date']],
@@ -12498,7 +12498,7 @@ closeRowDD = function(dd){
       const s = q.value.trim().toLowerCase();
       sortBy = lbSel.wish.s; const wf = lbSel.wish.f;
       const rows = list.map((b, i) => [b, i]).filter(([b]) => (wf === 'all' || (b.lib || '') === wf) && (!s || (b.title + ' ' + b.author).toLowerCase().includes(s)));
-      if(sortBy === 'length') rows.sort((p, n) => (n[0].words || 0) - (p[0].words || 0) || lc2(p[0].title, n[0].title));
+      if(sortBy === 'length') rows.sort((p, n) => (!p[0].words) - (!n[0].words) || (p[0].words || 0) - (n[0].words || 0) || lc2(p[0].title, n[0].title));   // shortest first; none last
       if(sortBy === 'year') rows.sort((p, n) => (p[0].released == null) - (n[0].released == null) || (p[0].released || 0) - (n[0].released || 0) || lc2(p[0].title, n[0].title));
       const by = k => (p, n) => (p[0][k] || '').localeCompare(n[0][k] || '', undefined, { sensitivity: 'base' });
       const lc = (x, y) => x.localeCompare(y, undefined, { sensitivity: 'base' });
@@ -12507,7 +12507,10 @@ closeRowDD = function(dd){
         const x = authorKeyOf(p[0]), y = authorKeyOf(n[0]); return lc(x[0], y[0]) || lc(x[1], y[1]) || by('title')(p, n); });
       if(!rows.length){ view.innerHTML = '<div id="wl-empty">No matches</div>'; return; }
       // Status: each group (in Date Added order) under its own divider; empty groups left out
-      const grouped = sortBy === 'status' ? GROUPS.map(([k, name]) => [name, rows.filter(([b]) => (b.lib || '') === k)]).filter(g => g[1].length) : [[null, rows]];
+      // Length: grouped by word count — Short (under 60,000), Medium (to 100,000), Long (to 200,000), Epic (200,000 and up), then none given
+      const LEN = [['Short', w => w > 0 && w < 60000], ['Medium', w => w >= 60000 && w < 100000], ['Long', w => w >= 100000 && w < 200000], ['Epic', w => w >= 200000], ['No Word Count', w => !(w > 0)]];
+      const grouped = sortBy === 'status' ? GROUPS.map(([k, name]) => [name, rows.filter(([b]) => (b.lib || '') === k)]).filter(g => g[1].length)
+        : sortBy === 'length' ? LEN.map(([name, f]) => [name, rows.filter(([b]) => f(b.words || 0))]).filter(g => g[1].length) : [[null, rows]];
       view.innerHTML = grouped.map(([name, rs]) => (name ? `<div class="list-divider"><span class="ld-name">${name}</span></div>` : '') + rs.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card wl-wish" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>${b.released != null ? `<i class="wl-yr">${wlYr(b.released)}</i>` : ''}${b.words ? `<i class="wl-yr wl-wd">${wlWords(b.words)}</i>` : ''}` +
         `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
         MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('wait', b.lib === 'wait', 'Waiting on it', 'M12 4v10M12 19.8v.01') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>').join('')).join('');
