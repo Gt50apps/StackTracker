@@ -1135,6 +1135,10 @@
   #tl-info .tl-bk span{min-width:0; overflow:hidden; text-overflow:ellipsis;}
   #tl-info .tl-bk b{flex:none;}
   #tl-info .t{font:600 .85rem Georgia, serif; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  /* a library book picked: its title on the left (two lines, a little smaller, when it's long), its dates and reading on the right, a line each */
+  #tl-info .t.lt{flex:1 1 auto; min-width:0;}
+  #tl-info .t.lt.two{white-space:normal; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; font-size:.74rem; line-height:1.1; padding-bottom:2px; margin-bottom:-2px;}
+  #tl-info .ld{flex:none; display:flex; flex-direction:column; align-items:flex-end; font-size:.58rem; line-height:1.15; white-space:nowrap; text-align:right;}
   /* This Month, nothing picked: ◀ | the month's totals + hint | ▶ */
   #tl-info.nav{padding:0; gap:0; align-items:stretch;}
   #tl-info .tl-nav{flex:0 0 42px; box-sizing:border-box; height:auto; border:none; margin:0; padding:0; box-shadow:none; transform:none; background:var(--cbffffff, #ffffff); color:var(--ink); font:900 15px/1 Arial, sans-serif; cursor:pointer; -webkit-tap-highlight-color:transparent;}
@@ -1521,6 +1525,8 @@
     overflow:hidden; overflow-wrap:anywhere; font-size:.72rem; line-height:1.05;}
   .book-row.wrap .br-author{font-size:.58rem; line-height:1.15;}
   .book-row.wrap .br-main{line-height:1.05;}
+  .book-row.wrap .br-title{padding-bottom:3px; margin-bottom:-3px;}   /* room for the second line's g, y, p inside its clip, without moving the author */
+  .book-row.wrap .br-author{position:relative;}
   /* list view dividers: as slim as the shelf view's, so the list reads just as tight (Library and My Lists) */
   #list-container > .list-divider, #coll-list .list-divider{height:24px;}   /* the open book's bars too */
 
@@ -10659,10 +10665,13 @@
         bar.classList.add('on'); TL.picked = r.key;
         let pages = 0, rd = 0; for(let d = new Date(r.s); d < fillEnd; d = tlAdd(d, 1)){ const v = readOn.get(r.b.title + '|' + (+d)) || 0; pages += v; if(v > 0) rd++; }
         const n = Math.round((r.due - today) / 864e5);
-        const state = r.back ? `back <b>${tlFmt(r.back)}</b>` : n < 0 ? `<b>${-n}</b> ${-n === 1 ? 'day' : 'days'} late` : n === 0 ? `due <b>today</b>` : `<b>${n}</b> ${n === 1 ? 'day' : 'days'} left`;
+        // dates short (no year) when they're this year
+        const sf = d => d.getFullYear() === today.getFullYear() ? `${TL_MON[d.getMonth()]} ${d.getDate()}` : tlFmt(d);
+        const state = r.back ? `back <b>${sf(r.back)}</b>` : n < 0 ? `<b>${-n}</b> ${-n === 1 ? 'day' : 'days'} late` : n === 0 ? `due <b>today</b>` : `<b>${n}</b> ${n === 1 ? 'day' : 'days'} left`;
         tlInfo.classList.remove('nav', 'pick');
-        tlInfo.innerHTML = `<span class="t">${tlEsc(r.b.title)}</span>` +
-          `<span>${tlFmt(r.s)} – ${tlFmt(r.due)} · ${state}<br>read on <b>${rd}</b> ${rd === 1 ? 'day' : 'days'} · <b>${tlN(pages)}</b> ${Math.round(pages) === 1 ? 'page' : 'pages'}</span>`;
+        tlInfo.innerHTML = `<span class="t lt">${tlEsc(r.b.title)}</span>` +
+          `<span class="ld"><span>${sf(r.s)} – ${sf(r.due)}</span><span>${state}</span><span>read <b>${rd}</b> ${rd === 1 ? 'day' : 'days'} · <b>${tlN(pages)}</b> ${Math.round(pages) === 1 ? 'page' : 'pages'}</span></span>`;
+        tlInfo.querySelector('.lt').classList.toggle('two', (() => { const t = tlInfo.querySelector('.lt'); return t.scrollWidth > t.clientWidth + 1; })());
       });
     });
   }
