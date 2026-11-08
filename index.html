@@ -473,7 +473,7 @@
   .fc-half:focus-within{background:var(--bg);}
   /* Title | Subtitle divider: its own line, so it can be drawn up into the top border as the card moves up (--dv 1 = full, 0 = gone) */
   #author-card{position:relative;}
-  #title-card::before, #author-card::before, #author-card::after{content:''; position:absolute; left:50%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); transform-origin:50% 0; transform:scaleY(var(--dv, 1)); pointer-events:none;}
+  #title-card::before, #author-card::before, #author-card::after{content:''; position:absolute; left:50%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); transform-origin:50% 0; transform:scaleY(var(--dv, 1)); pointer-events:none; z-index:2;}   /* above the halves (a focused half's ground mustn't cover it) */
   /* Author: First Name | Last Name | Author List, in thirds */
   #author-card{grid-template-columns:repeat(3, minmax(0, 1fr));}
   #author-card::before{left:33.333%;} #author-card::after{left:66.667%;}
