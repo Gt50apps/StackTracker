@@ -124,8 +124,15 @@
   .book-row.spined{padding:0 24px;}
   .book-row.spined .br-anchor{left:24px;}
   .book-row.spined .tape-fill{left:13px; width:calc(100% - 26px);}   /* an audiobook's tape winds between the spines */
-  .br-spine{position:absolute; top:0; bottom:0; width:16px; z-index:1; overflow:hidden; pointer-events:none; background:var(--cloth, #6b4a32);}
-  .br-spine.l{left:0; box-shadow:3px 0 5px -1px rgba(0,0,0,.5);} .br-spine.r{right:0; box-shadow:-3px 0 5px -1px rgba(0,0,0,.5);}
+  .br-spine{position:absolute; top:-12px; bottom:-12px; width:16px; z-index:1; overflow:hidden; pointer-events:none; background:var(--cloth, #6b4a32);}
+  /* (it runs past the card's top and bottom, clipped by the card, so its shadow goes the whole height) */
+  .br-spine.l{left:0; box-shadow:1px 0 1px rgba(0,0,0,.55), 3px 0 3px rgba(0,0,0,.3), 7px 0 8px rgba(0,0,0,.22);}
+  .br-spine.r{right:0; box-shadow:-1px 0 1px rgba(0,0,0,.55), -3px 0 3px rgba(0,0,0,.3), -7px 0 8px rgba(0,0,0,.22);}
+  /* the spine rounds over: lit across its middle, falling into shade at the edge by the pages */
+  .br-spine::after{content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(90deg, rgba(0,0,0,.28), rgba(255,255,255,.14) 40%, rgba(255,255,255,.06) 60%, rgba(0,0,0,.42));}
+  .br-spine.r::after{background:linear-gradient(270deg, rgba(0,0,0,.28), rgba(255,255,255,.14) 40%, rgba(255,255,255,.06) 60%, rgba(0,0,0,.42));}
+  .br-spine > i{z-index:1;}
   .br-spine > canvas.cloth-bg{position:absolute; inset:0; width:100%; height:100%; display:block;}
   .br-spine > i{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; writing-mode:vertical-rl; transform:rotate(180deg);
     font:normal 700 .46rem/1 Arial, sans-serif; letter-spacing:.2px; color:var(--ds-ink, #fff); white-space:nowrap;}   /* white, so the page-coloured fill stands out */
@@ -1600,7 +1607,7 @@
   #ctray .k-paper .sh .cs{position:absolute; left:50%; top:50%; width:60%; height:auto; transform:translate(-50%, -50%); display:block; overflow:visible; fill:var(--cb000000, #000000); pointer-events:none;}
   /* the picked cover carries a large white star, centred on it. Picking another: this one's star shrinks away (.12s),
      then the new one's grows from nothing, overshoots well past its size, and springs back to settle */
-  #ctray .k-book .cv::after{content:''; position:absolute; left:50%; top:50%; width:70%; aspect-ratio:1; background:var(--cbffffff, #ffffff);
+  #ctray .k-book .cv::after{content:''; position:absolute; left:50%; top:50%; width:70%; aspect-ratio:1; background:var(--st, var(--cbffffff, #ffffff));
     clip-path:polygon(50% 0%, 61.2% 34.5%, 97.6% 34.5%, 68.2% 55.9%, 79.4% 90.5%, 50% 69.1%, 20.6% 90.5%, 31.8% 55.9%, 2.4% 34.5%, 38.8% 34.5%);
     transform:translate(-50%, -45.25%) scale(0);}
   #ctray .k-book.on .cv::after{transform:translate(-50%, -45.25%) scale(1); animation:star-pop .62s .12s both;}
@@ -3887,7 +3894,7 @@
       k.lineWidth = 0.35 + v*0.3;
       k.beginPath(); wrap(x, true); k.stroke();
     }
-    if(done){ k.fillStyle = 'rgba(20,8,2,.45)'; k.fillRect(-pad, 0, W, h); }   // finished: the same tape, darker
+    if(done){ k.fillStyle = 'rgba(0,0,0,.55)'; k.fillRect(-pad, 0, W, h); }   // finished: the same tape under a dark veil, as a finished book's pages
     k.restore();
   }
 
@@ -3902,13 +3909,14 @@
     let s = (parseInt(seed, 10) % 2147483646) + 1;
     const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
     for(let i = 0; i < 5; i++) rnd();                        // stir, so neighbouring seeds look unalike
-    // page edges: fine vertical lines a few px apart, each a slightly different shade
+    // page edges, grained: lines of every weight and tone packed close, like the grain of a stack of pages
+    // (drawn at twice size: the canvas is 240px across, shown 120px)
     const c = document.createElement('canvas'); c.width = 240; c.height = 4;
-    const x = c.getContext('2d'), gapMin = 2 + Math.floor(rnd()*2), gapVar = 2 + Math.floor(rnd()*3), darkShare = .45 + rnd()*.3;
-    for(let i = Math.floor(rnd()*3); i < c.width; i += gapMin + Math.floor(rnd()*gapVar)){
-      const dark = rnd() < darkShare;
-      x.fillStyle = dark ? `rgba(60,40,20,${0.04 + rnd()*0.09})` : `rgba(255,250,240,${0.07 + rnd()*0.12})`;
-      x.fillRect(i, 0, 1, c.height);
+    const x = c.getContext('2d');
+    for(let i = rnd() * 2; i < c.width; i += 1.4 + rnd() * 3.2){
+      const v = rnd(), dark = v < .55, lw = .6 + rnd() * 2.4;
+      x.fillStyle = dark ? `rgba(70,50,30,${.06 + v * .3})` : `rgba(255,252,245,${.2 + (v - .55) * .9})`;
+      x.fillRect(i, 0, Math.min(lw, c.width - i), c.height);
     }
     // age spots (used by foxed paper): soft brown dots scattered at random
     const f = document.createElement('canvas'); f.width = 60; f.height = 40;
@@ -3924,16 +3932,18 @@
     const pat = seed ? pagePattern(seed) : { lines: 'var(--page-lines)', spots: 'var(--fox-spots)' };
     const gilt = tone.edge === 'gilt';
     let col = gilt ? tone.base : paperOf(tone);
-    if(gilt && !done && readableTextOn(col) === '#fff') col = mixHex(col, '#ffffff', 0.35);   // finished: the full gilt, darkened
-    el.style.backgroundColor = mixHex(col, '#000000', done ? PAGE_DONE_DARKEN : (gilt ? 0.04 : PAGE_FILL_DARKEN));
+    if(gilt && readableTextOn(col) === '#fff') col = mixHex(col, '#ffffff', 0.35);
+    // finished: the same fill as while reading, with a dark veil laid over it (white text on top)
+    el.style.backgroundColor = mixHex(col, '#000000', gilt ? 0.04 : PAGE_FILL_DARKEN);
     const layers = [], sizes = [];
-    if(gilt && !done){ layers.push('linear-gradient(180deg, rgba(255,248,220,.38), rgba(255,248,220,0) 45%, rgba(60,30,0,.14))'); sizes.push('100% 100%'); }
+    if(done){ layers.push(`linear-gradient(rgba(0,0,0,${PAGE_DONE_VEIL}), rgba(0,0,0,${PAGE_DONE_VEIL}))`); sizes.push('100% 100%'); }
+    if(gilt){ layers.push('linear-gradient(180deg, rgba(255,248,220,.38), rgba(255,248,220,0) 45%, rgba(60,30,0,.14))'); sizes.push('100% 100%'); }
     if(tone.spots){ layers.push(pat.spots); sizes.push('60px 40px'); }
     layers.push(pat.lines); sizes.push('120px 100%');
     el.style.backgroundImage = layers.join(', ');
     el.style.backgroundSize = sizes.join(', ');
   }
-  const PAGE_DONE_DARKEN = 0.55;   // finished: fill this dark, text white   // progress fills: the page colour taken this much toward black
+  const PAGE_DONE_DARKEN = 0.55, PAGE_DONE_VEIL = 0.72;   // finished: a dark veil this strong over the fill, text white   // progress fills: the page colour taken this much toward black
   // fill + numbers of one list card; also called live while the book is open
   function paintListRow(row, b){
     if(row.classList.contains('tape-simple')){
@@ -5294,13 +5304,13 @@
 
   function drawBorder(ctx, kind, bx, by, bw, bh){
     const cx = bx+bw/2, cy = by+bh/2;
-    ctx.strokeStyle = 'rgba(255,255,255,.4)';
-    ctx.fillStyle = 'rgba(255,255,255,.4)';
+    ctx.strokeStyle = `rgba(${COVER_INK},.4)`;
+    ctx.fillStyle = `rgba(${COVER_INK},.4)`;
     ctx.lineWidth = 3;
 
     if(kind===0){ // Classic Frame
       ctx.strokeRect(bx, by, bw, bh);
-      ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(${COVER_INK},.18)`; ctx.lineWidth = 1;
       ctx.strokeRect(bx+10, by+10, bw-20, bh-20);
     }
     else if(kind===1){ // Herringbone
@@ -5407,7 +5417,7 @@
         }
       };
       fan(bx,by,1,1); fan(bx+bw,by,-1,1); fan(bx,by+bh,1,-1); fan(bx+bw,by+bh,-1,-1);
-      ctx.lineWidth=1; ctx.strokeStyle='rgba(255,255,255,.2)'; ctx.strokeRect(bx,by,bw,bh);
+      ctx.lineWidth=1; ctx.strokeStyle=`rgba(${COVER_INK},.2)`; ctx.strokeRect(bx,by,bw,bh);
     }
     else if(kind===8){ // Interlocking Rings along top/bottom
       const rings=(y)=>{
@@ -5434,7 +5444,7 @@
         }
       };
       pin(bx,by,1,1); pin(bx+bw,by,-1,1); pin(bx,by+bh,1,-1); pin(bx+bw,by+bh,-1,-1);
-      ctx.lineWidth=1; ctx.strokeStyle='rgba(255,255,255,.22)'; ctx.strokeRect(bx,by,bw,bh);
+      ctx.lineWidth=1; ctx.strokeStyle=`rgba(${COVER_INK},.22)`; ctx.strokeRect(bx,by,bw,bh);
     }
     else if(kind===10){ // Step Ladder frame (rungs along top and bottom)
       ctx.lineWidth=2;
@@ -5482,7 +5492,7 @@
       ctx.beginPath(); ctx.ellipse(cx,cy,bw*0.22,bh*0.12,0,0,Math.PI*2); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(bx,cy); ctx.lineTo(cx-bw*0.22,cy); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(cx+bw*0.22,cy); ctx.lineTo(bx+bw,cy); ctx.stroke();
-      ctx.lineWidth=1; ctx.strokeStyle='rgba(255,255,255,.22)'; ctx.strokeRect(bx,by,bw,bh);
+      ctx.lineWidth=1; ctx.strokeStyle=`rgba(${COVER_INK},.22)`; ctx.strokeRect(bx,by,bw,bh);
     }
     else if(kind===15){ // Corner Circles
       ctx.lineWidth=2; ctx.strokeRect(bx,by,bw,bh);
@@ -5535,7 +5545,7 @@
         ctx.closePath(); ctx.fill();
       };
       arrow(cx,by,0,1); arrow(cx,by+bh,0,-1); arrow(bx,cy,1,0); arrow(bx+bw,cy,-1,0);
-      ctx.lineWidth=1; ctx.strokeStyle='rgba(255,255,255,.22)'; ctx.strokeRect(bx,by,bw,bh);
+      ctx.lineWidth=1; ctx.strokeStyle=`rgba(${COVER_INK},.22)`; ctx.strokeRect(bx,by,bw,bh);
     }
     else if(kind===20){ // Scallops: a row of small half-circle arcs along every edge, bulging inward
       ctx.lineWidth=1.5;
@@ -5644,16 +5654,17 @@
   }
 
   function drawFrontDesign(ctx, book, style, boardL, c){
+    setCoverInk(style.color);   // white words and lines, or dark ones on a pale cover
     if(book.format === 'both'){
       // title and author together at the top; the tape's pocket below, framed in the book's own border
       const bl = boardL ? boardL - 14 : 0;                       // border nearer the hinge, as pocketLayout expects
       const boardCX = (bl + c.width - 10) / 2, boardW = c.width - 10 - bl;
       drawBorder(ctx, style.border, bl + BOTH_BORDER_INSET, 48, boardW - 2*BOTH_BORDER_INSET, c.height-96);
       const L = pocketLayout(book);
-      ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.textAlign = 'center';
+      ctx.fillStyle = `rgba(${COVER_INK},.95)`; ctx.textAlign = 'center';
       ctx.font = '700 44px Georgia, serif';
       wrapText(ctx, book.title, boardCX, 150, boardW-100, 52);
-      ctx.font = 'italic 26px Georgia, serif'; ctx.fillStyle = 'rgba(255,255,255,.85)';
+      ctx.font = 'italic 26px Georgia, serif'; ctx.fillStyle = `rgba(${COVER_INK},.85)`;
       wrapText(ctx, book.author || '', boardCX, L.authorY, boardW-110, 30);   // a long name wraps
       const m = L.m;
       const x1 = L.toPxX(L.cx - L.pw/2 - m), x2 = L.toPxX(L.cx + L.pw/2 + m);
@@ -5664,7 +5675,7 @@
     const boardCX = (boardL + c.width - 10) / 2;
     const boardW = c.width - 10 - boardL;
     drawBorder(ctx, style.border, boardL + 26, 48, boardW - 52, c.height-96);
-    ctx.fillStyle = 'rgba(255,255,255,.95)';
+    ctx.fillStyle = `rgba(${COVER_INK},.95)`;
     ctx.textAlign = 'center';
     ctx.font = '700 44px Georgia, serif';
     wrapText(ctx, book.title, boardCX, 150, boardW-100, 52);
@@ -5672,11 +5683,11 @@
       // smaller, under the title (front cover only — the spine keeps just the title)
       const tl = wrapLines(ctx, book.title || '', boardW-100).length;
       ctx.font = '400 26px Georgia, serif';
-      ctx.fillStyle = 'rgba(255,255,255,.85)';
+      ctx.fillStyle = `rgba(${COVER_INK},.85)`;
       wrapText(ctx, book.subtitle, boardCX, 150 + (tl - 1)*52 + 46, boardW-110, 32);
     }
     ctx.font = 'italic 26px Georgia, serif';
-    ctx.fillStyle = 'rgba(255,255,255,.85)';
+    ctx.fillStyle = `rgba(${COVER_INK},.85)`;
     // a long author name wraps, growing upward so its last line keeps its place by the border
     const al = wrapLines(ctx, book.author || '', boardW-110);
     al.forEach((ln, i) => ctx.fillText(ln, boardCX, c.height-92 - (al.length - 1 - i)*30));
@@ -5699,6 +5710,9 @@
   // Shared spine renderer: draws gradient, bands, and wrapped vertical title
   // into any canvas context. Used for BOTH the 3D texture and the 2D shelf
   // spine so they are pixel-identical in layout, font sizing, and orientation.
+  // the words, lines and star on a cover or spine: white, or near-black on a pale cover (White)
+  let COVER_INK = '255,255,255';
+  function setCoverInk(color){ COVER_INK = readableTextOn(color) === '#fff' ? '255,255,255' : '29,27,34'; }
   function starPath(ctx, outerR, innerR){
     ctx.beginPath();
     for(let i=0;i<10;i++){
@@ -5728,6 +5742,7 @@
   }
 
   function drawSpineInto(ctx, w, h, title, color, completed){
+    setCoverInk(color);
     const g = ctx.createLinearGradient(0,0,w,0);
     g.addColorStop(0, shade(color,8));
     g.addColorStop(.5, color);
@@ -5735,12 +5750,12 @@
     ctx.fillStyle = g;
     ctx.fillRect(0,0,w,h);
     // thin bands near top and bottom
-    ctx.fillStyle = 'rgba(255,255,255,.35)';
+    ctx.fillStyle = COVER_INK === '255,255,255' ? 'rgba(255,255,255,.35)' : 'rgba(0,0,0,.28)';   // (pressed darker into a pale cover)
     ctx.fillRect(0, h*0.082, w, h*0.0147);
     ctx.fillRect(0, h - h*0.097, w, h*0.0147);
     // finished books get an embossed star above the top band
     if(completed){
-      drawEmbossedStar(ctx, w/2, h*0.045, Math.min(w*0.36, h*0.032), '#d4af37');
+      drawEmbossedStar(ctx, w/2, h*0.045, Math.min(w*0.36, h*0.032), COVER_INK === '255,255,255' ? '#d4af37' : '#1d1b22');   // a black star on a pale cover
     }
     // vertical title, wrapping onto multiple lines; font is sized relative to
     // spine height and shrinks until all lines fit the width
@@ -5757,7 +5772,7 @@
     ctx.translate(w/2, h/2);
     ctx.rotate(Math.PI/2);
     ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(255,255,255,.92)';
+    ctx.fillStyle = `rgba(${COVER_INK},.92)`;
     ctx.font = '600 '+fontPx+'px Arial, sans-serif';
     lines.forEach((ln, i)=>{
       const y = (i - (lines.length-1)/2)*lineH + fontPx*0.34;
@@ -8230,7 +8245,8 @@
     {name:'Pine', hex:'#2b5752'}, {name:'Navy', hex:'#234a5e'}, {name:'Indigo', hex:'#303d66'},
     {name:'Plum', hex:'#3a2f52'}, {name:'Wine', hex:'#66304c'},
     {name:'Walnut', hex:'#6b4a32'}, {name:'Umber', hex:'#5a4636'}, {name:'Espresso', hex:'#4a3a2b'},
-    {name:'Slate', hex:'#57646e'}, {name:'Onyx', hex:'#1d1b22'}
+    {name:'Slate', hex:'#57646e'}, {name:'Onyx', hex:'#1d1b22'},
+    {name:'White', hex:'#dedad0'}, {name:'Robin\'s Egg', hex:'#5e9aa0'}
   ];
   // brighter ribbon / spinner tones, same rainbow order, charcoal last
   const BOOKMARK_COLOR_PRESETS = [
@@ -9254,7 +9270,7 @@
         get: () => customizeColorIdx, name: i => COVER_COLOR_PRESETS[i].name,
         set: i => { customizeColorIdx = i; touched.add('color'); renderColorPreview(customizeColorPreview, customizeColorSubtitle, ...colorCardSet()); },
         // a closed book lying on its back: its cover colour, a darker spine down the left, the page edge at the right and bottom
-        paint: (b, p) => { b.classList.add('k-cover', 'k-book'); b.style.setProperty('--c', p.hex); b.style.setProperty('--cd', shade(p.hex, -.35)); },
+        paint: (b, p) => { b.classList.add('k-cover', 'k-book'); b.style.setProperty('--c', p.hex); b.style.setProperty('--cd', shade(p.hex, -.35)); if(readableTextOn(p.hex) !== '#fff') b.style.setProperty('--st', '#1d1b22'); },   // a black star on a pale cover
         html: '<i class="pg"></i><i class="cv"></i>',
         max: 90,      // as large as the room allows
         fromBg: () => coverHex()
@@ -10446,13 +10462,22 @@
   // textures: page block edge-on (horizontal lines), tape wound curved (This Year / This Month) or straight (All Time)
   // every bar draws its own pattern from a seed (the book's, or the period's): no two alike
   const tlRnd = seed => { let s = Math.max(1, Math.floor(seed) % 2147483646); for(let i = 0; i < 3; i++) s = (s * 16807) % 2147483647; return () => (s = (s * 16807) % 2147483647) / 2147483647; };
+  // grained page edge (as the list's fill): lines of every weight and tone packed close; across = lines lie across a bar
+  function tlGrain(x, len, thick, rnd, across){
+    for(let i = rnd() * 2; i < len; i += 1.4 + rnd() * 3.2){
+      const v = rnd(), dark = v < .55, lw = Math.min(.6 + rnd() * 2.4, len - i);
+      x.fillStyle = dark ? `rgba(70,50,30,${.06 + v * .3})` : `rgba(255,252,245,${.2 + (v - .55) * .9})`;
+      if(across) x.fillRect(0, i, thick, lw); else x.fillRect(i, 0, lw, thick);
+    }
+  }
+  // a day's own seed: its date as a number, 20261108 (each day's bar its own grain, always the same)
+  const tlDateSeed = d => d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
   function tlPageLines(seed = 23){
     const key = 'page' + seed;
     if(TL.tex[key]) return TL.tex[key];
-    const c = document.createElement('canvas'); c.width = 4; c.height = 120; const x = c.getContext('2d');
-    const rnd = tlRnd(seed);
-    for(let i = 0; i < c.height; i += 2 + Math.floor(rnd() * 2)){ const dark = rnd() < .6;
-      x.fillStyle = dark ? `rgba(60,40,20,${.10 + rnd() * .14})` : `rgba(255,250,240,${.3 + rnd() * .3})`; x.fillRect(0, i, 4, 1); }
+    // the same grained page edge as the list's fill, lying across (drawn at twice size: 240 tall, shown 120)
+    const c = document.createElement('canvas'); c.width = 4; c.height = 240; const x = c.getContext('2d');
+    tlGrain(x, 240, 4, tlRnd(seed), true);
     return TL.tex[key] = `url(${c.toDataURL()})`;
   }
   function tlTapeStraight(seed = 5){
@@ -10487,10 +10512,7 @@
       x.fillStyle = '#8c5229'; x.fillRect(0, 0, 240, 4);
       for(let i = 0; i < 240; i += 2 + Math.floor(rnd() * 2)){ const v = rnd();
         x.fillStyle = v < .55 ? `rgba(90,45,15,${.12 + v * .3})` : `rgba(240,200,160,${.12 + (v - .55) * .5})`; x.fillRect(i, 0, 1, 4); }
-    } else {
-      for(let i = 0; i < 240; i += 3 + Math.floor(rnd() * 3)){ const dark = rnd() < .6;
-        x.fillStyle = dark ? `rgba(60,40,20,${.05 + rnd() * .07})` : `rgba(255,250,240,${.08 + rnd() * .1})`; x.fillRect(i, 0, 1, 4); }
-    }
+    } else tlGrain(x, 240, 4, rnd, false);   // pages: the list's grained page edge
     return TL.tex[key] = `url(${c.toDataURL()})`;
   }
   // the header strip over the card: each part's left edge and right edge (px), and its words; a black line between parts
@@ -10573,8 +10595,8 @@
       if(bb - bt < 5){ const c = (bt + bb) / 2; bt = c - 2.5; bb = c + 2.5; }      // a one-day read: a short bar centred on its day
       const bh = bb - bt, bx = x0 + r.lane * (BW + GAP);
       const look = TL.view === 'all'
-          ? (r.kind === 'audio' ? `background:#8c5229 ${tlTapeStraight(r.seed)} repeat;background-size:4px 90px` : `background:#e7dfc9 ${tlPageLines(r.seed)} repeat;background-size:4px 120px`)
-          : (r.kind === 'audio' ? `background:#8c5229 ${tlTapeWraps(BW - 4, r.seed)} repeat-y;background-size:${BW - 4}px 90px` : `background:${r.page} ${tlPageLines(r.seed)} repeat;background-size:4px 120px`);
+          ? (r.kind === 'audio' ? `background:#8c5229 ${tlTapeStraight(r.seed)} repeat;background-size:4px 90px` : `background:#e7dfc9 ${tlPageLines(tlDateSeed(r.s))} repeat;background-size:4px 120px`)
+          : (r.kind === 'audio' ? `background:#8c5229 ${tlTapeWraps(BW - 4, r.seed)} repeat-y;background-size:${BW - 4}px 90px` : `background:${r.page} ${tlPageLines(tlDateSeed(r.s))} repeat;background-size:4px 120px`);
       const bar = el(`left:${bx}px;top:${bt.toFixed(1)}px;width:${BW}px;height:${bh.toFixed(1)}px;${look}`, 'tl-bar' + (r.e ? '' : ' now') + (TL.picked === r.key ? ' on' : ''));
       // on pace: the rest of the bar, out to the estimated finish, outlined and at 30%
       if(r.eta && r.end < t1){
@@ -10649,7 +10671,7 @@
       // read days: page texture over the cloth, a run of read days as one piece
       let runA = null;
       const flush = d => { if(!runA) return; const a = clampY(d), z = clampY(runA);
-        const seg = document.createElement('div'); seg.style.cssText = `position:absolute;left:0;right:0;top:${(a - bt - bIn).toFixed(1)}px;height:${(z - a).toFixed(1)}px;background:${page} ${tlPageLines(sd + (+runA % 97))} repeat;background-size:4px 120px;box-shadow:${[d < fillEnd ? 'inset 0 4px 4px -3px rgba(0,0,0,.55)' : '', runA > r.s ? 'inset 0 -4px 4px -3px rgba(0,0,0,.55)' : ''].filter(Boolean).join(', ') || 'none'}`;   // where the cover's cloth meets the pages it casts a shadow on them: the cloth sits higher
+        const seg = document.createElement('div'); seg.style.cssText = `position:absolute;left:0;right:0;top:${(a - bt - bIn).toFixed(1)}px;height:${(z - a).toFixed(1)}px;background:${page} ${tlPageLines(tlDateSeed(runA))} repeat;background-size:4px 120px;box-shadow:${[d < fillEnd ? 'inset 0 4px 4px -3px rgba(0,0,0,.55)' : '', runA > r.s ? 'inset 0 -4px 4px -3px rgba(0,0,0,.55)' : ''].filter(Boolean).join(', ') || 'none'}`;   // where the cover's cloth meets the pages it casts a shadow on them: the cloth sits higher
         bar.appendChild(seg); runA = null; };
       for(let d = new Date(r.s); d < fillEnd; d = tlAdd(d, 1)){
         const read = readOn.get(r.b.title + '|' + (+d)) > 0;
@@ -10811,7 +10833,7 @@
         let bTop = top + pad, bH = bh;
         if(tlDaily()){ const d = window.devicePixelRatio || 1, cy = tlCanvas.getBoundingClientRect().top - tlCanvas.scrollTop;
           const sy = q => Math.round((cy + q) * d) / d - cy, a = sy(bTop), z = sy(bTop + bH); bTop = a; bH = Math.max(4, z - a); }
-        const bar = el(`left:${c.x}px;top:${bTop.toFixed(4)}px;width:${w.toFixed(1)}px;height:${bH.toFixed(4)}px;${c.look(1 + Math.floor(+k.a / 864e5) * 31 + (c.key === 'secs' ? 17 : 0))}`, 'tl-gbar' + (all ? ' plain' : '') + (TL.pickedK === (+k.a) + '|' + c.key || TL.pickedK === (+k.a) + '|all' ? ' on' : ''));
+        const bar = el(`left:${c.x}px;top:${bTop.toFixed(4)}px;width:${w.toFixed(1)}px;height:${bH.toFixed(4)}px;${c.look(tlDateSeed(k.a) + (c.key === 'secs' ? 17 : 0))}`, 'tl-gbar' + (all ? ' plain' : '') + (TL.pickedK === (+k.a) + '|' + c.key || TL.pickedK === (+k.a) + '|all' ? ' on' : ''));
         bar.dataset.k = +k.a;
         // day by day: a black line between each book's share of the day (biggest share first)
         if(tlDaily() && k.parts[c.key].size > 1){
