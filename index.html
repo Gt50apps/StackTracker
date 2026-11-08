@@ -97,7 +97,13 @@
   #all-books-view.cards #card-container{display:flex;}
   #all-books-view.cards #shelves-container, #all-books-view.cards #list-container{display:none;}
   #card-container .wl-mark{pointer-events:none;}
-  #card-container > .list-divider{height:24px;}   /* the same slim divider as the wishlist's */
+  #card-container > .list-divider{height:24px;}
+  #card-container .cm-dots{display:flex; align-items:center; gap:3px;}
+  #card-container .cm-dots i{display:block; flex:none; width:5px; height:5px; border-radius:50%; background:var(--ink); transform:scale(.8);}
+  #card-container .wl-mark.on .cm-dots i{background:var(--cfffffff, #ffffff); animation:cmGrow 1.2s ease-in-out infinite;}
+  #card-container .wl-mark.on .cm-dots i:nth-child(2){animation-delay:.2s;} #card-container .wl-mark.on .cm-dots i:nth-child(3){animation-delay:.4s;}
+  @keyframes cmGrow{0%, 80%, 100%{transform:scale(.6);} 40%{transform:scale(1.25);}}
+  @media (prefers-reduced-motion: reduce){ #card-container .cm-dots i{animation:none !important;} }   /* the same slim divider as the wishlist's */
   #card-container .wl-card{flex:1 1 auto; min-width:0; padding-left:30px; padding-right:30px;}
   .book-row{
     position:relative; display:flex; align-items:center; gap:8px; height:45px; box-sizing:border-box;
@@ -439,6 +445,27 @@
   .field-card input::placeholder{color:var(--muted); opacity:1; font:700 min(.74rem, 2.95vw) Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   .field-card.invalid input::placeholder{color:var(--cfaa3333, #aa3333);}
   #tags-card{cursor:pointer;}
+  #tags-card > label{position:absolute; left:8px; right:4px; top:4px; font:700 .5rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted);}   /* as a filled count card's name */
+  #tags-card{position:relative;} #tags-value{margin-top:9px;}
+  /* every field's name and text centred in its own section */
+  #book-fields .cnt-card .cnt-lbl, #tags-card > label{left:4px; right:4px; text-align:center;}
+  #book-fields .cnt-card input, #tags-value{text-align:center;}
+  /* the quarter cards: a word to a line while empty ("(Optional)" under Word Count); filled, the name on one line */
+  #words-card .cnt-lbl{line-height:1;}   /* three lines: still inside the card */
+  #pages-card .cnt-lbl b, #words-card .cnt-lbl b{white-space:nowrap;}
+  #words-card.has .cnt-lbl .opt, #words-card:focus-within .cnt-lbl .opt{display:none;}
+  #pages-card.has .cnt-lbl, #pages-card:focus-within .cnt-lbl, #words-card.has .cnt-lbl, #words-card:focus-within .cnt-lbl{font-size:.5rem;}
+  #pages-input{-moz-appearance:textfield; appearance:textfield;} #pages-input::-webkit-inner-spin-button, #pages-input::-webkit-outer-spin-button{-webkit-appearance:none; margin:0;}   /* no spinner taking room off one side */
+  /* Page Count / Word Count: the name on two lines while empty; typing (or a number in it), it shrinks to one small line at the top */
+  .cnt-card{position:relative; cursor:text;}
+  .cnt-card .cnt-lbl{position:absolute; left:8px; right:4px; top:50%; transform:translateY(-50%); pointer-events:none;
+    font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted);}
+  .cnt-card.has .cnt-lbl, .cnt-card:focus-within .cnt-lbl{top:4px; transform:none; font-size:.5rem; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .cnt-card .cnt-lbl b{display:block; font-weight:inherit;}
+  .cnt-card.has .cnt-lbl b, .cnt-card:focus-within .cnt-lbl b{display:inline;}
+  .cnt-card input{margin-top:9px;}
+  .cnt-card.invalid .cnt-lbl, #title-card.invalid .cnt-card:first-child .cnt-lbl, #author-card.invalid .cnt-card .cnt-lbl{color:var(--cfaa3333, #aa3333);}
+  .fc-half.cnt-card{display:block;} .fc-half.cnt-card input{display:block; height:20px; margin-top:16px;}
   /* split cards: Title | Subtitle, and Author | Author List, each one card divided in half */
   .field-card.split{display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); align-items:stretch; padding:0; overflow:hidden;}   /* two exactly equal halves, whatever their padding or divider */
   .field-card.split:focus-within{background:var(--panel);}
@@ -2776,22 +2803,22 @@
   <canvas id="customize-canvas"></canvas>
   <div id="book-fields" class="hidden">
     <div class="field-card split" id="title-card" data-prompt="Tap to input book data">
-      <div class="fc-half"><input id="title-input" autocomplete="off" placeholder="TITLE" aria-label="Title"></div>
-      <div class="fc-half"><input id="subtitle-input" autocomplete="off" placeholder="SUBTITLE (OPTIONAL)" aria-label="Subtitle (optional)"></div>
+      <div class="fc-half cnt-card"><span class="cnt-lbl"><b>Title</b></span><input id="title-input" autocomplete="off" placeholder="" aria-label="Title"></div>
+      <div class="fc-half cnt-card"><span class="cnt-lbl"><b>Subtitle</b> <b>(Optional)</b></span><input id="subtitle-input" autocomplete="off" placeholder="" aria-label="Subtitle (optional)"></div>
     </div>
     <div class="field-card split" id="author-card">
-      <div class="fc-half"><input id="author-first" autocomplete="off" placeholder="FIRST NAME" aria-label="Author first name"></div>
-      <div class="fc-half"><input id="author-input" autocomplete="off" placeholder="LAST NAME" aria-label="Author last name"></div>
+      <div class="fc-half cnt-card"><span class="cnt-lbl"><b>First</b> <b>Name</b></span><input id="author-first" autocomplete="off" placeholder="" aria-label="Author first name"></div>
+      <div class="fc-half cnt-card"><span class="cnt-lbl"><b>Last</b> <b>Name</b></span><input id="author-input" autocomplete="off" placeholder="" aria-label="Author last name"></div>
       <button type="button" class="fc-more" id="author-more" aria-label="Open author list">Author List</button>
     </div>
-    <div class="field-card span1" id="pages-card"><input id="pages-input" type="number" inputmode="numeric" min="1" placeholder="PAGES" aria-label="Number of pages"></div>
+    <div class="field-card span1 cnt-card" id="pages-card"><span class="cnt-lbl"><b>Page</b> <b>Count</b></span><input id="pages-input" type="number" inputmode="numeric" min="1" placeholder="" aria-label="Page count"></div>
   <div id="length-wheels" class="hidden" aria-label="Length">
       <div class="lw-wheel" data-k="0"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>H</span></div>
       <div class="lw-wheel" data-k="1"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>M</span></div>
       <div class="lw-wheel" data-k="2"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span>S</span></div>
     </div>
     <div class="field-card" id="year-card" aria-label="Year released"><input type="hidden" id="year-input"><button type="button" id="year-era" hidden>AD</button><div class="lw-wheel" data-k="c"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">YEAR</span></div><div class="lw-wheel" data-k="e"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
-    <div class="field-card" id="words-card"><input id="words-input" type="text" inputmode="numeric" placeholder="WORDS" autocomplete="off" aria-label="Word count (optional)"></div>
+    <div class="field-card cnt-card" id="words-card"><span class="cnt-lbl"><b>Word</b> <b>Count</b> <b class="opt">(Optional)</b></span><input id="words-input" type="text" inputmode="numeric" placeholder="" autocomplete="off" aria-label="Word count (optional)"></div>
     <div class="field-card" id="tags-card"><label>Lists</label><div id="tags-value">None</div></div>
     <button type="button" class="field-card" id="loan-add"><b>Library Book Data</b><i>Optional</i></button>
     <div id="loan-card" hidden><input type="hidden" id="loan-out"><input type="hidden" id="loan-due">
@@ -3086,7 +3113,7 @@
   // the author as written on the book, "First Last"; old books keep their whole name in Last until it's fixed
   const authorTyped = ()=> [authorFirstInput.value.trim(), authorInput.value.trim()].filter(Boolean).join(' ');
   const setAuthorFields = b=>{ const has = b && typeof b.authorLast === 'string';
-    authorFirstInput.value = has ? (b.authorFirst || '') : ''; authorInput.value = has ? b.authorLast : ((b && b.author) || ''); };
+    authorFirstInput.value = has ? (b.authorFirst || '') : ''; authorInput.value = has ? b.authorLast : ((b && b.author) || ''); if(window.__cntSync) requestAnimationFrame(window.__cntSync); };
   const pagesInput = document.getElementById('pages-input');
   // audiobook length: accepts 10:24:05, 10:24, or plain digits read right to left as
   // seconds, minutes, hours (102405 → 10:24:05, 4500 → 45:00)
@@ -4459,7 +4486,9 @@
   });
   // Cards view: like the wishlist — its cover cloth, the year and word count on the ends, then three status cards
   const cardContainer = document.getElementById('card-container');
-  const CMARK = (k, on, d) => `<button type="button" class="wl-mark ${k}${on ? ' on' : ''}" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="${k === 'wait' ? 4 : 3.6}" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg></button>`;
+  const CMARK = (k, on, d) => `<button type="button" class="wl-mark ${k}${on ? ' on' : ''}" tabindex="-1" aria-hidden="true">` + (k === 'wait'
+    ? '<span class="cm-dots"><i></i><i></i><i></i></span>'   // in progress: three dots, each swelling in turn while it's lit
+    : `<svg viewBox="0 0 24 24" fill="none" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`) + '</button>';
   function renderCards(ordered, groups){
     const esc = t => String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
     const groupOf = groups ? null : currentSort().group; let last = null, html = '';
@@ -8723,7 +8752,7 @@
       pagesInput.type = audio ? 'text' : 'number';
       pagesInput.readOnly = audio;                        // the wheels set it; no keyboard
       showLengthWheels(audio && customizeMode !== 'customize');   // always shown for an audiobook (Add / Edit)
-      pagesInput.placeholder = audio ? 'LENGTH' : 'PAGES';
+      pagesInput.placeholder = '';
       // carry the number across: pages ↔ minutes of listening
       if(v){
         pagesInput.value = audio ? secsToLength((parseInt(v, 10) || 0) * 60)
@@ -8759,10 +8788,11 @@
       setAuthorFields(book);
       pagesInput.dataset.mode = 'pages'; pagesInput.type = 'number'; pagesInput.readOnly = false;
       showLengthWheels(false);
-      pagesInput.placeholder = 'PAGES';
+      pagesInput.placeholder = '';
       pagesInput.value = book.pages || '';
       yearSet(book.released);
       wordsInput.value = book.words > 0 ? book.words.toLocaleString('en-US') : ''; wordsCard.classList.remove('invalid');
+      requestAnimationFrame(cntSync);
       // a library book (or one being checked out now): its loan dates
       const ln = book.loan || (book._loan ? { out: Date.now(), due: Date.now() + 21 * 864e5 } : null);
       loanCard.hidden = !ln; loanAdd.hidden = !!ln; loanCard.classList.remove('invalid'); loanTouched = !!book._loan; loanDropped = false;
@@ -8868,6 +8898,10 @@
   // ---- the release year: a number, AD unless the little AD | BC switch says BC; blank is fine ----
   // Words: optional; "92000", "92,000" or "92k"
   const wordsCard = document.getElementById('words-card'), wordsInput = document.getElementById('words-input');
+  // the count cards' names: two lines while empty, a small one-line name at the top once there's a number (or you're typing)
+  const cntSync = () => document.querySelectorAll('#book-fields .cnt-card').forEach(c => c.classList.toggle('has', !!c.querySelector('input').value));
+  window.__cntSync = cntSync;
+  document.querySelectorAll('#book-fields .cnt-card').forEach(c => { const i = c.querySelector('input'); i.addEventListener('input', cntSync); c.addEventListener('click', () => i.focus()); });
   wordsInput.addEventListener('input', () => wordsCard.classList.remove('invalid'));
   const wordsRead = () => { const v = wordsInput.value.trim().toLowerCase().replace(/[,\s]/g, ''); if(!v) return null;
     const m = v.match(/^(\d+(?:\.\d+)?)(k|m)?$/); if(!m) return false; const n = Math.round(parseFloat(m[1]) * (m[2] === 'k' ? 1e3 : m[2] === 'm' ? 1e6 : 1)); return n > 0 ? Math.min(n, 9999999) : false; };
