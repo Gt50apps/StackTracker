@@ -92,6 +92,13 @@
   #library-view.list #coll-list{display:flex;}
   #library-view.list #library-container{display:none;}
   #all-books-view.list #shelves-container{display:none;}
+  /* Cards: each book as a wishlist-style cloth card, then ✓ read | ! in progress | ✗ unread (the one that's true lit) */
+  #card-container{display:none; flex-direction:column; gap:4px; margin:-12px 0 0;}
+  #all-books-view.cards #card-container{display:flex;}
+  #all-books-view.cards #shelves-container, #all-books-view.cards #list-container{display:none;}
+  #card-container .wl-mark{pointer-events:none;}
+  #card-container > .list-divider{height:24px;}   /* the same slim divider as the wishlist's */
+  #card-container .wl-card{flex:1 1 auto; min-width:0; padding-left:30px; padding-right:30px;}
   .book-row{
     position:relative; display:flex; align-items:center; gap:8px; height:45px; box-sizing:border-box;
     padding:0 8px; background:var(--unread); border:3px solid var(--cb000000, #000000); border-radius:8px; cursor:pointer;
@@ -1685,7 +1692,10 @@
   .wl-card .wl-yr[hidden]{display:none;}
   .wl-card .wl-wd{left:auto; right:2px;}   /* its word count, the same at the right end */
   /* Library tab: Wishlist | Checked Out | Returned */
-  .lb-tabs{height:21px; box-sizing:border-box; flex:none;} .lb-tabs .tab{padding:0; line-height:1; height:auto;}
+  /* Checked Out | Returned as one divided card, Wishlist its own card beside it */
+  .lb-tabs{flex:none; display:flex; gap:4px; height:21px;}
+  .lb-tabs .tl-views{height:21px; box-sizing:border-box; margin:0;}
+  .lb-tabs .lb-pair{flex:2 1 0; min-width:0;} .lb-tabs .lb-solo{flex:1 1 0; min-width:0;}
   #wl-sort{display:none !important;}   /* the wishlist: always by status, no sort tabs */
   /* a loan: its book card, then the due card — days left, coloured by how soon it's due */
   .ln-due, .ln-due:active{flex:none; width:62px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none; background:var(--panel); color:var(--ink);
@@ -2133,6 +2143,17 @@
   #rl-pos i{font-style:normal; font-size:.5rem; color:var(--cfb4ab9b, #b4ab9b);}
   #rl-pos i.on{color:var(--ink);}
   #rl-line.many #rl-pos{display:flex;}
+  /* the line card's right end: a check for showing the wishlist's books (the magenta dots) */
+  /* (All Time only: the other spans have no wishlist dots) */
+  #rl-line.wishy #rl-wheel > div{padding:0 82px 0 10px;}   /* centred in the space left of the check */
+  #rl-wish{display:none !important;} #rl-line.wishy #rl-wish{display:flex !important;}
+  #rl-wish, #rl-wish:active{position:absolute; right:0; top:0; bottom:0; width:72px; margin:0; padding:0; box-sizing:border-box; border:0; border-left:3px solid var(--cb000000, #000000); border-radius:0; box-shadow:none;
+    background:var(--cbffffff, #ffffff); flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer;}
+  #rl-wish i{width:15px; height:15px; box-sizing:border-box; border:2.5px solid var(--cb000000, #000000); border-radius:4px; background:var(--cbffffff, #ffffff); display:flex; align-items:center; justify-content:center;}
+  #rl-wish[aria-pressed="true"] i{background:var(--cbc2278f, #c2278f);}
+  #rl-wish[aria-pressed="true"] i::after{content:''; width:6px; height:3px; margin-top:-2px; border:solid #fff; border-width:0 0 2.2px 2.2px; transform:rotate(-45deg);}
+  #rl-wish span{font:700 .5rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink);}
+  #rl-wish[aria-pressed="false"] span{color:var(--muted);}
 </style>
 <script>
   window.CSS_HEXES = ["b000000", "b2e4636", "b2f3136", "b2fb84a", "b3a2213", "b3d2513", "b3f2b1d", "b4a2e18", "b4f3019", "b5a4c40", "b5b6633", "b63401f", "b6b4a32", "b6b6560", "b6e4724", "b77502e", "b7a2f2b", "b845530", "b865a34", "b8a6a4f", "b8c5229", "b996439", "b9a6a42", "ba9825f", "baa3333", "bb07a4b", "bb5342a", "bc9b98f", "bc9c0ad", "bcbc4b1", "bd6d2c8", "bd9a514", "be3dccd", "be4ded2", "bece7dc", "befe6d3", "bf4efe3", "bf6dcd8", "bf6e3df", "bfaf7f0", "bffffff", "f000000", "f2fb84a", "f5c4a2e", "f8a8378", "f8f8a80", "faa3333", "fb4ab9b", "fb5342a", "fc4bdb0", "fcfc8ba", "fd6cfc2", "fd6d0c4", "fe5322b", "ff4ead2", "fffffff"];
@@ -2680,12 +2701,13 @@
   <div class="tabs shelf-ctl" id="view-tabs">
     <div class="tab active" data-mode="shelf">Shelf</div>
     <div class="tab" data-mode="list">List</div>
+    <div class="tab" data-mode="cards">Cards</div>
   </div>
   <div id="sort-card" class="shelf-ctl"><span id="sort-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="sort-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="sort-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="filter-name">All books</span><span class="sort-k">• Sort by:</span><span class="sort-v" id="sort-name">Date added</span></div>
  </div>
  <!-- Wishlist: sort, and search -->
  <div class="hdr-row hidden" id="wishlist-controls">
-  <div class="tabs lb-tabs" id="lb-tabs"><div class="tab active" data-m="wish">Wishlist</div><div class="tab" data-m="out">Checked Out</div><div class="tab" data-m="ret">Returned</div></div>
+  <div class="lb-tabs" id="lb-tabs"><div class="tl-views lb-pair"><button type="button" data-m="out" class="on">Checked Out</button><button type="button" data-m="ret">Returned</button></div><div class="tl-views lb-solo"><button type="button" data-m="wish">Wishlist</button></div></div>
   <div class="tl-views" id="wl-sort"><button type="button" data-s="added" class="on">Date Added</button><button type="button" data-s="title">Title</button><button type="button" data-s="author">Author</button><button type="button" data-s="status">Status</button></div>
   <div id="lb-card"><span id="lb-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="wl-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="lb-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="lb-filter-name">All</span><span class="sort-k">• Sort by:</span><span class="sort-v" id="lb-sort-name">Status</span></div>
  </div>
@@ -2729,6 +2751,7 @@
   <div class="shelf-wrap">
     <div id="shelves-container"></div>
     <div id="list-container"></div>
+    <div id="card-container"></div>
     <div class="empty-msg" id="empty-msg">Your shelf is empty. Add a book to begin.</div>
     <div class="count" id="count"></div>
   </div>
@@ -2937,7 +2960,7 @@
   </div>
   <div id="timeline-body">
     <div class="tl-page"><div class="tl-card"><div id="tl-head"></div><div id="tl-canvas"></div></div></div>
-    <div id="rl-line"><div id="rl-wheel"></div><div id="rl-pos"></div></div>
+    <div id="rl-line"><div id="rl-wheel"></div><div id="rl-pos"></div><button type="button" id="rl-wish" aria-pressed="true" aria-label="Show wishlist books"><i></i><span>Wishlist</span></button></div>
     <button type="button" id="tl-full">Tap for full window view</button>
     <div class="tl-foot"><div id="tl-info"><span class="hint">Tap a book to see it here</span></div></div>
   </div>
@@ -3501,6 +3524,7 @@
       return;
     }
     renderList(ordered, listContainer, search ? search.groups : null);
+    renderCards(ordered, search ? search.groups : null);
     // Status sort (or a search): each group gets its own divider and starts on a fresh shelf
     const shelfGroup = search ? (b, i) => search.groups[i] : prefs.sort === 'status' ? currentSort().group : null;
     const case3d = shelf3dOK();
@@ -3684,10 +3708,19 @@
     { id:'year',     name:'Year',           desc:'Oldest released first; no year last',
       fn: (a,b)=>{ const ha = typeof a.released === 'number', hb = typeof b.released === 'number';
                    return (hb - ha) || (ha ? a.released - b.released : 0) || cmp(titleKey(a.title), titleKey(b.title)); } },
-    { id:'length',   name:'Length',         desc:'Longest book first',
-      fn: (a,b)=> cmp(b.pages, a.pages) || cmp(titleKey(a.title), titleKey(b.title)) }
+    { id:'length',   name:'Length',         desc:'Longest first, grouped flash fiction to epic novel',
+      fn: (a,b)=> cmp(wordsOf(b), wordsOf(a)) || cmp(titleKey(a.title), titleKey(b.title)),
+      group: b => lenBand(wordsOf(b)) }
   ];
   function currentSort(){ return SORTS.find(s => s.id === prefs.sort) || SORTS[0]; }
+  // length in words: its word count when it has one, else about 250 a page, or (an audiobook) about 155 a minute of listening
+  function wordsOf(b){ if(b.words > 0) return b.words;
+    if(b.format === 'audio' && b.audioSeconds > 0) return Math.round(b.audioSeconds / 60 * 155);
+    return b.pages > 0 ? b.pages * 250 : 0; }
+  // the length bands by word count, flash fiction to the epic novel (each from where it begins)
+  const LEN_BANDS = [[1, 'Nano-Fiction'], [300, 'Ultra-Flash Fiction'], [500, 'Flash Fiction'], [1000, 'Ultra-Short Story'], [5000, 'Short Story'],
+    [10000, 'Novelette'], [20000, 'Novella'], [50000, 'Standard Novel'], [80001, 'Long Novel'], [175001, 'Grand Novel'], [250000, 'Epic Novel']];
+  function lenBand(w){ if(!(w > 0)) return 'No Length'; let name = LEN_BANDS[0][1]; LEN_BANDS.forEach(([from, n]) => { if(w >= from) name = n; }); return name; }
   // filters: which books show (shelves, list and collections)
   const FILTERS = [
     { id:'all',    name:'All books', short:'All',    fn: ()=> true },
@@ -4424,6 +4457,28 @@
     let lastW = 0;
     if(window.ResizeObserver) new ResizeObserver(es => { const w = Math.round(es[0].contentRect.width); if(w && w !== lastW){ lastW = w; fitListTitles(c); } }).observe(c);
   });
+  // Cards view: like the wishlist — its cover cloth, the year and word count on the ends, then three status cards
+  const cardContainer = document.getElementById('card-container');
+  const CMARK = (k, on, d) => `<button type="button" class="wl-mark ${k}${on ? ' on' : ''}" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="${k === 'wait' ? 4 : 3.6}" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg></button>`;
+  function renderCards(ordered, groups){
+    const esc = t => String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const groupOf = groups ? null : currentSort().group; let last = null, html = '';
+    ordered.forEach((b, bi) => {
+      if(groupOf || groups){ const g = groups ? groups[bi] : groupOf(b); if(g !== last){ last = g; html += `<div class="list-divider"><span class="ld-name">${esc(g)}</span></div>`; } }
+      const st = bookFinished(b) ? 'yes' : bookRead(b) > 0 ? 'wait' : 'no', hex = bookColor(b);
+      const yr = typeof b.released === 'number' && !isNaN(b.released) ? (b.released < 0 ? -b.released + ' BC' : String(b.released)) : '';
+      const n = b.words > 0 ? b.words : (b.format === 'audio' && b.audioSeconds > 0 ? Math.round(b.audioSeconds) : 0);
+      html += `<div class="wl-row" data-bi="${bi}"><div class="wl-card" data-hex="${hex}" style="--cloth:${hex}"><canvas aria-hidden="true"></canvas>` +
+        (yr ? `<i class="wl-yr">${yr}</i>` : '') + (n ? `<i class="wl-yr wl-wd">${Math.min(9999999, n).toLocaleString('en-US')}</i>` : '') +
+        `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
+        CMARK('yes', st === 'yes', 'M4 12.5l5 5L20 6') + CMARK('wait', st === 'wait', 'M12 4v10M12 19.8v.01') + CMARK('no', st === 'no', 'M6 6l12 12M18 6L6 18') + '</div>';
+    });
+    cardContainer.innerHTML = html;
+    cardContainer.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex, t = c.querySelector('.t');
+      const fit = () => { c.classList.remove('two'); if(t && t.scrollWidth > t.clientWidth + 1) c.classList.add('two'); };
+      const go = () => { fit(); if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(hex), true, 16); };
+      if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go); });
+  }
   function renderList(ordered, target = listContainer, groups = null){
     requestAnimationFrame(() => fitListTitles(target));
     const listContainer = target;
@@ -4500,6 +4555,7 @@
   const viewTabs = [...document.querySelectorAll('#view-tabs .tab')];
   function applyView(){
     allBooksView.classList.toggle('list', prefs.view === 'list');
+    allBooksView.classList.toggle('cards', prefs.view === 'cards');
     document.getElementById('library-view').classList.toggle('list', prefs.view === 'list');
     if(prefs.view === 'list') repaintTapeRows();          // drawn to their width, which is 0 while hidden
     else if(shelfStale){ shelfStale = false; render(); }   // a tape was wound from the list
@@ -4693,6 +4749,7 @@
       document.getElementById('wishlist-view').classList.toggle('active', view === 'wishlist');
       document.getElementById('wishlist-controls').classList.toggle('hidden', view !== 'wishlist');
       { const l = document.querySelector('#add-card .add-lbl'); if(l) l.textContent = view === 'wishlist' ? 'Add New Wishlist Book' : 'Add New Book'; }
+      if(view === 'wishlist' && window.__lbHome) window.__lbHome();   // the Library always opens on Checked Out
       if(view === 'wishlist' && window.wishRender) window.wishRender();
       if(view === 'wishlist' && window.__lbLabel) window.__lbLabel();
       window.scrollTo(0, 0);                              // each page opens at its top
@@ -10818,11 +10875,12 @@
     // All Time also has the books not started yet (black dots); the spans only what was read in them
     const started = b => (b.reads || []).length > 0 || (b.days || []).some(v => v > 0);
     const read = books.filter(b => touched(b) || (all && !started(b))), has = b => typeof b.released === 'number' && !isNaN(b.released);
-    // All Time: the wishlist too, any with a year (magenta)
-    const wish = all && window.wishState ? window.wishState().filter(has).map(w => Object.assign(w, { _wish: true })) : [];
+    // All Time: the wishlist too, any with a year (magenta) — unless its check on the line card is off
+    const wish = all && !RL.noWish && window.wishState ? window.wishState().filter(has).map(w => Object.assign(w, { _wish: true })) : [];
     return { list: read.filter(has).concat(wish).sort((a, b) => a.released - b.released), without: read.filter(b => !has(b)).length };
   }
   // a dot's colour: dark gold read, green being read now, black not started; an audiobook's is a square
+  const rlKey = b => (b._wish ? 'w|' : 'b|') + b.title + '|' + b.released;   // one book's dot (a wishlist copy is made fresh each draw)
   const rlState = b => b._wish ? 'wish' : bookFinished(b) ? 'read' : (b.days || []).some(v => v > 0) ? 'now' : (b.reads || []).length ? 'read' : 'unread';
   function relDraw(){
     const today = tlDay(new Date()), R = tlRange(today), key = TL.view + '|' + TL.off;
@@ -10875,18 +10933,19 @@
       const over = new Map();
       pts.forEach(p => { if(p.x > xMax){ const kk = Math.round(p.y); over.set(kk, (over.get(kk) || 0) + 1); return; }
         placed.push(p);
-        html += `<div class="rl-dot ${rlState(p.b)}${p.b.format === 'audio' ? ' tape' : ''}${RL.picked === p.b.released ? ' on' : ''}" data-i="${list.indexOf(p.b)}" style="left:${p.x}px; top:${p.y}px; width:${D}px; height:${D}px; margin:${-D / 2}px 0 0 ${-D / 2}px"></div>`; });
+        html += `<div class="rl-dot ${rlState(p.b)}${p.b.format === 'audio' ? ' tape' : ''}${RL.picked === rlKey(p.b) ? ' on' : ''}" data-i="${list.indexOf(p.b)}" style="left:${p.x}px; top:${p.y}px; width:${D}px; height:${D}px; margin:${-D / 2}px 0 0 ${-D / 2}px"></div>`; });
       over.forEach((n, y) => html += `<div class="rl-more" style="left:${xMax - 2}px; top:${y}px">+${n}</div>`);
     });
     // no tag on the card: the picked dots just get their rings, and the line card under the card names the book
     if(!list.length && without) html += `<div class="rl-empty">Add a year to a book (Edit) to see it here</div>`;
     tlCanvas.innerHTML = html;
+    document.getElementById('rl-line').classList.toggle('wishy', TL.view === 'all');   // the Wishlist check: All Time only
     rlLine(); rlFoot(R, list, without);
   }
   // the line card: the picked book — title, author, year (years ago); several from one year make it a wheel, opening on 1 of n
   function rlLine(){
     const wheel = document.getElementById('rl-wheel'), lc = document.getElementById('rl-line'), NOW = rlNow();
-    const group = RL.picked === null ? [] : RL.shown.filter(b => b.released === RL.picked);
+    const group = RL.picked === null ? [] : RL.shown.filter(b => rlKey(b) === RL.picked);   // (just the one book now)
     const ago = y => { const n = NOW - y; return n === 0 ? 'this year' : n.toLocaleString() + (n === 1 ? ' year ago' : ' years ago'); };
     wheel.innerHTML = group.length ? group.map(b => `<div><span class="tt">${tlEsc(b.title)}</span><span class="au">${tlEsc(b.author || '')}</span><span class="yr">${rlYr(b.released)} <span>(${ago(b.released)}${b._wish ? ' · wishlist' : ''})</span></span></div>`).join('')
       : '<div class="empty">Tap a dot to see the book here</div>';
@@ -10903,7 +10962,7 @@
     wheel.addEventListener('scroll', () => { const i = Math.round(wheel.scrollTop / RL_NOTCH);
       if(RL.picked === null || i === RL.wheelI) return;
       RL.wheelI = i; if(window.hapticTick) window.hapticTick();
-      rlMark(RL.shown.filter(b => b.released === RL.picked)); }, {passive: true}); }
+      rlMark(RL.shown.filter(b => rlKey(b) === RL.picked)); }, {passive: true}); }
   // the footer: as the other views — the span with ◀ ▶ to step back, how many and the years they came out; or the picked one
   function rlFoot(R, list, without){
     {   // (a picked book is named on the line card above, not here)
@@ -10927,12 +10986,20 @@
       return;
     }
   }
-  // a tap picks the dot nearest the finger, and with it every book from that year; tap it again to let go
+  // the line card's Wishlist check: show the wishlist's dots or not (kept between visits)
+  { const w = document.getElementById('rl-wish');
+    try{ RL.noWish = localStorage.getItem('stack-tracker-rl-wish') === '0'; }catch(e){}
+    w.setAttribute('aria-pressed', String(!RL.noWish));
+    w.addEventListener('click', e => { e.stopPropagation(); RL.noWish = !RL.noWish; w.setAttribute('aria-pressed', String(!RL.noWish));
+      try{ localStorage.setItem('stack-tracker-rl-wish', RL.noWish ? '0' : '1'); }catch(e){}
+      if(RL.noWish && RL.picked && RL.picked.startsWith('w|')) RL.picked = null;
+      if(window.hapticTick) window.hapticTick(); relDraw(); }); }
+  // a tap picks the dot nearest the finger — just that book, even with others from the same year beside it; tap it again to let go
   tlCanvas.addEventListener('click', e => {
     if(TL.mode !== 'released') return;
     const r = tlCanvas.getBoundingClientRect(), fx = e.clientX - r.left, fy = e.clientY - r.top;
     let best = null, bd = 16; RL.placed.forEach(p => { const d = Math.hypot(p.x - fx, p.y - fy); if(d < bd){ bd = d; best = p; } });
-    const y = best ? best.b.released : null; RL.picked = y !== null && y !== RL.picked ? y : null; RL.wheelI = 0; relDraw();
+    const k = best ? rlKey(best.b) : null; RL.picked = k !== null && k !== RL.picked ? k : null; RL.wheelI = 0; relDraw();
   });
   function tlDraw(){
     TL.reads = tlCollect();
@@ -12383,7 +12450,7 @@ closeRowDD = function(dd){
     // ---- the Library's Sort and Filter: its own for each tab card (kept between visits) ----
     const LB = {
       wish: { f: [['all', 'All', 'Every wishlist book'], ['', 'To Check', 'Not looked for yet'], ['yes', 'Found', 'Found at the library'], ['wait', 'Waiting', 'On hold, or on its way'], ['no', 'Not There', 'The library doesn\'t have it']],
-              s: [['status', 'Status', 'Grouped by status, authors A–Z by last name'], ['author', 'Author', 'Last name, first name, then title'], ['title', 'Title', 'A–Z'], ['added', 'Date Added', 'The order they went on the list'], ['year', 'Year', 'Oldest released first; no year last'], ['length', 'Length', 'Short, Medium, Long, Epic by word count']] },
+              s: [['status', 'Status', 'Grouped by status, authors A–Z by last name'], ['author', 'Author', 'Last name, first name, then title'], ['title', 'Title', 'A–Z'], ['added', 'Date Added', 'The order they went on the list'], ['year', 'Year', 'Oldest released first; no year last'], ['length', 'Length', 'Flash fiction to epic novel, by word count']] },
       out:  { f: [['all', 'All', 'Every book checked out'], ['late', 'Overdue', 'Past its due date'], ['week', 'Due This Week', 'Due in the next 7 days'], ['renewed', 'Renewed', 'Renewed at least once']],
               s: [['due', 'Due Date', 'Soonest first, grouped by when'], ['title', 'Title', 'A–Z'], ['author', 'Author', 'Last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first'], ['year', 'Year', 'Oldest released first; no year last']] },
       ret:  { f: [['all', 'All', 'Every book returned'], ['done', 'Finished', 'Read to the end'], ['part', 'Not Finished', 'Went back before the end'], ['late', 'Returned Late', 'Went back after its due date']],
@@ -12401,7 +12468,7 @@ closeRowDD = function(dd){
     const MARK = (k, on, label, d) => `<button type="button" class="wl-mark ${k}${on ? ' on' : ''}" data-k="${k}" aria-label="${label}" aria-pressed="${on}">` +
       `<svg viewBox="0 0 24 24" fill="none" stroke-width="${k === 'wait' ? 4 : 3.6}" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg></button>`;
     // ---- the Library tab: Wishlist | Checked Out | Returned (loans are the books with library data) ----
-    let mode = 'wish', openLoan = -1;
+    let mode = 'out', openLoan = -1;   // opens on Checked Out
     const DAY = 864e5, today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
     let loans = [];   // the library books: every book with a loan
     const md = t => new Date(t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -12487,11 +12554,16 @@ closeRowDD = function(dd){
     }
     const closeAll = () => view.querySelectorAll('.ln-dd.open').forEach(closeRowDD);
     const lbLabel = () => { const l = document.querySelector('#add-card .add-lbl'); if(l && document.body.classList.contains('tab-wishlist')) l.textContent = mode === 'wish' ? 'Add New Wishlist Book' : 'Check Out a Book'; };
-    document.querySelectorAll('#lb-tabs .tab').forEach(t => t.addEventListener('click', () => {
-      mode = t.dataset.m; openLoan = -1; document.querySelectorAll('#lb-tabs .tab').forEach(x => x.classList.toggle('active', x === t));
+    document.querySelectorAll('#lb-tabs [data-m]').forEach(t => t.addEventListener('click', () => {
+      mode = t.dataset.m; openLoan = -1; document.querySelectorAll('#lb-tabs [data-m]').forEach(x => x.classList.toggle('on', x === t));
       document.body.classList.toggle('lb-loans', mode !== 'wish'); lbShow();
       lbLabel(); render(); window.dispatchEvent(new Event('resize')); window.scrollTo(0, 0); }));
     window.__lbLabel = lbLabel;
+    document.body.classList.add('lb-loans');
+    // opening the Library tab: back to Checked Out, whichever card was last open
+    window.__lbHome = () => { if(mode === 'out') return; mode = 'out'; openLoan = -1;
+      document.querySelectorAll('#lb-tabs [data-m]').forEach(x => x.classList.toggle('on', x.dataset.m === 'out'));
+      document.body.classList.add('lb-loans'); lbShow(); lbLabel(); };
     function render(){
       if(mode !== 'wish') return renderLoans();
       if(!list.length){ view.innerHTML = '<div id="wl-empty">No wishlist books yet</div>'; return; }
@@ -12507,8 +12579,9 @@ closeRowDD = function(dd){
         const x = authorKeyOf(p[0]), y = authorKeyOf(n[0]); return lc(x[0], y[0]) || lc(x[1], y[1]) || by('title')(p, n); });
       if(!rows.length){ view.innerHTML = '<div id="wl-empty">No matches</div>'; return; }
       // Status: each group (in Date Added order) under its own divider; empty groups left out
-      // Length: grouped by word count — Short (under 60,000), Medium (to 100,000), Long (to 200,000), Epic (200,000 and up), then none given
-      const LEN = [['Short', w => w > 0 && w < 60000], ['Medium', w => w >= 60000 && w < 100000], ['Long', w => w >= 100000 && w < 200000], ['Epic', w => w >= 200000], ['No Word Count', w => !(w > 0)]];
+      // Length: grouped by word count, flash fiction up to the epic novel (the bands below are where each begins), then none given
+      const BANDS = LEN_BANDS;
+      const LEN = BANDS.map(([from, name], k) => [name, w => w >= from && (k === BANDS.length - 1 || w < BANDS[k + 1][0])]).concat([['No Word Count', w => !(w > 0)]]);
       const grouped = sortBy === 'status' ? GROUPS.map(([k, name]) => [name, rows.filter(([b]) => (b.lib || '') === k)]).filter(g => g[1].length)
         : sortBy === 'length' ? LEN.map(([name, f]) => [name, rows.filter(([b]) => f(b.words || 0))]).filter(g => g[1].length) : [[null, rows]];
       view.innerHTML = grouped.map(([name, rs]) => (name ? `<div class="list-divider"><span class="ld-name">${name}</span></div>` : '') + rs.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card wl-wish" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>${b.released != null ? `<i class="wl-yr">${wlYr(b.released)}</i>` : ''}${b.words ? `<i class="wl-yr wl-wd">${wlWords(b.words)}</i>` : ''}` +
