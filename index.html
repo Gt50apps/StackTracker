@@ -276,6 +276,25 @@
   .so-opt b{font-family:Georgia, serif; font-size:.9rem; font-weight:600; color:var(--ink);}
   .so-opt span{font-family:Arial, sans-serif; font-size:.62rem; color:var(--muted);}
   .so-opt.on{background:var(--ink-bg, var(--ink));}
+  /* the picked sort: three arrows on the right, up for its usual order, down for reversed (tap it again to flip;
+     each arrow turns over in turn) */
+  .so-opt{position:relative;}
+  .so-dir{display:none; position:absolute; right:8px; top:50%; width:26px; height:26px; margin-top:-13px; pointer-events:none;}
+  .so-opt.on .so-dir{display:block;}
+  /* PodTracer's triple triangles: white at the top to grey at the bottom, each with its own shadow */
+  .so-dir svg{width:100%; height:100%; display:block; overflow:visible; will-change:transform;}
+  .so-dir polygon{filter:drop-shadow(0 1.6px 1.2px rgba(0,0,0,.5)); transform-box:fill-box; transform-origin:50% 50%; transform:rotate(180deg) translateZ(0);   /* usual order: pointing up */
+    transition:transform .38s cubic-bezier(.45,0,.25,1);}
+  .so-dir polygon:nth-child(2){transition-delay:.06s;} .so-dir polygon:nth-child(1){transition-delay:.12s;}   /* the top one turns first */
+  .so-opt.desc .so-dir polygon{transform:none;}   /* flipped: pointing down */
+  /* the same arrows, small, in the Sort and Filter bars (after "Sort by:") */
+  .bar-dir{flex:none; align-self:center; width:12px; height:12px; margin:0 -2px 0 -1px; pointer-events:none;}
+  .bar-dir svg{width:100%; height:100%; display:block; overflow:visible;}
+  .bar-dir polygon{transform-box:fill-box; transform-origin:50% 50%; transform:rotate(180deg); transition:transform .38s cubic-bezier(.45,0,.25,1);}
+  .bar-dir polygon:nth-child(2){transition-delay:.06s;} .bar-dir polygon:nth-child(1){transition-delay:.12s;}
+  .bar-dir.desc polygon{transform:none;}
+  #sort-card.searching .bar-dir, #lb-card.searching .bar-dir{visibility:hidden;}
+  .so-opt.on > b, .so-opt.on > span{padding-right:30px;}
   .so-opt.on b{color:var(--cfffffff, #ffffff);} .so-opt.on span{color:var(--cfcfc8ba, #cfc8ba);}
 
   #add-card{
@@ -1432,7 +1451,7 @@
   .sh-head h2{flex:1 1 0; min-width:0; margin:0; height:42px; padding:0 25% 0 0; display:flex; align-items:center; justify-content:center; background:var(--bg);
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink); white-space:nowrap;}
   #sort-page .so-filter{height:auto; margin:0; padding:0 4px 4px; display:flex; flex-direction:column; gap:4px; border:0; border-bottom:3px solid var(--cb000000, #000000); border-radius:0; overflow:visible; background:var(--bg);}
-  #sort-page .so-filter .so-opt{width:100%; height:45px; box-sizing:border-box; margin:0; padding:0 8px; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--panel);
+  #sort-page .so-filter .so-opt{width:100%; height:36px; box-sizing:border-box; margin:0; padding:0 8px; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--panel);
     display:flex; flex-direction:column; justify-content:center; align-items:flex-start; text-align:left; text-transform:none; letter-spacing:0; line-height:1.15; box-shadow:none; font-weight:400;}
   #sort-page .so-filter .so-opt + .so-opt{border-left:3px solid var(--cb000000, #000000);}
   
@@ -1440,10 +1459,16 @@
   #sort-page .so-filter .so-opt.on b{color:var(--cfffffff, #ffffff);} #sort-page .so-filter .so-opt.on span{color:var(--cfcfc8ba, #cfc8ba);}
   #sort-page .so-list{padding-top:0;}
   /* every card on this page: capitals, one height */
-  #sort-page .so-opt{height:45px; box-sizing:border-box; flex:none;}
+  #sort-page .so-opt{height:36px; box-sizing:border-box; flex:none;}
+  #sort-page .so-opt, #sort-page .so-opt > b, #sort-page .so-opt > span{transition:none;}
+  /* All Types | Books | Audiobooks: one card divided in three, above the status filters */
+  #sort-page .so-fmt{height:36px; margin:0; flex:none;}
+  #sort-page .so-fmt button{transition:none; line-height:1.1; background:var(--cbffffff, #ffffff); color:var(--ink); font-weight:700;}
+  #sort-page .so-fmt button + button{border-left:none;}   /* the 3px gap is the divider, like the other split cards */
+  #sort-page .so-fmt button.on{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}   /* a pick switches at once (a fade would stall while the shelves rebuild behind, like slow motion) */   /* shorter cards: name over its line, tight */
   #sort-page .so-opt b{font:700 .78rem/1.15 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   #sort-page .so-opt span{font:400 .58rem/1.2 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
-  #sort-page .list-divider{height:45px;}
+  #sort-page .list-divider{height:24px;}   /* the standard slim divider */
   /* every header and footer bar is boxed: 3px black at its top and its bottom */
   #app-header, #book-toolbar, .lg-head, .customize-header{border-top:3px solid var(--cb000000, #000000);}
   #app-footer, #page-panel, .tl-foot{border-bottom:3px solid var(--cb000000, #000000);}
@@ -1725,6 +1750,7 @@
   /* the Library's options: filters and sorts together in one scrolling column (the window may be too short for them all) */
   #sort-page #lb-opts{flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; display:flex; flex-direction:column;}
   #sort-page #lb-opts .so-list{flex:none; overflow:visible;}
+  #sort-page #lb-opts .so-list .so-opt{align-items:flex-start; text-align:left;}   /* left, as Home's sort cards */
   /* a wishlist card: its year, if it has one, sideways in the left end, the bands moved in to make room */
   .wl-card.wl-wish{padding-left:30px; padding-right:30px;}
   .wl-card .wl-yr{position:absolute; left:2px; top:0; bottom:0; width:13px; display:flex; align-items:center; justify-content:center; pointer-events:none;
@@ -2401,7 +2427,7 @@
       const hatch = r => { let d = '', s = 7; for(let c = -r.h; c < r.w; c += s){ const xa = Math.max(0, c), ya = Math.max(0, -c) , xb = Math.min(r.w, c + r.h), yb = Math.min(r.h, r.w - c);
         d += `M${(r.x + xa).toFixed(1)},${(r.y + r.h - ya).toFixed(1)} L${(r.x + xb).toFixed(1)},${(r.y + r.h - yb).toFixed(1)} `; } return d; };
       const pieces = [...planks.map(p => [p, 'plank']), ...all.map(b => [b, 'book'])];
-      const plankTop = planks.map(p => rel(p).y);
+      const plankTop = planks.map(p => rel(p).y), RECT = new Map(pieces.map(([n]) => [n, rel(n)]));   // every piece measured once, before any line is added
       // the pencil lines are the borders here: each piece's own black border takes its fill colour instead
       pieces.forEach(([n]) => { n.style.borderColor = getComputedStyle(n).backgroundColor; });
       // pencil work, drawn by a sliding mask: a clipping box slides over it while its contents slide back the other way,
@@ -2422,7 +2448,7 @@
         A(p.o, [{ transform: 'none', opacity: 1 }, { transform: `${T}(100%)`, opacity: .3 }], { duration: dur, delay: at, easing: 'ease-in', fill: 'forwards' });
         A(p.i, [{ transform: 'none' }, { transform: `${T}(-100%)` }], { duration: dur, delay: at, easing: 'ease-in', fill: 'forwards' }); };
       pieces.forEach(([n, kind], idx) => {
-        const isP = kind === 'plank', r = rel(n), j = isP ? idx : idx - 2;
+        const isP = kind === 'plank', r = Object.assign({}, RECT.get(n)), j = isP ? idx : idx - 2;
         if(!isP){ const pt = plankTop[all.indexOf(n) < 5 ? 0 : 1]; r.h = pt - r.y; }   // down to the shelf's top
         const line = pencil(r, box(r, !isP), 2, 1), ax = isP ? 'x' : 'y';
         const at = isP ? 60 + j * 260 : 520 + j * 75, dur = isP ? 360 : 300;
@@ -2451,11 +2477,14 @@
     // sprouts and grows up into its book. At the end they wilt and wither down into the shelves, and the shelves
     // fly out
     function spGarden({ A, rows, all, planks, shelvesIn, shelvesOut, subAt, VW, VH }){
+      const G0 = performance.now(), wilts = [];
       shelvesIn(0);
       const layer = (html, css) => { const d = document.createElement('div'); d.style.cssText = 'position:absolute; left:0; top:0; width:0; height:0; pointer-events:none; will-change:transform, opacity; transform-origin:0 0;' + (css || ''); d.innerHTML = html; el.appendChild(d); return d; };
       all.forEach(b => { b.style.transformOrigin = '50% 100%'; b.innerHTML = `<span class="lt" style="display:inline-block">${b.textContent}</span>`; });
       // seeds, one under each book's place
       const spots = all.map(b => { const r = rel(b); return { x: r.x + r.w / 2, y: r.y + r.h }; });
+      const COL = all.map(b => getComputedStyle(b).backgroundColor), HT = all.map(b => b.offsetHeight), LAND = rows.map(r => { const q = rel(r[0]); return q.y + q.h - 2; });   // every position and colour read before anything is added
+      const shelfY0 = rows.map(r => { const q = rel(r[0]); return q.y + q.h - 52; }), xs0 = rows.map(r => [rel(r[0]).x - 10, rel(r[r.length - 1]).x + 40]), W0 = el.clientWidth;
       const seeds = spots.map((p, i) => { const s = document.createElement('div');
         s.style.cssText = `position:absolute; left:${p.x - 5}px; top:${p.y - 7}px; width:10px; height:7px; border-radius:50%; background:#6b4a32; border:2px solid #000; box-sizing:border-box;`;
         el.appendChild(s);
@@ -2468,9 +2497,7 @@
         '<path d="M10,-12 L-14,-28 L-12,-32 L12,-20" fill="#2b5752" stroke="#000" stroke-width="3" stroke-linejoin="round"/>' +
         '<path d="M-17,-34 L-9,-26" stroke="#000" stroke-width="4" stroke-linecap="round"/>' +
         '<path d="M12,-22 L40,-22" stroke="rgba(255,255,255,.35)" stroke-width="2"/></svg>');
-      const shelfY = rows.map(r => rel(r[0]).y + rel(r[0]).h - 52),   // the can's base, a little above the seeds
-       xs = rows.map(r => [rel(r[0]).x - 10, rel(r[r.length - 1]).x + 40]);
-      const R = rel(el.querySelector('.sp-shelf')), W = el.clientWidth;
+      const shelfY = shelfY0, xs = xs0, W = W0;   // the can's base, a little above the seeds (read before anything was added)
       // its path: in from the right over the top shelf, along it pouring (tipped), down to the bottom shelf, along it, away left
       const P = [ { t: 650, x: W + 80, y: shelfY[0], a: 0 }, { t: 900, x: xs[0][1], y: shelfY[0], a: 0 }, { t: 980, x: xs[0][1], y: shelfY[0], a: -28 },
                   { t: 1400, x: xs[0][0], y: shelfY[0], a: -28 }, { t: 1470, x: xs[0][0], y: shelfY[0], a: 0 },
@@ -2484,12 +2511,21 @@
       const tipAt = t => { let i = 0; while(i < P.length - 2 && P[i + 1].t <= t) i++; const a = P[i], b = P[i + 1], f = Math.max(0, Math.min(1, (t - a.t) / (b.t - a.t)));
         const x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f, ang = (a.a + (b.a - a.a) * f) * Math.PI / 180;
         const tx = -16, ty = -31; return { x: x + tx * Math.cos(ang) - ty * Math.sin(ang), y: y + tx * Math.sin(ang) + ty * Math.cos(ang) }; };
-      [[990, 1400, 0], [1710, 2100, 1]].forEach(([a, b, si]) => { for(let t = a; t < b; t += 32){
-        const p = tipAt(t), land = rel(rows[si][0]).y + rel(rows[si][0]).h - 2;
-        const d = layer('<i style="position:absolute; left:-2.2px; top:-3.4px; width:4.4px; height:6.8px; border-radius:50%; background:#4f8fc0; display:block"></i>', 'opacity:0;');   // hidden until it falls
-        const jx = (Math.random() - .5) * 6;
-        A(d, [{ transform: `translate(${p.x}px, ${p.y}px)`, opacity: 1 }, { transform: `translate(${p.x - 8 + jx}px, ${land}px)`, opacity: .9, offset: .92 }, { transform: `translate(${p.x - 8 + jx}px, ${land}px)`, opacity: 0 }],
-          { duration: 300, delay: t, easing: 'cubic-bezier(.5,0,1,1)', fill: 'forwards' }); } });
+      [[990, 1400, 0], [1710, 2100, 1]].forEach(([a, b, si]) => {
+        const p0 = tipAt(a), H = Math.max(10, LAND[si] - p0.y), v = H / 260, POUR = b - a, DUR = POUR + 260, GAP = v * 32, LEN = H + v * POUR;
+        // one stream per pour: the window under the spout follows it along the shelf; inside, a strip of drops slides down
+        // through it — drops only where it was pouring, so the first falls from the spout and the last runs out onto the shelf
+        const win = layer('', `width:10px; height:${H.toFixed(1)}px; overflow:hidden; opacity:0;`);
+        const strip = document.createElement('div');
+        strip.style.cssText = `position:absolute; left:0; top:0; width:10px; height:${LEN.toFixed(1)}px; box-sizing:border-box; padding-top:${H.toFixed(1)}px; will-change:transform;` +
+          `background:radial-gradient(2.2px 3.4px at 5px 50%, #4f8fc0 98%, transparent) 0 0 / 10px ${GAP.toFixed(2)}px repeat-y content-box; background-origin:content-box;`;
+        win.appendChild(strip);
+        const kf = []; for(let t = a; t <= b + 1; t += 50){ const q = tipAt(Math.min(t, b)); kf.push({ transform: `translate(${(q.x - 9).toFixed(1)}px, ${q.y.toFixed(1)}px)`, offset: (t - a) / DUR }); }
+        kf.push({ transform: kf[kf.length - 1].transform, offset: 1 });
+        A(win, kf, { duration: DUR, delay: a, fill: 'none' });
+        A(win, [{ opacity: 1 }, { opacity: 1 }], { duration: DUR, delay: a, fill: 'none' });
+        A(strip, [{ transform: `translateY(${(-LEN + H).toFixed(1)}px)` }, { transform: `translateY(${H.toFixed(1)}px)` }], { duration: DUR, delay: a, easing: 'linear', fill: 'none' });
+      });
       // each seed sprouts once the water reaches it, then grows into its book
             all.forEach((b, i) => {
         const si = i < rows[0].length ? 0 : 1, sp = spots[i];
@@ -2498,7 +2534,7 @@
         if(w == null) w = si ? 1900 : 1200;
         // the sapling: the book itself as a thin stem in its own colour, two leaves (the book's colour too) at its tip.
         // The stem grows, then widens and fills out into the book while the leaves fold away into its top
-        const col = getComputedStyle(b).backgroundColor, h = b.offsetHeight;
+        const col = COL[i], h = HT[i];
         const leaves = layer(`<svg width="28" height="16" viewBox="-14 -12 28 16" style="position:absolute; left:-14px; top:-12px; overflow:visible"><path d="M0,0 Q-10,-7 -12,2 Q-4,4 0,0 Z" fill="${col}" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/>` +
           `<path d="M0,-2 Q10,-10 12,-1 Q4,2 0,-2 Z" fill="${col}" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg>`);
         // three stages, each resting a moment: the seed; a small sapling (a short stem and its two leaves); then it grows
@@ -2514,6 +2550,9 @@
         A(seeds[i], [{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: w + 120, fill: 'forwards' });
         // the end, in the order they grew: it wilts — a slight lean, creases and wrinkles spreading over it as its colour
         // dulls — then withers, drawing in narrower and browner, and then shrinks down until it's lost in the shelf
+        // the wilt is made in a quiet moment once the books are growing (not on the first frame), still timed from the splash's start
+        const grown = w + DUR + 90 + 200, lean = (Math.random() < .5 ? -1 : 1) * (2 + Math.random() * 3), back0 = Math.max(3250, grown + 120) + Math.random() * 60;
+        wilts.push(() => { const back = Math.max(0, back0 - (performance.now() - G0));
         const wr = document.createElement('i');
         const crease = () => { let d = ''; for(let c = 0; c < 6; c++){ const y = 8 + c * 15 + Math.random() * 8; d += `M0,${y.toFixed(1)} `;
           for(let x = 4; x <= 28; x += 4) d += `L${x},${(y + (Math.random() - .5) * 7).toFixed(1)} `; } return d; };
@@ -2526,7 +2565,6 @@
         const tint = document.createElement('i');   // the dulling and browning, as a layer fading in over it (no filters)
         tint.style.cssText = 'position:absolute; inset:0; pointer-events:none; opacity:0; background:#3b2a16; will-change:opacity;';
         b.insertBefore(tint, wr);
-        const grown = w + DUR + 90 + 200, lean = (Math.random() < .5 ? -1 : 1) * (2 + Math.random() * 3), back = Math.max(3250, grown + 120) + Math.random() * 60;
         A(b, [{ transform: 'rotate(0deg) scale(1, 1)', opacity: 1, easing: 'ease-in-out' },
               { transform: `rotate(${lean}deg) scale(.97, .96)`, opacity: 1, offset: .34, easing: 'ease-in-out' },
               { transform: `rotate(${lean * 1.2}deg) scale(.74, .86)`, opacity: 1, offset: .62, easing: 'cubic-bezier(.45,0,.75,.6)' },
@@ -2535,8 +2573,9 @@
           { duration: 660, delay: back, fill: 'forwards' });
         A(tint, [{ opacity: 0 }, { opacity: .38, offset: .5 }, { opacity: .6 }], { duration: 420, delay: back, fill: 'forwards' });
         A(wr, [{ opacity: 0 }, { opacity: .9, offset: .45 }, { opacity: 1 }], { duration: 420, delay: back + 30, fill: 'forwards' });
-        A(letter, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: back + 140, fill: 'forwards' });
+        A(letter, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: back + 140, fill: 'forwards' }); });
       });
+      later(() => wilts.splice(0).forEach(f => f()), 2300);   // ahead of the app's build at 2.45 s
       subAt(2600, 4050);   // shown through the wilting, gone before the shelves leave
       shelvesOut(4060);
     }
@@ -2590,8 +2629,8 @@
     requestAnimationFrame(() => {
       // the ending is worked out now, before anything moves: every book is standing exactly where it will land. Its
       // animations are handed over at once, timed to start at 1.6 s — the browser starts them itself, right on time
-      try{ ending(); }catch(e){ console.error(e); }
-      el.classList.add('go');
+      el.classList.add('go'); T0 = performance.now();
+      later(() => { try{ ending(); }catch(e){ console.error(e); } }, 960);   // every book is still by 0.95 s; still starts at 1.6 s
       startApp();
       later(() => el.querySelector('.sp-sub').classList.add('in'), 800);
       later(() => { el.classList.add('ending'); el.querySelector('.sp-sub').classList.remove('in'); }, START);
@@ -2600,16 +2639,17 @@
     setTimeout(() => { document.body.classList.remove('splashing'); if(el.isConnected){ el.remove(); if(window.__runApp) window.__runApp(); } flushAfter(); }, 9000);   // never stuck
 
     // ---- helpers: a recorded path becomes one animation over the whole ending ----
-    const FPS = 30, STEP = 1 / 120;                        // simulated finely enough, kept 30 times a second (the browser joins them smoothly)
+    const FPS = 30, STEP = 1 / 60;                         // simulated 60 times a second, kept 30 (the browser joins them smoothly)
     const xf = f => `translate(${f.x.toFixed(1)}px, ${f.y.toFixed(1)}px) rotate(${f.a.toFixed(2)}deg)`;
+    let T0 = 0; const at = () => Math.max(0, START - (performance.now() - T0));   // the ending's start, counted from the splash's
     function play(node, frames, origin){
       if(origin) node.style.transformOrigin = origin;   // (the shelves only slide on the way in, so this can be set now)
       const kf = frames.map((f, i) => ({ transform: xf(f), opacity: f.o == null ? 1 : f.o, offset: Math.min(1, f.t / SPAN) }));
       kf[0].offset = 0; kf[kf.length - 1].offset = 1;
       for(let i = 1; i < kf.length; i++) if(kf[i].offset <= kf[i - 1].offset) kf[i].offset = Math.min(1, kf[i - 1].offset + 1e-6);
-      anims.push(node.animate(kf, { duration: SPAN, delay: START, easing: 'linear', fill: 'forwards' }));
+      anims.push(node.animate(kf, { duration: SPAN, delay: at(), easing: 'linear', fill: 'forwards' }));
     }
-    const later2 = (node, kf, o) => anims.push(node.animate(kf, Object.assign({ fill: 'forwards' }, o, { delay: START + (o.delay || 0) })));
+    const later2 = (node, kf, o) => anims.push(node.animate(kf, Object.assign({ fill: 'forwards' }, o, { delay: at() + (o.delay || 0) })));
     // run a simulation from 0 to SPAN ms, calling tick(t, dt) and recording each body's state 60 times a second
     function simulate(bodies, tick){
       const rec = bodies.map(() => []); let nextRec = 0;
@@ -2743,13 +2783,13 @@
     <div class="tab" data-mode="list">List</div>
     <div class="tab" data-mode="cards">Cards</div>
   </div>
-  <div id="sort-card" class="shelf-ctl"><span id="sort-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="sort-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="sort-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="filter-name">All books</span><span class="sort-k">• Sort by:</span><span class="sort-v" id="sort-name">Date added</span></div>
+  <div id="sort-card" class="shelf-ctl"><span id="sort-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="sort-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="sort-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="filter-name">All books</span><span class="sort-k">• Sort by:</span><i class="bar-dir" id="sort-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="7.5,21.5 32.5,21.5 20,33.5" fill="#b3ada4" stroke="#b3ada4" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,15 32.5,15 20,27" fill="#77706a" stroke="#77706a" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,8.5 32.5,8.5 20,20.5" fill="#2b2620" stroke="#2b2620" stroke-width="1.6" stroke-linejoin="round"/></svg></i><span class="sort-v" id="sort-name">Date added</span></div>
  </div>
  <!-- Wishlist: sort, and search -->
  <div class="hdr-row hidden" id="wishlist-controls">
   <div class="lb-tabs" id="lb-tabs"><div class="tl-views lb-pair"><button type="button" data-m="out" class="on">Checked Out</button><button type="button" data-m="ret">Returned</button></div><div class="tl-views lb-solo"><button type="button" data-m="wish">Wishlist</button></div></div>
   <div class="tl-views" id="wl-sort"><button type="button" data-s="added" class="on">Date Added</button><button type="button" data-s="title">Title</button><button type="button" data-s="author">Author</button><button type="button" data-s="status">Status</button></div>
-  <div id="lb-card"><span id="lb-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="wl-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="lb-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="lb-filter-name">All</span><span class="sort-k">• Sort by:</span><span class="sort-v" id="lb-sort-name">Status</span></div>
+  <div id="lb-card"><span id="lb-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="wl-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="lb-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="lb-filter-name">All</span><span class="sort-k">• Sort by:</span><i class="bar-dir" id="lb-sort-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="7.5,21.5 32.5,21.5 20,33.5" fill="#b3ada4" stroke="#b3ada4" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,15 32.5,15 20,27" fill="#77706a" stroke="#77706a" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,8.5 32.5,8.5 20,20.5" fill="#2b2620" stroke="#2b2620" stroke-width="1.6" stroke-linejoin="round"/></svg></i><span class="sort-v" id="lb-sort-name">Status</span></div>
  </div>
  <!-- Timeline: what to chart, and over what span -->
  <div class="hdr-row hidden" id="timeline-controls">
@@ -2980,6 +3020,7 @@
   <!-- top section: one card per filter -->
   <div class="so-filter" id="filter-row">
     <div class="list-divider"><span class="ld-name">Filter</span></div>
+    <div class="tl-views so-fmt" id="fmt-row"><button type="button" data-fmt="all" class="on">All<br>Types</button><button type="button" data-fmt="book">Only<br>Books</button><button type="button" data-fmt="audio">Only<br>Audiobooks</button></div>
     <button type="button" class="so-opt" data-f="all"><b>All books</b><span>Every book in your library</span></button>
     <button type="button" class="so-opt" data-f="read"><b>Read</b><span>Finished books only</span></button>
     <button type="button" class="so-opt" data-f="started"><b>Started</b><span>In progress, not finished yet</span></button>
@@ -3559,7 +3600,7 @@
     else if(currentFilter().id !== 'all') countEl.textContent = `${ordered.length} of ${plural(books.length, 'book')}`;
     if(!ordered.length){
       const msg = search ? `<div class="so-empty">No titles or authors match “${searchQ.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;')}”.</div>`
-                         : `<div class="so-empty">No ${currentFilter().name.toLowerCase()} books.</div>`;
+                         : `<div class="so-empty">No ${currentFilter().empty}.</div>`;
       shelvesContainer.innerHTML = msg; listContainer.innerHTML = msg;
       return;
     }
@@ -3728,27 +3769,27 @@
   const statusRank = b => bookFinished(b) ? 2 : (bookRead(b) > 0 ? 0 : 1);
 
   const SORTS = [
-    { id:'added',    name:'Date added',     desc:'The order books were put on the shelf',
+    { id:'added',    name:'Date added',     desc:'The order books were put on the shelf', rdesc:'Newest on the shelf first',
       fn: null },
-    { id:'title',    name:'Title',          desc:'A–Z, ignoring “The”, “A” and “An”',
+    { id:'title',    name:'Title',          desc:'A–Z, ignoring “The”, “A” and “An”', rdesc:'Z–A, ignoring “The”, “A” and “An”',
       fn: (a,b)=> cmp(titleKey(a.title), titleKey(b.title)) },
-    { id:'author',   name:'Author',         desc:'Library order: last name, first name, then title',
+    { id:'author',   name:'Author',         desc:'Library order: last name, first name, then title', rdesc:'Z–A: last name, first name, then title',
       fn: (a,b)=>{ const x = authorKeyOf(a), y = authorKeyOf(b);
                    return cmp(x[0], y[0]) || cmp(x[1], y[1]) || cmp(titleKey(a.title), titleKey(b.title)); },
       group: b => (b.author || '').trim() || (b.authorLast || b.authorFirst) ? authorLastFirst(b) : 'Unknown author' },
-    { id:'status',   name:'Status',         desc:'In progress, then unread, then read',
+    { id:'status',   name:'Status',         desc:'In progress, then unread, then read', rdesc:'Read, then unread, then in progress',
       fn: (a,b)=> cmp(statusRank(a), statusRank(b)) || cmp(titleKey(a.title), titleKey(b.title)),
       group: b => STATUS_NAMES[statusRank(b)] },
-    { id:'read',     name:'Read order',     desc:'By the day you started reading; unstarted last',
+    { id:'read',     name:'Read order',     desc:'By the day you started reading; unstarted last', rdesc:'Unstarted first, then latest started',
       fn: (a,b)=> cmp(readDaySpan(a).first, readDaySpan(b).first) || cmp(titleKey(a.title), titleKey(b.title)) },
-    { id:'recent',   name:'Recently read',  desc:'Most recently read first; unstarted last',
+    { id:'recent',   name:'Recently read',  desc:'Most recently read first; unstarted last', rdesc:'Unstarted first, then least recently read',
       fn: (a,b)=> cmp(readDaySpan(b).last, readDaySpan(a).last) || cmp(titleKey(a.title), titleKey(b.title)) },
-    { id:'progress', name:'Progress',       desc:'Furthest along first',
+    { id:'progress', name:'Progress',       desc:'Furthest along first', rdesc:'Least far along first',
       fn: (a,b)=> cmp(pct(b), pct(a)) || cmp(titleKey(a.title), titleKey(b.title)) },
-    { id:'year',     name:'Year',           desc:'Oldest released first; no year last',
+    { id:'year',     name:'Year',           desc:'Oldest released first; no year last', rdesc:'No year first, then newest released',
       fn: (a,b)=>{ const ha = typeof a.released === 'number', hb = typeof b.released === 'number';
                    return (hb - ha) || (ha ? a.released - b.released : 0) || cmp(titleKey(a.title), titleKey(b.title)); } },
-    { id:'length',   name:'Length',         desc:'Longest first, grouped flash fiction to epic novel',
+    { id:'length',   name:'Length',         desc:'Longest first, grouped flash fiction to epic novel', rdesc:'Shortest first, grouped flash fiction to epic novel',
       fn: (a,b)=> cmp(wordsOf(b), wordsOf(a)) || cmp(titleKey(a.title), titleKey(b.title)),
       group: b => lenBand(wordsOf(b)) }
   ];
@@ -3768,7 +3809,16 @@
     { id:'started', name:'Started',   short:'Started', fn: b => !bookFinished(b) && bookRead(b) > 0 },   // in progress
     { id:'unread',  name:'Unread',    short:'Unread',  fn: b => !bookFinished(b) && !(bookRead(b) > 0) } // not begun
   ];
-  function currentFilter(){ return FILTERS.find(f => f.id === prefs.filter) || FILTERS[0]; }
+  // the type card: all, just books, or just audiobooks (a book with its tape counts as both); with the status filter, one filter
+  const FMTS = { all: ['', ''], book: ['Books', 'books'], audio: ['Audiobooks', 'audiobooks'] };
+  const isAudio = b => b.format === 'audio', isBookF = b => b.format !== 'audio';
+  function currentFilter(){
+    const st = FILTERS.find(f => f.id === prefs.filter) || FILTERS[0], fm = FMTS[prefs.fmt] ? prefs.fmt : 'all';
+    if(fm === 'all') return Object.assign({}, st, { empty: st.id === 'all' ? 'books' : st.name.toLowerCase() + ' books' });
+    const ok = fm === 'audio' ? b => isAudio(b) || b.format === 'both' : b => isBookF(b);
+    const name = st.id === 'all' ? FMTS[fm][0] : st.name + ' ' + FMTS[fm][1];
+    return { id: st.id + '|' + fm, name, short: name, empty: name.toLowerCase(), fn: b => ok(b) && st.fn(b) };
+  }
   // search (the filter card's search field): every book whose title matches, then every book by each
   // author whose name matches. Searches the whole library; each part gets its own divider
   let searchQ = '';
@@ -3798,7 +3848,8 @@
   function sortedBooks(){
     const s = currentSort(), f = currentFilter();
     const list = books.filter(f.fn);
-    return s.fn ? list.sort(s.fn) : list;
+    if(s.fn) list.sort(s.fn);
+    return prefs.desc ? list.reverse() : list;   // the picked sort flipped
   }
 
   // faint page edges for the progress fills: fine vertical lines, each a
@@ -4598,6 +4649,7 @@
   }
 
   const viewTabs = [...document.querySelectorAll('#view-tabs .tab')];
+  function barDir(){ const d = document.getElementById('sort-dir'); if(d) d.classList.toggle('desc', !!prefs.desc); }
   function applyView(){
     allBooksView.classList.toggle('list', prefs.view === 'list');
     allBooksView.classList.toggle('cards', prefs.view === 'cards');
@@ -4605,7 +4657,7 @@
     if(prefs.view === 'list') repaintTapeRows();          // drawn to their width, which is 0 while hidden
     else if(shelfStale){ shelfStale = false; render(); }   // a tape was wound from the list
     viewTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === prefs.view));
-    document.getElementById('sort-name').textContent = currentSort().name;
+    document.getElementById('sort-name').textContent = currentSort().name; barDir();
     const flt = currentFilter();
     document.getElementById('filter-name').textContent = flt.name;
   }
@@ -4615,16 +4667,27 @@
 
   const sortPage = document.getElementById('sort-page');
   const sortList = document.getElementById('sort-list');
+  let sortFlipT = 0;
+  // the shelves and lists rebuilt after the new pick has been painted (two frames on), so the tap never waits on them
+  function reshelve(){ clearTimeout(sortFlipT); requestAnimationFrame(() => { sortFlipT = setTimeout(() => { render(); renderCollections(); }, 30); }); }
   function renderSortOptions(){
-    document.querySelectorAll('#filter-row button').forEach(b => b.classList.toggle('on', b.dataset.f === currentFilter().id));
+    document.querySelectorAll('#filter-row button[data-f]').forEach(b => b.classList.toggle('on', b.dataset.f === (prefs.filter || 'all')));
+    document.querySelectorAll('#fmt-row button').forEach(b => b.classList.toggle('on', b.dataset.fmt === (FMTS[prefs.fmt] ? prefs.fmt : 'all')));
     sortList.innerHTML = '<div class="list-divider"><span class="ld-name">Sort</span></div>';
     SORTS.forEach(s=>{
       const o = document.createElement('div');
-      o.className = 'so-opt' + (s.id === prefs.sort ? ' on' : '');
-      o.innerHTML = `<b>${s.name}</b><span>${s.desc}</span>`;
+      o.className = 'so-opt' + (s.id === prefs.sort ? ' on' : '') + (prefs.desc ? ' desc' : '');
+      o.innerHTML = `<b>${s.name}</b><span data-a="${s.desc}" data-r="${s.rdesc || s.desc}">${prefs.desc && s.rdesc ? s.rdesc : s.desc}</span><i class="so-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="7.5,21.5 32.5,21.5 20,33.5" fill="#a9a59e" stroke="#a9a59e" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,15 32.5,15 20,27" fill="#d6d3ce" stroke="#d6d3ce" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,8.5 32.5,8.5 20,20.5" fill="#ffffff" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/></svg></i>`;
       o.addEventListener('click', ()=>{
-        prefs.sort = s.id; savePrefs(); applyView(); render(); renderCollections();
-        renderSortOptions();   // stays open: Back returns to the shelves
+        if(s.id === prefs.sort){   // the picked one again: flip its order, the arrows turning over
+          prefs.desc = !prefs.desc; savePrefs();
+          sortList.querySelectorAll('.so-opt').forEach(x => { x.classList.toggle('desc', !!prefs.desc); const t = x.querySelector('span'); t.textContent = t.dataset[prefs.desc ? 'r' : 'a']; });
+          barDir();
+          clearTimeout(sortFlipT); sortFlipT = setTimeout(() => { render(); renderCollections(); }, 480);   // (after the turn)   // the shelves re-sort once the arrows have turned, so the turn never stutters
+          if(window.hapticTick) window.hapticTick(); return; }
+        prefs.sort = s.id; savePrefs(); applyView();   // a new sort keeps the last direction
+        sortList.querySelectorAll('.so-opt').forEach(x => x.classList.toggle('on', x === o));   // the pick shows at once…
+        reshelve();   // …and the shelves re-sort once that's on screen (stays open: Back returns to the shelves)
       });
       sortList.appendChild(o);
     });
@@ -4655,8 +4718,13 @@
   });
   document.getElementById('sort-done').addEventListener('click', ()=> sortPage.classList.remove('open'));
   // picking a filter applies it straight away; the page stays open so a sort can be picked too
-  document.querySelectorAll('#filter-row button').forEach(b => b.addEventListener('click', ()=>{
-    prefs.filter = b.dataset.f; savePrefs(); applyView(); render(); renderCollections(); renderSortOptions();
+  document.querySelectorAll('#fmt-row button').forEach(b => b.addEventListener('click', ()=>{
+    prefs.fmt = b.dataset.fmt; savePrefs(); applyView();
+    document.querySelectorAll('#fmt-row button').forEach(x => x.classList.toggle('on', x === b)); reshelve();
+  }));
+  document.querySelectorAll('#filter-row button[data-f]').forEach(b => b.addEventListener('click', ()=>{
+    prefs.filter = b.dataset.f; savePrefs(); applyView();
+    document.querySelectorAll('#filter-row button[data-f]').forEach(x => x.classList.toggle('on', x === b)); reshelve();
   }));
   applyView();
 
@@ -4686,7 +4754,7 @@
       const items = [], groups = [];
       names.forEach(name => sortedBooks().filter(b => bookTags(b).includes(name)).forEach(b => { items.push(b); groups.push(name); }));
       if(items.length) renderList(items, collList, groups);
-      else collList.innerHTML = `<div class="so-empty">No ${currentFilter().name.toLowerCase()} books.</div>`;
+      else collList.innerHTML = `<div class="so-empty">No ${currentFilter().empty}.</div>`;
       if(prefs.view === 'list') requestAnimationFrame(repaintTapeRows);
     }
     const avail = estimateShelfWidth() - 20;
@@ -7350,7 +7418,7 @@
   }
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=> requestShelfRender());
   window.addEventListener('resize', requestShelfRender);
-  document.addEventListener('click', ()=> animateShelf(500), true);   // tabs, shelves opening, view changes
+  document.addEventListener('click', e=>{ if(!sortPage.classList.contains('open') || (e.target.closest && e.target.closest('#sort-done'))) animateShelf(500); }, true);   // not while the Sort and Filter page covers the shelves (its arrows must turn smoothly)   // tabs, shelves opening, view changes
   ['pointerover','pointerout'].forEach(t=> document.addEventListener(t, e=>{
     if(e.target.closest && e.target.closest('.spine.live')) animateShelf(250);   // follow the hover lift
   }));
@@ -12515,16 +12583,18 @@ closeRowDD = function(dd){
     // ---- the Library's Sort and Filter: its own for each tab card (kept between visits) ----
     const LB = {
       wish: { f: [['all', 'All', 'Every wishlist book'], ['', 'To Check', 'Not looked for yet'], ['yes', 'Found', 'Found at the library'], ['wait', 'Waiting', 'On hold, or on its way'], ['no', 'Not There', 'The library doesn\'t have it']],
-              s: [['status', 'Status', 'Grouped by status, authors A–Z by last name'], ['author', 'Author', 'Last name, first name, then title'], ['title', 'Title', 'A–Z'], ['added', 'Date Added', 'The order they went on the list'], ['year', 'Year', 'Oldest released first; no year last'], ['length', 'Length', 'Flash fiction to epic novel, by word count']] },
+              s: [['status', 'Status', 'Grouped by status, authors A–Z by last name', 'Groups reversed, authors Z–A by last name'], ['author', 'Author', 'Last name, first name, then title', 'Z–A: last name, first name, then title'], ['title', 'Title', 'A–Z', 'Z–A'], ['added', 'Date Added', 'The order they went on the list', 'Newest on the list first'], ['year', 'Year', 'Oldest released first; no year last', 'No year first, then newest released'], ['length', 'Length', 'Flash fiction to epic novel, by word count', 'Epic novel to flash fiction, by word count']] },
       out:  { f: [['all', 'All', 'Every book checked out'], ['late', 'Overdue', 'Past its due date'], ['week', 'Due This Week', 'Due in the next 7 days'], ['renewed', 'Renewed', 'Renewed at least once']],
-              s: [['due', 'Due Date', 'Soonest first, grouped by when'], ['title', 'Title', 'A–Z'], ['author', 'Author', 'Last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first'], ['year', 'Year', 'Oldest released first; no year last']] },
+              s: [['due', 'Due Date', 'Soonest first, grouped by when', 'Latest first, grouped by when'], ['title', 'Title', 'A–Z', 'Z–A'], ['author', 'Author', 'Last name, first name, then title', 'Z–A: last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first', 'Earliest checked out first'], ['year', 'Year', 'Oldest released first; no year last', 'No year first, then newest released']] },
       ret:  { f: [['all', 'All', 'Every book returned'], ['done', 'Finished', 'Read to the end'], ['part', 'Not Finished', 'Went back before the end'], ['late', 'Returned Late', 'Went back after its due date']],
-              s: [['back', 'Returned', 'Most recently returned first'], ['title', 'Title', 'A–Z'], ['author', 'Author', 'Last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first'], ['year', 'Year', 'Oldest released first; no year last']] } };
+              s: [['back', 'Returned', 'Most recently returned first', 'Earliest returned first'], ['title', 'Title', 'A–Z', 'Z–A'], ['author', 'Author', 'Last name, first name, then title', 'Z–A: last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first', 'Earliest checked out first'], ['year', 'Year', 'Oldest released first; no year last', 'No year first, then newest released']] } };
     let lbSel = { wish: { f: 'all', s: 'status' }, out: { f: 'all', s: 'due' }, ret: { f: 'all', s: 'back' } };
     try{ const v = JSON.parse(localStorage.getItem('stack-tracker-lb-sort') || 'null'); if(v) ['wish', 'out', 'ret'].forEach(k => { if(v[k]) Object.assign(lbSel[k], v[k]); }); }catch(e){}
-    const lbSave = () => { try{ localStorage.setItem('stack-tracker-lb-sort', JSON.stringify(lbSel)); }catch(e){} };
+    let lbDesc = false, lbFlipT = 0;   // the picked sort flipped (one direction for all three cards; a new sort keeps it)
+    try{ const v = JSON.parse(localStorage.getItem('stack-tracker-lb-sort') || 'null'); if(v && v.desc) lbDesc = true; }catch(e){}
+    const lbSave = () => { try{ localStorage.setItem('stack-tracker-lb-sort', JSON.stringify(Object.assign({}, lbSel, { desc: lbDesc }))); }catch(e){} };
     const lbName = (m, k, id) => (LB[m][k].find(o => o[0] === id) || LB[m][k][0])[1];
-    const lbShow = () => { document.getElementById('lb-filter-name').textContent = lbName(mode, 'f', lbSel[mode].f); document.getElementById('lb-sort-name').textContent = lbName(mode, 's', lbSel[mode].s); };
+    const lbShow = () => { document.getElementById('lb-filter-name').textContent = lbName(mode, 'f', lbSel[mode].f); document.getElementById('lb-sort-name').textContent = lbName(mode, 's', lbSel[mode].s); document.getElementById('lb-sort-dir').classList.toggle('desc', lbDesc); };
     const lc2 = (x, y) => String(x || '').localeCompare(String(y || ''), undefined, { sensitivity: 'base' });
     const byAuthor = (a, b) => { const x = authorKeyOf(a), y = authorKeyOf(b); return lc2(x[0], y[0]) || lc2(x[1], y[1]) || lc2(a.title, b.title); };
     const GROUPS = [['', 'To Check'], ['yes', 'Found'], ['wait', 'Waiting'], ['no', 'Not There']];
@@ -12570,10 +12640,11 @@ closeRowDD = function(dd){
       const yr = b => typeof b.released === 'number' ? b.released : null;
       const sorter = S === 'year' ? (p, n) => (yr(p[0]) == null) - (yr(n[0]) == null) || (yr(p[0]) || 0) - (yr(n[0]) || 0) || lc2(p[0].title, n[0].title) : S === 'title' ? (p, n) => lc2(p[0].title, n[0].title) : S === 'author' ? (p, n) => byAuthor(p[0], n[0]) : S === 'out' ? (p, n) => n[0].loan.out - p[0].loan.out
         : mode === 'out' ? (p, n) => p[0].loan.due - n[0].loan.due : (p, n) => n[0].loan.returned - p[0].loan.returned;
-      rows.sort(sorter);
+      rows.sort(sorter); if(lbDesc) rows.reverse();
       let html = '';
       if(mode === 'out'){
-        [['Overdue', b => left(b) < 0], ['Due This Week', b => left(b) >= 0 && left(b) <= 7], ['Later', b => left(b) > 7]].forEach(([name, f], gi) => {
+        const DG = [['Overdue', b => left(b) < 0], ['Due This Week', b => left(b) >= 0 && left(b) <= 7], ['Later', b => left(b) > 7]];
+        (lbDesc ? DG.reverse() : DG).forEach(([name, f], gi) => {
           // Due Date: grouped under dividers; any other sort: one list, in that order
           const g = S === 'due' ? rows.filter(([b]) => f(b)) : gi ? [] : rows; if(!g.length) return;
           if(S === 'due') html += `<div class="list-divider"><span class="ld-name">${name}</span></div>`;
@@ -12647,8 +12718,10 @@ closeRowDD = function(dd){
       // Length: grouped by word count, flash fiction up to the epic novel (the bands below are where each begins), then none given
       const BANDS = LEN_BANDS;
       const LEN = BANDS.map(([from, name], k) => [name, w => w >= from && (k === BANDS.length - 1 || w < BANDS[k + 1][0])]).concat([['No Word Count', w => !(w > 0)]]);
-      const grouped = sortBy === 'status' ? GROUPS.map(([k, name]) => [name, rows.filter(([b]) => (b.lib || '') === k)]).filter(g => g[1].length)
+      if(lbDesc) rows.reverse();   // flipped: the whole order turned round, groups too
+      let grouped = sortBy === 'status' ? GROUPS.map(([k, name]) => [name, rows.filter(([b]) => (b.lib || '') === k)]).filter(g => g[1].length)
         : sortBy === 'length' ? LEN.map(([name, f]) => [name, rows.filter(([b]) => f(b.words || 0))]).filter(g => g[1].length) : [[null, rows]];
+      if(lbDesc) grouped = grouped.reverse();
       view.innerHTML = grouped.map(([name, rs]) => (name ? `<div class="list-divider"><span class="ld-name">${name}</span></div>` : '') + rs.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card wl-wish" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>${b.released != null ? `<i class="wl-yr">${wlYr(b.released)}</i>` : ''}${b.words ? `<i class="wl-yr wl-wd">${wlWords(b.words)}</i>` : ''}` +
         `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
         MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('wait', b.lib === 'wait', 'Waiting on it', 'M12 4v10M12 19.8v.01') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>').join('')).join('');
@@ -12675,11 +12748,17 @@ closeRowDD = function(dd){
       document.getElementById('lb-search').addEventListener('click', e => { e.stopPropagation(); card.classList.add('searching'); q.focus(); window.scrollTo(0, 0); });
       document.getElementById('lb-close').addEventListener('click', e => { e.stopPropagation(); card.classList.remove('searching'); q.value = ''; q.blur(); render(); });
       const paint = () => {
-        const opt = (k, [id, name, desc]) => `<button type="button" class="so-opt${lbSel[mode][k] === id ? ' on' : ''}" data-k="${k}" data-id="${id}"><b>${name}</b><span>${desc}</span></button>`;
+        const opt = (k, [id, name, desc, rdesc]) => `<button type="button" class="so-opt${lbSel[mode][k] === id ? ' on' : ''}${k === 's' && lbDesc ? ' desc' : ''}" data-k="${k}" data-id="${id}"><b>${name}</b><span data-a="${desc}" data-r="${rdesc || desc}">${k === 's' && lbDesc && rdesc ? rdesc : desc}</span>${k === 's' ? '<i class="so-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="7.5,21.5 32.5,21.5 20,33.5" fill="#a9a59e" stroke="#a9a59e" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,15 32.5,15 20,27" fill="#d6d3ce" stroke="#d6d3ce" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,8.5 32.5,8.5 20,20.5" fill="#ffffff" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/></svg></i>' : ''}</button>`;
         opts.innerHTML = `<div class="so-filter"><div class="list-divider"><span class="ld-name">Filter</span></div>${LB[mode].f.map(o => opt('f', o)).join('')}</div>` +
           `<div class="so-list"><div class="list-divider"><span class="ld-name">Sort</span></div>${LB[mode].s.map(o => opt('s', o)).join('')}</div>`;
-        opts.querySelectorAll('.so-opt').forEach(b => b.addEventListener('click', () => { lbSel[mode][b.dataset.k] = b.dataset.id; lbSave(); lbShow(); render();
-          opts.querySelectorAll(`.so-opt[data-k="${b.dataset.k}"]`).forEach(x => x.classList.toggle('on', x === b)); }));   // just the pick moves: nothing redrawn; stays open, like Home's
+        opts.querySelectorAll('.so-opt').forEach(b => b.addEventListener('click', () => {
+          if(b.dataset.k === 's' && lbSel[mode].s === b.dataset.id){   // the picked sort again: flip its order
+            lbDesc = !lbDesc; lbSave(); opts.querySelectorAll('.so-opt[data-k="s"]').forEach(x => { x.classList.toggle('desc', lbDesc); const t = x.querySelector('span'); t.textContent = t.dataset[lbDesc ? 'r' : 'a']; }); lbShow();
+            clearTimeout(lbFlipT); lbFlipT = setTimeout(render, 480);   // re-sorted once the arrows have turned
+            if(window.hapticTick) window.hapticTick(); return; }
+          lbSel[mode][b.dataset.k] = b.dataset.id; lbSave(); lbShow();
+          opts.querySelectorAll(`.so-opt[data-k="${b.dataset.k}"]`).forEach(x => x.classList.toggle('on', x === b));
+          clearTimeout(lbFlipT); requestAnimationFrame(() => { lbFlipT = setTimeout(render, 30); }); }));   // the pick shows at once; the list follows   // just the pick moves: nothing redrawn; stays open, like Home's
       };
       card.addEventListener('click', () => { if(card.classList.contains('searching')){ q.focus(); return; }
         paint(); opts.hidden = false; opts.scrollTop = 0; page.classList.add('lb', 'open'); });
