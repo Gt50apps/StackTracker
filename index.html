@@ -1132,6 +1132,11 @@
   #tl-head > span{position:absolute; top:0; bottom:0; display:flex; align-items:center; justify-content:center; white-space:nowrap; overflow:hidden;
     font:700 min(.62rem, 2.6vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink);}
   #tl-head > i{position:absolute; top:0; bottom:0; width:3px; background:var(--cb000000, #000000);}
+  /* Activity's Books column: Pages | Words, the one shown in dark */
+  #tl-head > span.tl-flip{cursor:pointer; gap:0; justify-content:stretch;}
+  #tl-head > span.tl-flip > b{flex:1 1 0; height:100%; display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--muted, #7c7064);}
+  #tl-head > span.tl-flip > b.on{background:var(--cb000000, #000000); color:var(--cbffffff, #ffffff);}
+  #tl-head > span.tl-flip > i{flex:none; width:3px; height:100%; background:var(--cb000000, #000000);}
   #tl-canvas > div{position:absolute;}
   #tl-canvas > .tl-pin{translate:var(--sx, 0px) 0;}   /* the date column stays put when the bars scroll sideways */
   .tl-lbl{font:800 8px Arial, sans-serif; letter-spacing:-.2px; color:var(--muted); text-transform:uppercase; text-align:center;}
@@ -10507,16 +10512,18 @@
   //  · Pages & Listening: pages read on the left and hours listened on the right (page / tape textures; All Time in plain black), per
   //    day (This Month) or month; All Time gives one total per year.
   // Tap a bar and the footer shows it.
-  const TL = { view: 'month', mode: 'graph', reads: [], tex: {}, picked: '', pickedK: '', off: 0 };   // off: months (This Month) or years (This Year) back from the current one
+  const TL = { view: 'month', mode: 'graph', reads: [], tex: {}, picked: '', pickedK: '', off: 0 };
+  try{ TL.words = localStorage.getItem('stack-tracker-tl-words') === '1'; }catch(e){}   // Activity's Books column: pages, or words   // off: months (This Month) or years (This Year) back from the current one
   const tlCanvas = document.getElementById('tl-canvas'), tlInfo = document.getElementById('tl-info');
   const TL_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const TL_MONTH = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   // the footer when nothing is picked: the span's name, its totals and a hint, with ◀ ▶ to step
   // to earlier months (This Month) or years (This Year); All Time has nowhere to step, so they rest greyed
   function tlIdle(){
-    const R = tlRange(tlDay(new Date())); let pages = 0, secs = 0;
-    TL.reads.forEach(r => r.daily.forEach((v, j) => { if(!v) return; const d = tlAdd(r.s, j); if(d >= R.t0 && d < R.t1){ if(r.kind === 'audio') secs += v; else pages += v; } }));
-    const tot = [pages ? `<b>${tlN(pages)}</b> pages` : '', secs ? `<b>${tlHM(secs)}</b>` : ''].filter(Boolean).join(' · ');
+    const R = tlRange(tlDay(new Date())); let pages = 0, secs = 0, words = 0;
+    TL.reads.forEach(r => r.daily.forEach((v, j) => { if(!v) return; const d = tlAdd(r.s, j); if(d >= R.t0 && d < R.t1){ if(r.kind === 'audio') secs += v; else { pages += v; words += v * (r.wpp || 0); } } }));
+    const wd = TL.mode === 'graph' && TL.words;   // Activity showing words: the total in words too
+    const tot = [pages ? (wd ? `<b>${tlN(words)}</b> words` : `<b>${tlN(pages)}</b> pages`) : '', secs ? `<b>${tlHM(secs)}</b>` : ''].filter(Boolean).join(' · ');
     const first = TL.reads.length ? new Date(Math.min(...TL.reads.map(r => +r.s))) : new Date(), now = new Date();
     const minOff = TL.view === 'week' ? Math.round((tlSun(first) - tlSun(now)) / (7 * 864e5))
                  : TL.view === 'month' ? (first.getFullYear() - now.getFullYear()) * 12 + first.getMonth() - now.getMonth()
@@ -10583,6 +10590,7 @@
         const first = days.findIndex(v => v > 0); if(first < 0) return;
         const end = keyDate(endKey), s = tlAdd(end, -(days.length - 1 - first));
         out.push({ id: id++, title: b.title, kind: audio ? 'audio' : 'book', total: audio ? b.audioSeconds : b.pages, reread, page, s, e: finished ? end : null, seed: 1 + (bs + k * 7919) % 2147483000,
+          wpp: !audio && b.words > 0 && b.pages > 0 ? b.words / b.pages : 0,   // words a page: its word count over its page count (none without a word count)
           daily: days.slice(first).map(v => audio ? v * spp : v) });
       };
       (b.reads || []).forEach((r, k) => add(r.days, r.finishedOn, true, k > 0, k));
@@ -10685,6 +10693,10 @@
     const h = document.getElementById('tl-head'); h.innerHTML = '';
     parts.forEach((p, i) => {
       const t = document.createElement('span'); t.style.left = p.x + 'px'; t.style.width = Math.max(0, p.end - p.x) + 'px'; t.textContent = p.text; h.appendChild(t);
+      if(p.flip){   // Books: Pages | Words — tap to switch (words: each book's word count over its page count, a page at a time)
+        t.className = 'tl-flip'; t.innerHTML = `<b class="${TL.words ? '' : 'on'}">Pages</b><i></i><b class="${TL.words ? 'on' : ''}">Words</b>`;
+        t.addEventListener('click', () => { TL.words = !TL.words; try{ localStorage.setItem('stack-tracker-tl-words', TL.words ? '1' : '0'); }catch(e){}
+          TL.pickedK = ''; if(window.hapticTick) window.hapticTick(); tlDraw(); }); }
       if(i) { const ln = document.createElement('i'); ln.style.left = p.line + 'px'; h.appendChild(ln); }
     });
   }
@@ -10868,8 +10880,9 @@
     if(tlVs.src !== TL.reads){   // every logged day, by kind, once per draw
       tlVs.src = TL.reads; tlVs.day = new Map(); tlVs.first = {};
       TL.reads.forEach(r => { const kk = r.kind === 'audio' ? 'secs' : 'pages';
-        r.daily.forEach((v, j) => { if(!v) return; const d = tlAdd(r.s, j), t = +d, e = tlVs.day.get(t) || { pages: 0, secs: 0 };
-          e[kk] += v; tlVs.day.set(t, e); if(!(tlVs.first[kk] <= t)) tlVs.first[kk] = t; }); }); }
+        r.daily.forEach((v, j) => { if(!v) return; const d = tlAdd(r.s, j), t = +d, e = tlVs.day.get(t) || { pages: 0, secs: 0, words: 0 };
+          e[kk] += v; if(r.wpp){ e.words += v * r.wpp; if(!(tlVs.first.words <= t)) tlVs.first.words = t; }
+          tlVs.day.set(t, e); if(!(tlVs.first[kk] <= t)) tlVs.first[kk] = t; }); }); }
     let a, b;
     if(tlDaily()){ a = tlAdd(k.a, TL.view === 'week' ? -7 : -30); b = tlAdd(a, 1); }
     else { a = new Date(k.a.getFullYear() - 1, k.a.getMonth(), 1); b = new Date(k.a.getFullYear() - 1, k.a.getMonth() + 1, 1); }
@@ -10880,7 +10893,7 @@
     const p2 = n => String(n).padStart(2, '0');
     let diff = key === 'secs' ? Math.round(k[key] / 60) - Math.round(prev / 60) : Math.round(k[key]) - Math.round(prev);
     const sign = diff > 0 ? '+' : diff < 0 ? '−' : '±'; diff = Math.abs(diff);
-    const body = key === 'secs' ? (diff >= 60 ? `${Math.floor(diff / 60)}:${p2(diff % 60)}` : p2(diff)) : p2(diff);   // no letters: minutes, or h:mm
+    const body = key === 'secs' ? (diff >= 60 ? `${Math.floor(diff / 60)}:${p2(diff % 60)}` : p2(diff)) : key === 'words' ? tlN(diff) : p2(diff);   // words with their commas   // no letters: minutes, or h:mm
     return ` (${sign}${body})`;
   }
   function tlDrawGraph(){
@@ -10897,28 +10910,31 @@
     if(tlDaily()) for(let d = new Date(t0); d < t1; d = tlAdd(d, 1)) buckets.push({ a: d, b: tlAdd(d, 1) });
     else if(yearly) for(let Y = t0.getFullYear(); Y < t1.getFullYear(); Y++) buckets.push({ a: new Date(Y, 0, 1), b: new Date(Y + 1, 0, 1) });
     else for(let d = new Date(t0); d < t1; d = new Date(d.getFullYear(), d.getMonth() + 1, 1)) buckets.push({ a: d, b: new Date(d.getFullYear(), d.getMonth() + 1, 1) });
-    buckets.forEach(k => { k.pages = 0; k.secs = 0; k.parts = { pages: new Map(), secs: new Map() }; k.n = Math.round((Math.min(k.b, tlAdd(today, 1)) - k.a) / 864e5); });
+    buckets.forEach(k => { k.pages = 0; k.secs = 0; k.words = 0; k.parts = { pages: new Map(), secs: new Map(), words: new Map() }; k.n = Math.round((Math.min(k.b, tlAdd(today, 1)) - k.a) / 864e5); });
     const idx = new Map(buckets.map((k, j) => [keyOf(k.a), j]));
     TL.reads.forEach(r => r.daily.forEach((v, j) => {
       if(!v) return; const d = tlAdd(r.s, j);
       const k = buckets[idx.get(keyOf(d))]; if(!k) return;
       const kk = r.kind === 'audio' ? 'secs' : 'pages'; k[kk] += v;
       k.parts[kk].set(r.title, (k.parts[kk].get(r.title) || 0) + v);
+      if(r.wpp){ k.words += v * r.wpp; k.parts.words.set(r.title, (k.parts.words.get(r.title) || 0) + v * r.wpp); }
     }));
     // one column per kind read in this span: pages, listening, or both side by side
     let cols = [
+      TL.words ? { key: 'words', max: Math.max(1, ...buckets.map(k => k.words)), text: v => `${tlN(v)}W`,
+        look: sd => all ? '' : `background:#e7dfc9 ${tlFillLines('page', sd)} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` } :
       { key: 'pages', max: Math.max(1, ...buckets.map(k => k.pages)), text: v => `${tlN(v)}P`,
         look: sd => all ? '' : `background:#e7dfc9 ${tlFillLines('page', sd)} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
       { key: 'secs', max: Math.max(1, ...buckets.map(k => k.secs)), text: v => tlHM(v),
         look: sd => all ? '' : `background:#8c5229 ${tlFillLines('tape', sd)} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
     ];
-    const used = cols.filter(c => buckets.some(k => k[c.key] > 0));
+    const used = cols.filter(c => buckets.some(k => k[c.key === 'words' ? 'pages' : c.key] > 0));   // (the Books column stays while there are pages, words or not, so it can be switched back)
     if(used.length) cols = used;
     const half = (W - x0) / cols.length, xm = Math.round(x0 + half);
     cols.forEach((c, j) => { c.x = j ? xm + 2 : x0; c.r = j || cols.length === 1 ? 4 : W - xm + 5; c.end = j || cols.length === 1 ? W : xm - 1; });
     if(cols.length > 1) el(`left:${xm - 1}px;top:0;bottom:0;width:3px;background:#000;z-index:2`);
     tlHead([{ x: 0, end: LW, text: 'Date' }, ...cols.map((c, j) => ({ x: j ? xm + 2 : LW + 3, end: j || cols.length === 1 ? W : xm - 1, line: j ? xm - 1 : LW,
-      text: c.key === 'secs' ? 'Audiobooks' : 'Books' }))]);
+      text: c.key === 'secs' ? 'Audiobooks' : 'Books', flip: c.key !== 'secs' }))]);
     // a whole span picked (its row, or a year's label on All Time): pages and listening both, and how many books
     const showSpan = (a, b2, when, id) => {
       tlCanvas.querySelectorAll('.tl-gbar.on, .tl-row.on').forEach(t => t.classList.remove('on'));
@@ -10926,13 +10942,14 @@
       TL.pickedK = id;
       tlCanvas.querySelectorAll(`.tl-row[data-id="${id}"]`).forEach(t => t.classList.add('on'));
       buckets.forEach(k => { if(k.a >= a && k.a < b2) tlCanvas.querySelectorAll(`.tl-gbar[data-k="${+k.a}"]`).forEach(t => t.classList.add('on')); });
-      let pages = 0, secs = 0; const tb = new Set(), ta = new Set();
+      let pages = 0, secs = 0, words = 0; const tb = new Set(), ta = new Set();
       TL.reads.forEach(r => r.daily.forEach((v, j) => { if(!v) return; const d = tlAdd(r.s, j); if(d < a || d >= b2) return;
-        if(r.kind === 'audio'){ secs += v; ta.add(r.title); } else { pages += v; tb.add(r.title); } }));
+        if(r.kind === 'audio'){ secs += v; ta.add(r.title); } else { pages += v; words += v * (r.wpp || 0); tb.add(r.title); } }));
       const n = Math.max(1, Math.round((Math.min(b2, tlAdd(today, 1)) - a) / 864e5)), oneDay = n === 1 && Math.round((b2 - a) / 864e5) === 1;
       const avg = v => oneDay ? '' : ` · <b>${v}</b> a day`, bk = x => `${x} ${x === 1 ? 'book' : 'books'}`;
       const rows = [];
-      if(pages) rows.push(`<div class="tl-bk"><span>Pages · ${bk(tb.size)}</span><b>${tlN(pages)} ${Math.round(pages) === 1 ? 'page' : 'pages'}</b></div>`);
+      if(pages && TL.words) rows.push(`<div class="tl-bk"><span>Words · ${bk(tb.size)}</span><b>${tlN(words)} ${Math.round(words) === 1 ? 'word' : 'words'}</b></div>`);
+      else if(pages) rows.push(`<div class="tl-bk"><span>Pages · ${bk(tb.size)}</span><b>${tlN(pages)} ${Math.round(pages) === 1 ? 'page' : 'pages'}</b></div>`);
       if(secs) rows.push(`<div class="tl-bk"><span>Listening · ${bk(ta.size)}</span><b>${tlHM(secs)}</b></div>`);
             tlInfo.classList.remove('nav'); tlInfo.classList.add('pick');
       tlInfo.innerHTML = `<div class="tl-pl"><span class="t">${when}</span><span class="tot">${tb.size + ta.size ? `<b>${bk(new Set([...tb, ...ta]).size)}</b>` : ''}${oneDay ? '' : ` · ${n} ${n === 1 ? 'day' : 'days'}`}</span></div><div class="tl-pr">${rows.join('')}</div>`;
@@ -10945,7 +10962,7 @@
       if(TL.pickedK === id){ TL.pickedK = ''; tlIdle(); return; }
       tlCanvas.querySelectorAll(`.tl-gbar[data-k="${+k.a}"][data-c="${c.key}"]`).forEach(t => t.classList.add('on')); TL.pickedK = id;
       const when = tlDaily() ? tlFmt(k.a) : yearly ? String(k.a.getFullYear()) : `${TL_MON[k.a.getMonth()]} ${k.a.getFullYear()}`, n = Math.max(1, k.n);
-      const amt = c.key === 'secs' ? tlHM : v => `${tlN(v)} ${Math.round(v) === 1 ? 'page' : 'pages'}`;
+      const unit = c.key === 'words' ? 'word' : 'page', amt = c.key === 'secs' ? tlHM : v => `${tlN(v)} ${Math.round(v) === 1 ? unit : unit + 's'}`;
       const tot = `<b>${amt(k[c.key])}</b>` + (tlDaily() ? '' : ` · <b>${c.key === 'secs' ? tlHM(k[c.key] / n) : tlN(k[c.key] / n)}</b> a day`);
       const list = [...k.parts[c.key].entries()].sort((p, q) => q[1] - p[1]);
       const show3 = list.length <= 3 ? list : list.slice(0, 2);
@@ -11040,7 +11057,7 @@
     }
     if(all){
       const years = new Map();
-      buckets.forEach(k => { const Y = k.a.getFullYear(), t = years.get(Y) || { pages: 0, secs: 0 }; t.pages += k.pages; t.secs += k.secs; years.set(Y, t); });
+      buckets.forEach(k => { const Y = k.a.getFullYear(), t = years.get(Y) || { pages: 0, secs: 0, words: 0 }; t.pages += k.pages; t.secs += k.secs; t.words += k.words; years.set(Y, t); });
       years.forEach((t, Y) => { const mid = y(new Date(Y, 6, 1));
         cols.forEach(c => t[c.key] && el(`right:${c.r}px;top:${mid.toFixed(1)}px;font-size:10px;background:#fff;padding:1px 3px;border-radius:3px`, 'tl-gval', c.text(t[c.key]))); });
     }
