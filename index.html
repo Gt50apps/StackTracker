@@ -3800,7 +3800,7 @@
     return b.pages > 0 ? b.pages * 250 : 0; }
   // the length bands by word count, flash fiction to the epic novel (each from where it begins)
   const LEN_BANDS = [[1, 'Nano-Fiction'], [300, 'Ultra-Flash Fiction'], [500, 'Flash Fiction'], [1000, 'Ultra-Short Story'], [5000, 'Short Story'],
-    [10000, 'Novelette'], [20000, 'Novella'], [50000, 'Short Novel'], [80000, 'Standard Novel'], [160001, 'Long Novel'], [175001, 'Grand Novel'], [250000, 'Epic Novel'],
+    [10000, 'Novelette'], [20000, 'Novella'], [50000, 'Slim Novel'], [80000, 'Standard Novel'], [160001, 'Long Novel'], [175001, 'Grand Novel'], [250000, 'Epic Novel'],
     [500000, 'Leviathan Novel'], [1000000, 'Behemoth Novel'], [1500000, 'Zaratan Novel'], [2000000, 'Jörmungandr Novel'], [3000000, 'Bahamut Novel'], [4000000, 'Ouroboros Novel']];
   function lenBand(w){ if(!(w > 0)) return 'No Length'; let name = LEN_BANDS[0][1]; LEN_BANDS.forEach(([from, n]) => { if(w >= from) name = n; }); return name; }
   // filters: which books show (shelves, list and collections)
