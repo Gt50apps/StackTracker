@@ -108,7 +108,7 @@
   @media (prefers-reduced-motion: reduce){ :is(#card-container, #coll-cards) .cm-dots i{animation:none !important;} }   /* the same slim divider as the wishlist's */
   :is(#card-container, #coll-cards) .wl-card{flex:1 1 auto; min-width:0; padding-left:30px; padding-right:30px;}
   /* an audiobook on a light shell (white, grey, yellow): dark words */
-  .wl-card.tape.lite{color:var(--cf1c1c1e, #1c1c1e);} .wl-card.tape.lite .a{color:rgba(28,28,30,.82);} .wl-card.tape.lite .wl-yr{color:rgba(28,28,30,.8);}
+  .wl-card.lite{color:var(--cf1c1c1e, #1c1c1e);} .wl-card.lite .a{color:rgba(28,28,30,.82);} .wl-card.lite .wl-yr{color:rgba(28,28,30,.8);}   /* a light cover or shell: dark words */
   .book-row{
     position:relative; display:flex; align-items:center; gap:8px; height:45px; box-sizing:border-box;
     padding:0 8px; background:var(--unread); border:3px solid var(--cb000000, #000000); border-radius:8px; cursor:pointer;
@@ -133,9 +133,7 @@
   .br-spine.l{left:0; box-shadow:1px 0 1px rgba(0,0,0,.55), 3px 0 3px rgba(0,0,0,.3), 7px 0 8px rgba(0,0,0,.22);}
   .br-spine.r{right:0; box-shadow:-1px 0 1px rgba(0,0,0,.55), -3px 0 3px rgba(0,0,0,.3), -7px 0 8px rgba(0,0,0,.22);}
   /* the spine rounds over: lit across its middle, falling into shade at the edge by the pages */
-  .br-spine::after{content:''; position:absolute; inset:0; pointer-events:none;
-    background:linear-gradient(90deg, rgba(0,0,0,.28), rgba(255,255,255,.14) 40%, rgba(255,255,255,.06) 60%, rgba(0,0,0,.42));}
-  .br-spine.r::after{background:linear-gradient(270deg, rgba(0,0,0,.28), rgba(255,255,255,.14) 40%, rgba(255,255,255,.06) 60%, rgba(0,0,0,.42));}
+  /* (no shading over the caps themselves: their texture shows flat; the only shadow is the one they cast onto the fill) */
   .br-spine > i{z-index:1;}
   .br-spine > canvas.cloth-bg{position:absolute; inset:0; width:100%; height:100%; display:block;}
   .br-spine > i{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; writing-mode:vertical-rl; transform:rotate(180deg);
@@ -4168,8 +4166,8 @@
   // the two short spine pieces on a list card: its year on the left, a number on the right (words, or an audiobook's seconds)
   function spinesFor(row, b, n){
     const [sl, sr] = row.querySelectorAll('.br-spine'), hex = bookColor(b);
-    const tape = b.format === 'audio' ? (b.title || '') + '|' + (b.author || '') : null;   // an audiobook's ends: the tape's top, as on its card
-    clothBehind(sl, hex, tape && tape + '|l'); clothBehind(sr, hex, tape && tape + '|r');
+    const seed = (b.title || '') + '|' + (b.author || ''), tape = b.format === 'audio';   // an audiobook's ends: the tape's top; a book's: its paper, as on its card
+    clothBehind(sl, hex, seed + '|l', tape); clothBehind(sr, hex, seed + '|r', tape);
     sl.querySelector('i').textContent = typeof b.released === 'number' && !isNaN(b.released) ? (b.released < 0 ? -b.released + ' BC' : String(b.released)) : '';
     sr.querySelector('i').textContent = n > 0 ? Math.min(9999999, n).toLocaleString('en-US') : '';
   }
@@ -4361,7 +4359,7 @@
   const DS_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   // a card dressed in the book's own cover: its colour in the cover cloth (no end bands), text in white
   // (or ink on a pale cover) so it stays readable; drawn whenever the card has a size
-  function clothBehind(card, hex, tapeSeed){
+  function clothBehind(card, hex, seed, tape){
     let cv = card.querySelector(':scope > canvas.cloth-bg');
     if(!cv){ cv = document.createElement('canvas'); cv.className = 'cloth-bg'; cv.setAttribute('aria-hidden', 'true'); card.prepend(cv); }
     const ink = readableTextOn(hex);
@@ -4369,9 +4367,10 @@
     card.style.setProperty('--cloth', hex);   // its flat colour shows until the cloth is drawn
     card.style.setProperty('--ds-ink', ink);
     card.style.setProperty('--ds-muted', ink === '#fff' ? 'rgba(255,255,255,.78)' : 'rgba(43,38,32,.7)');
-    const go = () => { if(tapeSeed) drawTapeTop(cv, cv.dataset.hex, tapeSeed, false); else if(window.CLOTH && cv.dataset.hex) window.CLOTH.draw(cv, window.CLOTH.rgb(cv.dataset.hex), false); };
-    const changed = cv.dataset.hex !== hex || cv.dataset.tape !== (tapeSeed || '');
-    cv.dataset.tape = tapeSeed || '';
+    const go = () => { if(!cv.dataset.hex) return; if(tape) drawTapeTop(cv, cv.dataset.hex, seed, false);
+      else if(seed && window.BOOKPAPER) window.BOOKPAPER.draw(cv, cv.dataset.hex, seed, false); else if(window.CLOTH) window.CLOTH.draw(cv, window.CLOTH.rgb(cv.dataset.hex), false); };
+    const changed = cv.dataset.hex !== hex || cv.dataset.tape !== (seed || '') + (tape ? 't' : '');
+    cv.dataset.tape = (seed || '') + (tape ? 't' : '');
     cv.dataset.hex = hex;
     if(!cv._ro && window.ResizeObserver){ cv._ro = new ResizeObserver(go); cv._ro.observe(cv); }
     if(changed){ go(); requestAnimationFrame(go); }   // straight away if it can (no stale colour), again once laid out
@@ -4610,7 +4609,7 @@
       const yr = typeof b.released === 'number' && !isNaN(b.released) ? (b.released < 0 ? -b.released + ' BC' : String(b.released)) : '';
       const n = b.format === 'audio' ? (b.audioSeconds > 0 ? Math.round(b.audioSeconds) : 0) : (b.words > 0 ? b.words : 0);
       const tape = b.format === 'audio';   // an audiobook: the tape's top, in its shell colour (dark words on a light shell)
-      html += `<div class="wl-row" data-bi="${bi}"><div class="wl-card${tape ? ' tape' + (tapeLite(hex) ? ' lite' : '') : ''}" data-hex="${hex}"${tape ? ` data-seed="${esc((b.title || '') + '|' + (b.author || ''))}"` : ''} style="--cloth:${hex}"><canvas aria-hidden="true"></canvas>` +
+      html += `<div class="wl-row" data-bi="${bi}"><div class="wl-card${tape ? ' tape' : ''}${tapeLite(hex) ? ' lite' : ''}" data-hex="${hex}" data-seed="${esc((b.title || '') + '|' + (b.author || ''))}" style="--cloth:${hex}"><canvas aria-hidden="true"></canvas>` +
         (yr ? `<i class="wl-yr">${yr}</i>` : '') + (n ? `<i class="wl-yr wl-wd">${Math.min(9999999, n).toLocaleString('en-US')}</i>` : '') +
         `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
         CMARK('yes', st === 'yes', 'M4 12.5l5 5L20 6') + CMARK('wait', st === 'wait', 'M12 4v10M12 19.8v.01') + CMARK('no', st === 'no', 'M6 6l12 12M18 6L6 18') + '</div>';
@@ -4618,7 +4617,7 @@
     cardContainer.innerHTML = html;
     cardContainer.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex, t = c.querySelector('.t');
       const fit = () => { c.classList.remove('two'); if(t && t.scrollWidth > t.clientWidth + 1) c.classList.add('two'); };
-      const go = () => { fit(); if(c.classList.contains('tape')) drawTapeTop(cv, hex, c.dataset.seed); else if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(hex), true, 16); };
+      const go = () => { fit(); if(c.classList.contains('tape')) drawTapeTop(cv, hex, c.dataset.seed); else if(window.BOOKPAPER) BOOKPAPER.draw(cv, hex, c.dataset.seed, true, 16); };
       if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go); });
   }
   function renderList(ordered, target = listContainer, groups = null){
@@ -10122,6 +10121,49 @@
       else { requestAnimationFrame(go); window.addEventListener('resize', go); }
     });
     window.CLOTH = { draw, rgb };
+    // ---- a book's cover on its cards: linen-embossed paper, as on most modern hardbacks. Each book's title and author set
+    //      its own thread spacing, thread thickness (and which way stands out), press depth, the odd faint thicker thread,
+    //      a little mottling and a touch lighter or darker overall — the same book always the same. Lit, and banded, as the cloth. ----
+    function paperDraw(cv, hex, seedStr, bands = true, bandIn = 10){
+      const s = window.devicePixelRatio || 1, rc = cv.getBoundingClientRect(), W = Math.round(rc.width * s), H = Math.round(rc.height * s);
+      if(!W || !H) return; const key = 'p|' + hex + '|' + seedStr + (bands ? '|b' + bandIn : '');
+      if(cv.width === W && cv.height === H && cv._drawn === key) return;
+      cv.width = W; cv.height = H; cv._drawn = key;
+      let h = 2166136261; for(const ch of String(seedStr || '')) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+      const r = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) ^ Math.imul(h ^ (h >>> 13), 3266489909)) >>> 0) / 4294967296;
+      const N = 64, grid = new Float32Array(N * N).map(() => r()), sm = t => t * t * (3 - 2 * t);
+      const noise = (px, py) => { const xi = Math.floor(px), yi = Math.floor(py), xf = sm(px - xi), yf = sm(py - yi), a = (i, j) => grid[((j & 63) * N) + (i & 63)];
+        const t = a(xi, yi) + (a(xi + 1, yi) - a(xi, yi)) * xf, b = a(xi, yi + 1) + (a(xi + 1, yi + 1) - a(xi, yi + 1)) * xf; return t + (b - t) * yf; };
+      const ox = r() * 500, oy = r() * 500; r(); r(); r();
+      const pit = (1.8 + r() * 1.8) * s, wx = .25 + r() * .3, wy = .25 + r() * .3, bias = (r() - .5) * .8; r(); const depth = .06 + r() * .06;   // (the list's end caps the same as the card)
+      const mot = r() * .9, tone = (r() - .5) * .14;
+      const slubX = Array.from({ length: 512 }, () => r() < .07 ? (r() - .3) * .45 : 0), slubY = Array.from({ length: 512 }, () => r() < .07 ? (r() - .3) * .45 : 0);
+      const col = rgb(hex), x = cv.getContext('2d'), im = x.createImageData(W, H), d = im.data;
+      for(let py = 0; py < H; py++) for(let px = 0; px < W; px++){
+        const u = px + ox, w = py + oy, i = Math.floor(u / pit), j = Math.floor(w / pit), fx = u / pit - i, fy = w / pit - j;
+        const v = (fx < wx ? .55 + bias : 0) + (fy < wy ? -.55 + bias : 0) + slubX[i & 511] * (fy < .5 ? 1 : .3) + slubY[j & 511] * (fx < .5 ? 1 : .3)
+          + (noise(px / (22 * s), py / (10 * s)) - .5) * mot + tone / depth * .5 + (r() - .5) * .25;
+        const t = v * depth, o = (py * W + px) * 4;
+        for(let k = 0; k < 3; k++) d[o + k] = t >= 0 ? col[k] + (255 - col[k]) * t : col[k] * (1 + t);
+        d[o + 3] = 255; }
+      x.putImageData(im, 0, 0);
+      const lg = x.createLinearGradient(0, 0, W * .25, H * 1.6);   // lit as the cloth is
+      lg.addColorStop(0, 'rgba(255,255,255,.07)'); lg.addColorStop(1, 'rgba(0,0,0,.16)'); x.fillStyle = lg; x.fillRect(0, 0, W, H);
+      const g = x.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, 'rgba(255,255,255,.06)'); g.addColorStop(.12, 'rgba(255,255,255,0)'); g.addColorStop(.85, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.18)');
+      x.fillStyle = g; x.fillRect(0, 0, W, H);
+      if(!bands) return;
+      const bw = Math.max(2, Math.round(2 * s)), e = Math.max(1, Math.round(s)), mix = (c, t) => Math.round(c + (255 - c) * t);
+      [Math.round(bandIn * s), W - Math.round(bandIn * s) - bw].forEach(bx => {
+        const bg = x.createLinearGradient(0, 0, 0, H);
+        bg.addColorStop(0, `rgb(${col.map(c => mix(c, .52)).join(',')})`); bg.addColorStop(1, `rgb(${col.map(c => mix(c, .4)).join(',')})`);
+        x.fillStyle = bg; x.fillRect(bx, 0, bw, H);
+        x.fillStyle = 'rgba(0,0,0,.28)'; x.fillRect(bx - e, 0, e, H); x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(bx + bw, 0, e, H);
+      });
+    }
+    // a light cover (white, or a pale colour): its words go dark
+    const paperLite = hex => { const [r, g, b] = rgb(hex).map(v => v / 255); return .2126 * r + .7152 * g + .0722 * b > .55; };
+    window.BOOKPAPER = { draw: paperDraw, lite: paperLite };
     // make every cloth sheet now, while the app loads (one a frame, so nothing stalls): the buttons, the tab
     // cards and every cover colour a book's stats card can use. Pages never opened still have theirs ready
     {
@@ -12716,7 +12758,7 @@ closeRowDD = function(dd){
       if(!html && (s || F !== 'all')) html = '<div id="wl-empty">No matches</div>';
       view.innerHTML = html;
       view.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex; fit(c);
-        const go = () => { fit(c); if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(hex), true, 6); };
+        const go = () => { fit(c); if(window.BOOKPAPER){ c.classList.toggle('lite', BOOKPAPER.lite(hex)); BOOKPAPER.draw(cv, hex, ((c.querySelector('.t') || {}).textContent || '') + '|' + ((c.querySelector('.a') || {}).textContent || ''), true, 6); } };   // its paper, as on its card in Home
         if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go);
       });
       // tapping a loan (its card or its days card) opens its dropdown; one open at a time
@@ -12790,7 +12832,7 @@ closeRowDD = function(dd){
       view.querySelectorAll('.wl-card').forEach(c => {
         const cv = c.querySelector('canvas'), hex = list[+c.dataset.i].color;
         fit(c);
-        const go = () => { fit(c); if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown(hex)), true, 16); };   // bands in a little, the year (if any) in the left end
+        const go = () => { fit(c); if(window.BOOKPAPER){ c.classList.toggle('lite', BOOKPAPER.lite(shown(hex))); BOOKPAPER.draw(cv, shown(hex), ((c.querySelector('.t') || {}).textContent || '') + '|' + ((c.querySelector('.a') || {}).textContent || ''), true, 16); } };   // bands in a little, the year (if any) in the left end
         if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go);
         c.addEventListener('click', () => open(+c.dataset.i));
       });
@@ -12840,7 +12882,7 @@ closeRowDD = function(dd){
     // the preview card in the second header: the words as typed, the colour they make (redrawn once typing pauses)
     const prev = document.getElementById('wl-prev'), pCv = prev.querySelector('canvas'), pT = prev.querySelector('.t'), pA = prev.querySelector('.a');
     let pHex = '', pTimer = 0;
-    const pDraw = () => { if(window.CLOTH && pHex) CLOTH.draw(pCv, CLOTH.rgb(shown(pHex)), true, 16); };
+    const pDraw = () => { if(window.BOOKPAPER && pHex){ pCv.parentElement.classList.toggle('lite', BOOKPAPER.lite(shown(pHex))); BOOKPAPER.draw(pCv, shown(pHex), tIn.value.trim() + '|' + typedAuthor(), true, 16); } };   // as it will look
     if(window.ResizeObserver) new ResizeObserver(pDraw).observe(pCv);
     function preview(now){
       const t = tIn.value.trim(), a = typedAuthor();
