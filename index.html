@@ -93,18 +93,22 @@
   #library-view.list #library-container{display:none;}
   #all-books-view.list #shelves-container{display:none;}
   /* Cards: each book as a wishlist-style cloth card, then ✓ read | ! in progress | ✗ unread (the one that's true lit) */
-  #card-container{display:none; flex-direction:column; gap:4px; margin:-12px 0 0;}
+  :is(#card-container, #coll-cards){display:none; flex-direction:column; gap:4px; margin:-12px 0 0;}
   #all-books-view.cards #card-container{display:flex;}
+  #library-view.cards #coll-cards{display:flex;}
+  #library-view.cards #library-container, #library-view.cards #coll-list{display:none;}
   #all-books-view.cards #shelves-container, #all-books-view.cards #list-container{display:none;}
-  #card-container .wl-mark{pointer-events:none;}
-  #card-container > .list-divider{height:24px;}
-  #card-container .cm-dots{display:flex; align-items:center; gap:3px;}
-  #card-container .cm-dots i{display:block; flex:none; width:5px; height:5px; border-radius:50%; background:var(--ink); transform:scale(.8);}
-  #card-container .wl-mark.on .cm-dots i{background:var(--cfffffff, #ffffff); animation:cmGrow 1.2s ease-in-out infinite;}
-  #card-container .wl-mark.on .cm-dots i:nth-child(2){animation-delay:.2s;} #card-container .wl-mark.on .cm-dots i:nth-child(3){animation-delay:.4s;}
+  :is(#card-container, #coll-cards) .wl-mark{pointer-events:none;}
+  :is(#card-container, #coll-cards) > .list-divider{height:24px;}
+  :is(#card-container, #coll-cards) .cm-dots{display:flex; align-items:center; gap:3px;}
+  :is(#card-container, #coll-cards) .cm-dots i{display:block; flex:none; width:5px; height:5px; border-radius:50%; background:var(--ink); transform:scale(.8);}
+  :is(#card-container, #coll-cards) .wl-mark.on .cm-dots i{background:var(--cfffffff, #ffffff); animation:cmGrow 1.2s ease-in-out infinite;}
+  :is(#card-container, #coll-cards) .wl-mark.on .cm-dots i:nth-child(2){animation-delay:.2s;} :is(#card-container, #coll-cards) .wl-mark.on .cm-dots i:nth-child(3){animation-delay:.4s;}
   @keyframes cmGrow{0%, 80%, 100%{transform:scale(.6);} 40%{transform:scale(1.25);}}
-  @media (prefers-reduced-motion: reduce){ #card-container .cm-dots i{animation:none !important;} }   /* the same slim divider as the wishlist's */
-  #card-container .wl-card{flex:1 1 auto; min-width:0; padding-left:30px; padding-right:30px;}
+  @media (prefers-reduced-motion: reduce){ :is(#card-container, #coll-cards) .cm-dots i{animation:none !important;} }   /* the same slim divider as the wishlist's */
+  :is(#card-container, #coll-cards) .wl-card{flex:1 1 auto; min-width:0; padding-left:30px; padding-right:30px;}
+  /* an audiobook on a light shell (white, grey, yellow): dark words */
+  .wl-card.tape.lite{color:var(--cf1c1c1e, #1c1c1e);} .wl-card.tape.lite .a{color:rgba(28,28,30,.82);} .wl-card.tape.lite .wl-yr{color:rgba(28,28,30,.8);}
   .book-row{
     position:relative; display:flex; align-items:center; gap:8px; height:45px; box-sizing:border-box;
     padding:0 8px; background:var(--unread); border:3px solid var(--cb000000, #000000); border-radius:8px; cursor:pointer;
@@ -442,7 +446,7 @@
   #book-fields > #title-card, #book-fields > #author-card{grid-column:1 / -1;}   /* Title | Subtitle across, then Author | Author List */
   /* audiobook: Length on the left (a third), its wheels beside it (two thirds), Lists below */
   /* audiobook: no length readout — the wheels (two thirds) then Lists on the same line */
-  #book-fields.audio > #pages-card{display:none;}
+  #book-fields.audio > #pages-card, #book-fields.audio > #words-card{display:none;}
   #book-fields.audio > #length-wheels{grid-column:span 3;}
   #book-fields.audio > #tags-card{grid-column:span 3;}
   #book-fields.audio > #pages-card.invalid + #length-wheels{border-color:var(--cbaa3333, #aa3333);}   /* missing length shows on the wheels */
@@ -1817,7 +1821,9 @@
   .wl-fields .field-card input{height:auto; font-size:.95rem;}
   .wl-pair{display:flex; gap:4px;} .wl-pair > .field-card{flex:1 1 0; min-width:0;}
   .wl-names{position:relative;}
-  .wl-names::before{content:''; position:absolute; left:50%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); pointer-events:none;}
+  .wl-names::before, .wl-names::after{content:''; position:absolute; left:33.333%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); pointer-events:none; z-index:2;}
+  .wl-names::after{left:66.667%;}
+  .field-card.split.wl-names{grid-template-columns:repeat(3, minmax(0, 1fr));}   /* First Name | Last Name | Author List, like Add / Edit */
   #wl-del, #wl-del:active{height:45px; margin:0; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--panel); color:var(--cfaa3333, #aa3333); box-shadow:none;
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   #wl-del.armed{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff);}
@@ -2139,6 +2145,8 @@
   /* ===== Released: the Year card in Add / Edit ===== */
   /* Pages (or the length wheels) | Year | Words | Lists: a quarter each */
   #book-fields > #pages-card, #book-fields > #year-card, #book-fields > #words-card, #book-fields > #tags-card, #book-fields.audio > #length-wheels, #book-fields.audio > #tags-card{grid-column:span 3;}
+  /* audiobook: no Words card, so Length | Year | Lists take a third each */
+  #book-fields.audio > #length-wheels, #book-fields.audio > #year-card, #book-fields.audio > #tags-card{grid-column:span 4;}
   /* the length wheels in a third: H / M / S tucked small into each wheel's corner, clear of the numbers */
   #length-wheels .lw-wheel span{left:3px; top:3px; transform:none; font-size:.5rem;}
   .yc-row{display:flex; align-items:center; gap:6px; min-width:0;}
@@ -2783,13 +2791,13 @@
     <div class="tab" data-mode="list">List</div>
     <div class="tab" data-mode="cards">Cards</div>
   </div>
-  <div id="sort-card" class="shelf-ctl"><span id="sort-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="sort-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="sort-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="filter-name">All books</span><span class="sort-k">• Sort by:</span><i class="bar-dir" id="sort-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="7.5,21.5 32.5,21.5 20,33.5" fill="#b3ada4" stroke="#b3ada4" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,15 32.5,15 20,27" fill="#77706a" stroke="#77706a" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,8.5 32.5,8.5 20,20.5" fill="#2b2620" stroke="#2b2620" stroke-width="1.6" stroke-linejoin="round"/></svg></i><span class="sort-v" id="sort-name">Date added</span></div>
+  <div id="sort-card" class="shelf-ctl"><span id="sort-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="sort-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="sort-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="filter-name">All books</span><span class="sort-k">• Sort by:</span><i class="bar-dir" id="sort-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="10.4,11 29.6,11 20,27.6" fill="#000" stroke="#000" stroke-width="5" stroke-linejoin="round"/></svg></i><span class="sort-v" id="sort-name">Date added</span></div>
  </div>
  <!-- Wishlist: sort, and search -->
  <div class="hdr-row hidden" id="wishlist-controls">
   <div class="lb-tabs" id="lb-tabs"><div class="tl-views lb-pair"><button type="button" data-m="out" class="on">Checked Out</button><button type="button" data-m="ret">Returned</button></div><div class="tl-views lb-solo"><button type="button" data-m="wish">Wishlist</button></div></div>
   <div class="tl-views" id="wl-sort"><button type="button" data-s="added" class="on">Date Added</button><button type="button" data-s="title">Title</button><button type="button" data-s="author">Author</button><button type="button" data-s="status">Status</button></div>
-  <div id="lb-card"><span id="lb-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="wl-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="lb-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="lb-filter-name">All</span><span class="sort-k">• Sort by:</span><i class="bar-dir" id="lb-sort-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="7.5,21.5 32.5,21.5 20,33.5" fill="#b3ada4" stroke="#b3ada4" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,15 32.5,15 20,27" fill="#77706a" stroke="#77706a" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,8.5 32.5,8.5 20,20.5" fill="#2b2620" stroke="#2b2620" stroke-width="1.6" stroke-linejoin="round"/></svg></i><span class="sort-v" id="lb-sort-name">Status</span></div>
+  <div id="lb-card"><span id="lb-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="wl-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="lb-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="lb-filter-name">All</span><span class="sort-k">• Sort by:</span><i class="bar-dir" id="lb-sort-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="10.4,11 29.6,11 20,27.6" fill="#000" stroke="#000" stroke-width="5" stroke-linejoin="round"/></svg></i><span class="sort-v" id="lb-sort-name">Status</span></div>
  </div>
  <!-- Timeline: what to chart, and over what span -->
  <div class="hdr-row hidden" id="timeline-controls">
@@ -2808,7 +2816,7 @@
   <div class="wl-prev-band"><div class="wl-card wl-wish" id="wl-prev"><canvas aria-hidden="true"></canvas><i class="wl-yr" hidden></i><i class="wl-yr wl-wd" hidden></i><span class="t"></span><span class="a"></span></div></div>
   <div class="wl-fields">
     <div class="field-card"><input id="wl-t" type="text" placeholder="Title" autocomplete="off" aria-label="Title"></div>
-    <div class="field-card split wl-names"><div class="fc-half"><input id="wl-af" type="text" placeholder="First Name" autocomplete="off" aria-label="Author first name"></div><div class="fc-half"><input id="wl-a" type="text" placeholder="Last Name" autocomplete="off" aria-label="Author last name"></div></div>
+    <div class="field-card split wl-names"><div class="fc-half"><input id="wl-af" type="text" placeholder="First Name" autocomplete="off" aria-label="Author first name"></div><div class="fc-half"><input id="wl-a" type="text" placeholder="Last Name" autocomplete="off" aria-label="Author last name"></div><button type="button" class="fc-more" id="wl-amore" aria-label="Open author list">Author List</button></div>
     <div class="wl-pair">
       <div class="field-card" id="wl-year-card"><div class="yc-row"><input id="wl-year" type="number" inputmode="numeric" min="1" placeholder="Year (optional)" aria-label="Year released (optional)"><button type="button" id="wl-era" aria-label="AD or BC">AD</button></div></div>
       <div class="field-card" id="wl-words-card"><input id="wl-words" type="text" inputmode="numeric" placeholder="Words (optional)" autocomplete="off" aria-label="Word count (optional)"></div>
@@ -2841,6 +2849,7 @@
 <div class="view" id="library-view">
   <div id="library-container"></div>
   <div id="coll-list"></div>
+  <div id="coll-cards"></div>
 </div>
 
 <div id="customize-page">
@@ -3768,6 +3777,8 @@
   const STATUS_NAMES = ['In progress', 'Unread', 'Read'];
   const statusRank = b => bookFinished(b) ? 2 : (bookRead(b) > 0 ? 0 : 1);
 
+  // the day a book was finished (its current read, else its latest earlier one); null if never
+  const doneKey = b => (bookFinished(b) && b.finishedOn) || (b.reads || []).map(r => r.finishedOn).filter(Boolean).sort().pop() || null;
   const SORTS = [
     { id:'added',    name:'Date added',     desc:'The order books were put on the shelf', rdesc:'Newest on the shelf first',
       fn: null },
@@ -3782,6 +3793,13 @@
       group: b => STATUS_NAMES[statusRank(b)] },
     { id:'read',     name:'Read order',     desc:'By the day you started reading; unstarted last', rdesc:'Unstarted first, then latest started',
       fn: (a,b)=> cmp(readDaySpan(a).first, readDaySpan(b).first) || cmp(titleKey(a.title), titleKey(b.title)) },
+    { id:'done',     name:'Completed order', desc:'In progress by last read, then latest finished, then unread as added', rdesc:'Unread newest added first, then earliest finished, then in progress',
+      // in progress first (most recently read first), then finished (most recently finished first), then unread (as added: left as they are)
+      fn: (a,b)=>{ const r = x => bookFinished(x) ? 1 : bookRead(x) > 0 ? 0 : 2, ra = r(a), rb = r(b);
+                   if(ra !== rb) return ra - rb;
+                   if(ra === 0) return cmp(readDaySpan(b).last, readDaySpan(a).last);
+                   if(ra === 1){ const x = doneKey(a), y = doneKey(b); return (!!y - !!x) || (x && y ? cmp(y, x) : 0); }   // latest finished first
+                   return 0; } },
     { id:'recent',   name:'Recently read',  desc:'Most recently read first; unstarted last', rdesc:'Unstarted first, then least recently read',
       fn: (a,b)=> cmp(readDaySpan(b).last, readDaySpan(a).last) || cmp(titleKey(a.title), titleKey(b.title)) },
     { id:'progress', name:'Progress',       desc:'Furthest along first', rdesc:'Least far along first',
@@ -3795,8 +3813,8 @@
   ];
   function currentSort(){ return SORTS.find(s => s.id === prefs.sort) || SORTS[0]; }
   // length in words: its word count when it has one, else about 250 a page, or (an audiobook) about 155 a minute of listening
-  function wordsOf(b){ if(b.words > 0) return b.words;
-    if(b.format === 'audio' && b.audioSeconds > 0) return Math.round(b.audioSeconds / 60 * 155);
+  function wordsOf(b){ if(b.format === 'audio') return b.audioSeconds > 0 ? Math.round(b.audioSeconds / 60 * 155) : 0;   // an audiobook goes by its time
+    if(b.words > 0) return b.words;
     return b.pages > 0 ? b.pages * 250 : 0; }
   // the length bands by word count, flash fiction to the epic novel (each from where it begins)
   const LEN_BANDS = [[1, 'Nano-Fiction'], [300, 'Ultra-Flash Fiction'], [500, 'Flash Fiction'], [1000, 'Ultra-Short Story'], [5000, 'Short Story'],
@@ -4150,7 +4168,8 @@
   // the two short spine pieces on a list card: its year on the left, a number on the right (words, or an audiobook's seconds)
   function spinesFor(row, b, n){
     const [sl, sr] = row.querySelectorAll('.br-spine'), hex = bookColor(b);
-    clothBehind(sl, hex); clothBehind(sr, hex);
+    const tape = b.format === 'audio' ? (b.title || '') + '|' + (b.author || '') : null;   // an audiobook's ends: the tape's top, as on its card
+    clothBehind(sl, hex, tape && tape + '|l'); clothBehind(sr, hex, tape && tape + '|r');
     sl.querySelector('i').textContent = typeof b.released === 'number' && !isNaN(b.released) ? (b.released < 0 ? -b.released + ' BC' : String(b.released)) : '';
     sr.querySelector('i').textContent = n > 0 ? Math.min(9999999, n).toLocaleString('en-US') : '';
   }
@@ -4342,7 +4361,7 @@
   const DS_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   // a card dressed in the book's own cover: its colour in the cover cloth (no end bands), text in white
   // (or ink on a pale cover) so it stays readable; drawn whenever the card has a size
-  function clothBehind(card, hex){
+  function clothBehind(card, hex, tapeSeed){
     let cv = card.querySelector(':scope > canvas.cloth-bg');
     if(!cv){ cv = document.createElement('canvas'); cv.className = 'cloth-bg'; cv.setAttribute('aria-hidden', 'true'); card.prepend(cv); }
     const ink = readableTextOn(hex);
@@ -4350,8 +4369,9 @@
     card.style.setProperty('--cloth', hex);   // its flat colour shows until the cloth is drawn
     card.style.setProperty('--ds-ink', ink);
     card.style.setProperty('--ds-muted', ink === '#fff' ? 'rgba(255,255,255,.78)' : 'rgba(43,38,32,.7)');
-    const go = () => { if(window.CLOTH && cv.dataset.hex) window.CLOTH.draw(cv, window.CLOTH.rgb(cv.dataset.hex), false); };
-    const changed = cv.dataset.hex !== hex;
+    const go = () => { if(tapeSeed) drawTapeTop(cv, cv.dataset.hex, tapeSeed, false); else if(window.CLOTH && cv.dataset.hex) window.CLOTH.draw(cv, window.CLOTH.rgb(cv.dataset.hex), false); };
+    const changed = cv.dataset.hex !== hex || cv.dataset.tape !== (tapeSeed || '');
+    cv.dataset.tape = tapeSeed || '';
     cv.dataset.hex = hex;
     if(!cv._ro && window.ResizeObserver){ cv._ro = new ResizeObserver(go); cv._ro.observe(cv); }
     if(changed){ go(); requestAnimationFrame(go); }   // straight away if it can (no stale colour), again once laid out
@@ -4557,15 +4577,40 @@
   const CMARK = (k, on, d) => `<button type="button" class="wl-mark ${k}${on ? ' on' : ''}" tabindex="-1" aria-hidden="true">` + (k === 'wait'
     ? '<span class="cm-dots"><i></i><i></i><i></i></span>'   // in progress: three dots, each swelling in turn while it's lit
     : `<svg viewBox="0 0 24 24" fill="none" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`) + '</button>';
-  function renderCards(ordered, groups){
+  // ---- an audiobook's card in the Cards view: the top of the tape — matte, faintly pebbled plastic, a soft seam where the
+  //      two halves meet, and a groove near each end where a book card has its bands (the year and seconds sit outside them) ----
+  const tapeLite = hex => { const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255); return .2126 * r + .7152 * g + .0722 * b > .55; };
+  function drawTapeTop(cv, hex, seedStr, grooves = true){
+    const s = window.devicePixelRatio || 1, rc = cv.getBoundingClientRect(), W = Math.round(rc.width * s), H = Math.round(rc.height * s);
+    if(!W || !H) return; const key = hex + '|' + seedStr;
+    if(cv.width === W && cv.height === H && cv._drawn === key) return;
+    cv.width = W; cv.height = H; cv._drawn = key;
+    const x = cv.getContext('2d'), sh = f => f >= 0 ? mixHex(hex, '#ffffff', f) : mixHex(hex, '#000000', -f);
+    let h = 2166136261; for(const ch of seedStr || '') h = Math.imul(h ^ ch.charCodeAt(0), 16777619);   // the same pebbling for the same tape
+    const rnd = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) ^ Math.imul(h ^ (h >>> 13), 3266489909)) >>> 0) / 4294967296;
+    const g = x.createLinearGradient(0, 0, 0, H);   // lit from the top, a little shade toward the bottom
+    g.addColorStop(0, sh(.14)); g.addColorStop(.18, sh(.04)); g.addColorStop(.8, sh(-.04)); g.addColorStop(1, sh(-.2));
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    for(let i = 0, n = Math.round(W * H / (9 * s * s)); i < n; i++){ const px = rnd() * W, py = rnd() * H, d = (.5 + rnd() * .7) * s;
+      x.fillStyle = rnd() < .5 ? 'rgba(0,0,0,.07)' : 'rgba(255,255,255,.06)'; x.fillRect(px, py, d, d); }
+    const y = H / 2, sw = 4 * s, sg = x.createLinearGradient(0, y - sw / 2, 0, y + sw / 2);   // the seam: a soft, shallow groove
+    sg.addColorStop(0, 'rgba(0,0,0,0)'); sg.addColorStop(.42, 'rgba(0,0,0,.08)'); sg.addColorStop(.58, 'rgba(255,255,255,.05)'); sg.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = sg; x.fillRect(0, y - sw / 2, W, sw);
+    if(!grooves) return;   // (a list card's short end pieces have none)
+    const e = Math.max(1, Math.round(s));
+    [Math.round(16 * s), W - Math.round(16 * s) - 2 * e].forEach(bx => { x.fillStyle = sh(-.35); x.fillRect(bx, 0, e, H); x.fillStyle = sh(.3); x.fillRect(bx + e, 0, e, H); });
+  }
+  function renderCards(ordered, groups, target = cardContainer){
+    const cardContainer = target;
     const esc = t => String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
     const groupOf = groups ? null : currentSort().group; let last = null, html = '';
     ordered.forEach((b, bi) => {
       if(groupOf || groups){ const g = groups ? groups[bi] : groupOf(b); if(g !== last){ last = g; html += `<div class="list-divider"><span class="ld-name">${esc(g)}</span></div>`; } }
       const st = bookFinished(b) ? 'yes' : bookRead(b) > 0 ? 'wait' : 'no', hex = bookColor(b);
       const yr = typeof b.released === 'number' && !isNaN(b.released) ? (b.released < 0 ? -b.released + ' BC' : String(b.released)) : '';
-      const n = b.words > 0 ? b.words : (b.format === 'audio' && b.audioSeconds > 0 ? Math.round(b.audioSeconds) : 0);
-      html += `<div class="wl-row" data-bi="${bi}"><div class="wl-card" data-hex="${hex}" style="--cloth:${hex}"><canvas aria-hidden="true"></canvas>` +
+      const n = b.format === 'audio' ? (b.audioSeconds > 0 ? Math.round(b.audioSeconds) : 0) : (b.words > 0 ? b.words : 0);
+      const tape = b.format === 'audio';   // an audiobook: the tape's top, in its shell colour (dark words on a light shell)
+      html += `<div class="wl-row" data-bi="${bi}"><div class="wl-card${tape ? ' tape' + (tapeLite(hex) ? ' lite' : '') : ''}" data-hex="${hex}"${tape ? ` data-seed="${esc((b.title || '') + '|' + (b.author || ''))}"` : ''} style="--cloth:${hex}"><canvas aria-hidden="true"></canvas>` +
         (yr ? `<i class="wl-yr">${yr}</i>` : '') + (n ? `<i class="wl-yr wl-wd">${Math.min(9999999, n).toLocaleString('en-US')}</i>` : '') +
         `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
         CMARK('yes', st === 'yes', 'M4 12.5l5 5L20 6') + CMARK('wait', st === 'wait', 'M12 4v10M12 19.8v.01') + CMARK('no', st === 'no', 'M6 6l12 12M18 6L6 18') + '</div>';
@@ -4573,7 +4618,7 @@
     cardContainer.innerHTML = html;
     cardContainer.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex, t = c.querySelector('.t');
       const fit = () => { c.classList.remove('two'); if(t && t.scrollWidth > t.clientWidth + 1) c.classList.add('two'); };
-      const go = () => { fit(); if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(hex), true, 16); };
+      const go = () => { fit(); if(c.classList.contains('tape')) drawTapeTop(cv, hex, c.dataset.seed); else if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(hex), true, 16); };
       if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go); });
   }
   function renderList(ordered, target = listContainer, groups = null){
@@ -4655,6 +4700,7 @@
     allBooksView.classList.toggle('list', prefs.view === 'list');
     allBooksView.classList.toggle('cards', prefs.view === 'cards');
     document.getElementById('library-view').classList.toggle('list', prefs.view === 'list');
+    document.getElementById('library-view').classList.toggle('cards', prefs.view === 'cards');
     if(prefs.view === 'list') repaintTapeRows();          // drawn to their width, which is 0 while hidden
     else if(shelfStale){ shelfStale = false; render(); }   // a tape was wound from the list
     viewTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === prefs.view));
@@ -4748,14 +4794,15 @@
     const names = allCollections();
     const collList = document.getElementById('coll-list');
     if(!names.length){
-      container.innerHTML = collList.innerHTML = '<div class="coll-empty">No lists yet.<br>Add a book to a list from Add Book or a book\'s Edit.</div>';
+      container.innerHTML = collList.innerHTML = document.getElementById('coll-cards').innerHTML = '<div class="coll-empty">No lists yet.<br>Add a book to a list from Add Book or a book\'s Edit.</div>';
       return;
     }
     { // the list: every collection's books, in the chosen sort, under a divider with its name
       const items = [], groups = [];
       names.forEach(name => sortedBooks().filter(b => bookTags(b).includes(name)).forEach(b => { items.push(b); groups.push(name); }));
-      if(items.length) renderList(items, collList, groups);
-      else collList.innerHTML = `<div class="so-empty">No ${currentFilter().empty}.</div>`;
+      const collCards = document.getElementById('coll-cards');
+      if(items.length){ renderList(items, collList, groups); renderCards(items, groups, collCards); }   // the Cards view too, a divider for each list
+      else collList.innerHTML = collCards.innerHTML = `<div class="so-empty">No ${currentFilter().empty}.</div>`;
       if(prefs.view === 'list') requestAnimationFrame(repaintTapeRows);
     }
     const avail = estimateShelfWidth() - 20;
@@ -9120,7 +9167,7 @@
       const bad = [!title, !author, !(pages > 0)];
       fieldCards.forEach((c, i)=> c.classList.toggle('invalid', bad[i]));
       const rel = yearRead(); yearCard.classList.toggle('invalid', rel === false);
-      const words = wordsRead(); wordsCard.classList.toggle('invalid', words === false); if(words === false) bad.push(true);
+      const words = audio ? null : wordsRead(); wordsCard.classList.toggle('invalid', words === false); if(words === false) bad.push(true);   // an audiobook has no word count, as it has no pages
       const loan = loanRead(); loanCard.classList.toggle('invalid', loan === false && !retCard.classList.contains('invalid'));
       if(bad.some(Boolean) || rel === false || loan === false) return;
       if(customizeMode === 'add'){
@@ -9168,9 +9215,12 @@
   const authorsPage = document.getElementById('authors-page');
   const authorsList = document.getElementById('authors-list');
   const authorNewInput = document.getElementById('author-new-input');
+  // the authors of both: books in the library and books on the wishlist (one list, whichever window it's opened from)
+  const authorPool = () => books.concat(window.__wishList ? window.__wishList() : []);
+  let authorTarget = null, authorCur = '';   // opened from the wishlist's window: where a pick goes, and the name there now
   function allAuthors(){
     const seen = new Map();
-    books.forEach(b=>{ const a = (b.author || '').trim(); if(a && !seen.has(a.toLowerCase())) seen.set(a.toLowerCase(), b); });
+    authorPool().forEach(b=>{ const a = (b.author || '').trim(); if(a && !seen.has(a.toLowerCase())) seen.set(a.toLowerCase(), b); });
     return [...seen.values()].sort((x, y)=>{
       const kx = authorKeyOf(x), ky = authorKeyOf(y);   // library order, same as the Author sort
       return cmp(kx[0], ky[0]) || cmp(kx[1], ky[1]);
@@ -9178,7 +9228,8 @@
   }
   function pickAuthor(name){
     // a name picked from the list: its first / last as some book already has them, else all in Last
-    const k = name.toLowerCase(), had = books.find(b => (b.author || '').trim().toLowerCase() === k && typeof b.authorLast === 'string');
+    const k = name.toLowerCase(), had = authorPool().find(b => (b.author || '').trim().toLowerCase() === k && typeof b.authorLast === 'string');
+    if(authorTarget){ authorTarget(had || { author: name }); authorsPage.classList.remove('open'); return; }
     setAuthorFields(had || { author: name });
     document.getElementById('author-card').classList.remove('invalid');
     authorsPage.classList.remove('open');
@@ -9186,8 +9237,8 @@
     rebuildCustomizePreview();
   }
   function renderAuthorOptions(){
-    const cur = authorTyped().toLowerCase();
-    const names = allAuthors();
+    const cur = (authorTarget ? authorCur : authorTyped()).toLowerCase();
+    const names = allAuthors(), pool = authorPool(), wish = window.__wishList ? window.__wishList() : [];
     authorsList.innerHTML = '';
     if(!names.length){
       authorsList.innerHTML = '<div class="tg-empty">No authors yet — add one above.</div>';
@@ -9196,12 +9247,13 @@
     names.forEach(n=>{
       const o = document.createElement('div');
       o.className = 'so-opt' + (n.toLowerCase() === cur ? ' on' : '');
-      const count = books.filter(b => (b.author || '').trim().toLowerCase() === n.toLowerCase()).length;
+      const same = b => (b.author || '').trim().toLowerCase() === n.toLowerCase();
+      const count = books.filter(same).length, wc = wish.filter(same).length;
       o.innerHTML = '<b></b><span></span>';
       // shown "Last, First", the same way it's sorted: by the split names where a book has them, else worked out from the name
-      const sp = books.find(b => (b.author || '').trim().toLowerCase() === n.toLowerCase() && typeof b.authorLast === 'string' && (b.authorLast || b.authorFirst));
+      const sp = pool.find(b => same(b) && typeof b.authorLast === 'string' && (b.authorLast || b.authorFirst));
       o.querySelector('b').textContent = authorLastFirst(sp || { author: n });
-      o.querySelector('span').textContent = plural(count, 'book');
+      o.querySelector('span').textContent = [count ? plural(count, 'book') : '', wc ? `(*${wc}*)` : ''].filter(Boolean).join(' ');   // library books, then (*n*) on the wishlist
       o.addEventListener('click', ()=> pickAuthor(n));
       authorsList.appendChild(o);
     });
@@ -9216,8 +9268,10 @@
   document.getElementById('author-new-add').addEventListener('click', useNewAuthor);
   authorNewInput.addEventListener('keydown', e=>{ if(e.key === 'Enter') useNewAuthor(); });
   document.getElementById('author-more').addEventListener('click', e=>{
-    e.stopPropagation(); renderAuthorOptions(); authorsPage.classList.add('open');
+    e.stopPropagation(); authorTarget = null; renderAuthorOptions(); authorsPage.classList.add('open');
   });
+  // the wishlist's window opens the same list: cur is the name typed there, fn takes the pick
+  window.__openAuthors = (cur, fn) => { authorTarget = fn; authorCur = cur || ''; renderAuthorOptions(); authorsPage.classList.add('open'); };
   document.getElementById('authors-done').addEventListener('click', ()=> authorsPage.classList.remove('open'));
 
   // ---- collections picker ----
@@ -12536,6 +12590,7 @@ closeRowDD = function(dd){
     let list = [];
     try{ const v = JSON.parse(localStorage.getItem(KEY) || '[]'); if(Array.isArray(v)) list = v; }catch(e){}
     const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(list)); }catch(e){} };
+    window.__wishList = () => list;   // its authors join the Author List
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
     const baseHex = c => (c._h0 || c.hex).toLowerCase();                 // a cover colour as saved (before any theme)
     const shown = hex => window.THEME && THEME.show ? THEME.show(hex) : hex;
@@ -12820,6 +12875,9 @@ closeRowDD = function(dd){
     tIn.addEventListener('input', check);
     [tIn, afIn, aIn].forEach(inp => inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); if(inp === tIn) afIn.focus(); else if(inp === afIn) aIn.focus(); else if(!saveBtn.disabled) saveBtn.click(); } }));
     document.getElementById('wl-cancel').addEventListener('click', close);
+    document.getElementById('wl-amore').addEventListener('click', e => { e.stopPropagation(); if(document.activeElement) document.activeElement.blur();
+      window.__openAuthors && __openAuthors(typedAuthor(), had => { const split = typeof had.authorLast === 'string';
+        afIn.value = split ? had.authorFirst || '' : ''; aIn.value = split ? had.authorLast : had.author; check(); }); });
     saveBtn.addEventListener('click', () => {
       const title = tIn.value.trim(), author = typedAuthor(), authorFirst = afIn.value.trim(), authorLast = aIn.value.trim(); if(!title) return;
       const released = wYearRead(), words = wWordsRead();
