@@ -220,6 +220,10 @@
     border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); font-family:Arial, sans-serif; font-size:.58rem; line-height:1.15; color:var(--muted); text-transform:uppercase; letter-spacing:0;}   /* every stat in capitals */
   /* two lines in the one card: days + dates, then per day | streak | best day */
   .ds-row{display:flex; justify-content:space-between; gap:8px; white-space:nowrap;}
+  /* a returned loan: two columns, a line each — Out / Due / Returned on the left, pages / days on the right */
+  .dd-stats.ds-ret{flex-direction:row; justify-content:space-between; align-items:center; height:auto; min-height:45px; padding:5px 10px; gap:8px;}
+  .ds-col{display:flex; flex-direction:column; gap:1px; min-width:0; white-space:nowrap;} .ds-col.r{text-align:right; align-items:flex-end;}
+  .ds-col > span{overflow:hidden; text-overflow:ellipsis;}
   .ds-row > span{min-width:0; overflow:hidden; text-overflow:ellipsis;}
   .ds-row:has(> .ds-eta){display:grid; grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr);}   /* the estimate sits dead centre */
   .ds-row > .ds-eta{text-align:center;}
@@ -1817,15 +1821,15 @@
   .wl-mark.on svg{stroke:var(--cfffffff, #ffffff);}
   #wl-empty{margin:40px 16px; text-align:center; font:700 min(.74rem, 2.95vw)/1.4 Arial, sans-serif; text-transform:uppercase; color:var(--muted);}
   /* the wishlist window: the Add a Book header, then Title and Author (Delete when editing); Add to My Library in its footer */
-  #wl-page{position:fixed; inset:0; z-index:30; background:var(--bg); display:flex; flex-direction:column; gap:4px;
+  #wl-page, #lc-page{position:fixed; inset:0; z-index:30; background:var(--bg); display:flex; flex-direction:column; gap:4px;
     opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
-  #wl-page.active{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  #wl-page.active, #lc-page.active{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
   .wl-head{flex:none; display:flex; background:var(--cb000000, #000000); padding-top:env(safe-area-inset-top); border-top:3px solid var(--cb000000, #000000); border-bottom:3px solid var(--cb000000, #000000);}
   .wl-head button, .wl-head button:active{flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none; color:var(--cfffffff, #ffffff);
     font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; background-clip:padding-box;}
-  #wl-cancel, #wl-cancel:active{background:var(--cb7a2f2b, #7a2f2b); border-right:3px solid var(--cb000000, #000000);}
-  #wl-save, #wl-save:active{background:var(--cb2e4636, #2e4636); border-left:3px solid var(--cb000000, #000000);}
-  #wl-save:disabled{color:rgba(255,255,255,.4); cursor:default;}
+  #wl-cancel, #wl-cancel:active, #lc-cancel, #lc-cancel:active{background:var(--cb7a2f2b, #7a2f2b); border-right:3px solid var(--cb000000, #000000);}
+  #wl-save, #wl-save:active, #lc-save, #lc-save:active{background:var(--cb2e4636, #2e4636); border-left:3px solid var(--cb000000, #000000);}
+  #wl-save:disabled, #lc-save:disabled{color:rgba(255,255,255,.4); cursor:default;}
   .wl-head h2{flex:1 1 0; min-width:0; height:42px; margin:0; padding:0 6px; background:var(--hdr-cell); color:var(--ink); text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     font:700 min(.74rem, 2.95vw)/42px Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
   /* second header: the card as it will look, on the walnut band */
@@ -1839,10 +1843,34 @@
   .wl-names::before, .wl-names::after{content:''; position:absolute; left:33.333%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); pointer-events:none; z-index:2;}
   .wl-names::after{left:66.667%;}
   .field-card.split.wl-names{grid-template-columns:repeat(3, minmax(0, 1fr));}   /* First Name | Last Name | Author List, like Add / Edit */
-  #wl-del, #wl-del:active{height:45px; margin:0; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--panel); color:var(--cfaa3333, #aa3333); box-shadow:none;
+  #wl-del, #wl-del:active, #lc-del, #lc-del:active{height:45px; margin:0; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--panel); color:var(--cfaa3333, #aa3333); box-shadow:none;
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
-  #wl-del.armed{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff);}
-  #wl-del[hidden], #wl-foot[hidden]{display:none;}
+  #wl-del.armed, #lc-del.armed{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff);}
+  #wl-del[hidden], #wl-foot[hidden], #lc-del[hidden]{display:none;}
+  /* My Card: the tab card, the barcode, the PIN */
+  .lb-tabs .lb-pair{flex:2 1 0;} .lb-tabs .lb-solo{flex:1 1 0;}
+  .lb-tabs button{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:min(.66rem, 2.75vw) !important; letter-spacing:0 !important; padding:0 2px !important;}   /* four across: Checked Out still fits */
+  body.lb-mycard #lb-card{display:none !important;}   /* nothing to search, filter or sort */
+  .lc-bar{background:#fff; border:3px solid var(--cb000000, #000000); border-radius:8px; padding:10px 10px 6px; text-align:center; box-sizing:border-box;}
+  .lc-bar svg{width:100%; height:auto; display:block;}
+  .lc-num{font:700 min(1.3rem, 5.6vw)/1.2 Arial, Helvetica, sans-serif; color:#333; white-space:pre; margin-top:3px; letter-spacing:.5px;}
+  .lc-dd .lc-bar{margin:0;}
+  /* the PIN: "PIN" small on top, the numbers large and bold below */
+  .lc-pin{flex-direction:column !important; align-items:center; justify-content:center; gap:0; height:auto !important; min-height:45px; padding:5px 10px !important; font-size:.58rem !important;}
+  .lc-pin b{display:block; font:700 min(1.6rem, 7vw)/1.1 Arial, Helvetica, sans-serif; letter-spacing:3px; color:var(--ink);}
+  .lc-pin, .lc-pin:active{width:100%; margin:0; box-shadow:none; cursor:pointer; text-transform:uppercase;}
+  .lc-pin b[hidden]{display:none;}
+  .lc-dd .lc-bar{cursor:pointer;}
+  .lc-float{position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0); transition:background .32s ease;}
+  .lc-float.on{background:#000;}   /* everything behind it fully dark */
+  .lc-fcard{position:fixed; margin:0; transition:top .32s cubic-bezier(.3,.7,.25,1);}
+  .lc-float.on .lc-fcard{top:calc(env(safe-area-inset-top) + 12px) !important;}
+  .lc-pin .lc-mask{display:flex; gap:min(.5rem, 2vw); height:min(1.76rem, 7.7vw); align-items:center;}
+  .lc-ast{width:min(1.15rem, 5vw); height:min(1.15rem, 5vw); display:block;}
+  #lc-num-card .cnt-lbl, #lc-pin-card .cnt-lbl{left:4px; right:4px; text-align:center; line-height:1;}
+  #lc-pin-card.has .cnt-lbl .opt, #lc-pin-card:focus-within .cnt-lbl .opt{display:none;}
+  #lc-num-card input, #lc-pin-card input{text-align:center; margin-top:9px; letter-spacing:1px;}
+  #lc-num-card.invalid{border-color:var(--cbaa3333, #aa3333);}
   #wl-foot{position:absolute; left:0; right:0; bottom:0; padding:4px 4px calc(4px + env(safe-area-inset-bottom)); background:var(--band, var(--cb6b4a32, #6b4a32));
     border-top:3px solid var(--cb000000, #000000); border-bottom:3px solid var(--cb000000, #000000);}
   #wl-real, #wl-real:active{position:relative; overflow:hidden; height:45px; width:100%; margin:0; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cb5b6633, #5b6633); color:var(--cfffffff, #ffffff); box-shadow:none;
@@ -2206,7 +2234,7 @@
   /* Developer Options, the newer switches */
   body.nov-shelf #view-tabs .tab[data-mode="shelf"], body.nov-list #view-tabs .tab[data-mode="list"], body.nov-cards #view-tabs .tab[data-mode="cards"]{display:none !important;}
   body.off-tllib #tl-modes button[data-m="library"]{display:none;}
-  body.off-loans #lb-tabs .lb-pair, body.off-wishcard #lb-tabs .lb-solo{display:none !important;}
+  body.off-loans #lb-tabs .lb-pair, body.off-wishcard #lb-tabs .lb-wish{display:none !important;}
   body.off-loans #lb-tabs, body.off-wishcard #lb-tabs{gap:0;}
   body.off-typefilter #fmt-row{display:none !important;}
   body.off-ends .wl-card .wl-yr, body.off-ends .br-spine > i{display:none !important;}
@@ -2835,7 +2863,7 @@
  </div>
  <!-- Wishlist: sort, and search -->
  <div class="hdr-row hidden" id="wishlist-controls">
-  <div class="lb-tabs" id="lb-tabs"><div class="tl-views lb-pair"><button type="button" data-m="out" class="on">Checked Out</button><button type="button" data-m="ret">Returned</button></div><div class="tl-views lb-solo"><button type="button" data-m="wish">Wishlist</button></div></div>
+  <div class="lb-tabs" id="lb-tabs"><div class="tl-views lb-pair"><button type="button" data-m="out" class="on">Checked Out</button><button type="button" data-m="ret">Returned</button></div><div class="tl-views lb-solo lb-my"><button type="button" data-m="card">My Card</button></div><div class="tl-views lb-solo lb-wish"><button type="button" data-m="wish">Wishlist</button></div></div>
   <div class="tl-views" id="wl-sort"><button type="button" data-s="added" class="on">Date Added</button><button type="button" data-s="title">Title</button><button type="button" data-s="author">Author</button><button type="button" data-s="status">Status</button></div>
   <div id="lb-card"><span id="lb-search" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="#2b2620" stroke-width="3.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></span><input id="wl-q" type="text" aria-label="Search titles and authors" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><span id="lb-close" aria-label="Close search"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="sort-k">Filter by:</span><span class="sort-v" id="lb-filter-name">All</span><span class="sort-k">• Sort by:</span><i class="bar-dir" id="lb-sort-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="10.4,11 29.6,11 20,27.6" fill="#000" stroke="#000" stroke-width="5" stroke-linejoin="round"/></svg></i><span class="sort-v" id="lb-sort-name">Status</span></div>
  </div>
@@ -2864,6 +2892,20 @@
     <button type="button" id="wl-del" hidden>Delete</button>
   </div>
   <div id="wl-foot" hidden><button type="button" id="wl-real"><canvas aria-hidden="true"></canvas><span>Add to My Library</span></button></div>
+</div>
+<!-- Library card: add / edit (number, optional PIN, library name and location) -->
+<div id="lc-page" aria-hidden="true">
+  <div class="wl-head"><button type="button" id="lc-cancel">Cancel</button><h2 id="lc-title">Add Library Card</h2><button type="button" id="lc-save" disabled>Add</button></div>
+  <div class="wl-prev-band"><div class="lc-bar" id="lc-prev"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg><div class="lc-num"></div></div></div>
+  <div class="wl-fields">
+    <div class="field-card"><input id="lc-name" type="text" placeholder="Library Name" autocomplete="off" aria-label="Library name"></div>
+    <div class="field-card"><input id="lc-loc" type="text" placeholder="Location" autocomplete="off" aria-label="Location"></div>
+    <div class="wl-pair">
+      <div class="field-card cnt-card" id="lc-num-card"><span class="cnt-lbl"><b>Card</b> <b>Number</b></span><input id="lc-num" type="text" inputmode="numeric" maxlength="14" autocomplete="off" aria-label="Library card number"></div>
+      <div class="field-card cnt-card" id="lc-pin-card"><span class="cnt-lbl"><b>PIN</b> <b class="opt">(Optional)</b></span><input id="lc-pin" type="text" inputmode="numeric" autocomplete="off" aria-label="PIN (optional)"></div>
+    </div>
+    <button type="button" id="lc-del" hidden>Delete</button>
+  </div>
 </div>
 <!-- footer: Add Book, full width -->
 <div id="app-footer">
@@ -7500,6 +7542,24 @@
     return settling || performance.now() < shelfAnimUntil;
   }
   function requestShelfRender(){ if(shelfR && !shelfRaf) shelfRaf = requestAnimationFrame(drawShelf); }
+  // Back from the background: the phone may have thrown away what the shelf's 3D canvases had drawn (it only redraws
+  // when something changes, so they stayed blank: books showed as bare outlines, no boards), or lost the 3D context
+  // altogether. Draw again whenever the app comes back; if the context was lost, have it restored and every texture sent
+  // up again before drawing.
+  {
+    const resend = () => { if(shelfScene) shelfScene.traverse(o => { if(!o.material) return;
+      (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { ['map', 'specularMap', 'bumpMap', 'alphaMap', 'emissiveMap'].forEach(k => { if(m[k]) m[k].needsUpdate = true; }); m.needsUpdate = true; }); }); };
+    const redraw = () => { requestShelfRender(); setTimeout(requestShelfRender, 250); setTimeout(requestShelfRender, 1000); };
+    [shelfCanvas, shelfTopCanvas].forEach(cv => {
+      cv.addEventListener('webglcontextlost', e => e.preventDefault(), false);   // (so it can be given back)
+      cv.addEventListener('webglcontextrestored', () => { resend(); redraw(); }, false); });
+    const wake = () => {
+      [shelfR, shelfTopR].forEach(r => { try{ if(r && r.getContext().isContextLost()) r.forceContextRestore(); }catch(e){} });
+      redraw(); };
+    document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') wake(); });
+    window.addEventListener('pageshow', wake);
+    window.addEventListener('focus', wake);
+  }
   function animateShelf(ms){ shelfAnimUntil = Math.max(shelfAnimUntil, performance.now() + ms); requestShelfRender(); }
   setTimeout(()=> idleCall(()=>{ if(shelfR && shelfTopOK()){ try{ updateShelfCam(); shelfTopR.compile(shelfScene, shelfCam); }catch(e){} requestShelfRender(); } }), 0);
   window.addEventListener('scroll', requestShelfRender, {passive:true});
@@ -9374,7 +9434,8 @@
     openCustomizeModal({ title:'', author:'', pages:0, cover:'hard' }, 'add');
   }
   function openEditModal(book){ openCustomizeModal(book, 'edit'); }
-  addCard.addEventListener('click', () => document.body.classList.contains('tab-wishlist') && document.body.classList.contains('lb-loans') ? openCustomizeModal({ title:'', author:'', pages:0, cover:'hard', _loan:true }, 'add') : document.body.classList.contains('tab-wishlist') && window.wishAdd ? window.wishAdd() : openAddModal());
+  addCard.addEventListener('click', () => document.body.classList.contains('tab-wishlist') && document.body.classList.contains('lb-mycard') && window.lcAdd ? window.lcAdd()
+    : document.body.classList.contains('tab-wishlist') && document.body.classList.contains('lb-loans') ? openCustomizeModal({ title:'', author:'', pages:0, cover:'hard', _loan:true }, 'add') : document.body.classList.contains('tab-wishlist') && window.wishAdd ? window.wishAdd() : openAddModal());
 
   // ===================== option pickers: Cover, Ribbon and Pages (plain shapes drawn with CSS) =====================
   // The option cards are the page's footer. Tapping Cover, Ribbon or Pages raises a picker out of the footer's top
@@ -12822,7 +12883,8 @@ closeRowDD = function(dd){
       else if(v && v.desc) Object.keys(lbDescs).forEach(k => lbDescs[k] = true); }catch(e){}   // (saved before: one for all)
     const lbSave = () => { try{ localStorage.setItem('stack-tracker-lb-sort', JSON.stringify(Object.assign({}, lbSel, { desc: lbDescs }))); }catch(e){} };
     const lbName = (m, k, id) => (LB[m][k].find(o => o[0] === id) || LB[m][k][0])[1];
-    const lbShow = (anim = false) => { document.getElementById('lb-filter-name').textContent = lbName(mode, 'f', lbSel[mode].f); document.getElementById('lb-sort-name').textContent = lbName(mode, 's', lbSel[mode].s); const d = document.getElementById('lb-sort-dir');
+    const lbShow = (anim = false) => { if(!lbSel[mode]) return;   // (My Card: no filter or sort)
+      document.getElementById('lb-filter-name').textContent = lbName(mode, 'f', lbSel[mode].f); document.getElementById('lb-sort-name').textContent = lbName(mode, 's', lbSel[mode].s); const d = document.getElementById('lb-sort-dir');
       // it only turns over when flipped; any other time (a tab change) it's simply set, no animation
       if(!anim){ d.classList.add('still'); d.classList.toggle('desc', lbDescs[mode]); void d.offsetWidth; d.classList.remove('still'); } else d.classList.toggle('desc', lbDescs[mode]); };
     const lc2 = (x, y) => String(x || '').localeCompare(String(y || ''), undefined, { sensitivity: 'base' });
@@ -12850,8 +12912,10 @@ closeRowDD = function(dd){
       const acts = L.returned ? `<button type="button" class="ag">Check Out Again</button><button type="button" class="ed">Edit</button>`
                               : `<button type="button" class="rn">Renew</button><button type="button" class="rt">Returned</button><button type="button" class="ed">Edit</button>`;
       return `<div class="row-dd book-dd ln-dd" data-li="${i}"><div class="dd-in">` +
-        `<div class="dd-stats"><div class="ds-row"><span>Out <b>${md(L.out)}</b> · Due <b>${md(L.due)}</b></span><span>${L.returned ? `Back <b>${md(L.returned)}</b>` : L.renewed ? `Renewed <b>${L.renewed}×</b>` : ''}</span></div>` +
-        `<div class="ds-row"><span>Read on <b>${rd}</b> ${rd === 1 ? 'day' : 'days'}</span><span>${amt}</span></div></div>` +
+        // the dates down the left (Out, Due, then Returned or how many renewals), what was read down the right (pages, days)
+        `<div class="dd-stats ds-ret"><div class="ds-col"><span>Out <b>${md(L.out)}</b></span><span>Due <b>${md(L.due)}</b></span>` +
+          (L.returned ? `<span>Returned <b>${md(L.returned)}</b></span>` : L.renewed ? `<span>Renewed <b>${L.renewed}×</b></span>` : '') + `</div>` +
+          `<div class="ds-col r"><span>${amt}</span><span>Read on <b>${rd}</b> ${rd === 1 ? 'day' : 'days'}</span></div></div>` +
         `<div class="dd-acts">${acts}</div>` +
         (L.returned ? '' : `<div class="ln-back" hidden><input type="hidden"><div class="field-card ld-set" aria-label="Returned"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">BACK</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ln-ok">Done</button></div>`) +
         `</div></div>`;
@@ -12921,26 +12985,122 @@ closeRowDD = function(dd){
       view.querySelectorAll('.ln-dd .ed').forEach(x => after(x, b => { closeAll(); openLoan = -1; openCustomizeModal(b, 'edit'); }));   // the same Edit a Book window as Home
     }
     const closeAll = () => view.querySelectorAll('.ln-dd.open').forEach(closeRowDD);
-    const lbLabel = () => { const l = document.querySelector('#add-card .add-lbl'); if(l && document.body.classList.contains('tab-wishlist')) l.textContent = mode === 'wish' ? 'Add New Wishlist Book' : 'Check Out a Book'; };
+    const lbLabel = () => { const l = document.querySelector('#add-card .add-lbl'); if(l && document.body.classList.contains('tab-wishlist')) l.textContent = mode === 'wish' ? 'Add New Wishlist Book' : mode === 'card' ? 'Add Library Card' : 'Check Out a Book'; };
     document.querySelectorAll('#lb-tabs [data-m]').forEach(t => t.addEventListener('click', () => {
-      mode = t.dataset.m; openLoan = -1; document.querySelectorAll('#lb-tabs [data-m]').forEach(x => x.classList.toggle('on', x === t));
-      document.body.classList.toggle('lb-loans', mode !== 'wish'); lbShow();
+      mode = t.dataset.m; openLoan = -1; openCard = -1;   // (coming to My Card: every card closed)
+      document.querySelectorAll('#lb-tabs [data-m]').forEach(x => x.classList.toggle('on', x === t));
+      document.body.classList.toggle('lb-loans', mode === 'out' || mode === 'ret'); document.body.classList.toggle('lb-mycard', mode === 'card'); lbShow();
       lbLabel(); render(); window.dispatchEvent(new Event('resize')); window.scrollTo(0, 0); }));
     window.__lbLabel = lbLabel;
     document.body.classList.add('lb-loans');
     // opening the Library tab: back to Checked Out, whichever card was last open
     // the card it opens on: Checked Out, or the Wishlist when loans are switched off (Developer Options)
     const homeMode = () => document.body.classList.contains('off-loans') ? 'wish' : 'out';
-    const goMode = m => { mode = m; openLoan = -1;
+    const goMode = m => { mode = m; openLoan = -1; openCard = -1;
       document.querySelectorAll('#lb-tabs [data-m]').forEach(x => x.classList.toggle('on', x.dataset.m === m));
-      document.body.classList.toggle('lb-loans', m !== 'wish'); lbShow(); lbLabel(); };
+      document.body.classList.toggle('lb-loans', m === 'out' || m === 'ret'); document.body.classList.toggle('lb-mycard', m === 'card'); lbShow(); lbLabel(); };
     window.__lbHome = () => { if(mode !== homeMode()) goMode(homeMode()); };
     // a switch turned a card off: off the one that's open, onto the other
     window.__lbFix = () => { const B = document.body.classList;
-      if(B.contains('off-loans') && mode !== 'wish'){ goMode('wish'); render(); }
+      if(B.contains('off-loans') && (mode === 'out' || mode === 'ret')){ goMode('wish'); render(); }
       else if(B.contains('off-wishcard') && mode === 'wish'){ goMode('out'); render(); } };
     window.__wlRender = () => render();
+
+    // ===== My Card: library cards — a card each (library and location), its dropdown the barcode, the PIN, Edit and Delete =====
+    const LC_KEY = 'stack-tracker-libcards-v1';
+    let cardsL = []; try{ cardsL = JSON.parse(localStorage.getItem(LC_KEY) || '[]'); if(!Array.isArray(cardsL)) cardsL = []; }catch(e){ cardsL = []; }
+    const lcSave = () => { try{ localStorage.setItem(LC_KEY, JSON.stringify(cardsL)); }catch(e){} };
+    let openCard = -1;
+    // Codabar, as library cards use: 7 parts a character (bar, space, bar, …), 1 = wide; start A, stop B; a digit not yet
+    // typed shows as a grey block, so the number fills in as it's typed
+    const CB = { '0':'0000011','1':'0000110','2':'0001001','3':'1100000','4':'0010010','5':'1000010','6':'0100001','7':'0100100','8':'0110000','9':'1001000',
+      '-':'0001100','$':'0011000',':':'1000101','/':'1010001','.':'1010100','+':'0010101','A':'0011010','B':'0101001','C':'0001011','D':'0001110' };
+    const LC_LEN = 14;
+    const LC_AST = '<svg class="lc-ast" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M5.1 8l13.8 8M18.9 8L5.1 16" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"/></svg>';
+    function lcBarcode(svg, numEl, data){
+      const NW = 2, WD = 6, QZ = 20, H = 90, DW = 5 * NW + 2 * WD, slots = ['A', ...String(data).padEnd(LC_LEN, ' '), 'B'];
+      let x = QZ, bars = '', covers = '';
+      slots.forEach((ch, ci) => { const pat = ch === ' ' ? null : CB[ch], w = ci === slots.length - 1 ? 4 * NW + 3 * WD : DW;
+        if(pat){ let bx = x; [...pat].forEach((p, i) => { const bw = p === '1' ? WD : NW; if(i % 2 === 0) bars += `<rect x="${bx}" y="0" width="${bw}" height="${H}"/>`; bx += bw; }); x = bx; }
+        else { covers += `<rect x="${x}" y="0" width="${w}" height="${H}" rx="1"/>`; x += w; }
+        if(ci < slots.length - 1) x += NW; });
+      x += QZ;
+      svg.setAttribute('viewBox', `0 0 ${x} ${H}`);
+      svg.innerHTML = `<rect width="${x}" height="${H}" fill="#fff"/><g fill="#000">${bars}</g><g fill="#ddd">${covers}</g>`;
+      // the library format: 2 1179 00526 3691 (blanks as _)
+      if(numEl) numEl.textContent = String(data).padEnd(LC_LEN, '_').slice(0, LC_LEN).replace(/^(.)(.{4})(.{5})(.{4})$/, '$1 $2 $3 $4');
+    }
+    function renderCardsL(){
+      if(!cardsL.length){ view.innerHTML = '<div id="wl-empty">No library cards yet</div>'; return; }
+      view.innerHTML = cardsL.map((c, i) => {
+        const hex = c.color || wishColor(c.name, c.loc);
+        return `<div class="wl-row lc-row" data-ci="${i}"><div class="wl-card" data-hex="${shown(hex)}" style="--cloth:${shown(hex)}"><canvas aria-hidden="true"></canvas><span class="t">${esc(c.name || 'Library Card')}</span>${c.loc ? `<span class="a">${esc(c.loc)}</span>` : ''}</div></div>` +
+          `<div class="row-dd book-dd ln-dd lc-dd" data-ci="${i}"><div class="dd-in">` +
+            `<div class="lc-bar"><svg xmlns="http://www.w3.org/2000/svg" aria-label="Barcode"></svg><div class="lc-num"></div></div>` +
+            // the PIN hidden as asterisks (round-ended strokes) until its card is tapped; tap again to hide it
+            (c.pin ? `<button type="button" class="dd-stats lc-pin">PIN <b class="lc-mask" aria-label="Hidden PIN, tap to show">${LC_AST.repeat(String(c.pin).length)}</b><b class="lc-real" hidden>${esc(c.pin)}</b></button>` : '') +
+            `<div class="dd-acts"><button type="button" class="ed">Edit</button><button type="button" class="dd-del">Delete</button></div>` +
+          `</div></div>`; }).join('');
+      view.querySelectorAll('.lc-dd').forEach(dd => { const c = cardsL[+dd.dataset.ci]; lcBarcode(dd.querySelector('svg'), dd.querySelector('.lc-num'), c.num || ''); });
+      view.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex; fit(c);
+        const go = () => { fit(c); if(window.BOOKPAPER){ c.classList.toggle('lite', BOOKPAPER.lite(hex)); BOOKPAPER.draw(cv, hex, ((c.querySelector('.t') || {}).textContent || '') + '|' + ((c.querySelector('.a') || {}).textContent || ''), true, 6); } };
+        if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go); });
+      const ddOpen = (row, on) => { const dd = row.nextElementSibling; if(!dd || !dd.classList.contains('lc-dd')) return;
+        if(!on){ closeRowDD(dd); row.classList.remove('open'); if(openCard === +row.dataset.ci) openCard = -1; return; }
+        view.querySelectorAll('.lc-dd.open').forEach(o => { if(o !== dd){ closeRowDD(o); if(o.previousElementSibling) o.previousElementSibling.classList.remove('open'); } });
+        dd.classList.add('open'); row.classList.add('open'); dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px'; openCard = +row.dataset.ci; };
+      view.querySelectorAll('.lc-row').forEach(row => { row.addEventListener('click', () => ddOpen(row, !row.classList.contains('open')));
+        if(+row.dataset.ci === openCard) ddOpen(row, true); });
+      view.querySelectorAll('.lc-dd').forEach(dd => dd.addEventListener('click', e => e.stopPropagation()));
+      // the barcode tapped: it floats up to the top of the screen over solid black, for the scanner; a tap anywhere sets it back
+      view.querySelectorAll('.lc-dd .lc-bar').forEach(bar => bar.addEventListener('click', e => { e.stopPropagation();
+        if(document.querySelector('.lc-float')) return;
+        const r = bar.getBoundingClientRect(), ov = document.createElement('div'), card = bar.cloneNode(true);
+        ov.className = 'lc-float'; card.classList.add('lc-fcard');
+        card.style.left = r.left + 'px'; card.style.top = r.top + 'px'; card.style.width = r.width + 'px';
+        ov.appendChild(card); document.body.appendChild(ov); bar.style.visibility = 'hidden';
+        void ov.offsetWidth; ov.classList.add('on'); if(window.hapticTick) window.hapticTick();
+        const back = () => { ov.classList.remove('on'); card.style.top = r.top + 'px';
+          setTimeout(() => { ov.remove(); bar.style.visibility = ''; }, 340); };
+        ov.addEventListener('click', ev => { ev.stopPropagation(); back(); }); }));
+      view.querySelectorAll('.lc-dd .lc-pin').forEach(x => x.addEventListener('click', e => { e.stopPropagation();
+        const shut = !x.querySelector('.lc-real').hidden; x.querySelector('.lc-real').hidden = shut; x.querySelector('.lc-mask').hidden = !shut; }));
+      view.querySelectorAll('.lc-dd .ed').forEach(x => x.addEventListener('click', e => { e.stopPropagation(); lcOpen(+x.closest('.lc-dd').dataset.ci); }));
+      view.querySelectorAll('.lc-dd .dd-del').forEach(x => { let armed = false, t = 0;   // tap twice: Delete, then Confirm?
+        x.addEventListener('click', e => { e.stopPropagation();
+          if(!armed){ armed = true; x.textContent = 'Confirm?'; x.classList.add('armed'); t = setTimeout(() => { armed = false; x.textContent = 'Delete'; x.classList.remove('armed'); }, 3000); return; }
+          clearTimeout(t); cardsL.splice(+x.closest('.lc-dd').dataset.ci, 1); openCard = -1; lcSave(); renderCardsL(); }); });
+    }
+    // the add / edit page: the barcode filling in on top as the number is typed
+    const lcPage = document.getElementById('lc-page'), lcName = document.getElementById('lc-name'), lcLoc = document.getElementById('lc-loc'),
+      lcNum = document.getElementById('lc-num'), lcPin = document.getElementById('lc-pin'), lcSaveB = document.getElementById('lc-save'), lcDel = document.getElementById('lc-del');
+    let lcEditing = -1, lcDelT = 0;
+    const lcCheck = () => { lcNum.value = lcNum.value.replace(/\D/g, '').slice(0, LC_LEN);
+      lcBarcode(lcPage.querySelector('#lc-prev svg'), lcPage.querySelector('#lc-prev .lc-num'), lcNum.value);
+      document.getElementById('lc-num-card').classList.toggle('has', !!lcNum.value); document.getElementById('lc-pin-card').classList.toggle('has', !!lcPin.value);
+      lcSaveB.disabled = !(lcName.value.trim() && lcNum.value.length); };
+    [lcName, lcLoc, lcNum, lcPin].forEach(el => el.addEventListener('input', lcCheck));
+    function lcOpen(i){
+      lcEditing = i; const c = i >= 0 ? cardsL[i] : null;
+      lcName.value = c ? c.name || '' : ''; lcLoc.value = c ? c.loc || '' : ''; lcNum.value = c ? c.num || '' : ''; lcPin.value = c ? c.pin || '' : '';
+      document.getElementById('lc-title').textContent = c ? 'Edit Library Card' : 'Add Library Card'; lcSaveB.textContent = c ? 'Save' : 'Add';
+      lcDel.hidden = !c; lcDel.classList.remove('armed'); lcDel.textContent = 'Delete'; clearTimeout(lcDelT);
+      lcCheck(); lcPage.classList.add('active'); lcPage.setAttribute('aria-hidden', 'false');
+    }
+    const lcClose = () => { lcPage.classList.remove('active'); lcPage.setAttribute('aria-hidden', 'true'); if(document.activeElement) document.activeElement.blur(); };
+    window.lcAdd = () => lcOpen(-1);
+    document.getElementById('lc-cancel').addEventListener('click', lcClose);
+    lcSaveB.addEventListener('click', () => { if(lcSaveB.disabled) return;
+      const c = { name: lcName.value.trim(), loc: lcLoc.value.trim(), num: lcNum.value, pin: lcPin.value.trim() };
+      c.color = wishColor(c.name, c.loc);
+      if(lcEditing >= 0) cardsL[lcEditing] = Object.assign(cardsL[lcEditing], c); else { cardsL.push(c); openCard = cardsL.length - 1; }
+      lcSave(); lcClose(); if(mode === 'card') renderCardsL(); });
+    lcDel.addEventListener('click', () => { if(lcEditing < 0) return;
+      if(!lcDel.classList.contains('armed')){ lcDel.classList.add('armed'); lcDel.textContent = 'Confirm?'; lcDelT = setTimeout(() => { lcDel.classList.remove('armed'); lcDel.textContent = 'Delete'; }, 3000); return; }
+      clearTimeout(lcDelT); cardsL.splice(lcEditing, 1); openCard = -1; lcSave(); lcClose(); if(mode === 'card') renderCardsL(); });
+
     function render(){
+      if(mode === 'card') return renderCardsL();
       if(mode !== 'wish') return renderLoans();
       if(!list.length){ view.innerHTML = '<div id="wl-empty">No wishlist books yet</div>'; return; }
       const s = q.value.trim().toLowerCase();
