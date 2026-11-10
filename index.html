@@ -7474,7 +7474,9 @@
   }
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=> requestShelfRender());
   window.addEventListener('resize', requestShelfRender);
-  document.addEventListener('click', e=>{ if(!sortPage.classList.contains('open') || (e.target.closest && e.target.closest('#sort-done'))) animateShelf(500); }, true);   // not while the Sort and Filter page covers the shelves (its arrows must turn smoothly)   // tabs, shelves opening, view changes
+  document.addEventListener('click', e=>{ if(!sortPage.classList.contains('open') || (e.target.closest && e.target.closest('#sort-done')))
+    // once the tap has done its work: only if shelves are on screen (not for taps in the Library, Timeline or Data tabs)
+    setTimeout(() => { if(['shelves-container', 'library-container'].some(id => { const el = document.getElementById(id); return el && el.offsetParent; })) animateShelf(500); }, 0); }, true);   // not while the Sort and Filter page covers the shelves (its arrows must turn smoothly)   // tabs, shelves opening, view changes
   ['pointerover','pointerout'].forEach(t=> document.addEventListener(t, e=>{
     if(e.target.closest && e.target.closest('.spine.live')) animateShelf(250);   // follow the hover lift
   }));
@@ -10133,6 +10135,7 @@
     // ---- a book's cover on its cards: linen-embossed paper, as on most modern hardbacks. Each book's title and author set
     //      its own thread spacing, thread thickness (and which way stands out), press depth, the odd faint thicker thread,
     //      a little mottling and a touch lighter or darker overall — the same book always the same. Lit, and banded, as the cloth. ----
+    const PAPER_CACHE = new Map();   // each book's drawn paper, by colour, title and author, and size
     function paperDraw(cv, hex, seedStr, bands = true, bandIn = 10){
       const s = window.devicePixelRatio || 1, rc = cv.getBoundingClientRect(), W = Math.round(rc.width * s), H = Math.round(rc.height * s);
       if(!W || !H) return; const key = 'p|' + hex + '|' + seedStr + (bands ? '|b' + bandIn : '');
@@ -10147,14 +10150,32 @@
       const pit = (1.8 + r() * 1.8) * s, wx = .25 + r() * .3, wy = .25 + r() * .3, bias = (r() - .5) * .8; r(); const depth = .06 + r() * .06;   // (the list's end caps the same as the card)
       const mot = r() * .9, tone = (r() - .5) * .14;
       const slubX = Array.from({ length: 512 }, () => r() < .07 ? (r() - .3) * .45 : 0), slubY = Array.from({ length: 512 }, () => r() < .07 ? (r() - .3) * .45 : 0);
-      const col = rgb(hex), x = cv.getContext('2d'), im = x.createImageData(W, H), d = im.data;
-      for(let py = 0; py < H; py++) for(let px = 0; px < W; px++){
-        const u = px + ox, w = py + oy, i = Math.floor(u / pit), j = Math.floor(w / pit), fx = u / pit - i, fy = w / pit - j;
-        const v = (fx < wx ? .55 + bias : 0) + (fy < wy ? -.55 + bias : 0) + slubX[i & 511] * (fy < .5 ? 1 : .3) + slubY[j & 511] * (fx < .5 ? 1 : .3)
-          + (noise(px / (22 * s), py / (10 * s)) - .5) * mot + tone / depth * .5 + (r() - .5) * .25;
-        const t = v * depth, o = (py * W + px) * 4;
-        for(let k = 0; k < 3; k++) d[o + k] = t >= 0 ? col[k] + (255 - col[k]) * t : col[k] * (1 + t);
-        d[o + 3] = 255; }
+      const col = rgb(hex), x = cv.getContext('2d'), ck = key + '|' + W + 'x' + H, hit = PAPER_CACHE.get(ck);
+      let im;
+      if(hit){ im = hit; PAPER_CACHE.delete(ck); PAPER_CACHE.set(ck, hit); }   // drawn before (a tab visited again): no work
+      else {
+        im = x.createImageData(W, H); const d = im.data;
+        // worked out once per column and per row, not per pixel: the threads, the odd thicker one, which half of a thread
+        const cu = new Float32Array(W), cs = new Float32Array(W), ch = new Uint8Array(W), rw = new Float32Array(H), rs = new Float32Array(H), rh = new Uint8Array(H);
+        for(let px = 0; px < W; px++){ const u = (px + ox) / pit, i = Math.floor(u), fx = u - i; cu[px] = fx < wx ? .55 + bias : 0; cs[px] = slubX[i & 511]; ch[px] = fx < .5 ? 1 : 0; }
+        for(let py = 0; py < H; py++){ const w = (py + oy) / pit, j = Math.floor(w), fy = w - j; rw[py] = fy < wy ? -.55 + bias : 0; rs[py] = slubY[j & 511]; rh[py] = fy < .5 ? 1 : 0; }
+        // the mottling changes slowly: a value every 4 pixels is plenty
+        const MW = (W >> 2) + 2, MH = (H >> 2) + 2, M = new Float32Array(MW * MH);
+        for(let my = 0; my < MH; my++) for(let mx = 0; mx < MW; mx++) M[my * MW + mx] = (noise(mx * 4 / (22 * s), my * 4 / (10 * s)) - .5) * mot;
+        const base = tone / depth * .5, c0 = col[0], c1 = col[1], c2 = col[2];
+        let q = h | 1;   // the fine grain: a quick generator of its own, from the same seed
+        for(let py = 0, o = 0; py < H; py++){ const rv = rw[py], rsv = rs[py], rhv = rh[py], mrow = (py >> 2) * MW;
+          for(let px = 0; px < W; px++, o += 4){
+            q ^= q << 13; q ^= q >>> 17; q ^= q << 5;
+            const v = cu[px] + rv + cs[px] * (rhv ? 1 : .3) + rsv * (ch[px] ? 1 : .3) + M[mrow + (px >> 2)] + base + ((q >>> 0) / 4294967296 - .5) * .25;
+            const t = v * depth;
+            if(t >= 0){ d[o] = c0 + (255 - c0) * t; d[o + 1] = c1 + (255 - c1) * t; d[o + 2] = c2 + (255 - c2) * t; }
+            else { d[o] = c0 * (1 + t); d[o + 1] = c1 * (1 + t); d[o + 2] = c2 * (1 + t); }
+            d[o + 3] = 255; } }
+        // kept for next time, up to about 24 MB of them (the oldest let go first)
+        PAPER_CACHE.set(ck, im); PAPER_CACHE.bytes = (PAPER_CACHE.bytes || 0) + W * H * 4;
+        while(PAPER_CACHE.bytes > 24e6 && PAPER_CACHE.size > 1){ const [k0, v0] = PAPER_CACHE.entries().next().value; PAPER_CACHE.delete(k0); PAPER_CACHE.bytes -= v0.width * v0.height * 4; }
+      }
       x.putImageData(im, 0, 0);
       const lg = x.createLinearGradient(0, 0, W * .25, H * 1.6);   // lit as the cloth is
       lg.addColorStop(0, 'rgba(255,255,255,.07)'); lg.addColorStop(1, 'rgba(0,0,0,.16)'); x.fillStyle = lg; x.fillRect(0, 0, W, H);
