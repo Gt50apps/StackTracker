@@ -293,6 +293,7 @@
   .bar-dir{flex:none; align-self:center; width:12px; height:12px; margin:0 -2px 0 -1px; pointer-events:none;}
   .bar-dir svg{width:100%; height:100%; display:block; overflow:visible;}
   .bar-dir polygon{transform-box:fill-box; transform-origin:50% 50%; transform:rotate(180deg); transition:transform .38s cubic-bezier(.45,0,.25,1);}
+  .bar-dir.still polygon{transition:none !important;}
   .bar-dir polygon:nth-child(2){transition-delay:.06s;} .bar-dir polygon:nth-child(1){transition-delay:.12s;}
   .bar-dir.desc polygon{transform:none;}
   #sort-card.searching .bar-dir, #lb-card.searching .bar-dir{visibility:hidden;}
@@ -12715,7 +12716,9 @@ closeRowDD = function(dd){
       else if(v && v.desc) Object.keys(lbDescs).forEach(k => lbDescs[k] = true); }catch(e){}   // (saved before: one for all)
     const lbSave = () => { try{ localStorage.setItem('stack-tracker-lb-sort', JSON.stringify(Object.assign({}, lbSel, { desc: lbDescs }))); }catch(e){} };
     const lbName = (m, k, id) => (LB[m][k].find(o => o[0] === id) || LB[m][k][0])[1];
-    const lbShow = () => { document.getElementById('lb-filter-name').textContent = lbName(mode, 'f', lbSel[mode].f); document.getElementById('lb-sort-name').textContent = lbName(mode, 's', lbSel[mode].s); document.getElementById('lb-sort-dir').classList.toggle('desc', lbDescs[mode]); };
+    const lbShow = (anim = false) => { document.getElementById('lb-filter-name').textContent = lbName(mode, 'f', lbSel[mode].f); document.getElementById('lb-sort-name').textContent = lbName(mode, 's', lbSel[mode].s); const d = document.getElementById('lb-sort-dir');
+      // it only turns over when flipped; any other time (a tab change) it's simply set, no animation
+      if(!anim){ d.classList.add('still'); d.classList.toggle('desc', lbDescs[mode]); void d.offsetWidth; d.classList.remove('still'); } else d.classList.toggle('desc', lbDescs[mode]); };
     const lc2 = (x, y) => String(x || '').localeCompare(String(y || ''), undefined, { sensitivity: 'base' });
     const byAuthor = (a, b) => { const x = authorKeyOf(a), y = authorKeyOf(b); return lc2(x[0], y[0]) || lc2(x[1], y[1]) || lc2(a.title, b.title); };
     const GROUPS = [['', 'To Check'], ['yes', 'Found'], ['wait', 'Waiting'], ['no', 'Not There']];
@@ -12876,7 +12879,7 @@ closeRowDD = function(dd){
           `<div class="so-list"><div class="list-divider"><span class="ld-name">Sort</span></div>${LB[mode].s.map(o => opt('s', o)).join('')}</div>`;
         opts.querySelectorAll('.so-opt').forEach(b => b.addEventListener('click', () => {
           if(b.dataset.k === 's' && lbSel[mode].s === b.dataset.id){   // the picked sort again: flip its order
-            lbDescs[mode] = !lbDescs[mode]; lbSave(); opts.querySelectorAll('.so-opt[data-k="s"]').forEach(x => { x.classList.toggle('desc', lbDescs[mode]); const t = x.querySelector('span'); t.textContent = t.dataset[lbDescs[mode] ? 'r' : 'a']; }); lbShow();
+            lbDescs[mode] = !lbDescs[mode]; lbSave(); opts.querySelectorAll('.so-opt[data-k="s"]').forEach(x => { x.classList.toggle('desc', lbDescs[mode]); const t = x.querySelector('span'); t.textContent = t.dataset[lbDescs[mode] ? 'r' : 'a']; }); lbShow(true);
             clearTimeout(lbFlipT); lbFlipT = setTimeout(render, 480);   // re-sorted once the arrows have turned
             if(window.hapticTick) window.hapticTick(); return; }
           lbSel[mode][b.dataset.k] = b.dataset.id; lbSave(); lbShow();
