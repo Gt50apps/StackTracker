@@ -2052,6 +2052,8 @@
   #dev-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
   .lg-head > #dev-back, .lg-head > #dev-back:active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
     background:var(--cb7a2f2b, #7a2f2b); color:var(--cfffffff, #ffffff); border-right:3px solid var(--cb000000, #000000); font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+  #dev-tabs{height:36px; margin:4px 4px 0;}   /* the second header: which settings */
+  #dev-tabs button{font-weight:700; font-size:min(.72rem, 3vw); letter-spacing:.3px; text-transform:uppercase; transition:none;}
   #dev-body{flex:1; min-height:0; overflow-y:auto; padding:4px 4px calc(8px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
   #dev-body *{box-sizing:border-box;}
   .dv-strip{flex:none; height:21px; display:flex; align-items:center; justify-content:center; background:var(--band); color:var(--cfffffff, #ffffff); border:3px solid var(--cb000000, #000000); border-radius:8px;
@@ -2185,6 +2187,18 @@
   #year-era.bc, #wl-era.bc{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   /* ===== Released, in the Timeline tab: a dot per release, in three columns that split to suit what's shown ===== */
   body.off-released #tl-modes button[data-m="released"]{display:none;}
+  /* Developer Options, the newer switches */
+  body.nov-shelf #view-tabs .tab[data-mode="shelf"], body.nov-list #view-tabs .tab[data-mode="list"], body.nov-cards #view-tabs .tab[data-mode="cards"]{display:none !important;}
+  body.off-tllib #tl-modes button[data-m="library"]{display:none;}
+  body.off-loans #lb-tabs .lb-pair, body.off-wishcard #lb-tabs .lb-solo{display:none !important;}
+  body.off-loans #lb-tabs, body.off-wishcard #lb-tabs{gap:0;}
+  body.off-typefilter #fmt-row{display:none !important;}
+  body.off-ends .wl-card .wl-yr, body.off-ends .br-spine > i{display:none !important;}
+  body.off-lnstar .ln-due .ln-star{display:none;} body.off-lnstar .ln-due b.n3, body.off-lnstar .ln-due b.n4{font-size:1.15rem;}
+  body.off-motion .cm-dots i{animation:none !important;}
+  body.off-motion .so-dir polygon, body.off-motion .bar-dir polygon{transition:none !important;}
+  .dv-themes.dv-splash{grid-template-columns:repeat(2, 1fr);}   /* ten: two across, no empty cells */
+  .dv-splash button{color:var(--ink) !important; background:var(--cbffffff, #ffffff) !important;} .dv-splash button.on{background:var(--ink) !important; color:var(--cbffffff, #ffffff) !important;}
   #tl-canvas .rl-tick{position:absolute; height:1px; background:var(--line, var(--cbe4ded2, #e4ded2));}
   #tl-canvas .rl-tl{position:absolute; width:31px; transform:translateY(-50%); text-align:center; font:700 .54rem/1 Arial, sans-serif; letter-spacing:-.2px; color:var(--muted); white-space:nowrap;}
   #tl-canvas .rl-tl small{display:block; font-size:.44rem; letter-spacing:0;}
@@ -2343,7 +2357,10 @@
     // to the same 5 seconds (all clear by 4.45 s, the fade at 4.6 s, gone at 5 s). Everything is a ready-made animation
     const CUSTOMS = { shuffle: spShuffle, lift: spLift, type: spType, sketch: spSketch, garden: spGarden };
     const ALL = ['pull', 'reverse', 'explode', 'shuffle', 'lift', 'type', 'sketch', 'garden'];
-    const PICK = ALL.includes(window.__end) ? window.__end : ALL[Math.floor(Math.random() * ALL.length)];   // each time, one of the eight
+    // which: Developer Options' choice — at random (each time, one of the eight), in turn, or always the same one
+    let want = 'random'; try{ want = (JSON.parse(localStorage.getItem('stack-tracker-dev-v1') || '{}') || {})._splash || 'random'; }catch(e){}
+    let PICK = ALL.includes(window.__end) ? window.__end : ALL.includes(want) ? want : ALL[Math.floor(Math.random() * ALL.length)];
+    if(!ALL.includes(window.__end) && want === 'turn'){ let i = 0; try{ i = (+localStorage.getItem('stack-tracker-splash-turn') || 0) % ALL.length; localStorage.setItem('stack-tracker-splash-turn', String(i + 1)); }catch(e){} PICK = ALL[i]; }
     const custom = CUSTOMS[PICK];
     // the fade to the app, and the splash taken away: ready-made too, so they happen on time even while the app is busy
     // building behind it. Every splash is clear of the screen before the fade starts
@@ -3123,6 +3140,7 @@
 <!-- developer options: five quick taps on the Library tab -->
 <div id="dev-page">
   <div class="lg-head"><button type="button" id="dev-back">Back</button><h2>Developer Options</h2><span></span></div>
+  <div class="tl-views" id="dev-tabs"><button type="button" data-g="look">Look</button><button type="button" data-g="home">Home</button><button type="button" data-g="library">Library</button><button type="button" data-g="timeline">Timeline</button><button type="button" data-g="data">Data</button></div>
   <div id="dev-body"></div>
 </div>
 
@@ -3827,7 +3845,8 @@
   const LEN_BANDS = [[1, 'Nano-Fiction'], [300, 'Ultra-Flash Fiction'], [500, 'Flash Fiction'], [1000, 'Ultra-Short Story'], [5000, 'Short Story'],
     [10000, 'Novelette'], [20000, 'Novella'], [50000, 'Slim Novel'], [80000, 'Standard Novel'], [160001, 'Long Novel'], [175001, 'Grand Novel'], [250000, 'Epic Novel'],
     [500000, 'Leviathan Novel'], [1000000, 'Behemoth Novel'], [1500000, 'Zaratan Novel'], [2000000, 'Jörmungandr Novel'], [3000000, 'Bahamut Novel'], [4000000, 'Ouroboros Novel']];
-  function lenBand(w){ if(!(w > 0)) return 'No Length'; let name = LEN_BANDS[0][1]; LEN_BANDS.forEach(([from, n]) => { if(w >= from) name = n; }); return name; }
+  function lenBand(w){ if(!(w > 0)) return 'No Length'; let name = LEN_BANDS[0][1]; const top = document.body.classList.contains('off-mythic') ? 250000 : Infinity;   // mythic off: Epic is the longest
+    LEN_BANDS.forEach(([from, n]) => { if(w >= from && from <= top) name = n; }); return name; }
   // filters: which books show (shelves, list and collections)
   const FILTERS = [
     { id:'all',    name:'All books', short:'All',    fn: ()=> true },
@@ -3839,7 +3858,7 @@
   const FMTS = { all: ['', ''], book: ['Books', 'books'], audio: ['Audiobooks', 'audiobooks'] };
   const isAudio = b => b.format === 'audio', isBookF = b => b.format !== 'audio';
   function currentFilter(){
-    const st = FILTERS.find(f => f.id === prefs.filter) || FILTERS[0], fm = FMTS[prefs.fmt] ? prefs.fmt : 'all';
+    const st = FILTERS.find(f => f.id === prefs.filter) || FILTERS[0], fm = FMTS[prefs.fmt] && !document.body.classList.contains('off-typefilter') ? prefs.fmt : 'all';
     if(fm === 'all') return Object.assign({}, st, { empty: st.id === 'all' ? 'books' : st.name.toLowerCase() + ' books' });
     const ok = fm === 'audio' ? b => isAudio(b) || b.format === 'both' : b => isBookF(b);
     const name = st.id === 'all' ? FMTS[fm][0] : st.name + ' ' + FMTS[fm][1];
@@ -4589,6 +4608,7 @@
   //      two halves meet, and a groove near each end where a book card has its bands (the year and seconds sit outside them) ----
   const tapeLite = hex => { const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255); return .2126 * r + .7152 * g + .0722 * b > .55; };
   function drawTapeTop(cv, hex, seedStr, grooves = true){
+    if(window.__tapeTopOff && window.BOOKPAPER) return BOOKPAPER.draw(cv, hex, seedStr, grooves, 16);   // tape top off: like a book
     const s = window.devicePixelRatio || 1, rc = cv.getBoundingClientRect(), W = Math.round(rc.width * s), H = Math.round(rc.height * s);
     if(!W || !H) return; const key = hex + '|' + seedStr;
     if(cv.width === W && cv.height === H && cv._drawn === key) return;
@@ -9263,7 +9283,7 @@
       // shown "Last, First", the same way it's sorted: by the split names where a book has them, else worked out from the name
       const sp = pool.find(b => same(b) && typeof b.authorLast === 'string' && (b.authorLast || b.authorFirst));
       o.querySelector('b').textContent = authorLastFirst(sp || { author: n });
-      o.querySelector('span').textContent = [count ? plural(count, 'book') : '', wc ? `(*${wc}*)` : ''].filter(Boolean).join(' ');   // library books, then (*n*) on the wishlist
+      o.querySelector('span').textContent = [count ? plural(count, 'book') : '', wc && !document.body.classList.contains('off-wlcount') ? `(*${wc}*)` : ''].filter(Boolean).join(' ');   // library books, then (*n*) on the wishlist
       o.addEventListener('click', ()=> pickAuthor(n));
       authorsList.appendChild(o);
     });
@@ -10137,6 +10157,7 @@
     //      a little mottling and a touch lighter or darker overall — the same book always the same. Lit, and banded, as the cloth. ----
     const PAPER_CACHE = new Map();   // each book's drawn paper, by colour, title and author, and size
     function paperDraw(cv, hex, seedStr, bands = true, bandIn = 10){
+      if(window.__texCloth) return draw(cv, rgb(hex), bands, bandIn);   // Developer Options: the old cloth
       const s = window.devicePixelRatio || 1, rc = cv.getBoundingClientRect(), W = Math.round(rc.width * s), H = Math.round(rc.height * s);
       if(!W || !H) return; const key = 'p|' + hex + '|' + seedStr + (bands ? '|b' + bandIn : '');
       if(cv.width === W && cv.height === H && cv._drawn === key) return;
@@ -10547,7 +10568,7 @@
   function tlIdle(){
     const R = tlRange(tlDay(new Date())); let pages = 0, secs = 0, words = 0;
     TL.reads.forEach(r => r.daily.forEach((v, j) => { if(!v) return; const d = tlAdd(r.s, j); if(d >= R.t0 && d < R.t1){ if(r.kind === 'audio') secs += v; else { pages += v; words += v * (r.wpp || 0); } } }));
-    const wd = TL.mode === 'graph' && TL.words;   // Activity showing words: the total in words too
+    const wd = TL.mode === 'graph' && TL.words && !document.body.classList.contains('off-words');   // Activity showing words: the total in words too
     const tot = [pages ? (wd ? `<b>${tlN(words)}</b> words` : `<b>${tlN(pages)}</b> pages`) : '', secs ? `<b>${tlHM(secs)}</b>` : ''].filter(Boolean).join(' · ');
     const first = TL.reads.length ? new Date(Math.min(...TL.reads.map(r => +r.s))) : new Date(), now = new Date();
     const minOff = TL.view === 'week' ? Math.round((tlSun(first) - tlSun(now)) / (7 * 864e5))
@@ -10946,7 +10967,7 @@
     }));
     // one column per kind read in this span: pages, listening, or both side by side
     let cols = [
-      TL.words ? { key: 'words', max: Math.max(1, ...buckets.map(k => k.words)), text: v => `${tlN(v)}W`,
+      TL.words && !document.body.classList.contains('off-words') ? { key: 'words', max: Math.max(1, ...buckets.map(k => k.words)), text: v => `${tlN(v)}W`,
         look: sd => all ? '' : `background:#e7dfc9 ${tlFillLines('page', sd)} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` } :
       { key: 'pages', max: Math.max(1, ...buckets.map(k => k.pages)), text: v => `${tlN(v)}P`,
         look: sd => all ? '' : `background:#e7dfc9 ${tlFillLines('page', sd)} repeat;background-size:120px 100%;border:2px solid #000;border-left:none;box-sizing:border-box` },
@@ -10959,7 +10980,7 @@
     cols.forEach((c, j) => { c.x = j ? xm + 2 : x0; c.r = j || cols.length === 1 ? 4 : W - xm + 5; c.end = j || cols.length === 1 ? W : xm - 1; });
     if(cols.length > 1) el(`left:${xm - 1}px;top:0;bottom:0;width:3px;background:#000;z-index:2`);
     tlHead([{ x: 0, end: LW, text: 'Date' }, ...cols.map((c, j) => ({ x: j ? xm + 2 : LW + 3, end: j || cols.length === 1 ? W : xm - 1, line: j ? xm - 1 : LW,
-      text: c.key === 'secs' ? 'Audiobooks' : 'Books', flip: c.key !== 'secs' }))]);
+      text: c.key === 'secs' ? 'Audiobooks' : 'Books', flip: c.key !== 'secs' && !document.body.classList.contains('off-words') }))]);
     // a whole span picked (its row, or a year's label on All Time): pages and listening both, and how many books
     const showSpan = (a, b2, when, id) => {
       tlCanvas.querySelectorAll('.tl-gbar.on, .tl-row.on').forEach(t => t.classList.remove('on'));
@@ -10973,7 +10994,7 @@
       const n = Math.max(1, Math.round((Math.min(b2, tlAdd(today, 1)) - a) / 864e5)), oneDay = n === 1 && Math.round((b2 - a) / 864e5) === 1;
       const avg = v => oneDay ? '' : ` · <b>${v}</b> a day`, bk = x => `${x} ${x === 1 ? 'book' : 'books'}`;
       const rows = [];
-      if(pages && TL.words) rows.push(`<div class="tl-bk"><span>Words · ${bk(tb.size)}</span><b>${tlN(words)} ${Math.round(words) === 1 ? 'word' : 'words'}</b></div>`);
+      if(pages && TL.words && !document.body.classList.contains('off-words')) rows.push(`<div class="tl-bk"><span>Words · ${bk(tb.size)}</span><b>${tlN(words)} ${Math.round(words) === 1 ? 'word' : 'words'}</b></div>`);
       else if(pages) rows.push(`<div class="tl-bk"><span>Pages · ${bk(tb.size)}</span><b>${tlN(pages)} ${Math.round(pages) === 1 ? 'page' : 'pages'}</b></div>`);
       if(secs) rows.push(`<div class="tl-bk"><span>Listening · ${bk(ta.size)}</span><b>${tlHM(secs)}</b></div>`);
             tlInfo.classList.remove('nav'); tlInfo.classList.add('pick');
@@ -12515,26 +12536,37 @@ Object.assign(ART, {
 })();
 
 
-// ===== Developer options: tap the Library tab 5 times quickly; switch features on and off =====
+// ===== Developer options: tap the Home tab 5 times quickly; switch features on and off =====
 (function(){
   const page = document.getElementById('dev-page'), body = document.getElementById('dev-body');
   const KEY = 'stack-tracker-dev-v1';
   // each switch: what it's called and what it hides when off (a class on <body>, see the styles)
   const FEATURES = [
-    { id: 'splash', name: 'Splash screen', note: 'The STACK TRACKER intro when the app opens' },
-    { id: 'badges', name: 'Badges', note: 'The Badges tab in Data' },
-    { id: 'stats', name: 'Stats tab', note: 'The Stats tab in Data' },
-    { id: 'compare', name: 'Compare Past Reads', note: 'In list dropdowns and the open book' },
-    { id: 'pastlog', name: 'Open Log of Past Reads', note: 'The card under Compare' },
-    { id: 'statbars', name: 'Stats bar cards', note: 'Month / year bars in Stats' },
-    { id: 'timeline', name: 'Timeline', note: 'The Timeline tab' },
-    { id: 'released', name: 'Released', note: 'Release years, in the Timeline tab' },
-    { id: 'wishlist', name: 'Wishlist', note: 'The Wishlist tab' },
-    { id: 'vslast', name: 'Vs last period', note: 'Change on the period before, after each bar in Pages & Listening' },
-    { id: 'haptics', name: 'Haptics', note: 'A small buzz as a wheel clicks past each number' }
+    { id: 'splash', g: 'look', name: 'Splash screen', note: 'The STACK TRACKER intro when the app opens' },
+    { id: 'badges', g: 'data', name: 'Badges', note: 'The Badges tab in Data' },
+    { id: 'stats', g: 'data', name: 'Stats tab', note: 'The Stats tab in Data' },
+    { id: 'compare', g: 'home', name: 'Compare Past Reads', note: 'In list dropdowns and the open book' },
+    { id: 'pastlog', g: 'home', name: 'Open Log of Past Reads', note: 'The card under Compare' },
+    { id: 'statbars', g: 'data', name: 'Stats bar cards', note: 'Month / year bars in Stats' },
+    { id: 'timeline', g: 'timeline', name: 'Timeline', note: 'The Timeline tab' },
+    { id: 'released', g: 'timeline', name: 'Released', note: 'Release years, in the Timeline tab' },
+    { id: 'wishlist', g: 'library', name: 'Library tab', note: 'The whole Library tab: Checked Out, Returned and Wishlist' },
+    { id: 'loans', g: 'library', name: 'Library loans', note: 'Checked Out and Returned in the Library tab' },
+    { id: 'wishcard', g: 'library', name: 'Wishlist', note: 'The Wishlist card in the Library tab' },
+    { id: 'tllib', g: 'timeline', name: 'Library timeline', note: 'The Library card in Timeline' },
+    { id: 'vslast', g: 'timeline', name: 'Vs last period', note: 'Change on the period before, after each bar in Activity' },
+    { id: 'words', g: 'timeline', name: 'Pages | Words', note: 'The switch on Activity\'s Books column' },
+    { id: 'typefilter', g: 'home', name: 'Type filter', note: 'All Types | Only Books | Only Audiobooks in Sort and Filter' },
+    { id: 'ends', g: 'look', name: 'Card ends', note: 'Year and word count (or seconds) on the ends of cards' },
+    { id: 'mythic', g: 'home', name: 'Mythic lengths', note: 'Leviathan to Ouroboros past Epic Novel (off: Epic is the longest)' },
+    { id: 'tapetop', g: 'look', name: 'Tape top', note: 'Audiobooks\' cards and list ends look like a tape (off: like a book)' },
+    { id: 'lnstar', g: 'library', name: 'Finished star', note: 'On checked-out books you\'ve finished' },
+    { id: 'wlcount', g: 'library', name: 'Wishlist counts', note: 'The (*n*) after authors in the Author List' },
+    { id: 'motion', g: 'look', name: 'Animations', note: 'The in-progress dots, and the sort arrows turning' },
+    { id: 'haptics', g: 'look', name: 'Haptics', note: 'A small buzz as a wheel clicks past each number' }
   ];
   // defaults: Medium shelves, tapes on the right, Shelf and List both, Badges and Haptics off, everything else on (saved choices override these)
-  const DEFAULTS = { badges: true, haptics: true, _tapes: 'side', _lib: 'both', _theme: 'walnut' };
+  const DEFAULTS = { badges: true, haptics: true, _tapes: 'side', _lib: 'both', _theme: 'walnut', _splash: 'random', _tex: 'paper' };
   let off = {}; try{ off = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }catch(e){}
   off = Object.assign({}, DEFAULTS, off);
   const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(off)); }catch(e){} };
@@ -12546,13 +12578,15 @@ Object.assign(ART, {
   // audiobook shelf: Side (always a one-third tape shelf beside the books) | Current
   const TAPES = [['side', 'Side'], ['cur', 'Current']];
   const tapesOf = () => off._tapes === 'side' ? 'side' : 'cur';
-  // Library view: Shelf | List | Both (with just one, the Shelf | List card goes)
-  const LIBS = [['shelf', 'Shelf'], ['list', 'List'], ['both', 'Both']];
-  const libOf = () => off._lib === 'shelf' || off._lib === 'list' ? off._lib : 'both';
+  // Home view: any of Shelf, List and Cards (at least one); with just one, the view card goes
+  const VIEWS = [['shelf', 'Shelf'], ['list', 'List'], ['cards', 'Cards']];
+  const viewsOf = () => { if(Array.isArray(off._views) && off._views.length) return VIEWS.map(v => v[0]).filter(v => off._views.includes(v));
+    return off._lib === 'shelf' || off._lib === 'list' ? [off._lib] : VIEWS.map(v => v[0]); };   // (saved before as Shelf | List | Both)
   function applyLib(){
-    const m = libOf(), one = m !== 'both';
-    document.body.classList.toggle('lib-one', one);
-    if(one && prefs.view !== m){ prefs.view = m; applyView(); }
+    const on = viewsOf();
+    document.body.classList.toggle('lib-one', on.length === 1);
+    VIEWS.forEach(([v]) => document.body.classList.toggle('nov-' + v, !on.includes(v)));
+    if(!on.includes(prefs.view)){ prefs.view = on[0]; applyView(); }
   }
   // colour themes: the page ground, the header bands and the tab / card tans
   const THEMES = [['walnut', 'Walnut', '#6b4a32'], ['green', 'Library Green', '#2e4636'], ['navy', 'Navy Ink', '#303d66'],
@@ -12573,42 +12607,76 @@ Object.assign(ART, {
     });
     if(window.reCloth) window.reCloth();
   }
+  // book texture: Paper (linen-embossed) | Cloth
+  const TEXES = [['paper', 'Paper'], ['cloth', 'Cloth']];
+  const texOf = () => off._tex === 'cloth' ? 'cloth' : 'paper';
+  function applyTex(){ const c = texOf() === 'cloth'; if(window.__texCloth === c) return; window.__texCloth = c; renderAll(); if(window.__wlRender) window.__wlRender(); }
+  // splash: one of the eight every time, at random or in turn, or always the same one
+  const SPLASHES = [['random', 'Random'], ['turn', 'In Turn'], ['pull', 'Pull'], ['reverse', 'Reverse'], ['explode', 'Explode'], ['shuffle', 'Shuffle'], ['lift', 'Lift'], ['type', 'Typewriter'], ['sketch', 'Sketch'], ['garden', 'Garden']];
+  const splashOf = () => SPLASHES.some(z => z[0] === off._splash) ? off._splash : 'random';
   // Data opens on Stats; with Stats hidden it opens on the next tab there is
   const firstData = () => !off.stats ? 'stats' : !off.badges ? 'badges' : 'backup';
   const showDataTab0 = showDataTab;
   showDataTab = name => showDataTab0((name === 'stats' && off.stats) || (name === 'badges' && off.badges) ? firstData() : name);
   function apply(){
     FEATURES.forEach(f => document.body.classList.toggle('off-' + f.id, !!off[f.id]));
+    const noLib = !!off.wishlist || (!!off.loans && !!off.wishcard);   // loans and wishlist both off: no Library tab, as the tab switch
+    document.body.classList.toggle('off-wishlist', noLib);
     // a hidden tab that's open: go to the first tab there is
     if((off.badges && document.getElementById('dt-view-badges').classList.contains('active')) ||
        (off.stats && document.getElementById('dt-view-stats').classList.contains('active'))) showDataTab(firstData());
     if(off.released && document.body.classList.contains('tl-rel')) document.querySelector('#tl-modes button[data-m="graph"]').click();
     if(off.timeline && document.body.classList.contains('tab-timeline')) document.querySelector('#tabs .tab[data-view="all"]').click();
-    if(window.reCloth && window.__wlOff !== !!off.wishlist){ if(window.__wlOff !== undefined) requestAnimationFrame(() => window.reCloth()); window.__wlOff = !!off.wishlist; }   // tab cards redrawn for four / five tabs
-    if(off.wishlist && document.body.classList.contains('tab-wishlist')) document.querySelector('#tabs .tab[data-view="all"]').click();
+    if(window.reCloth && window.__wlOff !== noLib){ if(window.__wlOff !== undefined) requestAnimationFrame(() => window.reCloth()); window.__wlOff = noLib; }   // tab cards redrawn for four / five tabs
+    if(noLib && document.body.classList.contains('tab-wishlist')) document.querySelector('#tabs .tab[data-view="all"]').click();
+    if(window.__lbFix) window.__lbFix();   // Library: a card that's gone, and the open one goes with it
+    if(off.tllib && document.querySelector('#tl-modes button[data-m="library"].on')){ const g = document.querySelector('#tl-modes button[data-m="graph"]'); if(g) g.click(); }
+    if(off.typefilter && prefs.fmt && prefs.fmt !== 'all'){ prefs.fmt = 'all'; savePrefs(); applyView(); }
+    window.__tapeTopOff = !!off.tapetop;
+    if(window.__devFlags !== JSON.stringify(FEATURES.map(f => !!off[f.id]))){ const first = window.__devFlags === undefined; window.__devFlags = JSON.stringify(FEATURES.map(f => !!off[f.id]));
+      if(!first){ renderAll(); if(window.__wlRender) window.__wlRender(); if(window.tlDraw) try{ tlDraw(); }catch(e){} } }
   }
   // haptics: a short buzz each time a wheel clicks onto the next number (phones that can vibrate)
   window.hapticTick = () => { if(!off.haptics && navigator.vibrate) try{ navigator.vibrate(30); }catch(e){} };
   const seg = (attr, list, cur, cls) => `<span class="dv-sw${cls ? ' ' + cls : ''}">${list.map(z => `<button type="button" data-${attr}="${z[0]}" class="${cur === z[0] ? 'on' : ''}">${z[1]}</button>`).join('')}</span>`;
   const ROWS7 = '<div></div><div></div><div></div><div></div><div></div><div></div><div></div>';
   let testV = 50;
+  // the second header: Look | Home | Library | Timeline | Data (the last one open is the one it opens on)
+  const tabs = document.getElementById('dev-tabs');
+  let devTab = 'look'; try{ devTab = localStorage.getItem('stack-tracker-dev-tab') || 'look'; }catch(e){}
+  tabs.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { devTab = b.dataset.g; try{ localStorage.setItem('stack-tracker-dev-tab', devTab); }catch(e){}
+    paint(); body.scrollTop = 0; if(window.hapticTick) window.hapticTick(); }));
   function paint(){
-    body.innerHTML =
-      `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Colour theme</b><span>The whole app's colours</span></span></div>` +
-        `<div class="dv-themes">${THEMES.map(z => `<button type="button" data-theme="${z[0]}" class="${themeOf() === z[0] ? 'on' : ''}" style="background:${z[2]}">${z[1]}</button>`).join('')}</div></div>` +
-      `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Bookshelf size</b><span>Books, tapes and shelves</span></span>${seg('size', SIZES, sizeOf()[0], 'three')}</div></div>` +
-      `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Audiobook shelf</b><span>Side: always a one-third shelf beside the books</span></span>${seg('tapes', TAPES, tapesOf())}</div></div>` +
-      `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Library view</b><span>Just one hides the Shelf | List card</span></span>${seg('lib', LIBS, libOf(), 'three')}</div></div>` +
-      `<div class="dv-c">` + FEATURES.map(f => `<div class="dv-row"><span class="dv-tx"><b>${f.name}</b><span>${f.note}</span></span>` +
-        `<span class="dv-sw" data-id="${f.id}"><button type="button" data-on="1" class="${off[f.id] ? '' : 'on'}">On</button><button type="button" data-on="0" class="${off[f.id] ? 'on' : ''}">Off</button></span></div>`).join('') + `</div>` +
-      `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Haptic tester</b><span>Turn the wheel to feel each click</span></span><span class="dv-wheel"><span class="lw-wheel">${ROWS7}</span></span></div></div>`;
+    // the switches of one tab, in one card
+    const sws = g => { const fs = FEATURES.filter(f => f.g === g); return fs.length ? `<div class="dv-c">` + fs.map(f => `<div class="dv-row"><span class="dv-tx"><b>${f.name}</b><span>${f.note}</span></span>` +
+        `<span class="dv-sw" data-id="${f.id}"><button type="button" data-on="1" class="${off[f.id] ? '' : 'on'}">On</button><button type="button" data-on="0" class="${off[f.id] ? 'on' : ''}">Off</button></span></div>`).join('') + `</div>` : ''; };
+    const card = (name, note, ctl) => `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>${name}</b><span>${note}</span></span>${ctl}</div></div>`;
+    const T = {
+      look: `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Colour theme</b><span>The whole app's colours</span></span></div>` +
+          `<div class="dv-themes">${THEMES.map(z => `<button type="button" data-theme="${z[0]}" class="${themeOf() === z[0] ? 'on' : ''}" style="background:${z[2]}">${z[1]}</button>`).join('')}</div></div>` +
+        card('Book texture', 'Book cards and list ends', seg('tex', TEXES, texOf())) +
+        `<div class="dv-c"><div class="dv-row"><span class="dv-tx"><b>Splash screen choice</b><span>Which one plays when the app opens</span></span></div>` +
+          `<div class="dv-themes dv-splash">${SPLASHES.map(z => `<button type="button" data-splash="${z[0]}" class="${splashOf() === z[0] ? 'on' : ''}">${z[1]}</button>`).join('')}</div></div>` +
+        sws('look') +
+        card('Haptic tester', 'Turn the wheel to feel each click', `<span class="dv-wheel"><span class="lw-wheel">${ROWS7}</span></span>`),
+      home: card('Home views', 'Any of them; just one hides the view card', `<span class="dv-sw three">${VIEWS.map(z => `<button type="button" data-view="${z[0]}" class="${viewsOf().includes(z[0]) ? 'on' : ''}">${z[1]}</button>`).join('')}</span>`) +
+        card('Bookshelf size', 'Books, tapes and shelves', seg('size', SIZES, sizeOf()[0], 'three')) +
+        card('Audiobook shelf', 'Side: always a one-third shelf beside the books', seg('tapes', TAPES, tapesOf())) +
+        sws('home'),
+      library: sws('library'), timeline: sws('timeline'), data: sws('data') };
+    tabs.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.g === devTab));
+    body.innerHTML = T[devTab] || T.look;
     body.querySelectorAll('[data-size]').forEach(b => b.onclick = () => { if(b.dataset.size === 'm') delete off._size; else off._size = b.dataset.size; save(); applySize(); paint(); });
     body.querySelectorAll('[data-tapes]').forEach(b => b.onclick = () => { off._tapes = b.dataset.tapes; save(); window.setTapeSide(off._tapes === 'side'); paint(); });
     body.querySelectorAll('[data-theme]').forEach(b => b.onclick = () => { off._theme = b.dataset.theme; save(); applyTheme(); renderAll(); paint(); });
-    body.querySelectorAll('[data-lib]').forEach(b => b.onclick = () => { off._lib = b.dataset.lib; save(); applyLib(); paint(); });
+    body.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { const on = viewsOf(), v = b.dataset.view;
+      const next = on.includes(v) ? on.filter(x => x !== v) : on.concat(v); if(!next.length) return;   // one at least
+      off._views = next; delete off._lib; save(); applyLib(); paint(); });
+    body.querySelectorAll('[data-tex]').forEach(b => b.onclick = () => { off._tex = b.dataset.tex; save(); applyTex(); paint(); });
+    body.querySelectorAll('[data-splash]').forEach(b => b.onclick = () => { off._splash = b.dataset.splash; save(); paint(); });
     body.querySelectorAll('.dv-sw[data-id] button').forEach(b => b.onclick = () => { off[b.parentElement.dataset.id] = b.dataset.on !== '1'; save(); apply(); paint(); });
     // the tester: an ordinary page wheel, 0–99, that goes nowhere
-    const w = body.querySelector('.dv-wheel .lw-wheel');
+    const w = body.querySelector('.dv-wheel .lw-wheel'); if(!w) return;
     w.querySelectorAll('div').forEach(d => d.style.fontSize = '13px');
     makeTimeWheels([w], { units: [1], offset: 7.5, total: () => 99, get: () => testV, set: T => testV = T, locked: () => false, onLocked(){}, done(){} }).sync(true);
   }
@@ -12625,8 +12693,9 @@ Object.assign(ART, {
   // export / import: the saved choices go out with the library and come back with it
   window.devState = () => Object.assign({}, off);
   window.devImport = d => { off = Object.assign({}, DEFAULTS, d); save();
-    apply(); applyLib(); applyTheme(); renderAll(); window.setTapeSide(off._tapes === 'side'); applySize(); if(page.classList.contains('open')) paint(); };
+    window.__texCloth = texOf() === 'cloth'; apply(); applyLib(); applyTheme(); renderAll(); window.setTapeSide(off._tapes === 'side'); applySize(); if(page.classList.contains('open')) paint(); };
   if(off._tapes === 'side') window.setTapeSide(true);
+  window.__texCloth = texOf() === 'cloth';
   apply(); applyLib(); applyTheme(); if(off._size) applySize(); else sizeNow = 1;
 })();
 
@@ -12844,9 +12913,17 @@ closeRowDD = function(dd){
     window.__lbLabel = lbLabel;
     document.body.classList.add('lb-loans');
     // opening the Library tab: back to Checked Out, whichever card was last open
-    window.__lbHome = () => { if(mode === 'out') return; mode = 'out'; openLoan = -1;
-      document.querySelectorAll('#lb-tabs [data-m]').forEach(x => x.classList.toggle('on', x.dataset.m === 'out'));
-      document.body.classList.add('lb-loans'); lbShow(); lbLabel(); };
+    // the card it opens on: Checked Out, or the Wishlist when loans are switched off (Developer Options)
+    const homeMode = () => document.body.classList.contains('off-loans') ? 'wish' : 'out';
+    const goMode = m => { mode = m; openLoan = -1;
+      document.querySelectorAll('#lb-tabs [data-m]').forEach(x => x.classList.toggle('on', x.dataset.m === m));
+      document.body.classList.toggle('lb-loans', m !== 'wish'); lbShow(); lbLabel(); };
+    window.__lbHome = () => { if(mode !== homeMode()) goMode(homeMode()); };
+    // a switch turned a card off: off the one that's open, onto the other
+    window.__lbFix = () => { const B = document.body.classList;
+      if(B.contains('off-loans') && mode !== 'wish'){ goMode('wish'); render(); }
+      else if(B.contains('off-wishcard') && mode === 'wish'){ goMode('out'); render(); } };
+    window.__wlRender = () => render();
     function render(){
       if(mode !== 'wish') return renderLoans();
       if(!list.length){ view.innerHTML = '<div id="wl-empty">No wishlist books yet</div>'; return; }
