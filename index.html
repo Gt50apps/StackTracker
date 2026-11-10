@@ -481,6 +481,14 @@
   #book-fields .cnt-card input, #tags-value{text-align:center;}
   /* the quarter cards: a word to a line while empty ("(Optional)" under Word Count); filled, the name on one line */
   #words-card .cnt-lbl{line-height:1;}   /* three lines: still inside the card */
+  /* the wishlist's word count: Word / Count / (Optional), a word a line, centred; once typed, small on one line at the top */
+  #wl-words-card .cnt-lbl, #wl-year-card .cnt-lbl{left:4px; right:4px; text-align:center; line-height:1;}
+  #wl-year-card.has .cnt-lbl .opt{display:none;} #wl-year-card.wheels .cnt-lbl{display:none;}
+  #wl-year-card .yc-row input{text-align:center; margin-top:9px; -moz-appearance:textfield; appearance:textfield;}
+  #wl-year-card .yc-row input::-webkit-inner-spin-button, #wl-year-card .yc-row input::-webkit-outer-spin-button{-webkit-appearance:none; margin:0;}   /* truly centred */
+  #wl-words-card .cnt-lbl b{white-space:nowrap;}
+  #wl-words-card.has .cnt-lbl .opt, #wl-words-card:focus-within .cnt-lbl .opt{display:none;}
+  #wl-words-card input{text-align:center; margin-top:9px;}
   #pages-card .cnt-lbl b, #words-card .cnt-lbl b{white-space:nowrap;}
   #words-card.has .cnt-lbl .opt, #words-card:focus-within .cnt-lbl .opt{display:none;}
   #pages-card.has .cnt-lbl, #pages-card:focus-within .cnt-lbl, #words-card.has .cnt-lbl, #words-card:focus-within .cnt-lbl{font-size:.5rem;}
@@ -1826,7 +1834,7 @@
   .wl-fields{display:flex; flex-direction:column; gap:4px; padding:0 4px;}
   .wl-fields .field-card{height:45px; flex:none;}
   .wl-fields .field-card input{height:auto; font-size:.95rem;}
-  .wl-pair{display:flex; gap:4px;} .wl-pair > .field-card{flex:1 1 0; min-width:0;}
+  .wl-pair{display:flex; gap:4px;} .wl-pair > .field-card{flex:0 0 calc(50% - 2px); min-width:0; box-sizing:border-box;}   /* halves, whatever is inside */
   .wl-names{position:relative;}
   .wl-names::before, .wl-names::after{content:''; position:absolute; left:33.333%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); pointer-events:none; z-index:2;}
   .wl-names::after{left:66.667%;}
@@ -2184,6 +2192,14 @@
   .yc-row input{flex:1; min-width:0;}
   #year-era, #wl-era{flex:none; margin:0; padding:2px 5px; height:auto; border:2px solid var(--cb000000, #000000); border-radius:5px; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--cf8a8378, #8a8378);
     font:700 .58rem/1 Arial, sans-serif; letter-spacing:.3px; cursor:pointer;}
+  /* the wishlist's year: "Year (optional)" until tapped, then three wheels (first two digits | last two | AD or BC) */
+  #wl-era[hidden]{display:none;}
+  #wl-year-card .wl-yw{display:none;}
+  #wl-year-card.wheels{padding:0; overflow:hidden; background:var(--panel);}
+  #wl-year-card.wheels .yc-row{display:none;}
+  #wl-year-card.wheels .wl-yw{display:flex; flex-direction:row; width:100%; height:100%;}
+  #wl-year-card .lw-wheel div{font-size:13px;}
+  #wl-year-card.blank .lw-wheel div{color:var(--cfc4bdb0, #c4bdb0);}   /* no year yet: faint */
   #year-era.bc, #wl-era.bc{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   /* ===== Released, in the Timeline tab: a dot per release, in three columns that split to suit what's shown ===== */
   body.off-released #tl-modes button[data-m="released"]{display:none;}
@@ -2842,8 +2858,8 @@
     <div class="field-card"><input id="wl-t" type="text" placeholder="Title" autocomplete="off" aria-label="Title"></div>
     <div class="field-card split wl-names"><div class="fc-half"><input id="wl-af" type="text" placeholder="First Name" autocomplete="off" aria-label="Author first name"></div><div class="fc-half"><input id="wl-a" type="text" placeholder="Last Name" autocomplete="off" aria-label="Author last name"></div><button type="button" class="fc-more" id="wl-amore" aria-label="Open author list">Author List</button></div>
     <div class="wl-pair">
-      <div class="field-card" id="wl-year-card"><div class="yc-row"><input id="wl-year" type="number" inputmode="numeric" min="1" placeholder="Year (optional)" aria-label="Year released (optional)"><button type="button" id="wl-era" aria-label="AD or BC">AD</button></div></div>
-      <div class="field-card" id="wl-words-card"><input id="wl-words" type="text" inputmode="numeric" placeholder="Words (optional)" autocomplete="off" aria-label="Word count (optional)"></div>
+      <div class="field-card cnt-card" id="wl-year-card"><span class="cnt-lbl"><b>Year</b> <b class="opt">(Optional)</b></span><div class="yc-row"><input id="wl-year" type="number" inputmode="numeric" min="1" placeholder="" aria-label="Year released (optional)" readonly><button type="button" id="wl-era" aria-label="AD or BC" hidden>AD</button></div><div class="wl-yw"><div class="lw-wheel" data-k="c"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">YEAR</span></div><div class="lw-wheel" data-k="e"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div></div>
+      <div class="field-card cnt-card" id="wl-words-card"><span class="cnt-lbl"><b>Word</b> <b>Count</b> <b class="opt">(Optional)</b></span><input id="wl-words" type="text" inputmode="numeric" placeholder="" autocomplete="off" aria-label="Word count (optional)"></div>
     </div>
     <button type="button" id="wl-del" hidden>Delete</button>
   </div>
@@ -12995,10 +13011,27 @@ closeRowDD = function(dd){
     wEra.addEventListener('click', () => { const bc = wEra.textContent !== 'BC'; wEra.textContent = bc ? 'BC' : 'AD'; wEra.classList.toggle('bc', bc); wYearCard.classList.remove('invalid'); preview(); });
     wYear.addEventListener('input', () => { wYearCard.classList.remove('invalid'); preview(); });
     // the year: null when blank, false when it can't be right (0, or in the future)
+    // tapped: the wheels (blank, they rest faint on 19 | 00 | AD until one is turned; – at the top of the first clears it)
+    const wyW = k => wYearCard.querySelector(`.lw-wheel[data-k="${k}"]`), wyN = () => wYear.value === '' ? null : parseInt(wYear.value, 10);
+    const wyPut = v => { wYear.value = v == null ? '' : String(v); wYearCard.classList.remove('invalid'); wYearCard.classList.toggle('blank', v == null); wYearCard.classList.toggle('has', v != null); preview(); };
+    const wySync = [
+      dateWheel(wyW('c'), { count: () => 101, wrap: false, text: i => i ? String(i - 1).padStart(2, '0') : '–',
+        get: () => wyN() == null ? 20 : Math.floor(wyN() / 100) + 1,
+        set: i => { const v = wyN(), cur = v == null ? 20 : Math.floor(v / 100) + 1; if(cur === i && v != null) return; if(v == null && i === 20) return;
+          wyPut(i ? (i - 1) * 100 + (v == null ? 0 : v % 100) : null); if(!i) wySync.forEach(f => f()); } }),
+      dateWheel(wyW('y'), { cut: true, count: () => 100, wrap: true, text: i => String(i).padStart(2, '0'), get: () => wyN() == null ? 0 : wyN() % 100,
+        set: i => { const v = wyN(); if(v != null && v % 100 === i) return; if(v == null && i === 0) return; wyPut((v == null ? 1900 : Math.floor(v / 100) * 100) + i); } }),
+      dateWheel(wyW('e'), { count: () => 2, wrap: false, text: i => i ? 'BC' : 'AD', get: () => wEra.textContent === 'BC' ? 1 : 0,   // AD | BC
+        set: i => { const bc = i === 1; if((wEra.textContent === 'BC') === bc) return; wEra.textContent = bc ? 'BC' : 'AD'; wEra.classList.toggle('bc', bc);
+          if(wyN() == null) wyPut(1900); else { wYearCard.classList.remove('invalid'); preview(); } } })];
+    const wyShow = () => { if(wYearCard.classList.contains('wheels')) return; if(document.activeElement) document.activeElement.blur();
+      wYearCard.classList.add('wheels'); wYearCard.classList.toggle('blank', wyN() == null); requestAnimationFrame(() => wySync.forEach(f => f())); };
+    wYearCard.addEventListener('click', wyShow);
     const wYearRead = () => { const v = wYear.value.trim(); if(!v) return null; const n = parseInt(v, 10), bc = wEra.textContent === 'BC';
       if(!(n > 0) || (!bc && n > new Date().getFullYear()) || (bc && n > 9999)) return false; return bc ? -n : n; };
     const wWords = document.getElementById('wl-words'), wWordsCard = document.getElementById('wl-words-card');
-    wWords.addEventListener('input', () => { wWordsCard.classList.remove('invalid'); preview(); });
+    const wWordsHas = () => wWordsCard.classList.toggle('has', !!wWords.value);
+    wWords.addEventListener('input', () => { wWordsCard.classList.remove('invalid'); wWordsHas(); preview(); });
     // words: null when blank, false when it isn't a count ("92,000" and "92000" both fine; "92k" too)
     const wWordsRead = () => { const v = wWords.value.trim().toLowerCase().replace(/[,\s]/g, ''); if(!v) return null;
       const m = v.match(/^(\d+(?:\.\d+)?)(k|m)?$/); if(!m) return false; const n = Math.round(parseFloat(m[1]) * (m[2] === 'k' ? 1e3 : m[2] === 'm' ? 1e6 : 1)); return n > 0 ? n : false; };
@@ -13032,8 +13065,8 @@ closeRowDD = function(dd){
       const split = b && typeof b.authorLast === 'string';   // older entries: the whole name in Last, to fix by hand
       afIn.value = split ? b.authorFirst || '' : ''; aIn.value = split ? b.authorLast : (b ? b.author : '');
       { const y = b && typeof b.released === 'number' ? b.released : null; wYear.value = y == null ? '' : Math.abs(y);
-        wEra.textContent = y != null && y < 0 ? 'BC' : 'AD'; wEra.classList.toggle('bc', y != null && y < 0); wYearCard.classList.remove('invalid'); }
-      wWords.value = b && b.words ? b.words.toLocaleString() : ''; wWordsCard.classList.remove('invalid');
+        wEra.textContent = y != null && y < 0 ? 'BC' : 'AD'; wEra.classList.toggle('bc', y != null && y < 0); wYearCard.classList.remove('invalid', 'wheels', 'blank'); wYearCard.classList.toggle('has', y != null); }   // back to the plain card till tapped
+      wWords.value = b && b.words ? b.words.toLocaleString() : ''; wWordsCard.classList.remove('invalid'); wWordsHas();
       del.hidden = !b; foot.hidden = !b; del.classList.remove('armed'); del.textContent = 'Delete'; clearTimeout(delT);
       check(); preview(true); page.classList.add('active'); page.setAttribute('aria-hidden', 'false');
       if(b){ const cv = document.querySelector('#wl-real > canvas'); requestAnimationFrame(() => { if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown('#5b6633'))); }); }
@@ -13055,8 +13088,7 @@ closeRowDD = function(dd){
       if(editing >= 0){ Object.assign(list[editing], { title, author, authorFirst, authorLast, color }); if(released != null) list[editing].released = released; else delete list[editing].released;
         if(words != null) list[editing].words = words; else delete list[editing].words; }
       else list.push({ title, author, authorFirst, authorLast, color, added: Date.now(), ...(released != null ? { released } : {}), ...(words != null ? { words } : {}) });
-      save(); render(); close();
-      if(editing < 0) requestAnimationFrame(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }));
+      save(); render(); close();   // (stays where it was in the list)
     });
     del.addEventListener('click', () => {
       if(!del.classList.contains('armed')){ del.classList.add('armed'); del.textContent = 'Confirm?';
