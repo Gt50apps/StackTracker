@@ -1781,6 +1781,7 @@
   .ln-due.late{background:var(--cbaa3333, #aa3333); color:#fff;}
   .ln-due.ret{color:var(--muted);}
   .ln-due{position:relative;}
+  .ln-due b.n3{font-size:.9rem;} .ln-due b.n4{font-size:.66rem;}   /* with the star: 3 or 4 digits made a little smaller, so they clear it */
   .ln-due .ln-star{position:absolute; top:3px; right:3px; width:11px; height:11px; pointer-events:none; filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));}
   /* a loan's dropdown (tap its card): the dates and what was read, then Renew | Returned | Edit (Returned: Check Out Again | Edit) */
   body.dd-on .wl-row.open{position:relative; z-index:8;}
@@ -12769,7 +12770,7 @@ closeRowDD = function(dd){
           if(S === 'due') html += `<div class="list-divider"><span class="ld-name">${name}</span></div>`;
           g.forEach(([b, i]) => { const n = left(b);
             const [big, small, cls] = n < 0 ? [-n, -n === 1 ? 'Day Late' : 'Days Late', 'late'] : n === 0 ? ['Today', '', 'soon'] : [n, n === 1 ? 'Day Left' : 'Days Left', n <= 3 ? 'soon' : n <= 7 ? 'week' : 'ok'];
-            html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ${cls}" data-li="${i}">${bookFinished(b) ? LN_STAR : ''}<b${typeof big === 'string' ? ' class="w"' : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</button></div>` + ddHTML(b, i);
+            html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ${cls}" data-li="${i}">${bookFinished(b) ? LN_STAR : ''}<b${typeof big === 'string' ? ' class="w"' : bookFinished(b) && String(big).length >= 3 ? ` class="n${Math.min(4, String(big).length)}"` : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</button></div>` + ddHTML(b, i);
           });
         });
       } else {
