@@ -12708,11 +12708,14 @@ closeRowDD = function(dd){
               s: [['back', 'Returned', 'Most recently returned first', 'Earliest returned first'], ['title', 'Title', 'A–Z', 'Z–A'], ['author', 'Author', 'Last name, first name, then title', 'Z–A: last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first', 'Earliest checked out first'], ['year', 'Year', 'Oldest released first; no year last', 'No year first, then newest released']] } };
     let lbSel = { wish: { f: 'all', s: 'status' }, out: { f: 'all', s: 'due' }, ret: { f: 'all', s: 'back' } };
     try{ const v = JSON.parse(localStorage.getItem('stack-tracker-lb-sort') || 'null'); if(v) ['wish', 'out', 'ret'].forEach(k => { if(v[k]) Object.assign(lbSel[k], v[k]); }); }catch(e){}
-    let lbDesc = false, lbFlipT = 0;   // the picked sort flipped (one direction for all three cards; a new sort keeps it)
-    try{ const v = JSON.parse(localStorage.getItem('stack-tracker-lb-sort') || 'null'); if(v && v.desc) lbDesc = true; }catch(e){}
-    const lbSave = () => { try{ localStorage.setItem('stack-tracker-lb-sort', JSON.stringify(Object.assign({}, lbSel, { desc: lbDesc }))); }catch(e){} };
+    // the picked sort flipped: each card (Checked Out, Returned, Wishlist) keeps its own direction; a new sort keeps it
+    const lbDescs = { out: false, ret: false, wish: false }; let lbFlipT = 0;
+    try{ const v = JSON.parse(localStorage.getItem('stack-tracker-lb-sort') || 'null');
+      if(v && typeof v.desc === 'object') Object.keys(lbDescs).forEach(k => lbDescs[k] = !!v.desc[k]);
+      else if(v && v.desc) Object.keys(lbDescs).forEach(k => lbDescs[k] = true); }catch(e){}   // (saved before: one for all)
+    const lbSave = () => { try{ localStorage.setItem('stack-tracker-lb-sort', JSON.stringify(Object.assign({}, lbSel, { desc: lbDescs }))); }catch(e){} };
     const lbName = (m, k, id) => (LB[m][k].find(o => o[0] === id) || LB[m][k][0])[1];
-    const lbShow = () => { document.getElementById('lb-filter-name').textContent = lbName(mode, 'f', lbSel[mode].f); document.getElementById('lb-sort-name').textContent = lbName(mode, 's', lbSel[mode].s); document.getElementById('lb-sort-dir').classList.toggle('desc', lbDesc); };
+    const lbShow = () => { document.getElementById('lb-filter-name').textContent = lbName(mode, 'f', lbSel[mode].f); document.getElementById('lb-sort-name').textContent = lbName(mode, 's', lbSel[mode].s); document.getElementById('lb-sort-dir').classList.toggle('desc', lbDescs[mode]); };
     const lc2 = (x, y) => String(x || '').localeCompare(String(y || ''), undefined, { sensitivity: 'base' });
     const byAuthor = (a, b) => { const x = authorKeyOf(a), y = authorKeyOf(b); return lc2(x[0], y[0]) || lc2(x[1], y[1]) || lc2(a.title, b.title); };
     const GROUPS = [['', 'To Check'], ['yes', 'Found'], ['wait', 'Waiting'], ['no', 'Not There']];
@@ -12760,11 +12763,11 @@ closeRowDD = function(dd){
       const yr = b => typeof b.released === 'number' ? b.released : null;
       const sorter = S === 'year' ? (p, n) => (yr(p[0]) == null) - (yr(n[0]) == null) || (yr(p[0]) || 0) - (yr(n[0]) || 0) || lc2(p[0].title, n[0].title) : S === 'title' ? (p, n) => lc2(p[0].title, n[0].title) : S === 'author' ? (p, n) => byAuthor(p[0], n[0]) : S === 'out' ? (p, n) => n[0].loan.out - p[0].loan.out
         : mode === 'out' ? (p, n) => p[0].loan.due - n[0].loan.due : (p, n) => n[0].loan.returned - p[0].loan.returned;
-      rows.sort(sorter); if(lbDesc) rows.reverse();
+      rows.sort(sorter); if(lbDescs[mode]) rows.reverse();
       let html = '';
       if(mode === 'out'){
         const DG = [['Overdue', b => left(b) < 0], ['Due This Week', b => left(b) >= 0 && left(b) <= 7], ['Later', b => left(b) > 7]];
-        (lbDesc ? DG.reverse() : DG).forEach(([name, f], gi) => {
+        (lbDescs[mode] ? DG.reverse() : DG).forEach(([name, f], gi) => {
           // Due Date: grouped under dividers; any other sort: one list, in that order
           const g = S === 'due' ? rows.filter(([b]) => f(b)) : gi ? [] : rows; if(!g.length) return;
           if(S === 'due') html += `<div class="list-divider"><span class="ld-name">${name}</span></div>`;
@@ -12838,10 +12841,10 @@ closeRowDD = function(dd){
       // Length: grouped by word count, flash fiction up to the epic novel (the bands below are where each begins), then none given
       const BANDS = LEN_BANDS;
       const LEN = BANDS.map(([from, name], k) => [name, w => w >= from && (k === BANDS.length - 1 || w < BANDS[k + 1][0])]).concat([['No Word Count', w => !(w > 0)]]);
-      if(lbDesc) rows.reverse();   // flipped: the whole order turned round, groups too
+      if(lbDescs[mode]) rows.reverse();   // flipped: the whole order turned round, groups too
       let grouped = sortBy === 'status' ? GROUPS.map(([k, name]) => [name, rows.filter(([b]) => (b.lib || '') === k)]).filter(g => g[1].length)
         : sortBy === 'length' ? LEN.map(([name, f]) => [name, rows.filter(([b]) => f(b.words || 0))]).filter(g => g[1].length) : [[null, rows]];
-      if(lbDesc) grouped = grouped.reverse();
+      if(lbDescs[mode]) grouped = grouped.reverse();
       view.innerHTML = grouped.map(([name, rs]) => (name ? `<div class="list-divider"><span class="ld-name">${name}</span></div>` : '') + rs.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card wl-wish" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>${b.released != null ? `<i class="wl-yr">${wlYr(b.released)}</i>` : ''}${b.words ? `<i class="wl-yr wl-wd">${wlWords(b.words)}</i>` : ''}` +
         `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
         MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('wait', b.lib === 'wait', 'Waiting on it', 'M12 4v10M12 19.8v.01') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>').join('')).join('');
@@ -12868,12 +12871,12 @@ closeRowDD = function(dd){
       document.getElementById('lb-search').addEventListener('click', e => { e.stopPropagation(); card.classList.add('searching'); q.focus(); window.scrollTo(0, 0); });
       document.getElementById('lb-close').addEventListener('click', e => { e.stopPropagation(); card.classList.remove('searching'); q.value = ''; q.blur(); render(); });
       const paint = () => {
-        const opt = (k, [id, name, desc, rdesc]) => `<button type="button" class="so-opt${lbSel[mode][k] === id ? ' on' : ''}${k === 's' && lbDesc ? ' desc' : ''}" data-k="${k}" data-id="${id}"><b>${name}</b><span data-a="${desc}" data-r="${rdesc || desc}">${k === 's' && lbDesc && rdesc ? rdesc : desc}</span>${k === 's' ? '<i class="so-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="7.5,21.5 32.5,21.5 20,33.5" fill="#a9a59e" stroke="#a9a59e" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,15 32.5,15 20,27" fill="#d6d3ce" stroke="#d6d3ce" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,8.5 32.5,8.5 20,20.5" fill="#ffffff" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/></svg></i>' : ''}</button>`;
+        const opt = (k, [id, name, desc, rdesc]) => `<button type="button" class="so-opt${lbSel[mode][k] === id ? ' on' : ''}${k === 's' && lbDescs[mode] ? ' desc' : ''}" data-k="${k}" data-id="${id}"><b>${name}</b><span data-a="${desc}" data-r="${rdesc || desc}">${k === 's' && lbDescs[mode] && rdesc ? rdesc : desc}</span>${k === 's' ? '<i class="so-dir" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="7.5,21.5 32.5,21.5 20,33.5" fill="#a9a59e" stroke="#a9a59e" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,15 32.5,15 20,27" fill="#d6d3ce" stroke="#d6d3ce" stroke-width="1.6" stroke-linejoin="round"/><polygon points="7.5,8.5 32.5,8.5 20,20.5" fill="#ffffff" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/></svg></i>' : ''}</button>`;
         opts.innerHTML = `<div class="so-filter"><div class="list-divider"><span class="ld-name">Filter</span></div>${LB[mode].f.map(o => opt('f', o)).join('')}</div>` +
           `<div class="so-list"><div class="list-divider"><span class="ld-name">Sort</span></div>${LB[mode].s.map(o => opt('s', o)).join('')}</div>`;
         opts.querySelectorAll('.so-opt').forEach(b => b.addEventListener('click', () => {
           if(b.dataset.k === 's' && lbSel[mode].s === b.dataset.id){   // the picked sort again: flip its order
-            lbDesc = !lbDesc; lbSave(); opts.querySelectorAll('.so-opt[data-k="s"]').forEach(x => { x.classList.toggle('desc', lbDesc); const t = x.querySelector('span'); t.textContent = t.dataset[lbDesc ? 'r' : 'a']; }); lbShow();
+            lbDescs[mode] = !lbDescs[mode]; lbSave(); opts.querySelectorAll('.so-opt[data-k="s"]').forEach(x => { x.classList.toggle('desc', lbDescs[mode]); const t = x.querySelector('span'); t.textContent = t.dataset[lbDescs[mode] ? 'r' : 'a']; }); lbShow();
             clearTimeout(lbFlipT); lbFlipT = setTimeout(render, 480);   // re-sorted once the arrows have turned
             if(window.hapticTick) window.hapticTick(); return; }
           lbSel[mode][b.dataset.k] = b.dataset.id; lbSave(); lbShow();
