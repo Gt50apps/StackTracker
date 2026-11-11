@@ -1869,7 +1869,16 @@
   .lc-band{display:flex; flex-direction:column; align-items:center; gap:6px;}
   /* below it, the card as it shows in the list: placed apart (it's a different shape) */
   .lc-strip{width:100%; height:46px; flex:none; position:relative; overflow:hidden; box-sizing:border-box; display:none !important;}
-  .lc-strip.has-photo{display:flex !important; touch-action:none; cursor:grab;}
+  .lc-strip.has-photo{display:flex !important;}
+  /* the photo moves only after Move is tapped (its four arrows turn into a tick in a circle); the tick puts it back */
+  .lc-face.movable, .lc-strip.movable{touch-action:none; cursor:grab;}
+  .lc-move, .lc-move:active{position:absolute; right:5px; bottom:5px; z-index:3; width:28px; height:28px; margin:0; padding:0; border:0; border-radius:50%; background:none; box-shadow:none; color:#fff;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.75)); cursor:pointer;}
+  .lc-move svg{width:100%; height:100%; display:block; overflow:visible; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;}
+  .lc-move .mv{transform-box:view-box; transform-origin:12px 12px; transition:transform .38s cubic-bezier(.3,.7,.25,1), opacity .25s;}
+  .lc-move.on .mv{transform:rotate(90deg) scale(.2); opacity:0;}
+  .lc-move .ok *{stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .3s ease;}
+  .lc-move.on .ok circle{stroke-dashoffset:0; transition-delay:.08s;} .lc-move.on .ok path{stroke-dashoffset:0; transition-delay:.3s;}
   .lc-strip > canvas{position:absolute; inset:0; width:100%; height:100%;}
   .lc-front{position:relative; width:min(calc(100vw - 24px), 340px); aspect-ratio:85.6 / 53.98; flex:none; border:3px solid var(--cb000000, #000000); border-radius:12px; overflow:hidden; box-sizing:border-box; color:#fff;}
   .lc-front > canvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
@@ -1889,7 +1898,10 @@
   .lc-front.has-photo{touch-action:none; cursor:grab;}
   .lc-hint{position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); text-align:center; font:700 .62rem/1 Arial, sans-serif; letter-spacing:.06em; text-transform:uppercase; color:#fff;
     text-shadow:0 1px 3px rgba(0,0,0,.8); opacity:0; transition:opacity .4s; pointer-events:none; font-style:normal;}
-  .lc-front.has-photo:not(.moved) .lc-hint{opacity:.9;}
+  .lc-front.has-photo:not(.moved) .lc-hint, .lc-face.movable:not(.moved) .lc-hint{opacity:.9;}
+  .lc-face .lc-hint{font-size:14px; z-index:2;}
+  .lc-face .ph{opacity:.45;} #lc-front .lcf-h:empty, #lc-front .lcf-s:empty, #lc-epair .lcf-sig:empty{display:none;}
+  #lc-epair{width:100%; align-self:stretch;}
   .wl-card > .lc-ph{z-index:0;} .wl-card.has-photo > span{position:relative; z-index:1; text-shadow:0 1px 3px rgba(0,0,0,.7);}
   .lc-photo{height:45px;} .lc-photo .fc-more:disabled{color:var(--muted); opacity:.5;}
   #lc-unpick:not(:disabled){color:var(--cbaa3333, #aa3333);}
@@ -1922,14 +1934,34 @@
   .lc-front > .lc-fh.up{bottom:min(2.15rem, 9.4vw);} .lc-front > .lc-fh:empty{display:none;}
   .lc-face.lite .lcf-h, .lc-front.lite > .lc-fh{color:#77726a;}
   /* the signature: in ink, on a pale hatched panel at the bottom of the back */
-  .lcf-sig, .lc-sig{position:relative; overflow:hidden; box-sizing:border-box; border:1px solid #cfc6ae;
+  .lcf-sig{position:relative; overflow:hidden; box-sizing:border-box; border:1px solid #cfc6ae;
     background:repeating-linear-gradient(135deg, #f5f1e6 0 4px, #e9e2cf 4px 8px);}
   .lcf-sig{position:absolute !important; left:19%; bottom:13px; width:62%; height:30px;}
-  .lc-sig{width:62%; height:34px; margin:6px auto 2px;} .lc-sig[hidden]{display:none;}
-  .lcf-sig i, .lc-sig i{font:21px/1.4 'Snell Roundhand', 'Segoe Script', 'Brush Script MT', 'Dancing Script', cursive; color:#1d2f6b; white-space:nowrap; display:block;
+  .lcf-sig i{font:21px/1.4 'Snell Roundhand', 'Segoe Script', 'Brush Script MT', 'Dancing Script', cursive; color:#1d2f6b; white-space:nowrap; display:block;
     position:absolute; left:0; top:50%; transform:translateY(-50%) rotate(-2deg); transform-origin:center;}   /* (placed by its ink: lcSigFit) */
-  #lc-sig{font-family:'Snell Roundhand', 'Segoe Script', 'Brush Script MT', 'Dancing Script', cursive; font-size:1.15rem; color:#1d2f6b;}
-  #lc-sig::placeholder{font-family:Arial, sans-serif; font-size:initial;}
+  /* a drawn signature: cut to its ink, so centring the picture centres the ink */
+  .lcf-sig img{position:absolute; left:6px; top:2px; width:calc(100% - 12px); height:calc(100% - 4px); object-fit:contain; display:block;}
+  /* Name | Sign, halves of one card; signed, the half shows the signature */
+  .lc-hs #lc-sign{border-left:3px solid var(--cb000000, #000000) !important; position:relative; overflow:hidden;}
+  .lc-hs #lc-sign img{position:absolute; left:8px; top:4px; width:calc(100% - 16px); height:calc(100% - 8px); object-fit:contain;}
+  .lc-hs #lc-sign i{font:1.15rem/1 'Snell Roundhand', 'Segoe Script', 'Brush Script MT', 'Dancing Script', cursive; text-transform:none; color:#1d2f6b; white-space:nowrap;}
+  /* the signing pad: dark behind; a wide white pad with a line to sign on; Cancel | Clear | Done */
+  #lc-signpad{position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.82); display:flex; align-items:center; justify-content:center; padding:12px;
+    opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
+  #lc-signpad.active{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  .sp-box{width:min(100%, 560px); display:flex; flex-direction:column; gap:6px;}
+  .sp-pad{position:relative; aspect-ratio:2.6 / 1; max-height:calc(100dvh - 90px); background:#fff; border:3px solid var(--cb000000, #000000); border-radius:12px; overflow:hidden;}
+  .sp-pad canvas{position:absolute; inset:0; width:100%; height:100%; touch-action:none; z-index:1; cursor:crosshair;}
+  .sp-line{position:absolute; left:8%; right:8%; bottom:27%; height:2px; background:#c9c2b2;}
+  .sp-line::before{content:'\00d7'; position:absolute; left:-1.1em; bottom:-.15em; font:700 1.1rem/1 Arial, sans-serif; color:#b3ab99;}
+  .sp-hint{position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); text-align:center; font:700 .62rem/1 Arial, sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#b3ab99; font-style:normal; pointer-events:none;}
+  .sp-pad.inked .sp-hint{display:none;}
+  .sp-acts{display:flex; height:45px; background:#fff; border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;}
+  .sp-acts button, .sp-acts button:active{flex:1 1 0; margin:0; border:0; border-radius:0; box-shadow:none; background:#fff; color:var(--ink); font:700 .72rem Arial, sans-serif; text-transform:uppercase;}
+  .sp-acts button + button{border-left:3px solid var(--cb000000, #000000);}
+  #sp-cancel{color:var(--cbaa3333, #aa3333);}
+  /* the add / edit window fits the screen: the barcode gives up height when room is short */
+  #lc-page .wl-fields{flex:1 1 auto; min-height:0; padding-bottom:calc(4px + env(safe-area-inset-bottom));}
   .lc-cb .lc-face.sig svg{margin-top:62px;}
   .lc-cb .lc-face{background:#fff; display:flex; flex-direction:column; align-items:center; padding:0 20px; color:#333;}
   .lcf-stripe{position:absolute; left:0; right:0; top:20px; height:34px; background:#1c1c1e;}
@@ -3000,19 +3032,22 @@
 <div id="lib-log" aria-hidden="true"><div class="wl-head"><button type="button" id="lg-back">Back</button><h2>Log</h2><span></span></div><div class="lp-list"></div></div>
 <div id="lib-pick" aria-hidden="true"><div class="wl-head"><button type="button" id="lp-cancel">Cancel</button><h2>Choose Library</h2><span></span></div><div class="lp-list"></div></div>
 <!-- Library card: add / edit (number, optional PIN, library name and location) -->
+<div id="lc-signpad" aria-hidden="true"><div class="sp-box"><div class="sp-pad"><canvas aria-label="Sign here"></canvas><i class="sp-line" aria-hidden="true"></i><em class="sp-hint">Sign Here</em></div>
+  <div class="sp-acts"><button type="button" id="sp-cancel">Cancel</button><button type="button" id="sp-clear">Clear</button><button type="button" id="sp-done">Done</button></div></div></div>
 <div id="lc-page" aria-hidden="true">
   <div class="wl-head"><button type="button" id="lc-cancel">Cancel</button><h2 id="lc-title">Add Library Card</h2><button type="button" id="lc-save" disabled>Add</button></div>
-  <div class="wl-prev-band lc-band"><div class="lc-front" id="lc-front"><canvas aria-hidden="true"></canvas><i class="lc-ph" aria-hidden="true"></i><span class="lc-ftop"><b class="lc-fn"></b><i class="lc-fl"></i></span><span class="lc-fs"></span><span class="lc-fh"></span><em class="lc-hint">Drag to move · pinch to zoom</em></div>
-    <div class="wl-card lc-strip" id="lc-strip"><canvas aria-hidden="true"></canvas><i class="lc-ph" aria-hidden="true"></i><span class="t"></span><span class="a"></span></div></div>
+  <div class="wl-prev-band lc-band"><div class="lc-pair" id="lc-epair">
+      <div class="lc-cd lc-cf big"><div class="lc-face" id="lc-front"><canvas aria-hidden="true"></canvas><i class="lc-ph" aria-hidden="true"></i><span class="lcf-top"><b class="lcf-n"></b><i class="lcf-l"></i></span><span class="lcf-s"></span><span class="lcf-h"></span><em class="lc-hint">Drag to move · pinch to zoom</em></div></div>
+      <div class="lc-cd lc-cb"><div class="lc-face"><i class="lcf-stripe"></i><svg xmlns="http://www.w3.org/2000/svg" aria-label="Barcode"></svg><div class="lc-num"></div><span class="lcf-sig"></span></div></div></div>
+    <div class="wl-card lc-strip" id="lc-strip"><canvas aria-hidden="true"></canvas><i class="lc-ph" aria-hidden="true"></i><span class="t"></span><span class="a"></span>
+      <button type="button" class="lc-move" aria-label="Move the photo"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="mv"><path d="M12 3.2v17.6M3.2 12h17.6M9.2 6L12 3.2 14.8 6M9.2 18L12 20.8 14.8 18M6 9.2L3.2 12 6 14.8M18 9.2L20.8 12 18 14.8"/></g><g class="ok"><circle cx="12" cy="12" r="9.3" pathLength="1"/><path d="M7.6 12.4l3 3 5.8-6.2" pathLength="1"/></g></svg></button></div></div>
   <div class="wl-fields">
     <div class="field-card split lc-photo"><button type="button" class="fc-more" id="lc-pick">Choose Photo</button><button type="button" class="fc-more" id="lc-unpick" disabled>No Photo</button></div>
     <input type="file" id="lc-file" accept="image/*" hidden>
-    <div class="lc-bar" id="lc-prev"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg><div class="lc-num"></div><div class="lc-sig" hidden><i></i></div></div>
     <div class="field-card"><input id="lc-name" type="text" placeholder="Library Name" autocomplete="off" aria-label="Library name"></div>
     <div class="field-card"><input id="lc-loc" type="text" placeholder="Location" autocomplete="off" aria-label="Location"></div>
     <div class="field-card"><input id="lc-slogan" type="text" placeholder="Slogan (Optional)" autocomplete="off" aria-label="Slogan (optional)"></div>
-    <div class="field-card"><input id="lc-holder" type="text" placeholder="Name on Card (Optional)" autocomplete="off" autocapitalize="characters" aria-label="Name on card (optional)"></div>
-    <div class="field-card"><input id="lc-sig" type="text" placeholder="Signature (Optional)" autocomplete="off" aria-label="Signature (optional)"></div>
+    <div class="field-card split lc-hs"><div class="fc-half"><input id="lc-holder" type="text" placeholder="Name (Optional)" autocomplete="off" autocapitalize="characters" aria-label="Name on card (optional)"></div><button type="button" class="fc-more" id="lc-sign">Sign (Optional)</button></div>
     <div class="wl-pair">
       <div class="field-card cnt-card" id="lc-num-card"><span class="cnt-lbl"><b>Card</b> <b>Number</b></span><input id="lc-num" type="text" inputmode="numeric" maxlength="14" autocomplete="off" aria-label="Library card number"></div>
       <div class="field-card cnt-card" id="lc-pin-card"><span class="cnt-lbl"><b>PIN</b> <b class="opt">(Optional)</b></span><input id="lc-pin" type="text" inputmode="numeric" autocomplete="off" aria-label="PIN (optional)"></div>
@@ -13199,7 +13234,9 @@ closeRowDD = function(dd){
     // the signature centred by its ink, its furthest left and right marks (a script's flourishes overhang its letters),
     // and made smaller if it's wider than the panel
     const lcSigCx = document.createElement('canvas').getContext('2d');
-    function lcSigFit(panel){ const i = panel && panel.firstElementChild; if(!i || !i.textContent) return;
+    // a signature: drawn (a picture, already cut to its ink), or typed before it could be drawn
+    const lcSigHTML = sig => /^data:image\//.test(sig) ? `<img src="${sig}" alt="Signature">` : `<i>${esc(sig)}</i>`;
+    function lcSigFit(panel){ const i = panel && panel.firstElementChild; if(!i || i.tagName !== 'I' || !i.textContent) return;
       i.style.fontSize = ''; const W = panel.clientWidth; if(!W) return;
       const ink = () => { lcSigCx.font = getComputedStyle(i).font; const m = lcSigCx.measureText(i.textContent);
         return [m.actualBoundingBoxLeft || 0, m.actualBoundingBoxRight || m.width]; };
@@ -13251,7 +13288,7 @@ closeRowDD = function(dd){
             `<div class="lc-pair">` +
               `<div class="lc-cd lc-cf big"><div class="lc-face${c.photo ? ' has-photo' : ''}"><canvas aria-hidden="true"></canvas>${c.photo ? '<i class="lc-ph" aria-hidden="true"></i>' : ''}` +
                 `<span class="lcf-top"><b class="lcf-n">${esc(c.name || 'Library Card')}</b>${c.loc ? `<i class="lcf-l">${esc(c.loc)}</i>` : ''}</span>${c.slogan ? `<span class="lcf-s">${esc(c.slogan)}</span>` : ''}${c.holder ? `<span class="lcf-h${c.slogan ? ' up' : ''}">${esc(c.holder)}</span>` : ''}</div></div>` +
-              `<div class="lc-cd lc-cb"><div class="lc-face${c.sig ? ' sig' : ''}"><i class="lcf-stripe"></i><svg xmlns="http://www.w3.org/2000/svg" aria-label="Barcode"></svg><div class="lc-num"></div>${c.sig ? `<span class="lcf-sig"><i>${esc(c.sig)}</i></span>` : ''}</div></div>` +
+              `<div class="lc-cd lc-cb"><div class="lc-face${c.sig ? ' sig' : ''}"><i class="lcf-stripe"></i><svg xmlns="http://www.w3.org/2000/svg" aria-label="Barcode"></svg><div class="lc-num"></div>${c.sig ? `<span class="lcf-sig">${lcSigHTML(c.sig)}</span>` : ''}</div></div>` +
             `</div>` +
             // the PIN hidden as asterisks (round-ended strokes) until its card is tapped; tap again to hide it
             (c.pin ? `<button type="button" class="dd-stats lc-pin">PIN <b class="lc-mask" aria-label="Hidden PIN, tap to show">${LC_AST.repeat(String(c.pin).length)}</b><b class="lc-real" hidden>${esc(c.pin)}</b></button>` : '') +
@@ -13303,7 +13340,8 @@ closeRowDD = function(dd){
           clearTimeout(t); cardsL.splice(+x.closest('.lc-dd').dataset.ci, 1); openCard = -1; lcSave(); renderCardsL(); }); });
     }
     // the add / edit page: the barcode filling in on top as the number is typed
-    const lcSlogan = document.getElementById('lc-slogan'), lcHolder = document.getElementById('lc-holder'), lcSig = document.getElementById('lc-sig');
+    const lcSlogan = document.getElementById('lc-slogan'), lcHolder = document.getElementById('lc-holder'), lcSignB = document.getElementById('lc-sign');
+    let lcSigData = '';   // the signature while the window is open
     const lcPage = document.getElementById('lc-page'), lcName = document.getElementById('lc-name'), lcLoc = document.getElementById('lc-loc'),
       lcNum = document.getElementById('lc-num'), lcPin = document.getElementById('lc-pin'), lcSaveB = document.getElementById('lc-save'), lcDel = document.getElementById('lc-del');
     let lcEditing = -1, lcDelT = 0;
@@ -13322,13 +13360,13 @@ closeRowDD = function(dd){
       lcPick.textContent = lcPh ? 'Change Photo' : 'Choose Photo';
       if(lcPh){ lcPhotoPut(lcFront.querySelector('.lc-ph'), lcPh); requestAnimationFrame(() => lcPhotoPut(lcStrip.querySelector('.lc-ph'), lcView('l'))); } };
     lcPick.addEventListener('click', () => { lcFile.value = ''; lcFile.click(); });
-    lcUnpick.addEventListener('click', () => { lcPh = null; lcFront.classList.remove('moved'); lcPhSync(); lcFrontSync(); });
+    lcUnpick.addEventListener('click', () => { lcPh = null; lcFront.classList.remove('moved'); lcSetMove(false); lcPhSync(); lcFrontSync(); });
     lcFile.addEventListener('change', () => { const f = lcFile.files && lcFile.files[0]; if(!f) return;
       const url = URL.createObjectURL(f), im = new Image();
       im.onload = () => { const MAX = 1100, k = Math.min(1, MAX / Math.max(im.naturalWidth, im.naturalHeight));   // big enough to zoom in on, small enough to keep
         const cv = document.createElement('canvas'); cv.width = Math.round(im.naturalWidth * k); cv.height = Math.round(im.naturalHeight * k);
         cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url);
-        lcPh = { src: cv.toDataURL('image/jpeg', .78), r: cv.width / cv.height, x: 50, y: 50, z: 1, lx: 50, ly: 50, lz: 1 }; lcFront.classList.remove('moved'); lcPhSync(); };
+        lcPh = { src: cv.toDataURL('image/jpeg', .78), r: cv.width / cv.height, x: 50, y: 50, z: 1, lx: 50, ly: 50, lz: 1 }; lcFront.classList.remove('moved'); lcPhSync(); lcSetMove(true); };   // a new photo: ready to be placed
       im.onerror = () => URL.revokeObjectURL(url); im.src = url; });
     // drag to move it about; pinch (or the mouse wheel) to zoom, 1× to 4×: on the full-size card (x, y, z) and, apart, on the
     // standard card in the list (lx, ly, lz)
@@ -13338,7 +13376,8 @@ closeRowDD = function(dd){
       const put = () => { el.classList.add('moved'); lcPhotoPut(el.querySelector('.lc-ph'), lcView(k)); };
       const snap = () => { const a = [...pts.values()]; return { x: lcPh[X], y: lcPh[Y], z: lcPh[Z], cx: a.reduce((t, p) => t + p.x, 0) / a.length, cy: a.reduce((t, p) => t + p.y, 0) / a.length,
         d: a.length > 1 ? Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) : 0 }; };
-      el.addEventListener('pointerdown', e => { if(!lcPh) return; el.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); start = snap(); });
+      const may = e => lcPh && lcMove && !(e && e.target.closest && e.target.closest('.lc-move')) && !(k === 'f' && !el.closest('.lc-cd').classList.contains('big'));
+      el.addEventListener('pointerdown', e => { if(!may(e)) return; el.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); start = snap(); });
       el.addEventListener('pointermove', e => { if(!lcPh || !pts.has(e.pointerId)) return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
         const now = snap(), box = el.getBoundingClientRect();
         if(pts.size > 1 && start.d) lcPh[Z] = Math.max(1, Math.min(4, start.z * now.d / start.d));
@@ -13348,29 +13387,82 @@ closeRowDD = function(dd){
         lcPh[X] = mv(now.cx - start.cx, iw - box.width, start.x); lcPh[Y] = mv(now.cy - start.cy, ih - box.height, start.y); put(); });
       const up = e => { pts.delete(e.pointerId); if(lcPh && pts.size) start = snap(); };
       el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
-      el.addEventListener('wheel', e => { if(!lcPh) return; e.preventDefault(); lcPh[Z] = Math.max(1, Math.min(4, lcPh[Z] * (e.deltaY < 0 ? 1.08 : 1 / 1.08))); put(); }, { passive: false }); };
+      el.addEventListener('wheel', e => { if(!may(e)) return; e.preventDefault(); lcPh[Z] = Math.max(1, Math.min(4, lcPh[Z] * (e.deltaY < 0 ? 1.08 : 1 / 1.08))); put(); }, { passive: false }); };
     const lcStrip = document.getElementById('lc-strip');
     lcDrag(lcFront, 'f'); lcDrag(lcStrip, 'l');
+    // Move: on, the photo can be dragged and pinched (the front brought forward to do it); the tick turns it off
+    let lcMove = false; const lcMoveB = lcStrip.querySelector('.lc-move'), lcEPair = document.getElementById('lc-epair');
+    function lcSetMove(on){ lcMove = !!(on && lcPh); lcMoveB.classList.toggle('on', lcMove); lcMoveB.setAttribute('aria-label', lcMove ? 'Done moving the photo' : 'Move the photo');
+      [lcFront, lcStrip].forEach(el => el.classList.toggle('movable', lcMove));
+      if(lcMove && !lcFront.closest('.lc-cd').classList.contains('big')) lcFlip(lcFront.closest('.lc-cd')); }
+    lcMoveB.addEventListener('click', e => { e.stopPropagation(); lcSetMove(!lcMove); });
+    // the front and back side by side, as in My Cards: tap the small one to bring it forward
+    function lcFlip(cd){ lcEPair.querySelectorAll('.lc-cd').forEach(x => x.classList.toggle('big', x === cd)); lcPairSize(lcEPair); }
+    lcEPair.querySelectorAll('.lc-cd').forEach(cd => cd.addEventListener('click', () => { if(!cd.classList.contains('big')) lcFlip(cd); }));
+    if(window.ResizeObserver) new ResizeObserver(() => lcPairSize(lcEPair, true)).observe(lcEPair);
     // the front: the library's colour (from its name and location, as the card will have) and the paper texture
     const lcFrontSync = () => { const hex = shown(wishColor(lcName.value.trim(), lcLoc.value.trim()));
-      lcFront.querySelector('.lc-fn').innerHTML = lcName.value.trim() ? esc(lcName.value.trim()) : '<span class="ph">Library Name</span>';
+      lcFront.querySelector('.lcf-n').innerHTML = lcName.value.trim() ? esc(lcName.value.trim()) : '<span class="ph">Library Name</span>';
       lcStrip.querySelector('.t').textContent = lcName.value.trim() || 'Library Name'; lcStrip.querySelector('.a').textContent = lcLoc.value.trim();
-      lcFront.querySelector('.lc-fl').innerHTML = lcLoc.value.trim() ? esc(lcLoc.value.trim()) : '<span class="ph">Location</span>';
-      lcFront.querySelector('.lc-fs').textContent = lcSlogan.value.trim(); lcFitLine(lcFront.querySelector('.lc-fs'));
-      const fh = lcFront.querySelector('.lc-fh'); fh.textContent = lcHolder.value.trim(); fh.classList.toggle('up', !!lcSlogan.value.trim());
-      const sg = lcPage.querySelector('#lc-prev .lc-sig'); sg.hidden = !lcSig.value.trim(); sg.firstElementChild.textContent = lcSig.value.trim(); lcSigFit(sg);
-      if(window.BOOKPAPER){ lcFront.classList.toggle('lite', BOOKPAPER.lite(hex) && !lcPh); BOOKPAPER.draw(lcFront.querySelector('canvas'), hex, lcName.value.trim() + '|' + lcLoc.value.trim(), false); } };
+      lcFront.querySelector('.lcf-l').innerHTML = lcLoc.value.trim() ? esc(lcLoc.value.trim()) : '<span class="ph">Location</span>';
+      lcFront.querySelector('.lcf-s').textContent = lcSlogan.value.trim(); lcFitLine(lcFront.querySelector('.lcf-s'));
+      const fh = lcFront.querySelector('.lcf-h'); fh.textContent = lcHolder.value.trim(); fh.classList.toggle('up', !!lcSlogan.value.trim());
+      const sg = lcEPair.querySelector('.lcf-sig'); if(sg._s !== lcSigData){ sg._s = lcSigData; sg.innerHTML = lcSigData ? lcSigHTML(lcSigData) : ''; }
+      sg.parentElement.classList.toggle('sig', !!lcSigData); lcSigFit(sg);
+      if(lcSignB._s !== lcSigData){ lcSignB._s = lcSigData; lcSignB.innerHTML = lcSigData ? lcSigHTML(lcSigData) : 'Sign (Optional)'; lcSignB.setAttribute('aria-label', lcSigData ? 'Signature: tap to sign again' : 'Sign (optional)'); }
+      if(window.BOOKPAPER){ lcFront.classList.toggle('lite', BOOKPAPER.lite(hex) && !lcPh); lcPaint(lcFront.querySelector('canvas'), hex, lcName.value.trim() + '|' + lcLoc.value.trim()); } };
     const lcCheck = () => { lcNum.value = lcNum.value.replace(/\D/g, '').slice(0, LC_LEN); lcFrontSync();
-      lcBarcode(lcPage.querySelector('#lc-prev svg'), lcPage.querySelector('#lc-prev .lc-num'), lcNum.value);
+      lcBarcode(lcEPair.querySelector('.lc-cb svg'), lcEPair.querySelector('.lc-cb .lc-num'), lcNum.value);
       document.getElementById('lc-num-card').classList.toggle('has', !!lcNum.value); document.getElementById('lc-pin-card').classList.toggle('has', !!lcPin.value);
       lcSaveB.disabled = !(lcName.value.trim() && lcNum.value.length); };
-    [lcName, lcLoc, lcSlogan, lcHolder, lcSig, lcNum, lcPin].forEach(el => el.addEventListener('input', lcCheck));
+    [lcName, lcLoc, lcSlogan, lcHolder, lcNum, lcPin].forEach(el => el.addEventListener('input', lcCheck));
+    // ---- signing: a finger (or pen, or mouse) on the pad, in ink; Done keeps it cut to its ink, nothing signed takes it off ----
+    const spPage = document.getElementById('lc-signpad'), spPad = spPage.querySelector('.sp-pad'), spCv = spPad.querySelector('canvas'), spX = spCv.getContext('2d');
+    let spInk = false, spDirty = false, spPts = null;
+    const SP_INK = '#1d2f6b';
+    function spSize(){ const k = window.devicePixelRatio || 1, r = spCv.getBoundingClientRect(); spCv.width = Math.round(r.width * k); spCv.height = Math.round(r.height * k);
+      spX.setTransform(k, 0, 0, k, 0, 0); spX.lineCap = spX.lineJoin = 'round'; spX.strokeStyle = SP_INK; spX.fillStyle = SP_INK; }
+    function spOpen(){ spPage.classList.add('active'); spPage.setAttribute('aria-hidden', 'false'); if(document.activeElement) document.activeElement.blur();
+      requestAnimationFrame(() => { spSize(); spInk = false; spDirty = false; spPad.classList.remove('inked');
+        if(/^data:image\//.test(lcSigData)){ const im = new Image(); im.onload = () => {   // the one it has, on the line, to add to or clear
+          const r = spCv.getBoundingClientRect(), h = Math.min(r.height * .5, im.height / (window.devicePixelRatio || 1)), w = Math.min(r.width * .84, im.width * h / im.height), hh = w * im.height / im.width;
+          spX.drawImage(im, (r.width - w) / 2, r.height * .73 - hh, w, hh); spInk = true; spPad.classList.add('inked'); }; im.src = lcSigData; } }); }
+    const spClose = () => { spPage.classList.remove('active'); spPage.setAttribute('aria-hidden', 'true'); spPts = null; };
+    const spAt = e => { const r = spCv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top, t: e.timeStamp, p: e.pressure }; };
+    // each stroke smoothed through the midpoints; quicker strokes a touch thinner, as a pen's are
+    spCv.addEventListener('pointerdown', e => { e.preventDefault(); spCv.setPointerCapture(e.pointerId); const a = spAt(e); spPts = [a]; spX.lineWidth = 2.8;
+      spX.beginPath(); spX.arc(a.x, a.y, 1.4, 0, Math.PI * 2); spX.fill(); spInk = spDirty = true; spPad.classList.add('inked'); });
+    spCv.addEventListener('pointermove', e => { if(!spPts) return; e.preventDefault();
+      const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      for(const ev of (evs.length ? evs : [e])){ const a = spAt(ev), b = spPts[spPts.length - 1]; const d = Math.hypot(a.x - b.x, a.y - b.y); if(d < .6) continue;
+        const v = d / Math.max(1, a.t - b.t), w = Math.max(1.6, Math.min(3.4, 3.6 - v * .9)); spX.lineWidth = (spX.lineWidth * .6) + w * .4;
+        const p0 = spPts.length > 1 ? spPts[spPts.length - 2] : b, m1 = { x: (p0.x + b.x) / 2, y: (p0.y + b.y) / 2 }, m2 = { x: (b.x + a.x) / 2, y: (b.y + a.y) / 2 };
+        spX.beginPath(); spX.moveTo(m1.x, m1.y); spX.quadraticCurveTo(b.x, b.y, m2.x, m2.y); spX.stroke(); spPts.push(a); } });
+    const spUp = () => { if(!spPts) return; const n = spPts.length; if(n > 1){ const a = spPts[n - 1], b = spPts[n - 2];
+        spX.beginPath(); spX.moveTo((a.x + b.x) / 2, (a.y + b.y) / 2); spX.lineTo(a.x, a.y); spX.stroke(); } spPts = null; };
+    spCv.addEventListener('pointerup', spUp); spCv.addEventListener('pointercancel', spUp);
+    document.getElementById('sp-clear').addEventListener('click', () => { spX.clearRect(0, 0, spCv.width, spCv.height); spInk = false; spDirty = true; spPad.classList.remove('inked'); });
+    document.getElementById('sp-cancel').addEventListener('click', spClose);
+    document.getElementById('sp-done').addEventListener('click', () => {
+      if(spDirty){ if(!spInk) lcSigData = '';
+        else { // cut to the ink: its furthest marks on every side, a little room round them
+          const W = spCv.width, H = spCv.height, px = spX.getImageData(0, 0, W, H).data; let x0 = W, y0 = H, x1 = -1, y1 = -1;
+          for(let y = 0; y < H; y++) for(let x = 0; x < W; x++) if(px[(y * W + x) * 4 + 3] > 16){ if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y; }
+          if(x1 < 0) lcSigData = '';
+          else { const pad = 3, k = Math.min(1, 160 / (y1 - y0 + 1 + pad * 2)), out = document.createElement('canvas');   // no taller than it needs to be
+            out.width = Math.round((x1 - x0 + 1 + pad * 2) * k); out.height = Math.round((y1 - y0 + 1 + pad * 2) * k);
+            out.getContext('2d').drawImage(spCv, x0 - pad, y0 - pad, x1 - x0 + 1 + pad * 2, y1 - y0 + 1 + pad * 2, 0, 0, out.width, out.height);
+            lcSigData = out.toDataURL('image/png'); } }
+        lcFrontSync(); }
+      spClose(); });
+    lcSignB.addEventListener('click', spOpen);
     function lcOpen(i){
       lcEditing = i; const c = i >= 0 ? cardsL[i] : null;
-      lcName.value = c ? c.name || '' : ''; lcLoc.value = c ? c.loc || '' : ''; lcSlogan.value = c ? c.slogan || '' : ''; lcHolder.value = c ? c.holder || '' : ''; lcSig.value = c ? c.sig || '' : ''; lcNum.value = c ? c.num || '' : ''; lcPin.value = c ? c.pin || '' : '';
+      lcName.value = c ? c.name || '' : ''; lcLoc.value = c ? c.loc || '' : ''; lcSlogan.value = c ? c.slogan || '' : ''; lcHolder.value = c ? c.holder || '' : ''; lcSigData = c ? c.sig || '' : ''; lcNum.value = c ? c.num || '' : ''; lcPin.value = c ? c.pin || '' : '';
       lcPh = c && c.photo ? { src: c.photo, r: c.r || 1.5, x: c.x == null ? 50 : c.x, y: c.y == null ? 50 : c.y, z: c.z || 1,
         lx: c.lx == null ? (c.x == null ? 50 : c.x) : c.lx, ly: c.ly == null ? (c.y == null ? 50 : c.y) : c.ly, lz: c.lz || c.z || 1 } : null;
-      lcFront.classList.toggle('moved', !!lcPh); requestAnimationFrame(lcPhSync);
+      lcFront.classList.toggle('moved', !!lcPh); lcSetMove(false); requestAnimationFrame(lcPhSync);
+      lcEPair.querySelectorAll('.lc-cd').forEach(x => x.classList.toggle('big', x.classList.contains('lc-cf'))); requestAnimationFrame(() => lcPairSize(lcEPair, true));
       document.getElementById('lc-title').textContent = c ? 'Edit Library Card' : 'Add Library Card'; lcSaveB.textContent = c ? 'Save' : 'Add';
       lcDel.hidden = !c; lcDel.classList.remove('armed'); lcDel.textContent = 'Delete'; clearTimeout(lcDelT);
       lcPage.classList.add('active'); lcPage.setAttribute('aria-hidden', 'false'); lcCheck(); requestAnimationFrame(lcFrontSync);
@@ -13379,7 +13471,7 @@ closeRowDD = function(dd){
     window.lcAdd = () => lcOpen(-1);
     document.getElementById('lc-cancel').addEventListener('click', lcClose);
     lcSaveB.addEventListener('click', () => { if(lcSaveB.disabled) return;
-      const c = { name: lcName.value.trim(), loc: lcLoc.value.trim(), slogan: lcSlogan.value.trim(), holder: lcHolder.value.trim(), sig: lcSig.value.trim(), num: lcNum.value, pin: lcPin.value.trim(),
+      const c = { name: lcName.value.trim(), loc: lcLoc.value.trim(), slogan: lcSlogan.value.trim(), holder: lcHolder.value.trim(), sig: lcSigData, num: lcNum.value, pin: lcPin.value.trim(),
         photo: lcPh ? lcPh.src : null, r: lcPh ? lcPh.r : null, x: lcPh ? lcPh.x : null, y: lcPh ? lcPh.y : null, z: lcPh ? lcPh.z : null,
         lx: lcPh ? lcPh.lx : null, ly: lcPh ? lcPh.ly : null, lz: lcPh ? lcPh.lz : null };
       c.color = wishColor(c.name, c.loc);
