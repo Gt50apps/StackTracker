@@ -2283,6 +2283,7 @@
     display:flex; align-items:center; justify-content:center; color:#fff; background:#8a8378;}
   .ln-lib > canvas, .ln-lib > .ll-ph{position:absolute; inset:0; width:100%; height:100%; display:block;}
   .ln-lib > .ll-ph{background-size:cover; display:none;} .ln-lib.photo > .ll-ph{display:block;} .ln-lib.photo > canvas{display:none;}
+  #loan-lib > .ll-ph.rot, .ln-lib > .ll-ph.rot{inset:auto; left:50%; top:50%; transform:translate(-50%, -50%) rotate(90deg); background-repeat:no-repeat;}
   .ln-lib > .ll-ph::after{content:''; position:absolute; inset:0; background:rgba(0,0,0,.28);}
   .ln-lib .ll-logo{position:relative; width:80%; height:auto; filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.6));}
   .ln-lib.none{background:var(--cbffffff, #ffffff); color:var(--cb000000, #000000);} .ln-lib.none > canvas{display:none;} .ln-lib.none .ll-logo{filter:none;}   /* the mark dead centre */
@@ -9247,8 +9248,8 @@
   const libBtn = document.getElementById('loan-lib');
   function libThumb(){ const c = libs().find(x => x.id === loanLib);
     libBtn.classList.toggle('none', !c); libBtn.classList.toggle('photo', !!(c && c.photo)); libBtn.setAttribute('aria-label', c ? 'Library: ' + c.name : 'Choose library');
-    const ph = libBtn.querySelector('.ll-ph'); ph.style.backgroundImage = c && c.photo ? `url("${c.photo}")` : '';
-    if(c && c.photo) ph.style.backgroundPosition = `${c.x == null ? 50 : c.x}% ${c.y == null ? 50 : c.y}%`;
+    const ph = libBtn.querySelector('.ll-ph'); if(!(c && c.photo)) ph.style.backgroundImage = '';
+    if(c && c.photo && window.__libPhoto) requestAnimationFrame(() => __libPhoto(ph, c));
     if(c && !c.photo && window.__libPaint) window.__libPaint(libBtn.querySelector('canvas'), c); }
   const pick = document.getElementById('lib-pick');
   const pickClose = () => { pick.classList.remove('active'); pick.setAttribute('aria-hidden', 'true'); };
@@ -13069,7 +13070,7 @@ closeRowDD = function(dd){
       view.querySelectorAll('.ln-lib').forEach(el => { const c = (window.__libCards ? __libCards() : []).find(x => x.id === el.dataset.lib);
         el.classList.toggle('none', !c); el.classList.toggle('photo', !!(c && c.photo)); if(!c) return;
         el.setAttribute('aria-label', 'From ' + c.name);
-        if(c.photo){ const ph = el.querySelector('.ll-ph'); ph.style.backgroundImage = `url("${c.photo}")`; ph.style.backgroundPosition = `${c.x == null ? 50 : c.x}% ${c.y == null ? 50 : c.y}%`; }
+        if(c.photo){ if(window.__libPhoto) __libPhoto(el.querySelector('.ll-ph'), c); }
         else requestAnimationFrame(() => window.__libPaint && __libPaint(el.querySelector('canvas'), c)); });
       view.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex; fit(c);
         const go = () => { fit(c); if(window.BOOKPAPER){ c.classList.toggle('lite', BOOKPAPER.lite(hex)); BOOKPAPER.draw(cv, hex, ((c.querySelector('.t') || {}).textContent || '') + '|' + ((c.querySelector('.a') || {}).textContent || ''), true, 6); } };   // its paper, as on its card in Home
@@ -13129,6 +13130,10 @@ closeRowDD = function(dd){
     // each card its own id (so a loan can say which library it's from)
     if(cardsL.some(c => !c.id)){ cardsL.forEach((c, i) => { if(!c.id) c.id = 'lc' + Date.now().toString(36) + i; }); lcSave(); }
     window.__libCards = () => cardsL;
+    // a card's photo in an upright slot: the front as placed in its editor, turned on its side to fill it
+    window.__libPhoto = (ph, c, again) => { const box = ph.parentElement, W = box.clientWidth, H = box.clientHeight;
+      if(!W || !H){ if(!again) requestAnimationFrame(() => window.__libPhoto(ph, c, true)); return; }
+      ph.classList.add('rot'); ph.style.width = H + 'px'; ph.style.height = W + 'px'; lcPhotoPut(ph, { photo: c.photo, r: c.r, x: c.x, y: c.y, z: c.z }); };
     window.__libPaint = (cv, c) => { const hex = shown(c.color || wishColor(c.name, c.loc)); if(window.BOOKPAPER) BOOKPAPER.draw(cv, hex, (c.name || '') + '|' + (c.loc || '') + '|v', false); };
     // the chooser's list: each library as its card in My Card; the one picked outlined
     window.__libRows = (box, cur, onPick) => { cardsL.forEach(c => { const hex = shown(c.color || wishColor(c.name, c.loc)), row = document.createElement('div');
@@ -13248,7 +13253,7 @@ closeRowDD = function(dd){
     const lcFront = document.getElementById('lc-front');
     let lcPh = null;   // { src, r (its width over height), x, y, z } while the window is open
     function lcPhotoPut(el, p){
-      const box = el.getBoundingClientRect(), bw = box.width || 340, bh = box.height || 214;
+      const box = el.getBoundingClientRect(), bw = el.offsetWidth || box.width || 340, bh = el.offsetHeight || box.height || 214;   // (its own size, so a turned box reads true)
       const cover = Math.max(1, (bh / bw) * p.r), w = cover * (p.z || 1) * 100;   // its width, as a share of the box's, to cover it
       el.style.backgroundImage = `url("${p.photo || p.src}")`; el.style.backgroundSize = `${w}% auto`;
       el.style.backgroundPosition = `${p.x == null ? 50 : p.x}% ${p.y == null ? 50 : p.y}%`;
