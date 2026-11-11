@@ -1873,11 +1873,14 @@
   #lc-num-card.invalid{border-color:var(--cbaa3333, #aa3333);}
   #wl-foot{position:absolute; left:0; right:0; bottom:0; padding:4px 4px calc(4px + env(safe-area-inset-bottom)); background:var(--band, var(--cb6b4a32, #6b4a32));
     border-top:3px solid var(--cb000000, #000000); border-bottom:3px solid var(--cb000000, #000000);}
-  #wl-real, #wl-real:active{position:relative; overflow:hidden; height:45px; width:100%; margin:0; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cb5b6633, #5b6633); color:var(--cfffffff, #ffffff); box-shadow:none;
-    display:flex; align-items:center; justify-content:center; padding:0 16px;}
-  #wl-real > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
-  #wl-real > span{position:relative; font:700 min(1rem, 4vw)/1 Georgia, 'Times New Roman', serif; letter-spacing:.14em; text-transform:uppercase; white-space:nowrap;}
-  #wl-real:active > canvas{filter:brightness(.92);}
+  /* two cards side by side: Add to My Library | Check Out from Library */
+  #wl-foot .wl-split{display:flex; gap:4px; height:45px;}
+  #wl-real, #wl-real:active, #wl-loan, #wl-loan:active{position:relative; overflow:hidden; flex:1 1 0; min-width:0; height:100%; margin:0; border:3px solid var(--cb000000, #000000); border-radius:8px; box-sizing:border-box;
+    background:var(--cb5b6633, #5b6633); color:var(--cfffffff, #ffffff); box-shadow:none; display:flex; align-items:center; justify-content:center; padding:0 6px;}
+  #wl-loan, #wl-loan:active{background:var(--cb303d66, #303d66);}
+  #wl-real > canvas, #wl-loan > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
+  #wl-real > span, #wl-loan > span{position:relative; font:700 min(.78rem, 3.3vw)/1.15 Georgia, 'Times New Roman', serif; letter-spacing:.1em; text-transform:uppercase; text-align:center;}
+  #wl-real:active > canvas, #wl-loan:active > canvas{filter:brightness(.92);}
   #dt-view-stats .st-m.now{flex:5 1 0;}   /* this month, a bar a day */
 </style>
 <style>
@@ -2891,7 +2894,7 @@
     </div>
     <button type="button" id="wl-del" hidden>Delete</button>
   </div>
-  <div id="wl-foot" hidden><button type="button" id="wl-real"><canvas aria-hidden="true"></canvas><span>Add to My Library</span></button></div>
+  <div id="wl-foot" hidden><div class="wl-split"><button type="button" id="wl-real"><canvas aria-hidden="true"></canvas><span>Add to<br>My Library</span></button><button type="button" id="wl-loan"><canvas aria-hidden="true"></canvas><span>Check Out<br>from Library</span></button></div></div>
 </div>
 <!-- Library card: add / edit (number, optional PIN, library name and location) -->
 <div id="lc-page" aria-hidden="true">
@@ -9038,7 +9041,7 @@
       wordsInput.value = book.words > 0 ? book.words.toLocaleString('en-US') : ''; wordsCard.classList.remove('invalid');
       requestAnimationFrame(cntSync);
       // a library book (or one being checked out now): its loan dates
-      const ln = book.loan || (book._loan ? { out: Date.now(), due: Date.now() + 21 * 864e5 } : null);
+      const ln = book.loan || (book._loan ? { out: Date.now(), due: book._loanDue || Date.now() + 21 * 864e5 } : null);
       loanCard.hidden = !ln; loanAdd.hidden = !!ln; loanCard.classList.remove('invalid'); loanTouched = !!book._loan; loanDropped = false;
       const ymd = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
       if(ln){ loanOut.value = ymd(ln.out); loanDue.value = ymd(ln.due); loanWheelsSync(); }
@@ -13229,7 +13232,8 @@ closeRowDD = function(dd){
       wWords.value = b && b.words ? b.words.toLocaleString() : ''; wWordsCard.classList.remove('invalid'); wWordsHas();
       del.hidden = !b; foot.hidden = !b; del.classList.remove('armed'); del.textContent = 'Delete'; clearTimeout(delT);
       check(); preview(true); page.classList.add('active'); page.setAttribute('aria-hidden', 'false');
-      if(b){ const cv = document.querySelector('#wl-real > canvas'); requestAnimationFrame(() => { if(window.CLOTH) CLOTH.draw(cv, CLOTH.rgb(shown('#5b6633'))); }); }
+      if(b) requestAnimationFrame(() => { if(window.CLOTH){ CLOTH.draw(document.querySelector('#wl-real > canvas'), CLOTH.rgb(shown('#5b6633')));
+        CLOTH.draw(document.querySelector('#wl-loan > canvas'), CLOTH.rgb(shown('#303d66'))); } });
       else setTimeout(() => tIn.focus(), 60);
     }
     function close(){ page.classList.remove('active'); page.setAttribute('aria-hidden', 'true'); if(document.activeElement) document.activeElement.blur(); }
@@ -13258,11 +13262,13 @@ closeRowDD = function(dd){
     // Add to My Library: Add a Book with its title, author and cover colour already in; once it's added there,
     // it leaves the wishlist (Cancel there keeps it)
     let pending = null;
-    document.getElementById('wl-real').addEventListener('click', () => {
-      const b = list[editing]; if(!b) return;
-      pending = b; close();
-      openCustomizeModal({ title: b.title, author: b.author, ...(typeof b.authorLast === 'string' ? { authorFirst: b.authorFirst, authorLast: b.authorLast } : {}), ...(b.released != null ? { released: b.released } : {}), ...(b.words ? { words: b.words } : {}), pages: 0, cover: 'hard', _wishColor: closestColorIdx(COVER_COLOR_PRESETS, shown(b.color)) }, 'add');   // the nearest cover colour
-    });
+    // a wishlist book into the Add a Book window, all it has filled in: as one of your own, or checked out from the library
+    // (out today, due a month from now; Returned left off, there to turn on)
+    const toBook = (b, loan) => { const due = new Date(); due.setMonth(due.getMonth() + 1);
+      return { title: b.title, author: b.author, ...(typeof b.authorLast === 'string' ? { authorFirst: b.authorFirst, authorLast: b.authorLast } : {}), ...(b.released != null ? { released: b.released } : {}), ...(b.words ? { words: b.words } : {}),
+        pages: 0, cover: 'hard', _wishColor: closestColorIdx(COVER_COLOR_PRESETS, shown(b.color)), ...(loan ? { _loan: true, _loanDue: due.getTime() } : {}) }; };   // the nearest cover colour
+    document.getElementById('wl-real').addEventListener('click', () => { const b = list[editing]; if(!b) return; pending = b; close(); openCustomizeModal(toBook(b, false), 'add'); });
+    document.getElementById('wl-loan').addEventListener('click', () => { const b = list[editing]; if(!b) return; pending = b; close(); openCustomizeModal(toBook(b, true), 'add'); });
     window.__wishAdded = () => { if(!pending) return; const i = list.indexOf(pending); if(i >= 0){ list.splice(i, 1); save(); render(); } pending = null; };
     window.__wishClosed = () => { pending = null; };
 
