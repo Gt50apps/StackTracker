@@ -1798,7 +1798,11 @@
   .ln-due .ln-star{position:absolute; top:3px; right:3px; width:11px; height:11px; pointer-events:none; filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));}
   /* a loan's dropdown (tap its card): the dates and what was read, then Renew | Returned | Edit (Returned: Check Out Again | Edit) */
   body.dd-on .wl-row.open{position:relative; z-index:8;}
-  .wl-row.open > .wl-card, .wl-row.open > .ln-due{border-bottom-left-radius:0; border-bottom-right-radius:0;}
+  .wl-row.open > .wl-card, .wl-row.open > .ln-due, .wl-row.open > .ln-lib{border-bottom-left-radius:0; border-bottom-right-radius:0;}
+  /* open: the dropdown lies over the library and days cards, so each takes a soft shadow along its bottom edge */
+  .wl-row > .ln-lib::after, .wl-row > .ln-due::after{content:''; position:absolute; left:0; right:0; bottom:0; height:12px; pointer-events:none; opacity:0; transition:opacity .2s;
+    background:linear-gradient(to top, rgba(0,0,0,.45), rgba(0,0,0,.15) 45%, rgba(0,0,0,0));}
+  .wl-row.open > .ln-lib::after, .wl-row.open > .ln-due::after{opacity:1;}
   .ln-dd .dd-acts .rt{color:var(--cf2e6b4a, #2e6b4a);}
   .ln-dd .dd-acts[hidden], .ln-back[hidden]{display:none;}
   .ln-back{display:flex; gap:4px; height:45px;}
@@ -2269,6 +2273,30 @@
   .ld-set .lw-wheel{flex:1 1 0;}   /* three equal wheels: the day (and its tag) dead centre in the card */
   #loan-x, #loan-x:active{flex:none; width:34px; grid-column:auto; height:auto; margin:0; padding:0; box-shadow:none; color:var(--muted); display:flex; align-items:center; justify-content:center;}
   #loan-x svg{width:13px; height:13px;}
+  /* the library it came from: its card stood on end (taller than wide) — the card's photo or colour, a plain white library mark; tap to choose */
+  #loan-lib, #loan-lib:active{position:relative; flex:none; height:100%; aspect-ratio:53.98 / 85.6; width:auto; margin:0; padding:0; overflow:hidden; box-shadow:none; border-radius:6px; background:#8a8378;}
+  #loan-lib > canvas, #loan-lib > .ll-ph{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  #loan-lib > .ll-ph{background-size:cover; background-position:center; display:none;} #loan-lib.photo > .ll-ph{display:block;} #loan-lib.photo > canvas{display:none;}
+  #loan-lib > .ll-ph::after{content:''; position:absolute; inset:0; background:rgba(0,0,0,.28);}
+  #loan-lib{display:flex !important; align-items:center; justify-content:center;}
+  .ln-lib{position:relative; flex:none; align-self:flex-start; height:46px; width:29px; border:2.5px solid var(--cb000000, #000000); border-radius:6px; overflow:hidden; box-sizing:border-box;
+    display:flex; align-items:center; justify-content:center; color:#fff; background:#8a8378;}
+  .ln-lib > canvas, .ln-lib > .ll-ph{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  .ln-lib > .ll-ph{background-size:cover; display:none;} .ln-lib.photo > .ll-ph{display:block;} .ln-lib.photo > canvas{display:none;}
+  .ln-lib > .ll-ph::after{content:''; position:absolute; inset:0; background:rgba(0,0,0,.28);}
+  .ln-lib .ll-logo{position:relative; width:80%; height:auto; filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.6));}
+  .ln-lib.none{background:var(--cbffffff, #ffffff); color:var(--cb000000, #000000);} .ln-lib.none > canvas{display:none;} .ln-lib.none .ll-logo{filter:none;}   /* the mark dead centre */
+  #loan-x, #loan-x:active{width:auto !important; aspect-ratio:53.98 / 85.6; height:100% !important;}   /* ✕ the same width as the library card beside it */
+  #loan-lib .ll-logo{position:relative; display:block; margin:auto; width:76%; height:auto; filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.6));}
+  #loan-lib.none{background:var(--panel);} #loan-lib.none .ll-logo path{stroke:var(--muted);} #loan-lib.none .ll-logo{filter:none; opacity:.6;}
+  /* choosing it: the library cards as in My Card, and No Library */
+  #lib-pick{position:fixed; inset:0; z-index:40; background:var(--bg); display:flex; flex-direction:column; opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s 180ms;}
+  #lib-pick.active{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  #lib-pick .lp-list{flex:1; overflow-y:auto; padding:6px 4px calc(10px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
+  #lib-pick .wl-row{cursor:pointer;} #lib-pick .wl-row.on .wl-card{outline:3px solid var(--cbffffff, #ffffff); outline-offset:-6px;}
+  #lib-pick .lp-none{height:46px; border:2.5px solid var(--cb000000, #000000); border-radius:6px; background:var(--cbffffff, #ffffff); display:flex; align-items:center; justify-content:center; font:700 .72rem Arial, sans-serif; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);}
+  #lib-pick .lp-none.on{background:var(--ink); color:var(--cbffffff, #ffffff);}
+  #lib-pick .lp-empty{padding:30px 10px; text-align:center; font:700 .72rem Arial, sans-serif; text-transform:uppercase; color:var(--muted);}
   .yc-row input{flex:1; min-width:0;}
   #year-era, #wl-era{flex:none; margin:0; padding:2px 5px; height:auto; border:2px solid var(--cb000000, #000000); border-radius:5px; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--cf8a8378, #8a8378);
     font:700 .58rem/1 Arial, sans-serif; letter-spacing:.3px; cursor:pointer;}
@@ -2945,6 +2973,7 @@
   </div>
   <div id="wl-foot" hidden><div class="wl-split"><button type="button" id="wl-real"><canvas aria-hidden="true"></canvas><span>Add to<br>My Library</span></button><button type="button" id="wl-loan"><canvas aria-hidden="true"></canvas><span>Check Out<br>from Library</span></button></div></div>
 </div>
+<div id="lib-pick" aria-hidden="true"><div class="wl-head"><button type="button" id="lp-cancel">Cancel</button><h2>Choose Library</h2><span></span></div><div class="lp-list"></div></div>
 <!-- Library card: add / edit (number, optional PIN, library name and location) -->
 <div id="lc-page" aria-hidden="true">
   <div class="wl-head"><button type="button" id="lc-cancel">Cancel</button><h2 id="lc-title">Add Library Card</h2><button type="button" id="lc-save" disabled>Add</button></div>
@@ -3024,7 +3053,7 @@
     <button type="button" class="field-card" id="loan-add"><b>Library Book Data</b><i>Optional</i></button>
     <div id="loan-card" hidden><input type="hidden" id="loan-out"><input type="hidden" id="loan-due">
       <div class="field-card ld-set" data-f="out" aria-label="Out"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">OUT</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
-      <div class="field-card ld-set" data-f="due" aria-label="Due"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">DUE</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><input type="hidden" id="loan-back"><div class="field-card ld-set" data-f="back" hidden aria-label="Returned"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">BACK</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ld-add" id="ret-add"><b>Returned</b><i>Optional</i></button><button type="button" class="field-card" id="loan-x" aria-label="Not a library book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="field-card ld-set" data-f="due" aria-label="Due"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">DUE</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><input type="hidden" id="loan-back"><div class="field-card ld-set" data-f="back" hidden aria-label="Returned"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">BACK</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ld-add" id="ret-add"><b>Returned</b><i>Optional</i></button><button type="button" class="field-card" id="loan-lib" aria-label="Library"><canvas aria-hidden="true"></canvas><i class="ll-ph" aria-hidden="true"></i><svg class="ll-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.2L12 4l9 5.2M4.5 9.5h15M6.5 11v6.5M10 11v6.5M14 11v6.5M17.5 11v6.5M4 18.8h16M3 21h18" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="field-card" id="loan-x" aria-label="Not a library book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   </div>
   <div id="customize-footer">
   <div id="customize-fields">
@@ -9099,6 +9128,7 @@
       loanCard.hidden = !ln; loanAdd.hidden = !!ln; loanCard.classList.remove('invalid'); loanTouched = !!book._loan; loanDropped = false;
       const ymd = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
       if(ln){ loanOut.value = ymd(ln.out); loanDue.value = ymd(ln.due); loanWheelsSync(); }
+      loanLib = ln && ln.lib ? ln.lib : (ln && !book.loan ? lastLib() : null); requestAnimationFrame(libThumb);   // a new checkout: the library used last
       retAuto = false; retDropped = false; retCard.classList.remove('invalid');
       if(ln && ln.returned){ loanBack.value = ymd(ln.returned); showRet(true); retSync(); } else showRet(false);
       if(book._loan && customizeMode === 'add') customizePageTitle.textContent = 'Check Out a Book';
@@ -9209,7 +9239,27 @@
   const loanCard = document.getElementById('loan-card'), loanOut = document.getElementById('loan-out'), loanDue = document.getElementById('loan-due'), loanAdd = document.getElementById('loan-add');
   let loanTouched = false, loanDropped = false;   // dates typed in this time / the loan taken off
   const ymdOf = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
-  loanAdd.addEventListener('click', () => { loanOut.value = ymdOf(Date.now()); loanDue.value = ymdOf(Date.now() + 21 * 864e5);
+  // ---- which library: the card stood on end in the row; tapping it opens the list of your library cards ----
+  let loanLib = null;
+  const libs = () => window.__libCards ? window.__libCards() : [];
+  const lastLib = () => { let id = null; try{ id = localStorage.getItem('stack-tracker-last-lib'); }catch(e){} const L = libs();
+    return L.some(c => c.id === id) ? id : (L.length === 1 ? L[0].id : (L[0] ? L[0].id : null)); };
+  const libBtn = document.getElementById('loan-lib');
+  function libThumb(){ const c = libs().find(x => x.id === loanLib);
+    libBtn.classList.toggle('none', !c); libBtn.classList.toggle('photo', !!(c && c.photo)); libBtn.setAttribute('aria-label', c ? 'Library: ' + c.name : 'Choose library');
+    const ph = libBtn.querySelector('.ll-ph'); ph.style.backgroundImage = c && c.photo ? `url("${c.photo}")` : '';
+    if(c && c.photo) ph.style.backgroundPosition = `${c.x == null ? 50 : c.x}% ${c.y == null ? 50 : c.y}%`;
+    if(c && !c.photo && window.__libPaint) window.__libPaint(libBtn.querySelector('canvas'), c); }
+  const pick = document.getElementById('lib-pick');
+  const pickClose = () => { pick.classList.remove('active'); pick.setAttribute('aria-hidden', 'true'); };
+  document.getElementById('lp-cancel').addEventListener('click', pickClose);
+  libBtn.addEventListener('click', () => { const list = pick.querySelector('.lp-list'), L = libs();
+    list.innerHTML = (L.length ? '' : '<div class="lp-empty">No library cards yet — add one in Library › My Card</div>') +
+      `<button type="button" class="lp-none${loanLib ? '' : ' on'}">No Library</button>`;
+    if(window.__libRows) window.__libRows(list, loanLib, id => { loanLib = id; try{ if(id) localStorage.setItem('stack-tracker-last-lib', id); }catch(e){} libThumb(); pickClose(); });
+    list.querySelector('.lp-none').addEventListener('click', () => { loanLib = null; libThumb(); pickClose(); });
+    pick.classList.add('active'); pick.setAttribute('aria-hidden', 'false'); });
+  loanAdd.addEventListener('click', () => { loanOut.value = ymdOf(Date.now()); loanDue.value = ymdOf(Date.now() + 21 * 864e5); loanLib = lastLib(); requestAnimationFrame(libThumb);
     loanAdd.hidden = true; loanCard.hidden = false; loanTouched = true; loanDropped = false; loanWheelsSync(); showRet(false); });
   // ✕ takes off the last card first: the Back date (not returned after all), then the library data itself
   document.getElementById('loan-x').addEventListener('click', e => { if(!retCard.hidden){ e.stopImmediatePropagation(); retAuto = false; retDropped = true; retCard.classList.remove('invalid'); showRet(false); return; } }, true);
@@ -9289,7 +9339,7 @@
     const out = atNoon(loanOut.value), due = atNoon(loanDue.value), back = retCard.hidden ? null : atNoon(loanBack.value);
     if(isNaN(out) || isNaN(due) || due < out) return false;
     if(back != null && (isNaN(back) || back < out)){ retCard.classList.add('invalid'); return false; }
-    return { out, due, back }; };
+    return { out, due, back, lib: loanLib || null }; };
   const yearInput = document.getElementById('year-input'), yearEra = document.getElementById('year-era'), yearCard = document.getElementById('year-card');
   function yearSet(y){ const has = y != null && y !== '' && !isNaN(y); yearInput.value = has ? Math.abs(y) : ''; yearEra.textContent = has && y < 0 ? 'BC' : 'AD';
     yearEra.classList.toggle('bc', has && y < 0); yearCard.classList.remove('invalid'); yearWheels(); }
@@ -12977,6 +13027,9 @@ closeRowDD = function(dd){
         (L.returned ? '' : `<div class="ln-back" hidden><input type="hidden"><div class="field-card ld-set" aria-label="Returned"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">BACK</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ln-ok">Done</button></div>`) +
         `</div></div>`;
     }
+    // a loan's library card, on end, between the book and its days (or returned-date) card (white with a black mark when it has none)
+    const LN_LIB = b => `<span class="ln-lib" data-lib="${esc(b.loan && b.loan.lib || '')}" aria-label="No library"><canvas aria-hidden="true"></canvas><i class="ll-ph" aria-hidden="true"></i>` +
+      `<svg class="ll-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.2L12 4l9 5.2M4.5 9.5h15M6.5 11v6.5M10 11v6.5M14 11v6.5M17.5 11v6.5M4 18.8h16M3 21h18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
     function renderLoans(){
       if(view.dataset.lm === mode){ const was = view.querySelector('.ln-dd.open'); openLoan = was ? +was.dataset.li : -1; }   // keep the open one open (unless it was closed)
       view.dataset.lm = mode;
@@ -13003,15 +13056,21 @@ closeRowDD = function(dd){
           if(S === 'due') html += `<div class="list-divider"><span class="ld-name">${name}</span></div>`;
           g.forEach(([b, i]) => { const n = left(b);
             const [big, small, cls] = n < 0 ? [-n, -n === 1 ? 'Day Late' : 'Days Late', 'late'] : n === 0 ? ['Today', '', 'soon'] : [n, n === 1 ? 'Day Left' : 'Days Left', n <= 3 ? 'soon' : n <= 7 ? 'week' : 'ok'];
-            html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ${cls}" data-li="${i}">${bookFinished(b) ? LN_STAR : ''}<b${typeof big === 'string' ? ' class="w"' : bookFinished(b) && String(big).length >= 3 ? ` class="n${Math.min(4, String(big).length)}"` : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</button></div>` + ddHTML(b, i);
+            html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}${LN_LIB(b)}<button type="button" class="ln-due ${cls}" data-li="${i}">${bookFinished(b) ? LN_STAR : ''}<b${typeof big === 'string' ? ' class="w"' : bookFinished(b) && String(big).length >= 3 ? ` class="n${Math.min(4, String(big).length)}"` : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</button></div>` + ddHTML(b, i);
           });
         });
       } else {
         rows.forEach(([b, i]) => { const d = new Date(b.loan.returned);
-          html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}<button type="button" class="ln-due ret" data-li="${i}"><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></button></div>` + ddHTML(b, i); });
+          html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}${LN_LIB(b)}<button type="button" class="ln-due ret" data-li="${i}"><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></button></div>` + ddHTML(b, i); });
       }
       if(!html && (s || F !== 'all')) html = '<div id="wl-empty">No matches</div>';
       view.innerHTML = html;
+      // each loan's library, as its card stood on end: the card's photo, or its colour and texture
+      view.querySelectorAll('.ln-lib').forEach(el => { const c = (window.__libCards ? __libCards() : []).find(x => x.id === el.dataset.lib);
+        el.classList.toggle('none', !c); el.classList.toggle('photo', !!(c && c.photo)); if(!c) return;
+        el.setAttribute('aria-label', 'From ' + c.name);
+        if(c.photo){ const ph = el.querySelector('.ll-ph'); ph.style.backgroundImage = `url("${c.photo}")`; ph.style.backgroundPosition = `${c.x == null ? 50 : c.x}% ${c.y == null ? 50 : c.y}%`; }
+        else requestAnimationFrame(() => window.__libPaint && __libPaint(el.querySelector('canvas'), c)); });
       view.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex; fit(c);
         const go = () => { fit(c); if(window.BOOKPAPER){ c.classList.toggle('lite', BOOKPAPER.lite(hex)); BOOKPAPER.draw(cv, hex, ((c.querySelector('.t') || {}).textContent || '') + '|' + ((c.querySelector('.a') || {}).textContent || ''), true, 6); } };   // its paper, as on its card in Home
         if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go);
@@ -13067,6 +13126,18 @@ closeRowDD = function(dd){
     const LC_KEY = 'stack-tracker-libcards-v1';
     let cardsL = []; try{ cardsL = JSON.parse(localStorage.getItem(LC_KEY) || '[]'); if(!Array.isArray(cardsL)) cardsL = []; }catch(e){ cardsL = []; }
     const lcSave = () => { try{ localStorage.setItem(LC_KEY, JSON.stringify(cardsL)); }catch(e){} };
+    // each card its own id (so a loan can say which library it's from)
+    if(cardsL.some(c => !c.id)){ cardsL.forEach((c, i) => { if(!c.id) c.id = 'lc' + Date.now().toString(36) + i; }); lcSave(); }
+    window.__libCards = () => cardsL;
+    window.__libPaint = (cv, c) => { const hex = shown(c.color || wishColor(c.name, c.loc)); if(window.BOOKPAPER) BOOKPAPER.draw(cv, hex, (c.name || '') + '|' + (c.loc || '') + '|v', false); };
+    // the chooser's list: each library as its card in My Card; the one picked outlined
+    window.__libRows = (box, cur, onPick) => { cardsL.forEach(c => { const hex = shown(c.color || wishColor(c.name, c.loc)), row = document.createElement('div');
+        row.className = 'wl-row' + (c.id === cur ? ' on' : '');
+        row.innerHTML = `<div class="wl-card${c.photo ? ' has-photo' : ''}" style="--cloth:${hex}"><canvas aria-hidden="true"></canvas>${c.photo ? '<i class="lc-ph" aria-hidden="true"></i>' : ''}<span class="t">${esc(c.name || 'Library Card')}</span>${c.loc ? `<span class="a">${esc(c.loc)}</span>` : ''}</div>`;
+        box.appendChild(row); const card = row.firstElementChild;
+        requestAnimationFrame(() => { if(c.photo) lcPhotoPut(card.querySelector('.lc-ph'), { photo: c.photo, r: c.r, x: c.lx == null ? c.x : c.lx, y: c.ly == null ? c.y : c.ly, z: c.lz || c.z });
+          else if(window.BOOKPAPER){ card.classList.toggle('lite', BOOKPAPER.lite(hex)); BOOKPAPER.draw(card.querySelector('canvas'), hex, (c.name || '') + '|' + (c.loc || ''), true, 6); } });
+        row.addEventListener('click', () => onPick(c.id)); }); };
     let openCard = -1;
     // Codabar, as library cards use: 7 parts a character (bar, space, bar, …), 1 = wide; start A, stop B; a digit not yet
     // typed shows as a grey block, so the number fills in as it's typed
@@ -13246,7 +13317,7 @@ closeRowDD = function(dd){
         photo: lcPh ? lcPh.src : null, r: lcPh ? lcPh.r : null, x: lcPh ? lcPh.x : null, y: lcPh ? lcPh.y : null, z: lcPh ? lcPh.z : null,
         lx: lcPh ? lcPh.lx : null, ly: lcPh ? lcPh.ly : null, lz: lcPh ? lcPh.lz : null };
       c.color = wishColor(c.name, c.loc);
-      if(lcEditing >= 0) cardsL[lcEditing] = Object.assign(cardsL[lcEditing], c); else { cardsL.push(c); openCard = cardsL.length - 1; }
+      if(lcEditing >= 0) cardsL[lcEditing] = Object.assign(cardsL[lcEditing], c); else { c.id = 'lc' + Date.now().toString(36); cardsL.push(c); openCard = cardsL.length - 1; }
       lcSave(); lcClose(); if(mode === 'card') renderCardsL(); });
     lcDel.addEventListener('click', () => { if(lcEditing < 0) return;
       if(!lcDel.classList.contains('armed')){ lcDel.classList.add('armed'); lcDel.textContent = 'Confirm?'; lcDelT = setTimeout(() => { lcDel.classList.remove('armed'); lcDel.textContent = 'Delete'; }, 3000); return; }
