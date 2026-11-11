@@ -1740,6 +1740,9 @@
   .wl-card .t, .wl-card .a{padding-bottom:3px; margin-bottom:-3px;}
   .wl-card .t{margin-top:auto; margin-bottom:auto;}
   .wl-card .t + .a{margin-top:-3px;}
+  /* a library card's years: a third line along the bottom */
+  .wl-card .lc-yrs{font:700 .5rem/1 Arial, sans-serif; letter-spacing:.06em; text-transform:uppercase; color:rgba(255,255,255,.78); margin-top:3px; white-space:nowrap;}
+  .wl-card.lite .lc-yrs{color:rgba(0,0,0,.6);}
   .wl-card.two .t{white-space:normal; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; flex:none;}
   .wl-card.two .a{flex:none;}
   /* at the library? a ✓ (found it), ! (waiting on it) and ✗ (not there) card to the right of each book (the ones not picked faint; none is fine) */
@@ -1899,8 +1902,9 @@
     text-shadow:0 1px 3px rgba(0,0,0,.8); opacity:0; transition:opacity .4s; pointer-events:none; font-style:normal;}
   .lc-front.has-photo:not(.moved) .lc-hint, .lc-face.movable:not(.moved) .lc-hint{opacity:.9;}
   .lc-face .lc-hint{font-size:14px; z-index:2;}
-  .lc-face .ph{opacity:.45;} #lc-front .lcf-h:empty, #lc-front .lcf-s:empty, #lc-epair .lcf-sig:empty{display:none;}
-  #lc-epair{width:100%; align-self:stretch;}
+  .lc-face .ph{opacity:.45;} #lc-front .lcf-s:empty, #lc-epair .lcf-sig:empty{display:none;}
+  #lc-epair{width:100%; align-self:center; max-width:calc((100dvh - 454px) / .4414 + 6px); min-width:160px;}
+  #lc-page:has(.lc-strip.has-photo) #lc-epair{max-width:calc((100dvh - 506px) / .4414 + 6px);}
   .wl-card > .lc-ph{z-index:0;} .wl-card.has-photo > span{position:relative; z-index:1; text-shadow:0 1px 3px rgba(0,0,0,.7);}
   .lc-photo{height:45px;} .lc-photo .fc-more:disabled{color:var(--muted); opacity:.5;}
   #lc-unpick:not(:disabled){color:var(--cbaa3333, #aa3333);}
@@ -1924,14 +1928,8 @@
   .lcf-n{font:700 22px/1.15 Georgia, 'Times New Roman', serif; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
   .lcf-l{font:italic 14px/1.15 Georgia, 'Times New Roman', serif; opacity:.9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .lcf-s{position:absolute; left:18px; right:18px; bottom:15px; text-align:center; font:italic 15px/1.15 Georgia, 'Times New Roman', serif; opacity:.9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .lcf-s::before{content:'\201C';} .lcf-s::after{content:'\201D';}   /* in quotation marks */
   .lc-face.has-photo > span{text-shadow:0 1px 3px rgba(0,0,0,.7); color:#fff;}
-  /* the name on the card, embossed: raised capitals, lit from the top left, centred along the bottom (just above the slogan when there is one) */
-  .lcf-h, .lc-front > .lc-fh{position:absolute; left:18px; right:18px; bottom:15px; text-align:center; font:700 17px/1 'Courier New', Courier, monospace; letter-spacing:2px; text-transform:uppercase;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#ebe7de; text-shadow:-1px -1px 0 rgba(255,255,255,.55), 1px 1px 0 rgba(0,0,0,.6), 2px 2px 2px rgba(0,0,0,.35) !important;}
-  .lcf-h.up{bottom:40px;}
-  .lc-front > .lc-fh{left:14px; right:14px; bottom:11px; max-width:none; font-size:min(.95rem, 4.2vw); letter-spacing:min(2px, .5vw);}
-  .lc-front > .lc-fh.up{bottom:min(2.15rem, 9.4vw);} .lc-front > .lc-fh:empty{display:none;}
-  .lc-face.lite .lcf-h, .lc-front.lite > .lc-fh{color:#77726a;}
   /* the signature: in ink, on a pale hatched panel at the bottom of the back */
   .lcf-sig{position:relative; overflow:hidden; box-sizing:border-box; border:1px solid #cfc6ae;
     background:repeating-linear-gradient(135deg, #f5f1e6 0 4px, #e9e2cf 4px 8px);}
@@ -1941,9 +1939,10 @@
   /* a drawn signature: cut to its ink, so centring the picture centres the ink */
   .lcf-sig img{position:absolute; left:6px; top:2px; width:calc(100% - 12px); height:calc(100% - 4px); object-fit:contain; display:block;}
   /* Name | Sign, halves of one card; signed, the half shows the signature */
-  .lc-hs #lc-sign{border-left:3px solid var(--cb000000, #000000) !important; position:relative; overflow:hidden;}
-  .lc-hs #lc-sign img{position:absolute; left:8px; top:4px; width:calc(100% - 16px); height:calc(100% - 8px); object-fit:contain;}
-  .lc-hs #lc-sign i{font:1.15rem/1 'Snell Roundhand', 'Segoe Script', 'Brush Script MT', 'Dancing Script', cursive; text-transform:none; color:#1d2f6b; white-space:nowrap;}
+  #lc-sign, #lc-sign:active{position:relative; overflow:hidden; margin:0; box-shadow:none; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink);}
+  #lc-sign img{position:absolute; left:8px; top:4px; width:calc(100% - 16px); height:calc(100% - 8px); object-fit:contain;}
+  #lc-sign i{font:1.15rem/1 'Snell Roundhand', 'Segoe Script', 'Brush Script MT', 'Dancing Script', cursive; text-transform:none; color:#1d2f6b; white-space:nowrap;}
   /* the signing pad: dark behind; a wide white pad with a line to sign on; Cancel | Clear | Done */
   #lc-signpad{position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.82); display:flex; align-items:center; justify-content:center; padding:12px;
     opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
@@ -2316,17 +2315,16 @@
   #loan-card{display:flex; gap:4px; height:45px;}
   #loan-card .ld-set .lw-wheel div{font-size:13px;}
   #ret-add{flex:1 1 0; min-width:0; padding:0;}
-  /* a library card's Date Received: a card to tap, then three wheels (the X beside them takes the date off) */
-  .lc-gotrow{display:flex; gap:6px; height:45px; flex:none;}
-  .lc-gotrow > .field-card{height:100%; box-sizing:border-box;}
-  #lc-got-add, #lc-got-add:active{flex:1 1 0; margin:0; padding:0; box-shadow:none; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; cursor:pointer;
-    font:700 .72rem Arial, sans-serif; text-transform:uppercase;}
-  #lc-got-add b{color:var(--ink);} #lc-got-add i{font:normal 700 .5rem/1 Arial, sans-serif; letter-spacing:.4px; color:var(--muted);}
-  #lc-got-set{flex:1 1 0 !important; min-width:0; width:auto !important; display:flex !important;}
-  #lc-got-set .lw-wheel div{font-size:13px;}
-  #lc-got-add[hidden], #lc-got-x[hidden], #lc-got-set[hidden]{display:none !important;}   /* (after the display above) */
-  #lc-got-x, #lc-got-x:active{flex:none; width:45px; margin:0; padding:0; box-shadow:none; display:flex; align-items:center; justify-content:center; color:var(--cbaa3333, #aa3333); cursor:pointer;}
-  #lc-got-x svg{width:16px; height:16px;}
+  /* a library card's dates, as a book's checkout: Date Received · Optional, then Got | End (or End Date · Current) | ✕ */
+  #lc-dates{display:flex; gap:4px; height:45px; flex:none;} #lc-dates[hidden], #lc-dates > [hidden], #lc-dates-add[hidden]{display:none !important;}
+  #lc-dates > .field-card{height:100%; box-sizing:border-box;}
+  #lc-dates .ld-set{flex:1 1 0 !important; min-width:0; width:auto !important;} #lc-dates .ld-set .lw-wheel div{font-size:13px;}
+  #lc-dates-add, #lc-dates-add:active, #lc-end-add, #lc-end-add:active{margin:0; box-shadow:none; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; cursor:pointer;
+    font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  #lc-dates-add b, #lc-end-add b{color:var(--ink);} #lc-dates-add i, #lc-end-add i{font:normal 700 .5rem/1 Arial, sans-serif; letter-spacing:.4px; color:var(--muted);}
+  #lc-end-add{flex:1 1 0 !important; min-width:0; padding:0;}
+  #lc-dates-x, #lc-dates-x:active{flex:none !important; width:34px; margin:0; padding:0; box-shadow:none; color:var(--muted); display:flex; align-items:center; justify-content:center;}
+  #lc-dates-x svg{width:13px; height:13px;}
   #ret-add b{font-size:min(.66rem, 2.6vw);} #ret-add i{font-size:.46rem;}
   .ld-set{position:relative; flex:1 1 0; min-width:0; display:flex; flex-direction:row; padding:0; overflow:hidden; background:var(--panel);}
   .ld-set .lw-wheel{flex:1 1 0;}   /* three equal wheels: the day (and its tag) dead centre in the card */
@@ -3047,7 +3045,7 @@
 <div id="lc-page" aria-hidden="true">
   <div class="wl-head"><button type="button" id="lc-cancel">Cancel</button><h2 id="lc-title">Add Library Card</h2><button type="button" id="lc-save" disabled>Add</button></div>
   <div class="wl-prev-band lc-band"><div class="lc-pair" id="lc-epair">
-      <div class="lc-cd lc-cf big"><div class="lc-face" id="lc-front"><canvas aria-hidden="true"></canvas><i class="lc-ph" aria-hidden="true"></i><span class="lcf-top"><b class="lcf-n"></b><i class="lcf-l"></i></span><span class="lcf-s"></span><span class="lcf-h"></span><em class="lc-hint">Drag to move · pinch to zoom</em></div></div>
+      <div class="lc-cd lc-cf big"><div class="lc-face" id="lc-front"><canvas aria-hidden="true"></canvas><i class="lc-ph" aria-hidden="true"></i><span class="lcf-top"><b class="lcf-n"></b><i class="lcf-l"></i></span><span class="lcf-s"></span><em class="lc-hint">Drag to move · pinch to zoom</em></div></div>
       <div class="lc-cd lc-cb"><div class="lc-face"><i class="lcf-stripe"></i><svg xmlns="http://www.w3.org/2000/svg" aria-label="Barcode"></svg><div class="lc-num"></div><span class="lcf-sig"></span></div></div></div>
     <div class="wl-card lc-strip" id="lc-strip"><canvas aria-hidden="true"></canvas><i class="lc-ph" aria-hidden="true"></i><span class="t"></span><span class="a"></span>
       <button type="button" class="lc-move" aria-label="Move the photo"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="mv"><path d="M12 3.2v17.6M3.2 12h17.6M9.2 6L12 3.2 14.8 6M9.2 18L12 20.8 14.8 18M6 9.2L3.2 12 6 14.8M18 9.2L20.8 12 18 14.8"/></g><g class="ok"><circle cx="12" cy="12" r="9.3" pathLength="1"/><path d="M7.6 12.4l3 3 5.8-6.2" pathLength="1"/></g></svg></button></div></div>
@@ -3057,12 +3055,13 @@
     <div class="field-card"><input id="lc-name" type="text" placeholder="Library Name" autocomplete="off" aria-label="Library name"></div>
     <div class="field-card"><input id="lc-loc" type="text" placeholder="Location" autocomplete="off" aria-label="Location"></div>
     <div class="field-card"><input id="lc-slogan" type="text" placeholder="Slogan (Optional)" autocomplete="off" aria-label="Slogan (optional)"></div>
-    <div class="field-card split lc-hs"><div class="fc-half"><input id="lc-holder" type="text" placeholder="Name (Optional)" autocomplete="off" autocapitalize="characters" aria-label="Name on card (optional)"></div><button type="button" class="fc-more" id="lc-sign">Sign (Optional)</button></div>
+    <button type="button" class="field-card" id="lc-sign">Sign (Optional)</button>
     <div class="wl-pair">
       <div class="field-card cnt-card" id="lc-num-card"><span class="cnt-lbl"><b>Card</b> <b>Number</b></span><input id="lc-num" type="text" inputmode="numeric" maxlength="14" autocomplete="off" aria-label="Library card number"></div>
       <div class="field-card cnt-card" id="lc-pin-card"><span class="cnt-lbl"><b>PIN</b> <b class="opt">(Optional)</b></span><input id="lc-pin" type="text" inputmode="numeric" autocomplete="off" aria-label="PIN (optional)"></div>
     </div>
-    <div class="lc-gotrow"><input type="hidden" id="lc-got"><div class="field-card ld-set" id="lc-got-set" hidden aria-label="Date received"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">GOT</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ld-add" id="lc-got-add"><b>Date Received</b><i>Optional</i></button><button type="button" class="field-card" id="lc-got-x" hidden aria-label="No date received"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <button type="button" class="field-card" id="lc-dates-add"><b>Date Received</b><i>Optional</i></button>
+    <div id="lc-dates" hidden><input type="hidden" id="lc-got"><input type="hidden" id="lc-end"><div class="field-card ld-set" id="lc-got-set" aria-label="Date received"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">GOT</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><div class="field-card ld-set" id="lc-end-set" hidden aria-label="End date"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">END</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card" id="lc-end-add"><b>End Date</b><i>Current</i></button><button type="button" class="field-card" id="lc-dates-x" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <button type="button" id="lc-del" hidden>Delete</button>
   </div>
 </div>
@@ -13057,7 +13056,7 @@ closeRowDD = function(dd){
               s: [['due', 'Due Date', 'Soonest first, grouped by when', 'Latest first, grouped by when'], ['title', 'Title', 'A–Z', 'Z–A'], ['author', 'Author', 'Last name, first name, then title', 'Z–A: last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first', 'Earliest checked out first'], ['year', 'Year', 'Oldest released first; no year last', 'No year first, then newest released']] },
       ret:  { f: [['all', 'All', 'Every book returned'], ['done', 'Finished', 'Read to the end'], ['part', 'Not Finished', 'Went back before the end'], ['late', 'Returned Late', 'Went back after its due date']],
               s: [['back', 'Returned', 'Most recently returned first', 'Earliest returned first'], ['title', 'Title', 'A–Z', 'Z–A'], ['author', 'Author', 'Last name, first name, then title', 'Z–A: last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first', 'Earliest checked out first'], ['year', 'Year', 'Oldest released first; no year last', 'No year first, then newest released']] } };
-    LB.card = { f: [['all', 'All', 'Every library card'], ['out', 'Books Out', 'Has a book checked out now'], ['photo', 'With Photo', 'Has a photo on the front']],
+    LB.card = { f: [['all', 'All', 'Every library card'], ['out', 'Books Out', 'Has a book checked out now'], ['cur', 'Current', 'Cards still in use'], ['old', 'Past', 'Cards no longer in use'], ['photo', 'With Photo', 'Has a photo on the front']],
                 s: [['added', 'Date Added', 'The order you added them', 'Newest added first'], ['got', 'Date Received', 'The card you got first, first', 'The card you got last, first'], ['name', 'Library', 'A–Z', 'Z–A']] };
     let lbSel = { wish: { f: 'all', s: 'status' }, out: { f: 'all', s: 'due' }, ret: { f: 'all', s: 'back' }, card: { f: 'all', s: 'added' } };
     try{ const v = JSON.parse(localStorage.getItem('stack-tracker-lb-sort') || 'null'); if(v) ['wish', 'out', 'ret', 'card'].forEach(k => { if(v[k]) Object.assign(lbSel[k], v[k]); }); }catch(e){}
@@ -13257,6 +13256,9 @@ closeRowDD = function(dd){
       let [L, Rt] = ink(); const room = W - 12;
       if(L + Rt > room){ i.style.fontSize = (parseFloat(getComputedStyle(i).fontSize) * room / (L + Rt)) + 'px'; [L, Rt] = ink(); }
       i.style.left = ((W - (L + Rt)) / 2 + L) + 'px'; }
+    // re-sized when its width changes (only then: setting its height mustn't set it off again), on the next frame
+    const lcPairWatch = pair => { if(!window.ResizeObserver) return; let w = -1;
+      new ResizeObserver(() => { const nw = pair.clientWidth; if(nw === w) return; w = nw; requestAnimationFrame(() => lcPairSize(pair, true)); }).observe(pair); };
     function lcPairSize(pair, still){
       const W = pair.clientWidth; if(!W) return;
       const G = 6, big = (W - G) * .7, small = W - G - big, H = big * 214.4 / 340;
@@ -13292,12 +13294,17 @@ closeRowDD = function(dd){
         const go = () => { fit(el); if(window.BOOKPAPER){ el.classList.toggle('lite', BOOKPAPER.lite(hex)); BOOKPAPER.draw(cv, hex, ((el.querySelector('.t') || {}).textContent || '') + '|' + ((el.querySelector('.a') || {}).textContent || ''), true, 6); } };
         requestAnimationFrame(go); });
     }
+    // its years: when it was got, to when it ended (or Present while it's current); month and year
+    const lcMY = v => { const [y, m] = v.split('-').map(Number); return new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'short' }) + ' ' + y; };
+    const lcRange = c => { const cur = c.current !== false, a = c.got ? lcMY(c.got) : '', b = cur ? 'Present' : c.end ? lcMY(c.end) : '';
+      if(!a && !(c.end && !cur)) return '';   // (nothing to show: no dates)
+      return a && b ? `${a} – ${b}` : a ? `Since ${a}` : `Until ${b}`; };
     function renderCardsL(){
       if(!cardsL.length){ view.innerHTML = '<div id="wl-empty">No library cards yet</div>'; return; }
       // searched, filtered and sorted (each keeps its place in the saved list, which the rows point to)
       const qs = q.value.trim().toLowerCase(), F = lbSel.card.f, S = lbSel.card.s, dn = lbDescs.card;
       const outLibs = new Set(books.filter(b => b.loan && !b.loan.returned && b.loan.lib).map(b => b.loan.lib));
-      const rows = cardsL.map((c, i) => [c, i]).filter(([c]) => (F === 'all' || (F === 'out' ? outLibs.has(c.id) : !!c.photo)) &&
+      const rows = cardsL.map((c, i) => [c, i]).filter(([c]) => (F === 'all' || (F === 'out' ? outLibs.has(c.id) : F === 'cur' ? c.current !== false : F === 'old' ? c.current === false : !!c.photo)) &&
         (!qs || ((c.name || '') + ' ' + (c.loc || '') + ' ' + (c.slogan || '')).toLowerCase().includes(qs)));
       const nm = c => (c.name || '').toLowerCase();
       if(S === 'name') rows.sort((a, b) => nm(a[0]).localeCompare(nm(b[0])) * (dn ? -1 : 1) || a[1] - b[1]);
@@ -13307,12 +13314,12 @@ closeRowDD = function(dd){
       if(!rows.length){ view.innerHTML = '<div id="wl-empty">No library cards match</div>'; return; }
       view.innerHTML = rows.map(([c, i]) => {
         const hex = c.color || wishColor(c.name, c.loc);
-        return `<div class="wl-row lc-row" data-ci="${i}"><div class="wl-card${c.photo ? ' has-photo' : ''}" data-hex="${shown(hex)}" style="--cloth:${shown(hex)}"><canvas aria-hidden="true"></canvas>${c.photo ? '<i class="lc-ph" aria-hidden="true"></i>' : ''}<span class="t">${esc(c.name || 'Library Card')}</span>${c.loc ? `<span class="a">${esc(c.loc)}</span>` : ''}</div></div>` +
+        return `<div class="wl-row lc-row" data-ci="${i}"><div class="wl-card${c.photo ? ' has-photo' : ''}" data-hex="${shown(hex)}" style="--cloth:${shown(hex)}"><canvas aria-hidden="true"></canvas>${c.photo ? '<i class="lc-ph" aria-hidden="true"></i>' : ''}<span class="t">${esc(c.name || 'Library Card')}</span>${c.loc ? `<span class="a">${esc(c.loc)}</span>` : ''}${lcRange(c) ? `<span class="lc-yrs">${esc(lcRange(c))}</span>` : ''}</div></div>` +
           `<div class="row-dd book-dd ln-dd lc-dd" data-ci="${i}"><div class="dd-in">` +
             // the card itself, front and back side by side: the one in front big, the other small beside it (tap it to bring it forward)
             `<div class="lc-pair">` +
               `<div class="lc-cd lc-cf big"><div class="lc-face${c.photo ? ' has-photo' : ''}"><canvas aria-hidden="true"></canvas>${c.photo ? '<i class="lc-ph" aria-hidden="true"></i>' : ''}` +
-                `<span class="lcf-top"><b class="lcf-n">${esc(c.name || 'Library Card')}</b>${c.loc ? `<i class="lcf-l">${esc(c.loc)}</i>` : ''}</span>${c.slogan ? `<span class="lcf-s">${esc(c.slogan)}</span>` : ''}${c.holder ? `<span class="lcf-h${c.slogan ? ' up' : ''}">${esc(c.holder)}</span>` : ''}</div></div>` +
+                `<span class="lcf-top"><b class="lcf-n">${esc(c.name || 'Library Card')}</b>${c.loc ? `<i class="lcf-l">${esc(c.loc)}</i>` : ''}</span>${c.slogan ? `<span class="lcf-s">${esc(c.slogan)}</span>` : ''}</div></div>` +
               `<div class="lc-cd lc-cb"><div class="lc-face${c.sig ? ' sig' : ''}"><i class="lcf-stripe"></i><svg xmlns="http://www.w3.org/2000/svg" aria-label="Barcode"></svg><div class="lc-num"></div>${c.sig ? `<span class="lcf-sig">${lcSigHTML(c.sig)}</span>` : ''}</div></div>` +
             `</div>` +
             // the PIN hidden as asterisks (round-ended strokes) until its card is tapped; tap again to hide it
@@ -13326,7 +13333,7 @@ closeRowDD = function(dd){
         else { f.classList.toggle('lite', !!(window.BOOKPAPER && BOOKPAPER.lite(hex))); lcPaint(f.querySelector('canvas'), hex, (c.name || '') + '|' + (c.loc || '')); }
         lcFitLine(dd.querySelector('.lcf-s')); lcSigFit(dd.querySelector('.lcf-sig'));
         const pair = dd.querySelector('.lc-pair'); lcPairSize(pair, true);
-        if(window.ResizeObserver) new ResizeObserver(() => lcPairSize(pair, true)).observe(pair); });
+        lcPairWatch(pair); });
       view.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex; fit(c);
         const go = () => { fit(c); if(window.BOOKPAPER){ c.classList.toggle('lite', BOOKPAPER.lite(hex)); BOOKPAPER.draw(cv, hex, ((c.querySelector('.t') || {}).textContent || '') + '|' + ((c.querySelector('.a') || {}).textContent || ''), true, 6); } };
         if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go); });
@@ -13365,7 +13372,7 @@ closeRowDD = function(dd){
           clearTimeout(t); cardsL.splice(+x.closest('.lc-dd').dataset.ci, 1); openCard = -1; lcSave(); renderCardsL(); }); });
     }
     // the add / edit page: the barcode filling in on top as the number is typed
-    const lcSlogan = document.getElementById('lc-slogan'), lcHolder = document.getElementById('lc-holder'), lcSignB = document.getElementById('lc-sign');
+    const lcSlogan = document.getElementById('lc-slogan'), lcSignB = document.getElementById('lc-sign');
     let lcSigData = '';   // the signature while the window is open
     const lcPage = document.getElementById('lc-page'), lcName = document.getElementById('lc-name'), lcLoc = document.getElementById('lc-loc'),
       lcNum = document.getElementById('lc-num'), lcPin = document.getElementById('lc-pin'), lcSaveB = document.getElementById('lc-save'), lcDel = document.getElementById('lc-del');
@@ -13424,14 +13431,13 @@ closeRowDD = function(dd){
     // the front and back side by side, as in My Cards: tap the small one to bring it forward
     function lcFlip(cd){ lcEPair.querySelectorAll('.lc-cd').forEach(x => x.classList.toggle('big', x === cd)); lcPairSize(lcEPair); }
     lcEPair.querySelectorAll('.lc-cd').forEach(cd => cd.addEventListener('click', () => { if(!cd.classList.contains('big')) lcFlip(cd); }));
-    if(window.ResizeObserver) new ResizeObserver(() => lcPairSize(lcEPair, true)).observe(lcEPair);
+    lcPairWatch(lcEPair);
     // the front: the library's colour (from its name and location, as the card will have) and the paper texture
     const lcFrontSync = () => { const hex = shown(wishColor(lcName.value.trim(), lcLoc.value.trim()));
       lcFront.querySelector('.lcf-n').innerHTML = lcName.value.trim() ? esc(lcName.value.trim()) : '<span class="ph">Library Name</span>';
       lcStrip.querySelector('.t').textContent = lcName.value.trim() || 'Library Name'; lcStrip.querySelector('.a').textContent = lcLoc.value.trim();
       lcFront.querySelector('.lcf-l').innerHTML = lcLoc.value.trim() ? esc(lcLoc.value.trim()) : '<span class="ph">Location</span>';
       lcFront.querySelector('.lcf-s').textContent = lcSlogan.value.trim(); lcFitLine(lcFront.querySelector('.lcf-s'));
-      const fh = lcFront.querySelector('.lcf-h'); fh.textContent = lcHolder.value.trim(); fh.classList.toggle('up', !!lcSlogan.value.trim());
       const sg = lcEPair.querySelector('.lcf-sig'); if(sg._s !== lcSigData){ sg._s = lcSigData; sg.innerHTML = lcSigData ? lcSigHTML(lcSigData) : ''; }
       sg.parentElement.classList.toggle('sig', !!lcSigData); lcSigFit(sg);
       if(lcSignB._s !== lcSigData){ lcSignB._s = lcSigData; lcSignB.innerHTML = lcSigData ? lcSigHTML(lcSigData) : 'Sign (Optional)'; lcSignB.setAttribute('aria-label', lcSigData ? 'Signature: tap to sign again' : 'Sign (optional)'); }
@@ -13440,7 +13446,7 @@ closeRowDD = function(dd){
       lcBarcode(lcEPair.querySelector('.lc-cb svg'), lcEPair.querySelector('.lc-cb .lc-num'), lcNum.value);
       document.getElementById('lc-num-card').classList.toggle('has', !!lcNum.value); document.getElementById('lc-pin-card').classList.toggle('has', !!lcPin.value);
       lcSaveB.disabled = !(lcName.value.trim() && lcNum.value.length); };
-    [lcName, lcLoc, lcSlogan, lcHolder, lcNum, lcPin].forEach(el => el.addEventListener('input', lcCheck));
+    [lcName, lcLoc, lcSlogan, lcNum, lcPin].forEach(el => el.addEventListener('input', lcCheck));
     // ---- signing: a finger (or pen, or mouse) on the pad, in ink; Done keeps it cut to its ink, nothing signed takes it off ----
     const spPage = document.getElementById('lc-signpad'), spPad = spPage.querySelector('.sp-pad'), spCv = spPad.querySelector('canvas'), spX = spCv.getContext('2d');
     let spInk = false, spDirty = false, spPts = null;
@@ -13481,17 +13487,22 @@ closeRowDD = function(dd){
         lcFrontSync(); }
       spClose(); });
     lcSignB.addEventListener('click', spOpen);
-    // Date Received: optional, kept as yyyy-mm-dd
-    const lcGot = document.getElementById('lc-got'), lcGotSet = document.getElementById('lc-got-set'), lcGotAdd = document.getElementById('lc-got-add'), lcGotX = document.getElementById('lc-got-x');
-    let lcGotSync = null;   // (its wheels made the first time they're needed)
-    const lcGotShow = () => { const on = !!lcGot.value; lcGotSet.hidden = lcGotX.hidden = !on; lcGotAdd.hidden = on;
-      if(on) requestAnimationFrame(() => { if(!lcGotSync) lcGotSync = window.__dateSet(lcGotSet, lcGot, null, { y0: 1940, n: new Date().getFullYear() - 1940 + 1 });   // (a card can be decades old)
-        lcGotSync(); }); };
-    lcGotAdd.addEventListener('click', () => { const d = new Date(); lcGot.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); lcGotShow(); });
-    lcGotX.addEventListener('click', () => { lcGot.value = ''; lcGotShow(); });
+    // the dates, as a book's checkout: Date Received · Optional opens Got and End; End stays Current until tapped
+    // (✕ takes off the end date when there is one, then the dates)
+    const lcGot = document.getElementById('lc-got'), lcEnd = document.getElementById('lc-end'), lcDates = document.getElementById('lc-dates'), lcDatesAdd = document.getElementById('lc-dates-add'),
+      lcEndSet = document.getElementById('lc-end-set'), lcEndAdd = document.getElementById('lc-end-add');
+    const lcYr = { y0: 1940, n: new Date().getFullYear() - 1940 + 1 };   // (a card can be decades old)
+    let lcGotSync = null, lcEndSync = null;
+    const lcToday = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+    const lcDatesShow = () => { const on = !!lcGot.value, end = on && !!lcEnd.value; lcDates.hidden = !on; lcDatesAdd.hidden = on; lcEndSet.hidden = !end; lcEndAdd.hidden = end;
+      requestAnimationFrame(() => { if(on){ if(!lcGotSync) lcGotSync = window.__dateSet(document.getElementById('lc-got-set'), lcGot, null, lcYr); lcGotSync(); }
+        if(end){ if(!lcEndSync) lcEndSync = window.__dateSet(lcEndSet, lcEnd, null, lcYr); lcEndSync(); } }); };
+    lcDatesAdd.addEventListener('click', () => { lcGot.value = lcToday(); lcEnd.value = ''; lcDatesShow(); });
+    lcEndAdd.addEventListener('click', () => { lcEnd.value = lcToday(); lcDatesShow(); });
+    document.getElementById('lc-dates-x').addEventListener('click', () => { if(lcEnd.value) lcEnd.value = ''; else lcGot.value = ''; lcDatesShow(); });
     function lcOpen(i){
-      lcEditing = i; const c = i >= 0 ? cardsL[i] : null; lcGot.value = c && c.got || ''; lcGotShow();
-      lcName.value = c ? c.name || '' : ''; lcLoc.value = c ? c.loc || '' : ''; lcSlogan.value = c ? c.slogan || '' : ''; lcHolder.value = c ? c.holder || '' : ''; lcSigData = c ? c.sig || '' : ''; lcNum.value = c ? c.num || '' : ''; lcPin.value = c ? c.pin || '' : '';
+      lcEditing = i; const c = i >= 0 ? cardsL[i] : null; lcGot.value = c && c.got || ''; lcEnd.value = c && c.got && c.current === false && c.end || ''; lcDatesShow();
+      lcName.value = c ? c.name || '' : ''; lcLoc.value = c ? c.loc || '' : ''; lcSlogan.value = c ? c.slogan || '' : ''; lcSigData = c ? c.sig || '' : ''; lcNum.value = c ? c.num || '' : ''; lcPin.value = c ? c.pin || '' : '';
       lcPh = c && c.photo ? { src: c.photo, r: c.r || 1.5, x: c.x == null ? 50 : c.x, y: c.y == null ? 50 : c.y, z: c.z || 1,
         lx: c.lx == null ? (c.x == null ? 50 : c.x) : c.lx, ly: c.ly == null ? (c.y == null ? 50 : c.y) : c.ly, lz: c.lz || c.z || 1 } : null;
       lcFront.classList.toggle('moved', !!lcPh); lcSetMove(false); requestAnimationFrame(lcPhSync);
@@ -13504,11 +13515,11 @@ closeRowDD = function(dd){
     window.lcAdd = () => lcOpen(-1);
     document.getElementById('lc-cancel').addEventListener('click', lcClose);
     lcSaveB.addEventListener('click', () => { if(lcSaveB.disabled) return;
-      const c = { name: lcName.value.trim(), loc: lcLoc.value.trim(), slogan: lcSlogan.value.trim(), holder: lcHolder.value.trim(), sig: lcSigData, got: lcGot.value || null, num: lcNum.value, pin: lcPin.value.trim(),
+      const c = { name: lcName.value.trim(), loc: lcLoc.value.trim(), slogan: lcSlogan.value.trim(), sig: lcSigData, got: lcGot.value || null, current: !lcEnd.value, end: lcEnd.value || null, num: lcNum.value, pin: lcPin.value.trim(),
         photo: lcPh ? lcPh.src : null, r: lcPh ? lcPh.r : null, x: lcPh ? lcPh.x : null, y: lcPh ? lcPh.y : null, z: lcPh ? lcPh.z : null,
         lx: lcPh ? lcPh.lx : null, ly: lcPh ? lcPh.ly : null, lz: lcPh ? lcPh.lz : null };
       c.color = wishColor(c.name, c.loc);
-      if(lcEditing >= 0) cardsL[lcEditing] = Object.assign(cardsL[lcEditing], c); else { c.id = 'lc' + Date.now().toString(36); cardsL.push(c); openCard = cardsL.length - 1; }
+      if(lcEditing >= 0){ cardsL[lcEditing] = Object.assign(cardsL[lcEditing], c); delete cardsL[lcEditing].holder; }   // (no name on cards any more) else { c.id = 'lc' + Date.now().toString(36); cardsL.push(c); openCard = cardsL.length - 1; }
       lcSave(); lcClose(); if(mode === 'card') renderCardsL(); });
     lcDel.addEventListener('click', () => { if(lcEditing < 0) return;
       if(!lcDel.classList.contains('armed')){ lcDel.classList.add('armed'); lcDel.textContent = 'Confirm?'; lcDelT = setTimeout(() => { lcDel.classList.remove('armed'); lcDel.textContent = 'Delete'; }, 3000); return; }
