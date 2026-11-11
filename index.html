@@ -2283,7 +2283,7 @@
     display:flex; align-items:center; justify-content:center; color:#fff; background:#8a8378;}
   .ln-lib > canvas, .ln-lib > .ll-ph{position:absolute; inset:0; width:100%; height:100%; display:block;}
   .ln-lib > .ll-ph{background-size:cover; display:none;} .ln-lib.photo > .ll-ph{display:block;} .ln-lib.photo > canvas{display:none;}
-  #loan-lib > .ll-ph.rot, .ln-lib > .ll-ph.rot{inset:auto; left:50%; top:50%; transform:translate(-50%, -50%) rotate(90deg); background-repeat:no-repeat;}
+  #loan-lib > .ll-ph.rot, .ln-lib > .ll-ph.rot{inset:auto; left:50%; top:50%; transform:translate(-50%, -50%) rotate(-90deg); background-repeat:no-repeat;}
   .ln-lib > .ll-ph::after{content:''; position:absolute; inset:0; background:rgba(0,0,0,.28);}
   .ln-lib .ll-logo{position:relative; width:80%; height:auto; filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.6));}
   .ln-lib.none{background:var(--cbffffff, #ffffff); color:var(--cb000000, #000000);} .ln-lib.none > canvas{display:none;} .ln-lib.none .ll-logo{filter:none;}   /* the mark dead centre */
@@ -2291,6 +2291,12 @@
   #loan-lib .ll-logo{position:relative; display:block; margin:auto; width:76%; height:auto; filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.6));}
   #loan-lib.none{background:var(--panel);} #loan-lib.none .ll-logo path{stroke:var(--muted);} #loan-lib.none .ll-logo{filter:none; opacity:.6;}
   /* choosing it: the library cards as in My Card, and No Library */
+  #lib-log{position:fixed; inset:0; z-index:40; background:var(--bg); display:flex; flex-direction:column; opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s 180ms;}
+  #lib-log.active{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  #lib-log .wl-head h2{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  #lib-log .lp-list{flex:1; overflow-y:auto; padding:6px 4px calc(10px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
+  #lib-log .lp-empty{padding:30px 10px; text-align:center; font:700 .72rem Arial, sans-serif; text-transform:uppercase; color:var(--muted);}
+  #lib-log .ln-due{cursor:default;}
   #lib-pick{position:fixed; inset:0; z-index:40; background:var(--bg); display:flex; flex-direction:column; opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s 180ms;}
   #lib-pick.active{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
   #lib-pick .lp-list{flex:1; overflow-y:auto; padding:6px 4px calc(10px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
@@ -2974,6 +2980,7 @@
   </div>
   <div id="wl-foot" hidden><div class="wl-split"><button type="button" id="wl-real"><canvas aria-hidden="true"></canvas><span>Add to<br>My Library</span></button><button type="button" id="wl-loan"><canvas aria-hidden="true"></canvas><span>Check Out<br>from Library</span></button></div></div>
 </div>
+<div id="lib-log" aria-hidden="true"><div class="wl-head"><button type="button" id="lg-back">Back</button><h2>Log</h2><span></span></div><div class="lp-list"></div></div>
 <div id="lib-pick" aria-hidden="true"><div class="wl-head"><button type="button" id="lp-cancel">Cancel</button><h2>Choose Library</h2><span></span></div><div class="lp-list"></div></div>
 <!-- Library card: add / edit (number, optional PIN, library name and location) -->
 <div id="lc-page" aria-hidden="true">
@@ -13183,6 +13190,26 @@ closeRowDD = function(dd){
     lcPaintCv.style.cssText = 'position:fixed; left:-1000px; top:0; width:340px; height:214px; pointer-events:none;';
     function lcPaint(cv, hex, seed){ if(!window.BOOKPAPER) return; if(!lcPaintCv.isConnected) document.body.appendChild(lcPaintCv);
       lcPaintCv._drawn = ''; BOOKPAPER.draw(lcPaintCv, hex, seed, false); cv.width = lcPaintCv.width; cv.height = lcPaintCv.height; cv.getContext('2d').drawImage(lcPaintCv, 0, 0); }
+    // a library's log: every book checked out from it, still out (soonest due first) then returned (latest first)
+    const lgPage = document.getElementById('lib-log'), lgList = lgPage.querySelector('.lp-list');
+    const lgClose = () => { lgPage.classList.remove('active'); lgPage.setAttribute('aria-hidden', 'true'); };
+    document.getElementById('lg-back').addEventListener('click', lgClose);
+    function libLog(c){ if(!c) return;
+      lgPage.querySelector('h2').textContent = c.name || 'Library Card';
+      const t0 = today(), mine = books.filter(b => b.loan && b.loan.lib && b.loan.lib === c.id);
+      const out = mine.filter(b => !b.loan.returned).sort((p, n) => p.loan.due - n.loan.due), back = mine.filter(b => b.loan.returned).sort((p, n) => n.loan.returned - p.loan.returned);
+      const dueCard = b => { const d = new Date(b.loan.due); d.setHours(0, 0, 0, 0); const n = Math.round((d.getTime() - t0) / DAY);
+        const [big, small, cls] = n < 0 ? [-n, -n === 1 ? 'Day Late' : 'Days Late', 'late'] : n === 0 ? ['Today', '', 'soon'] : [n, n === 1 ? 'Day Left' : 'Days Left', n <= 3 ? 'soon' : n <= 7 ? 'week' : 'ok'];
+        return `<span class="ln-due ${cls}"><b${typeof big === 'string' ? ' class="w"' : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</span>`; };
+      const backCard = b => { const d = new Date(b.loan.returned); return `<span class="ln-due ret"><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></span>`; };
+      const group = (name, list, card) => list.length ? `<div class="list-divider"><span class="ld-name">${name}</span></div>` + list.map(b => `<div class="wl-row">${cardHTML(b, -1)}${card(b)}</div>`).join('') : '';
+      lgList.innerHTML = mine.length ? group('Checked Out', out, dueCard) + group('Returned', back, backCard) : '<div class="lp-empty">No books from this library yet</div>';
+      lgPage.classList.add('active'); lgPage.setAttribute('aria-hidden', 'false');
+      lgList.scrollTop = 0;
+      lgList.querySelectorAll('.wl-card').forEach(el => { const cv = el.querySelector('canvas'), hex = el.dataset.hex;
+        const go = () => { fit(el); if(window.BOOKPAPER){ el.classList.toggle('lite', BOOKPAPER.lite(hex)); BOOKPAPER.draw(cv, hex, ((el.querySelector('.t') || {}).textContent || '') + '|' + ((el.querySelector('.a') || {}).textContent || ''), true, 6); } };
+        requestAnimationFrame(go); });
+    }
     function renderCardsL(){
       if(!cardsL.length){ view.innerHTML = '<div id="wl-empty">No library cards yet</div>'; return; }
       view.innerHTML = cardsL.map((c, i) => {
@@ -13197,7 +13224,7 @@ closeRowDD = function(dd){
             `</div>` +
             // the PIN hidden as asterisks (round-ended strokes) until its card is tapped; tap again to hide it
             (c.pin ? `<button type="button" class="dd-stats lc-pin">PIN <b class="lc-mask" aria-label="Hidden PIN, tap to show">${LC_AST.repeat(String(c.pin).length)}</b><b class="lc-real" hidden>${esc(c.pin)}</b></button>` : '') +
-            `<div class="dd-acts"><button type="button" class="ed">Edit</button><button type="button" class="dd-del">Delete</button></div>` +
+            `<div class="dd-acts"><button type="button" class="lg">Log</button><button type="button" class="ed">Edit</button><button type="button" class="dd-del">Delete</button></div>` +
           `</div></div>`; }).join('');
       view.querySelectorAll('.lc-row').forEach(row => { const c = cardsL[+row.dataset.ci], ph = row.querySelector('.lc-ph'); if(c.photo && ph) lcPhotoPut(ph, { photo: c.photo, r: c.r, x: c.lx == null ? c.x : c.lx, y: c.ly == null ? c.y : c.ly, z: c.lz || c.z }); });
       view.querySelectorAll('.lc-dd').forEach(dd => { const c = cardsL[+dd.dataset.ci], hex = shown(c.color || wishColor(c.name, c.loc)), f = dd.querySelector('.lc-cf .lc-face');
@@ -13237,6 +13264,7 @@ closeRowDD = function(dd){
         ov.addEventListener('click', ev => { ev.stopPropagation(); back(); }); }));
       view.querySelectorAll('.lc-dd .lc-pin').forEach(x => x.addEventListener('click', e => { e.stopPropagation();
         const shut = !x.querySelector('.lc-real').hidden; x.querySelector('.lc-real').hidden = shut; x.querySelector('.lc-mask').hidden = !shut; }));
+      view.querySelectorAll('.lc-dd .lg').forEach(x => x.addEventListener('click', e => { e.stopPropagation(); libLog(cardsL[+x.closest('.lc-dd').dataset.ci]); }));
       view.querySelectorAll('.lc-dd .ed').forEach(x => x.addEventListener('click', e => { e.stopPropagation(); lcOpen(+x.closest('.lc-dd').dataset.ci); }));
       view.querySelectorAll('.lc-dd .dd-del').forEach(x => { let armed = false, t = 0;   // tap twice: Delete, then Confirm?
         x.addEventListener('click', e => { e.stopPropagation();
