@@ -1889,9 +1889,27 @@
   #lc-unpick{border-left:3px solid var(--cb000000, #000000) !important;}   /* the divider between the two */
   .lc-front .ph{opacity:.45;}
   .lc-float{position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0); transition:background .32s ease;}
-  .lc-float.on{background:#000;}   /* everything behind it fully dark */
-  .lc-fcard{position:fixed; margin:0; transition:top .32s cubic-bezier(.3,.7,.25,1);}
-  .lc-float.on .lc-fcard{top:calc(env(safe-area-inset-top) + 12px) !important;}
+  .lc-float.on{background:#000;}
+  .lc-fcard .lc-face{box-shadow:none !important; filter:none !important;}   /* everything behind it fully dark */
+  .lc-fcard{position:fixed !important; left:0; top:0; width:340px !important; height:214.4px !important; inset:auto; transform-origin:0 0; transition:transform .34s cubic-bezier(.3,.7,.25,1);}
+  /* My Card's dropdown: the card's front and back, side by side */
+  .lc-pair{position:relative;}
+  .lc-cd{position:absolute; left:0; top:0; width:340px; height:214.4px; transform-origin:0 0; cursor:pointer; will-change:transform; transition:transform .42s cubic-bezier(.3,.7,.25,1);}
+  .lc-cd.big{z-index:1;} .lc-cf.big{cursor:default;}
+  .lc-pair.still .lc-cd{transition:none !important;}
+  .lc-face{position:absolute; inset:0; border:4px solid var(--cb000000, #000000); border-radius:14px; overflow:hidden; box-sizing:border-box; color:#fff; transition:box-shadow .42s, filter .42s;}
+  .lc-cd.big .lc-face{box-shadow:0 6px 18px rgba(0,0,0,.35);}
+  .lc-cd:not(.big) .lc-face{filter:brightness(.93);}
+  .lc-face > canvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  .lc-face.lite{color:#1c1c1e;}
+  .lcf-n, .lcf-l{position:absolute; max-width:300px;}
+  .lcf-n{left:18px; top:16px; font:700 22px/1.15 Georgia, 'Times New Roman', serif; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+  .lcf-l{right:18px; bottom:16px; font:italic 16px/1.15 Georgia, 'Times New Roman', serif; opacity:.9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:right;}
+  .lc-face.has-photo > span{text-shadow:0 1px 3px rgba(0,0,0,.7); color:#fff;}
+  .lc-cb .lc-face{background:#fff; display:flex; flex-direction:column; align-items:center; padding:0 20px; color:#333;}
+  .lcf-stripe{position:absolute; left:0; right:0; top:20px; height:34px; background:#1c1c1e;}
+  .lc-cb svg{width:100%; height:auto; display:block; margin-top:76px;}
+  .lc-cb .lc-num{font:700 18px/1.2 Arial, Helvetica, sans-serif; color:#333; white-space:pre; margin-top:4px;}
   .lc-pin .lc-mask{display:flex; gap:min(.5rem, 2vw); height:min(1.76rem, 7.7vw); align-items:center;}
   .lc-ast{width:min(1.15rem, 5vw); height:min(1.15rem, 5vw); display:block;}
   #lc-num-card .cnt-lbl, #lc-pin-card .cnt-lbl{left:4px; right:4px; text-align:center; line-height:1;}
@@ -13064,19 +13082,46 @@ closeRowDD = function(dd){
       // the library format: 2 1179 00526 3691 (blanks as _)
       if(numEl) numEl.textContent = String(data).padEnd(LC_LEN, '_').slice(0, LC_LEN).replace(/^(.)(.{4})(.{5})(.{4})$/, '$1 $2 $3 $4');
     }
+    // the front and back pair: each card drawn once at full size (340 × 214) and placed by one move-and-scale, so it only ever
+    // travels in a straight line from where it was to where it's going, inside the row, nothing in it shifting
+    function lcPairSize(pair, still){
+      const W = pair.clientWidth; if(!W) return;
+      const G = 6, big = (W - G) * .7, small = W - G - big, H = big * 214.4 / 340;
+      pair.style.height = H + 'px'; if(still) pair.classList.add('still');
+      const f = pair.querySelector('.lc-cf'), b = pair.querySelector('.lc-cb'), fBig = f.classList.contains('big');
+      const place = (c, x, w) => { const k = w / 340; c.style.transform = `translate(${x}px, ${(H - 214.4 * k) / 2}px) scale(${k})`; };
+      place(f, 0, fBig ? big : small); place(b, (fBig ? big : small) + G, fBig ? small : big);   // the front always left, the back right
+      if(still) requestAnimationFrame(() => requestAnimationFrame(() => pair.classList.remove('still')));
+      const dd = pair.closest('.lc-dd'); if(dd && dd.classList.contains('open')) dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px';
+    }
+    // the front's paper, drawn at the card's full size (it's shown scaled), then copied in
+    const lcPaintCv = document.createElement('canvas');
+    lcPaintCv.style.cssText = 'position:fixed; left:-1000px; top:0; width:340px; height:214px; pointer-events:none;';
+    function lcPaint(cv, hex, seed){ if(!window.BOOKPAPER) return; if(!lcPaintCv.isConnected) document.body.appendChild(lcPaintCv);
+      lcPaintCv._drawn = ''; BOOKPAPER.draw(lcPaintCv, hex, seed, false); cv.width = lcPaintCv.width; cv.height = lcPaintCv.height; cv.getContext('2d').drawImage(lcPaintCv, 0, 0); }
     function renderCardsL(){
       if(!cardsL.length){ view.innerHTML = '<div id="wl-empty">No library cards yet</div>'; return; }
       view.innerHTML = cardsL.map((c, i) => {
         const hex = c.color || wishColor(c.name, c.loc);
         return `<div class="wl-row lc-row" data-ci="${i}"><div class="wl-card${c.photo ? ' has-photo' : ''}" data-hex="${shown(hex)}" style="--cloth:${shown(hex)}"><canvas aria-hidden="true"></canvas>${c.photo ? '<i class="lc-ph" aria-hidden="true"></i>' : ''}<span class="t">${esc(c.name || 'Library Card')}</span>${c.loc ? `<span class="a">${esc(c.loc)}</span>` : ''}</div></div>` +
           `<div class="row-dd book-dd ln-dd lc-dd" data-ci="${i}"><div class="dd-in">` +
-            `<div class="lc-bar"><svg xmlns="http://www.w3.org/2000/svg" aria-label="Barcode"></svg><div class="lc-num"></div></div>` +
+            // the card itself, front and back side by side: the one in front big, the other small beside it (tap it to bring it forward)
+            `<div class="lc-pair">` +
+              `<div class="lc-cd lc-cf big"><div class="lc-face${c.photo ? ' has-photo' : ''}"><canvas aria-hidden="true"></canvas>${c.photo ? '<i class="lc-ph" aria-hidden="true"></i>' : ''}` +
+                `<span class="lcf-n">${esc(c.name || 'Library Card')}</span><span class="lcf-l">${esc(c.loc || '')}</span></div></div>` +
+              `<div class="lc-cd lc-cb"><div class="lc-face"><i class="lcf-stripe"></i><svg xmlns="http://www.w3.org/2000/svg" aria-label="Barcode"></svg><div class="lc-num"></div></div></div>` +
+            `</div>` +
             // the PIN hidden as asterisks (round-ended strokes) until its card is tapped; tap again to hide it
             (c.pin ? `<button type="button" class="dd-stats lc-pin">PIN <b class="lc-mask" aria-label="Hidden PIN, tap to show">${LC_AST.repeat(String(c.pin).length)}</b><b class="lc-real" hidden>${esc(c.pin)}</b></button>` : '') +
             `<div class="dd-acts"><button type="button" class="ed">Edit</button><button type="button" class="dd-del">Delete</button></div>` +
           `</div></div>`; }).join('');
       view.querySelectorAll('.lc-row').forEach(row => { const c = cardsL[+row.dataset.ci], ph = row.querySelector('.lc-ph'); if(c.photo && ph) lcPhotoPut(ph, { photo: c.photo, r: c.r, x: c.lx == null ? c.x : c.lx, y: c.ly == null ? c.y : c.ly, z: c.lz || c.z }); });
-      view.querySelectorAll('.lc-dd').forEach(dd => { const c = cardsL[+dd.dataset.ci]; lcBarcode(dd.querySelector('svg'), dd.querySelector('.lc-num'), c.num || ''); });
+      view.querySelectorAll('.lc-dd').forEach(dd => { const c = cardsL[+dd.dataset.ci], hex = shown(c.color || wishColor(c.name, c.loc)), f = dd.querySelector('.lc-cf .lc-face');
+        lcBarcode(dd.querySelector('.lc-cb svg'), dd.querySelector('.lc-cb .lc-num'), c.num || '');
+        if(c.photo) lcPhotoPut(f.querySelector('.lc-ph'), { photo: c.photo, r: c.r, x: c.x, y: c.y, z: c.z });
+        else { f.classList.toggle('lite', !!(window.BOOKPAPER && BOOKPAPER.lite(hex))); lcPaint(f.querySelector('canvas'), hex, (c.name || '') + '|' + (c.loc || '')); }
+        const pair = dd.querySelector('.lc-pair'); lcPairSize(pair, true);
+        if(window.ResizeObserver) new ResizeObserver(() => lcPairSize(pair, true)).observe(pair); });
       view.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex; fit(c);
         const go = () => { fit(c); if(window.BOOKPAPER){ c.classList.toggle('lite', BOOKPAPER.lite(hex)); BOOKPAPER.draw(cv, hex, ((c.querySelector('.t') || {}).textContent || '') + '|' + ((c.querySelector('.a') || {}).textContent || ''), true, 6); } };
         if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go); });
@@ -13087,16 +13132,23 @@ closeRowDD = function(dd){
       view.querySelectorAll('.lc-row').forEach(row => { row.addEventListener('click', () => ddOpen(row, !row.classList.contains('open')));
         if(+row.dataset.ci === openCard) ddOpen(row, true); });
       view.querySelectorAll('.lc-dd').forEach(dd => dd.addEventListener('click', e => e.stopPropagation()));
-      // the barcode tapped: it floats up to the top of the screen over solid black, for the scanner; a tap anywhere sets it back
-      view.querySelectorAll('.lc-dd .lc-bar').forEach(bar => bar.addEventListener('click', e => { e.stopPropagation();
-        if(document.querySelector('.lc-float')) return;
-        const r = bar.getBoundingClientRect(), ov = document.createElement('div'), card = bar.cloneNode(true);
+      // the small one tapped: it comes forward, the other goes small. The back, when it's the big one, tapped: it floats up to the
+      // top of the screen over solid black, full width, for the scanner; a tap anywhere sets it back
+      view.querySelectorAll('.lc-dd .lc-cd').forEach(cd => cd.addEventListener('click', e => { e.stopPropagation();
+        const pair = cd.parentElement;
+        if(!cd.classList.contains('big')){ pair.querySelectorAll('.lc-cd').forEach(x => x.classList.toggle('big', x === cd)); lcPairSize(pair); if(window.hapticTick) window.hapticTick(); return; }
+        if(!cd.classList.contains('lc-cb') || document.querySelector('.lc-float')) return;
+        const face = cd, r = cd.getBoundingClientRect(), ov = document.createElement('div'), card = cd.cloneNode(true);   // (the whole card, so it keeps its look)
         ov.className = 'lc-float'; card.classList.add('lc-fcard');
-        card.style.left = r.left + 'px'; card.style.top = r.top + 'px'; card.style.width = r.width + 'px';
-        ov.appendChild(card); document.body.appendChild(ov); bar.style.visibility = 'hidden';
+        const at = (x, y, w) => `translate(${x}px, ${y}px) scale(${w / 340})`;
+        card.style.transform = at(r.left, r.top, r.width);
+        ov.appendChild(card); document.body.appendChild(ov); face.style.visibility = 'hidden';
         void ov.offsetWidth; ov.classList.add('on'); if(window.hapticTick) window.hapticTick();
-        const back = () => { ov.classList.remove('on'); card.style.top = r.top + 'px';
-          setTimeout(() => { ov.remove(); bar.style.visibility = ''; }, 340); };
+        const pr = document.createElement('i'); pr.style.cssText = 'position:fixed; top:0; padding-top:env(safe-area-inset-top);'; document.body.appendChild(pr);
+        const top = parseFloat(getComputedStyle(pr).paddingTop) || 0; pr.remove();   // below the phone's notch
+        card.style.transform = at(12, top + 12, Math.min(window.innerWidth - 24, 520));
+        const back = () => { ov.classList.remove('on'); card.style.transform = at(r.left, r.top, r.width);
+          setTimeout(() => { ov.remove(); face.style.visibility = ''; }, 360); };
         ov.addEventListener('click', ev => { ev.stopPropagation(); back(); }); }));
       view.querySelectorAll('.lc-dd .lc-pin').forEach(x => x.addEventListener('click', e => { e.stopPropagation();
         const shut = !x.querySelector('.lc-real').hidden; x.querySelector('.lc-real').hidden = shut; x.querySelector('.lc-mask').hidden = !shut; }));
