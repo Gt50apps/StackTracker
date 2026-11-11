@@ -13519,7 +13519,8 @@ closeRowDD = function(dd){
         photo: lcPh ? lcPh.src : null, r: lcPh ? lcPh.r : null, x: lcPh ? lcPh.x : null, y: lcPh ? lcPh.y : null, z: lcPh ? lcPh.z : null,
         lx: lcPh ? lcPh.lx : null, ly: lcPh ? lcPh.ly : null, lz: lcPh ? lcPh.lz : null };
       c.color = wishColor(c.name, c.loc);
-      if(lcEditing >= 0){ cardsL[lcEditing] = Object.assign(cardsL[lcEditing], c); delete cardsL[lcEditing].holder; }   // (no name on cards any more) else { c.id = 'lc' + Date.now().toString(36); cardsL.push(c); openCard = cardsL.length - 1; }
+      if(lcEditing >= 0){ cardsL[lcEditing] = Object.assign(cardsL[lcEditing], c); delete cardsL[lcEditing].holder; }   // (no name on cards any more)
+      else { c.id = 'lc' + Date.now().toString(36); cardsL.push(c); openCard = cardsL.length - 1; }
       lcSave(); lcClose(); if(mode === 'card') renderCardsL(); });
     lcDel.addEventListener('click', () => { if(lcEditing < 0) return;
       if(!lcDel.classList.contains('armed')){ lcDel.classList.add('armed'); lcDel.textContent = 'Confirm?'; lcDelT = setTimeout(() => { lcDel.classList.remove('armed'); lcDel.textContent = 'Delete'; }, 3000); return; }
