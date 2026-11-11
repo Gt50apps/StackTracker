@@ -12901,8 +12901,10 @@ function paintStage(row, b){
   const tape = row.classList.contains('tape-simple'), tot = tape ? b.audioSeconds : b.pages, s = row._staged;
   const now = pct(b), f = s != null && tot ? Math.max(0, Math.min(1, s / tot)) : now;
   const main = tape ? row.querySelector('canvas.tape-fill:not(.tape-ghost)') : row.querySelector('.br-fill');
+  // a card with spines fills from under the left spine, measured between them (as paintListRow); a plain card edge to edge
+  const W = x => row.classList.contains('spined') ? (x >= 1 ? 'calc(100% + 6px)' : `calc(${x} * (100% - 32px) + 19px)`) : `calc(${x * 100}% + ${x >= 1 ? 6 : 3}px)`;
   const fillTo = x => { if(!main) return; if(tape) drawTapeFill(main, x, tapeLook(b.title), bookFinished(b));
-    else main.style.width = `calc(${x * 100}% + ${x >= 1 ? 6 : 3}px)`; };
+    else main.style.width = W(x); };
   if(s == null || bookFinished(b) || Math.abs(f - now) < 1e-9){
     if(el && !el.hidden){ el.hidden = true; fillTo(now); }   // back to the card's real progress
     return;
@@ -12915,7 +12917,7 @@ function paintStage(row, b){
   el.hidden = false;
   const a = Math.min(now, f), z = Math.max(now, f);
   if(tape) drawTapeFill(el, z, tapeLook(b.title), true);
-  else { el.style.width = `calc(${z * 100}% + ${z >= 1 ? 6 : 3}px)`;
+  else { el.style.width = W(z);
     if(!el._painted){ el._painted = true; paintPageFill(el, styleForBook(b).pageTone, true, b.seed); } }
   fillTo(a);
 }
