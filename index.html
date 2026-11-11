@@ -1854,7 +1854,6 @@
   /* My Card: the tab card, the barcode, the PIN */
   .lb-tabs .lb-pair{flex:2 1 0;} .lb-tabs .lb-solo{flex:1 1 0;}
   .lb-tabs button{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:min(.66rem, 2.75vw) !important; letter-spacing:0 !important; padding:0 2px !important;}   /* four across: Checked Out still fits */
-  body.lb-mycard #lb-card{display:none !important;}   /* nothing to search, filter or sort */
   .lc-bar{background:#fff; border:3px solid var(--cb000000, #000000); border-radius:8px; padding:10px 10px 6px; text-align:center; box-sizing:border-box;}
   .lc-bar svg{width:100%; height:auto; display:block;}
   .lc-num{font:700 min(1.3rem, 5.6vw)/1.2 Arial, Helvetica, sans-serif; color:#333; white-space:pre; margin-top:3px; letter-spacing:.5px;}
@@ -2317,6 +2316,17 @@
   #loan-card{display:flex; gap:4px; height:45px;}
   #loan-card .ld-set .lw-wheel div{font-size:13px;}
   #ret-add{flex:1 1 0; min-width:0; padding:0;}
+  /* a library card's Date Received: a card to tap, then three wheels (the X beside them takes the date off) */
+  .lc-gotrow{display:flex; gap:6px; height:45px; flex:none;}
+  .lc-gotrow > .field-card{height:100%; box-sizing:border-box;}
+  #lc-got-add, #lc-got-add:active{flex:1 1 0; margin:0; padding:0; box-shadow:none; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; cursor:pointer;
+    font:700 .72rem Arial, sans-serif; text-transform:uppercase;}
+  #lc-got-add b{color:var(--ink);} #lc-got-add i{font:normal 700 .5rem/1 Arial, sans-serif; letter-spacing:.4px; color:var(--muted);}
+  #lc-got-set{flex:1 1 0 !important; min-width:0; width:auto !important; display:flex !important;}
+  #lc-got-set .lw-wheel div{font-size:13px;}
+  #lc-got-add[hidden], #lc-got-x[hidden], #lc-got-set[hidden]{display:none !important;}   /* (after the display above) */
+  #lc-got-x, #lc-got-x:active{flex:none; width:45px; margin:0; padding:0; box-shadow:none; display:flex; align-items:center; justify-content:center; color:var(--cbaa3333, #aa3333); cursor:pointer;}
+  #lc-got-x svg{width:16px; height:16px;}
   #ret-add b{font-size:min(.66rem, 2.6vw);} #ret-add i{font-size:.46rem;}
   .ld-set{position:relative; flex:1 1 0; min-width:0; display:flex; flex-direction:row; padding:0; overflow:hidden; background:var(--panel);}
   .ld-set .lw-wheel{flex:1 1 0;}   /* three equal wheels: the day (and its tag) dead centre in the card */
@@ -3052,6 +3062,7 @@
       <div class="field-card cnt-card" id="lc-num-card"><span class="cnt-lbl"><b>Card</b> <b>Number</b></span><input id="lc-num" type="text" inputmode="numeric" maxlength="14" autocomplete="off" aria-label="Library card number"></div>
       <div class="field-card cnt-card" id="lc-pin-card"><span class="cnt-lbl"><b>PIN</b> <b class="opt">(Optional)</b></span><input id="lc-pin" type="text" inputmode="numeric" autocomplete="off" aria-label="PIN (optional)"></div>
     </div>
+    <div class="lc-gotrow"><input type="hidden" id="lc-got"><div class="field-card ld-set" id="lc-got-set" hidden aria-label="Date received"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">GOT</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ld-add" id="lc-got-add"><b>Date Received</b><i>Optional</i></button><button type="button" class="field-card" id="lc-got-x" hidden aria-label="No date received"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <button type="button" id="lc-del" hidden>Delete</button>
   </div>
 </div>
@@ -9365,7 +9376,8 @@
     return () => { cancelAnimationFrame(af); pos = spec.get(); render(); };
   }
   // one date on three wheels, kept in a yyyy-mm-dd input; returns a sync (call it after the input's value is set)
-  function dateSet(set, inp, changed){
+  function dateSet(set, inp, changed, yr){   // (yr: { y0, n } for a wider span of years, shown in full)
+    const y0 = yr ? yr.y0 : Y0, yn = yr ? yr.n : YN;
     const st = () => { const [y, m, d] = (inp.value || ymdOf(Date.now())).split('-').map(Number); return { y, m: m - 1, d }; };
     const put = (o, again) => { o.d = Math.min(o.d, dim(o.y, o.m)); inp.value = o.y + '-' + String(o.m + 1).padStart(2, '0') + '-' + String(o.d).padStart(2, '0');
       if(changed) changed(); if(again) syncs[1](); };   // (the day wheel, when its month's length changed)
@@ -9373,7 +9385,7 @@
     const syncs = [
       dateWheel(W('m'), { count: () => 12, wrap: true, text: i => MON[i], get: () => st().m, set: i => { const o = st(); if(o.m === i) return; o.m = i; put(o, true); } }),
       dateWheel(W('d'), { cut: true, count: () => { const o = st(); return dim(o.y, o.m); }, wrap: true, text: i => String(i + 1), get: () => st().d - 1, set: i => { const o = st(); if(o.d === i + 1) return; o.d = i + 1; put(o); } }),
-      dateWheel(W('y'), { count: () => YN, wrap: false, text: i => '’' + String(i).padStart(2, '0'), get: () => st().y - Y0, set: i => { const o = st(); if(o.y === Y0 + i) return; o.y = Y0 + i; put(o, true); } })];
+      dateWheel(W('y'), { count: () => yn, wrap: false, text: i => yr ? String(y0 + i) : '’' + String(i).padStart(2, '0'), get: () => st().y - y0, set: i => { const o = st(); if(o.y === y0 + i) return; o.y = y0 + i; put(o, true); } })];
     return () => syncs.forEach(f => f());
   }
   window.__dateSet = dateSet;
@@ -13045,10 +13057,12 @@ closeRowDD = function(dd){
               s: [['due', 'Due Date', 'Soonest first, grouped by when', 'Latest first, grouped by when'], ['title', 'Title', 'A–Z', 'Z–A'], ['author', 'Author', 'Last name, first name, then title', 'Z–A: last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first', 'Earliest checked out first'], ['year', 'Year', 'Oldest released first; no year last', 'No year first, then newest released']] },
       ret:  { f: [['all', 'All', 'Every book returned'], ['done', 'Finished', 'Read to the end'], ['part', 'Not Finished', 'Went back before the end'], ['late', 'Returned Late', 'Went back after its due date']],
               s: [['back', 'Returned', 'Most recently returned first', 'Earliest returned first'], ['title', 'Title', 'A–Z', 'Z–A'], ['author', 'Author', 'Last name, first name, then title', 'Z–A: last name, first name, then title'], ['out', 'Checked Out', 'Most recently checked out first', 'Earliest checked out first'], ['year', 'Year', 'Oldest released first; no year last', 'No year first, then newest released']] } };
-    let lbSel = { wish: { f: 'all', s: 'status' }, out: { f: 'all', s: 'due' }, ret: { f: 'all', s: 'back' } };
-    try{ const v = JSON.parse(localStorage.getItem('stack-tracker-lb-sort') || 'null'); if(v) ['wish', 'out', 'ret'].forEach(k => { if(v[k]) Object.assign(lbSel[k], v[k]); }); }catch(e){}
+    LB.card = { f: [['all', 'All', 'Every library card'], ['out', 'Books Out', 'Has a book checked out now'], ['photo', 'With Photo', 'Has a photo on the front']],
+                s: [['added', 'Date Added', 'The order you added them', 'Newest added first'], ['got', 'Date Received', 'The card you got first, first', 'The card you got last, first'], ['name', 'Library', 'A–Z', 'Z–A']] };
+    let lbSel = { wish: { f: 'all', s: 'status' }, out: { f: 'all', s: 'due' }, ret: { f: 'all', s: 'back' }, card: { f: 'all', s: 'added' } };
+    try{ const v = JSON.parse(localStorage.getItem('stack-tracker-lb-sort') || 'null'); if(v) ['wish', 'out', 'ret', 'card'].forEach(k => { if(v[k]) Object.assign(lbSel[k], v[k]); }); }catch(e){}
     // the picked sort flipped: each card (Checked Out, Returned, Wishlist) keeps its own direction; a new sort keeps it
-    const lbDescs = { out: false, ret: false, wish: false }; let lbFlipT = 0;
+    const lbDescs = { out: false, ret: false, wish: false, card: false }; let lbFlipT = 0;
     try{ const v = JSON.parse(localStorage.getItem('stack-tracker-lb-sort') || 'null');
       if(v && typeof v.desc === 'object') Object.keys(lbDescs).forEach(k => lbDescs[k] = !!v.desc[k]);
       else if(v && v.desc) Object.keys(lbDescs).forEach(k => lbDescs[k] = true); }catch(e){}   // (saved before: one for all)
@@ -13280,7 +13294,18 @@ closeRowDD = function(dd){
     }
     function renderCardsL(){
       if(!cardsL.length){ view.innerHTML = '<div id="wl-empty">No library cards yet</div>'; return; }
-      view.innerHTML = cardsL.map((c, i) => {
+      // searched, filtered and sorted (each keeps its place in the saved list, which the rows point to)
+      const qs = q.value.trim().toLowerCase(), F = lbSel.card.f, S = lbSel.card.s, dn = lbDescs.card;
+      const outLibs = new Set(books.filter(b => b.loan && !b.loan.returned && b.loan.lib).map(b => b.loan.lib));
+      const rows = cardsL.map((c, i) => [c, i]).filter(([c]) => (F === 'all' || (F === 'out' ? outLibs.has(c.id) : !!c.photo)) &&
+        (!qs || ((c.name || '') + ' ' + (c.loc || '') + ' ' + (c.slogan || '')).toLowerCase().includes(qs)));
+      const nm = c => (c.name || '').toLowerCase();
+      if(S === 'name') rows.sort((a, b) => nm(a[0]).localeCompare(nm(b[0])) * (dn ? -1 : 1) || a[1] - b[1]);
+      else if(S === 'got') rows.sort((a, b) => { const x = a[0].got, y = b[0].got; if(!x !== !y) return x ? -1 : 1;   // (no date: always last)
+        return (x && y && x !== y ? (x < y ? -1 : 1) * (dn ? -1 : 1) : 0) || a[1] - b[1]; });
+      else if(dn) rows.reverse();
+      if(!rows.length){ view.innerHTML = '<div id="wl-empty">No library cards match</div>'; return; }
+      view.innerHTML = rows.map(([c, i]) => {
         const hex = c.color || wishColor(c.name, c.loc);
         return `<div class="wl-row lc-row" data-ci="${i}"><div class="wl-card${c.photo ? ' has-photo' : ''}" data-hex="${shown(hex)}" style="--cloth:${shown(hex)}"><canvas aria-hidden="true"></canvas>${c.photo ? '<i class="lc-ph" aria-hidden="true"></i>' : ''}<span class="t">${esc(c.name || 'Library Card')}</span>${c.loc ? `<span class="a">${esc(c.loc)}</span>` : ''}</div></div>` +
           `<div class="row-dd book-dd ln-dd lc-dd" data-ci="${i}"><div class="dd-in">` +
@@ -13456,8 +13481,16 @@ closeRowDD = function(dd){
         lcFrontSync(); }
       spClose(); });
     lcSignB.addEventListener('click', spOpen);
+    // Date Received: optional, kept as yyyy-mm-dd
+    const lcGot = document.getElementById('lc-got'), lcGotSet = document.getElementById('lc-got-set'), lcGotAdd = document.getElementById('lc-got-add'), lcGotX = document.getElementById('lc-got-x');
+    let lcGotSync = null;   // (its wheels made the first time they're needed)
+    const lcGotShow = () => { const on = !!lcGot.value; lcGotSet.hidden = lcGotX.hidden = !on; lcGotAdd.hidden = on;
+      if(on) requestAnimationFrame(() => { if(!lcGotSync) lcGotSync = window.__dateSet(lcGotSet, lcGot, null, { y0: 1940, n: new Date().getFullYear() - 1940 + 1 });   // (a card can be decades old)
+        lcGotSync(); }); };
+    lcGotAdd.addEventListener('click', () => { const d = new Date(); lcGot.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); lcGotShow(); });
+    lcGotX.addEventListener('click', () => { lcGot.value = ''; lcGotShow(); });
     function lcOpen(i){
-      lcEditing = i; const c = i >= 0 ? cardsL[i] : null;
+      lcEditing = i; const c = i >= 0 ? cardsL[i] : null; lcGot.value = c && c.got || ''; lcGotShow();
       lcName.value = c ? c.name || '' : ''; lcLoc.value = c ? c.loc || '' : ''; lcSlogan.value = c ? c.slogan || '' : ''; lcHolder.value = c ? c.holder || '' : ''; lcSigData = c ? c.sig || '' : ''; lcNum.value = c ? c.num || '' : ''; lcPin.value = c ? c.pin || '' : '';
       lcPh = c && c.photo ? { src: c.photo, r: c.r || 1.5, x: c.x == null ? 50 : c.x, y: c.y == null ? 50 : c.y, z: c.z || 1,
         lx: c.lx == null ? (c.x == null ? 50 : c.x) : c.lx, ly: c.ly == null ? (c.y == null ? 50 : c.y) : c.ly, lz: c.lz || c.z || 1 } : null;
@@ -13471,7 +13504,7 @@ closeRowDD = function(dd){
     window.lcAdd = () => lcOpen(-1);
     document.getElementById('lc-cancel').addEventListener('click', lcClose);
     lcSaveB.addEventListener('click', () => { if(lcSaveB.disabled) return;
-      const c = { name: lcName.value.trim(), loc: lcLoc.value.trim(), slogan: lcSlogan.value.trim(), holder: lcHolder.value.trim(), sig: lcSigData, num: lcNum.value, pin: lcPin.value.trim(),
+      const c = { name: lcName.value.trim(), loc: lcLoc.value.trim(), slogan: lcSlogan.value.trim(), holder: lcHolder.value.trim(), sig: lcSigData, got: lcGot.value || null, num: lcNum.value, pin: lcPin.value.trim(),
         photo: lcPh ? lcPh.src : null, r: lcPh ? lcPh.r : null, x: lcPh ? lcPh.x : null, y: lcPh ? lcPh.y : null, z: lcPh ? lcPh.z : null,
         lx: lcPh ? lcPh.lx : null, ly: lcPh ? lcPh.ly : null, lz: lcPh ? lcPh.lz : null };
       c.color = wishColor(c.name, c.loc);
