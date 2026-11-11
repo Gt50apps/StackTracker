@@ -1861,6 +1861,33 @@
   .lc-pin, .lc-pin:active{width:100%; margin:0; box-shadow:none; cursor:pointer; text-transform:uppercase;}
   .lc-pin b[hidden]{display:none;}
   .lc-dd .lc-bar{cursor:pointer;}
+  /* the card's front, in the add / edit window: the size of a real card (85.6 × 54 mm), always the same width */
+  .lc-band{display:flex; flex-direction:column; align-items:center; gap:6px;}
+  /* below it, the card as it shows in the list: placed apart (it's a different shape) */
+  .lc-strip{width:100%; height:46px; flex:none; position:relative; overflow:hidden; box-sizing:border-box; display:none !important;}
+  .lc-strip.has-photo{display:flex !important; touch-action:none; cursor:grab;}
+  .lc-strip > canvas{position:absolute; inset:0; width:100%; height:100%;}
+  .lc-front{position:relative; width:min(calc(100vw - 24px), 340px); aspect-ratio:85.6 / 53.98; flex:none; border:3px solid var(--cb000000, #000000); border-radius:12px; overflow:hidden; box-sizing:border-box; color:#fff;}
+  .lc-front > canvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  .lc-front > span{position:absolute; max-width:calc(100% - 28px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .lc-fn{left:14px; top:12px; font:700 min(1.2rem, 5.2vw)/1.15 Georgia, 'Times New Roman', serif; white-space:normal !important; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;}
+  .lc-fl{right:14px; bottom:11px; font:italic min(.9rem, 3.9vw)/1.15 Georgia, 'Times New Roman', serif; opacity:.9; text-align:right;}
+  .lc-front.lite{color:#1c1c1e;}
+  /* a photo on the card: it covers the texture, darkened a little where the words sit; drag it about, pinch to zoom */
+  .lc-ph{position:absolute; inset:0; display:none; background-repeat:no-repeat; pointer-events:none;}
+  .lc-ph::after{content:''; position:absolute; inset:0; background:linear-gradient(160deg, rgba(0,0,0,.55), rgba(0,0,0,.08) 40%, rgba(0,0,0,.08) 60%, rgba(0,0,0,.55));}
+  .has-photo > .lc-ph{display:block;} .has-photo > canvas{visibility:hidden;}
+  .lc-front.has-photo, .wl-card.has-photo{color:#fff !important;} .wl-card.has-photo .a{color:rgba(255,255,255,.9) !important;}
+  .lc-front.has-photo > span{text-shadow:0 1px 3px rgba(0,0,0,.7);}
+  .lc-front.has-photo{touch-action:none; cursor:grab;}
+  .lc-hint{position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); text-align:center; font:700 .62rem/1 Arial, sans-serif; letter-spacing:.06em; text-transform:uppercase; color:#fff;
+    text-shadow:0 1px 3px rgba(0,0,0,.8); opacity:0; transition:opacity .4s; pointer-events:none; font-style:normal;}
+  .lc-front.has-photo:not(.moved) .lc-hint{opacity:.9;}
+  .wl-card > .lc-ph{z-index:0;} .wl-card.has-photo > span{position:relative; z-index:1; text-shadow:0 1px 3px rgba(0,0,0,.7);}
+  .lc-photo{height:45px;} .lc-photo .fc-more:disabled{color:var(--muted); opacity:.5;}
+  #lc-unpick:not(:disabled){color:var(--cbaa3333, #aa3333);}
+  #lc-unpick{border-left:3px solid var(--cb000000, #000000) !important;}   /* the divider between the two */
+  .lc-front .ph{opacity:.45;}
   .lc-float{position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0); transition:background .32s ease;}
   .lc-float.on{background:#000;}   /* everything behind it fully dark */
   .lc-fcard{position:fixed; margin:0; transition:top .32s cubic-bezier(.3,.7,.25,1);}
@@ -2899,8 +2926,12 @@
 <!-- Library card: add / edit (number, optional PIN, library name and location) -->
 <div id="lc-page" aria-hidden="true">
   <div class="wl-head"><button type="button" id="lc-cancel">Cancel</button><h2 id="lc-title">Add Library Card</h2><button type="button" id="lc-save" disabled>Add</button></div>
-  <div class="wl-prev-band"><div class="lc-bar" id="lc-prev"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg><div class="lc-num"></div></div></div>
+  <div class="wl-prev-band lc-band"><div class="lc-front" id="lc-front"><canvas aria-hidden="true"></canvas><i class="lc-ph" aria-hidden="true"></i><span class="lc-fn"></span><span class="lc-fl"></span><em class="lc-hint">Drag to move · pinch to zoom</em></div>
+    <div class="wl-card lc-strip" id="lc-strip"><canvas aria-hidden="true"></canvas><i class="lc-ph" aria-hidden="true"></i><span class="t"></span><span class="a"></span></div></div>
   <div class="wl-fields">
+    <div class="field-card split lc-photo"><button type="button" class="fc-more" id="lc-pick">Choose Photo</button><button type="button" class="fc-more" id="lc-unpick" disabled>No Photo</button></div>
+    <input type="file" id="lc-file" accept="image/*" hidden>
+    <div class="lc-bar" id="lc-prev"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg><div class="lc-num"></div></div>
     <div class="field-card"><input id="lc-name" type="text" placeholder="Library Name" autocomplete="off" aria-label="Library name"></div>
     <div class="field-card"><input id="lc-loc" type="text" placeholder="Location" autocomplete="off" aria-label="Location"></div>
     <div class="wl-pair">
@@ -13037,13 +13068,14 @@ closeRowDD = function(dd){
       if(!cardsL.length){ view.innerHTML = '<div id="wl-empty">No library cards yet</div>'; return; }
       view.innerHTML = cardsL.map((c, i) => {
         const hex = c.color || wishColor(c.name, c.loc);
-        return `<div class="wl-row lc-row" data-ci="${i}"><div class="wl-card" data-hex="${shown(hex)}" style="--cloth:${shown(hex)}"><canvas aria-hidden="true"></canvas><span class="t">${esc(c.name || 'Library Card')}</span>${c.loc ? `<span class="a">${esc(c.loc)}</span>` : ''}</div></div>` +
+        return `<div class="wl-row lc-row" data-ci="${i}"><div class="wl-card${c.photo ? ' has-photo' : ''}" data-hex="${shown(hex)}" style="--cloth:${shown(hex)}"><canvas aria-hidden="true"></canvas>${c.photo ? '<i class="lc-ph" aria-hidden="true"></i>' : ''}<span class="t">${esc(c.name || 'Library Card')}</span>${c.loc ? `<span class="a">${esc(c.loc)}</span>` : ''}</div></div>` +
           `<div class="row-dd book-dd ln-dd lc-dd" data-ci="${i}"><div class="dd-in">` +
             `<div class="lc-bar"><svg xmlns="http://www.w3.org/2000/svg" aria-label="Barcode"></svg><div class="lc-num"></div></div>` +
             // the PIN hidden as asterisks (round-ended strokes) until its card is tapped; tap again to hide it
             (c.pin ? `<button type="button" class="dd-stats lc-pin">PIN <b class="lc-mask" aria-label="Hidden PIN, tap to show">${LC_AST.repeat(String(c.pin).length)}</b><b class="lc-real" hidden>${esc(c.pin)}</b></button>` : '') +
             `<div class="dd-acts"><button type="button" class="ed">Edit</button><button type="button" class="dd-del">Delete</button></div>` +
           `</div></div>`; }).join('');
+      view.querySelectorAll('.lc-row').forEach(row => { const c = cardsL[+row.dataset.ci], ph = row.querySelector('.lc-ph'); if(c.photo && ph) lcPhotoPut(ph, { photo: c.photo, r: c.r, x: c.lx == null ? c.x : c.lx, y: c.ly == null ? c.y : c.ly, z: c.lz || c.z }); });
       view.querySelectorAll('.lc-dd').forEach(dd => { const c = cardsL[+dd.dataset.ci]; lcBarcode(dd.querySelector('svg'), dd.querySelector('.lc-num'), c.num || ''); });
       view.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex; fit(c);
         const go = () => { fit(c); if(window.BOOKPAPER){ c.classList.toggle('lite', BOOKPAPER.lite(hex)); BOOKPAPER.draw(cv, hex, ((c.querySelector('.t') || {}).textContent || '') + '|' + ((c.querySelector('.a') || {}).textContent || ''), true, 6); } };
@@ -13078,7 +13110,57 @@ closeRowDD = function(dd){
     const lcPage = document.getElementById('lc-page'), lcName = document.getElementById('lc-name'), lcLoc = document.getElementById('lc-loc'),
       lcNum = document.getElementById('lc-num'), lcPin = document.getElementById('lc-pin'), lcSaveB = document.getElementById('lc-save'), lcDel = document.getElementById('lc-del');
     let lcEditing = -1, lcDelT = 0;
-    const lcCheck = () => { lcNum.value = lcNum.value.replace(/\D/g, '').slice(0, LC_LEN);
+    // ---- the photo: picked from the phone, made card-sized (so it keeps offline and fits in storage), placed by x / y (0–100 %)
+    //      and zoom, shown the same on the front and on its card in the list ----
+    const lcFront = document.getElementById('lc-front');
+    let lcPh = null;   // { src, r (its width over height), x, y, z } while the window is open
+    function lcPhotoPut(el, p){
+      const box = el.getBoundingClientRect(), bw = box.width || 340, bh = box.height || 214;
+      const cover = Math.max(1, (bh / bw) * p.r), w = cover * (p.z || 1) * 100;   // its width, as a share of the box's, to cover it
+      el.style.backgroundImage = `url("${p.photo || p.src}")`; el.style.backgroundSize = `${w}% auto`;
+      el.style.backgroundPosition = `${p.x == null ? 50 : p.x}% ${p.y == null ? 50 : p.y}%`;
+    }
+    const lcFile = document.getElementById('lc-file'), lcPick = document.getElementById('lc-pick'), lcUnpick = document.getElementById('lc-unpick');
+    const lcPhSync = () => { [lcFront, lcStrip].forEach(el => el.classList.toggle('has-photo', !!lcPh)); lcUnpick.disabled = !lcPh; lcUnpick.textContent = lcPh ? 'Remove Photo' : 'No Photo';
+      lcPick.textContent = lcPh ? 'Change Photo' : 'Choose Photo';
+      if(lcPh){ lcPhotoPut(lcFront.querySelector('.lc-ph'), lcPh); requestAnimationFrame(() => lcPhotoPut(lcStrip.querySelector('.lc-ph'), lcView('l'))); } };
+    lcPick.addEventListener('click', () => { lcFile.value = ''; lcFile.click(); });
+    lcUnpick.addEventListener('click', () => { lcPh = null; lcFront.classList.remove('moved'); lcPhSync(); lcFrontSync(); });
+    lcFile.addEventListener('change', () => { const f = lcFile.files && lcFile.files[0]; if(!f) return;
+      const url = URL.createObjectURL(f), im = new Image();
+      im.onload = () => { const MAX = 1100, k = Math.min(1, MAX / Math.max(im.naturalWidth, im.naturalHeight));   // big enough to zoom in on, small enough to keep
+        const cv = document.createElement('canvas'); cv.width = Math.round(im.naturalWidth * k); cv.height = Math.round(im.naturalHeight * k);
+        cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url);
+        lcPh = { src: cv.toDataURL('image/jpeg', .78), r: cv.width / cv.height, x: 50, y: 50, z: 1, lx: 50, ly: 50, lz: 1 }; lcFront.classList.remove('moved'); lcPhSync(); };
+      im.onerror = () => URL.revokeObjectURL(url); im.src = url; });
+    // drag to move it about; pinch (or the mouse wheel) to zoom, 1× to 4×: on the full-size card (x, y, z) and, apart, on the
+    // standard card in the list (lx, ly, lz)
+    const lcView = k => k === 'l' ? { photo: lcPh.src, r: lcPh.r, x: lcPh.lx, y: lcPh.ly, z: lcPh.lz } : lcPh;
+    const lcDrag = (el, k) => { const pts = new Map(); let start = null;
+      const X = k === 'l' ? 'lx' : 'x', Y = k === 'l' ? 'ly' : 'y', Z = k === 'l' ? 'lz' : 'z';
+      const put = () => { el.classList.add('moved'); lcPhotoPut(el.querySelector('.lc-ph'), lcView(k)); };
+      const snap = () => { const a = [...pts.values()]; return { x: lcPh[X], y: lcPh[Y], z: lcPh[Z], cx: a.reduce((t, p) => t + p.x, 0) / a.length, cy: a.reduce((t, p) => t + p.y, 0) / a.length,
+        d: a.length > 1 ? Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) : 0 }; };
+      el.addEventListener('pointerdown', e => { if(!lcPh) return; el.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); start = snap(); });
+      el.addEventListener('pointermove', e => { if(!lcPh || !pts.has(e.pointerId)) return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        const now = snap(), box = el.getBoundingClientRect();
+        if(pts.size > 1 && start.d) lcPh[Z] = Math.max(1, Math.min(4, start.z * now.d / start.d));
+        const cover = Math.max(1, (box.height / box.width) * lcPh.r) * lcPh[Z], iw = box.width * cover, ih = iw / lcPh.r;
+        // a background's % position moves it across the room it has spare: so a drag of d px is d / spare of the way, the other way
+        const mv = (d, spare, p0) => spare > .5 ? Math.max(0, Math.min(100, p0 - d / spare * 100)) : 50;
+        lcPh[X] = mv(now.cx - start.cx, iw - box.width, start.x); lcPh[Y] = mv(now.cy - start.cy, ih - box.height, start.y); put(); });
+      const up = e => { pts.delete(e.pointerId); if(lcPh && pts.size) start = snap(); };
+      el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+      el.addEventListener('wheel', e => { if(!lcPh) return; e.preventDefault(); lcPh[Z] = Math.max(1, Math.min(4, lcPh[Z] * (e.deltaY < 0 ? 1.08 : 1 / 1.08))); put(); }, { passive: false }); };
+    const lcStrip = document.getElementById('lc-strip');
+    lcDrag(lcFront, 'f'); lcDrag(lcStrip, 'l');
+    // the front: the library's colour (from its name and location, as the card will have) and the paper texture
+    const lcFrontSync = () => { const hex = shown(wishColor(lcName.value.trim(), lcLoc.value.trim()));
+      lcFront.querySelector('.lc-fn').innerHTML = lcName.value.trim() ? esc(lcName.value.trim()) : '<span class="ph">Library Name</span>';
+      lcStrip.querySelector('.t').textContent = lcName.value.trim() || 'Library Name'; lcStrip.querySelector('.a').textContent = lcLoc.value.trim();
+      lcFront.querySelector('.lc-fl').innerHTML = lcLoc.value.trim() ? esc(lcLoc.value.trim()) : '<span class="ph">Location</span>';
+      if(window.BOOKPAPER){ lcFront.classList.toggle('lite', BOOKPAPER.lite(hex) && !lcPh); BOOKPAPER.draw(lcFront.querySelector('canvas'), hex, lcName.value.trim() + '|' + lcLoc.value.trim(), false); } };
+    const lcCheck = () => { lcNum.value = lcNum.value.replace(/\D/g, '').slice(0, LC_LEN); lcFrontSync();
       lcBarcode(lcPage.querySelector('#lc-prev svg'), lcPage.querySelector('#lc-prev .lc-num'), lcNum.value);
       document.getElementById('lc-num-card').classList.toggle('has', !!lcNum.value); document.getElementById('lc-pin-card').classList.toggle('has', !!lcPin.value);
       lcSaveB.disabled = !(lcName.value.trim() && lcNum.value.length); };
@@ -13086,15 +13168,20 @@ closeRowDD = function(dd){
     function lcOpen(i){
       lcEditing = i; const c = i >= 0 ? cardsL[i] : null;
       lcName.value = c ? c.name || '' : ''; lcLoc.value = c ? c.loc || '' : ''; lcNum.value = c ? c.num || '' : ''; lcPin.value = c ? c.pin || '' : '';
+      lcPh = c && c.photo ? { src: c.photo, r: c.r || 1.5, x: c.x == null ? 50 : c.x, y: c.y == null ? 50 : c.y, z: c.z || 1,
+        lx: c.lx == null ? (c.x == null ? 50 : c.x) : c.lx, ly: c.ly == null ? (c.y == null ? 50 : c.y) : c.ly, lz: c.lz || c.z || 1 } : null;
+      lcFront.classList.toggle('moved', !!lcPh); requestAnimationFrame(lcPhSync);
       document.getElementById('lc-title').textContent = c ? 'Edit Library Card' : 'Add Library Card'; lcSaveB.textContent = c ? 'Save' : 'Add';
       lcDel.hidden = !c; lcDel.classList.remove('armed'); lcDel.textContent = 'Delete'; clearTimeout(lcDelT);
-      lcCheck(); lcPage.classList.add('active'); lcPage.setAttribute('aria-hidden', 'false');
+      lcPage.classList.add('active'); lcPage.setAttribute('aria-hidden', 'false'); lcCheck(); requestAnimationFrame(lcFrontSync);
     }
     const lcClose = () => { lcPage.classList.remove('active'); lcPage.setAttribute('aria-hidden', 'true'); if(document.activeElement) document.activeElement.blur(); };
     window.lcAdd = () => lcOpen(-1);
     document.getElementById('lc-cancel').addEventListener('click', lcClose);
     lcSaveB.addEventListener('click', () => { if(lcSaveB.disabled) return;
-      const c = { name: lcName.value.trim(), loc: lcLoc.value.trim(), num: lcNum.value, pin: lcPin.value.trim() };
+      const c = { name: lcName.value.trim(), loc: lcLoc.value.trim(), num: lcNum.value, pin: lcPin.value.trim(),
+        photo: lcPh ? lcPh.src : null, r: lcPh ? lcPh.r : null, x: lcPh ? lcPh.x : null, y: lcPh ? lcPh.y : null, z: lcPh ? lcPh.z : null,
+        lx: lcPh ? lcPh.lx : null, ly: lcPh ? lcPh.ly : null, lz: lcPh ? lcPh.lz : null };
       c.color = wishColor(c.name, c.loc);
       if(lcEditing >= 0) cardsL[lcEditing] = Object.assign(cardsL[lcEditing], c); else { cardsL.push(c); openCard = cardsL.length - 1; }
       lcSave(); lcClose(); if(mode === 'card') renderCardsL(); });
