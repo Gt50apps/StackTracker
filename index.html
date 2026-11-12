@@ -1903,8 +1903,8 @@
   .lc-front.has-photo:not(.moved) .lc-hint, .lc-face.movable:not(.moved) .lc-hint{opacity:.9;}
   .lc-face .lc-hint{font-size:14px; z-index:2;}
   .lc-face .ph{opacity:.45;} #lc-front .lcf-s:empty, #lc-epair .lcf-sig:empty{display:none;}
-  #lc-epair{width:100%; align-self:center; max-width:calc((100dvh - 454px) / .4414 + 6px); min-width:160px;}
-  #lc-page:has(.lc-strip.has-photo) #lc-epair{max-width:calc((100dvh - 506px) / .4414 + 6px);}
+  #lc-epair{width:100%; align-self:center; max-width:calc((100dvh - 454px) / .4512 + 6px); min-width:160px;}
+  #lc-page:has(.lc-strip.has-photo) #lc-epair{max-width:calc((100dvh - 506px) / .4512 + 6px);}
   .wl-card > .lc-ph{z-index:0;} .wl-card.has-photo > span{position:relative; z-index:1; text-shadow:0 1px 3px rgba(0,0,0,.7);}
   .lc-photo{height:45px;} .lc-photo .fc-more:disabled{color:var(--muted); opacity:.5;}
   #lc-unpick:not(:disabled){color:var(--cbaa3333, #aa3333);}
@@ -1916,7 +1916,7 @@
   .lc-fcard{position:fixed !important; left:0; top:0; width:340px !important; height:214.4px !important; inset:auto; transform-origin:0 0; transition:transform .34s cubic-bezier(.3,.7,.25,1);}
   /* My Card's dropdown: the card's front and back, side by side */
   .lc-pair{position:relative;}
-  .lc-cd{position:absolute; left:0; top:0; width:340px; height:214.4px; transform-origin:0 0; cursor:pointer; will-change:transform; transition:transform .42s cubic-bezier(.3,.7,.25,1);}
+  .lc-cd{position:absolute; left:0; top:0; width:340px; height:214.4px; transform-origin:50% 50%; cursor:pointer; will-change:transform;}
   .lc-cd.big{z-index:1;} .lc-cf.big{cursor:default;}
   .lc-pair.still .lc-cd{transition:none !important;}
   .lc-face{position:absolute; inset:0; border:4px solid var(--cb000000, #000000); border-radius:14px; overflow:hidden; box-sizing:border-box; color:#fff; transition:box-shadow .42s, filter .42s;}
@@ -13259,14 +13259,33 @@ closeRowDD = function(dd){
     // re-sized when its width changes (only then: setting its height mustn't set it off again), on the next frame
     const lcPairWatch = pair => { if(!window.ResizeObserver) return; let w = -1;
       new ResizeObserver(() => { const nw = pair.clientWidth; if(nw === w) return; w = nw; requestAnimationFrame(() => lcPairSize(pair, true)); }).observe(pair); };
+    // the pair at rest: the big card flat, the small one a quarter turned and stood on end, its long side as tall as the big one
+    // (the front always on the left, the back on the right; the small one's top towards the other).
+    // Switching, each turns a quarter about its own middle, the front one way and the back the other; every frame the row is
+    // split between them (left part, 6px gap, right part) and each is sized to fit its part as it's turned just then,
+    // so neither leaves the row or touches the other on the way
+    const LC_CW = 340, LC_CH = 214.4, LC_R = LC_CH / LC_CW, LC_G = 6, LC_DUR = 620;
+    const lcEase = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, lcLerp = (a, b, t) => a + (b - a) * t;
+    const lcPose = (W, fBig) => { const B = (W - LC_G) / (1 + LC_R * LC_R), S = B * LC_R * LC_R; return fBig ? { wL: B, af: 0, ab: -90 } : { wL: S, af: 90, ab: 0 }; };
+    function lcPairDraw(pair){ const st = pair._st, W = pair.clientWidth; if(!W) return;
+      const H = (W - LC_G) / (1 + LC_R * LC_R) * LC_R, to = lcPose(W, st.fBig), a = st.from || to, e = lcEase(st.p);
+      const wL = lcLerp(a.wL, to.wL, e), wR = W - LC_G - wL, af = lcLerp(a.af, to.af, e), ab = lcLerp(a.ab, to.ab, e);
+      const fitK = (w, deg) => { const r = deg * Math.PI / 180, c = Math.abs(Math.cos(r)), sn = Math.abs(Math.sin(r)); return Math.min(w / (LC_CW * c + LC_CH * sn), H / (LC_CW * sn + LC_CH * c)); };
+      const put = (el, cx, deg, k) => { el.style.transform = `translate(${cx - LC_CW / 2}px, ${H / 2 - LC_CH / 2}px) rotate(${deg}deg) scale(${k})`; };
+      pair.style.height = H + 'px';
+      put(pair.querySelector('.lc-cf'), wL / 2, af, fitK(wL, af)); put(pair.querySelector('.lc-cb'), wL + LC_G + wR / 2, ab, fitK(wR, ab)); }
     function lcPairSize(pair, still){
       const W = pair.clientWidth; if(!W) return;
-      const G = 6, big = (W - G) * .7, small = W - G - big, H = big * 214.4 / 340;
-      pair.style.height = H + 'px'; if(still) pair.classList.add('still');
-      const f = pair.querySelector('.lc-cf'), b = pair.querySelector('.lc-cb'), fBig = f.classList.contains('big');
-      const place = (c, x, w) => { const k = w / 340; c.style.transform = `translate(${x}px, ${(H - 214.4 * k) / 2}px) scale(${k})`; };
-      place(f, 0, fBig ? big : small); place(b, (fBig ? big : small) + G, fBig ? small : big);   // the front always left, the back right
-      if(still) requestAnimationFrame(() => requestAnimationFrame(() => pair.classList.remove('still')));
+      const fBig = pair.querySelector('.lc-cf').classList.contains('big');
+      const st = pair._st || (pair._st = { fBig, p: 1, from: null, t0: 0, raf: 0 });
+      if(still){ if(st.raf) cancelAnimationFrame(st.raf); st.raf = 0; st.fBig = fBig; st.p = 1; st.from = null; lcPairDraw(pair); }
+      else if(fBig !== st.fBig){   // a switch: from wherever it is now (even mid-switch) to the other side
+        const cur = lcPose(W, st.fBig), a = st.from || cur, e = lcEase(st.p);
+        st.from = { wL: lcLerp(a.wL, cur.wL, e), af: lcLerp(a.af, cur.af, e), ab: lcLerp(a.ab, cur.ab, e) };
+        st.fBig = fBig; st.p = 0; st.t0 = performance.now();
+        const step = now => { st.p = Math.min(1, (now - st.t0) / LC_DUR); lcPairDraw(pair); st.raf = st.p < 1 ? requestAnimationFrame(step) : 0; if(!st.raf) st.from = null; };
+        if(!st.raf) st.raf = requestAnimationFrame(step); }
+      else if(!st.raf) lcPairDraw(pair);
       const dd = pair.closest('.lc-dd'); if(dd && dd.classList.contains('open')) dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px';
     }
     // the front's paper, drawn at the card's full size (it's shown scaled), then copied in
