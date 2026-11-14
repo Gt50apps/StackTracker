@@ -1793,6 +1793,8 @@
   /* the number sits in the middle of the card; the words under it along the bottom */
   .ln-due i{position:absolute; left:0; right:0; bottom:4px; text-align:center;}
   .ln-due b{position:relative; top:-1px;}
+  /* a returned date: its day's name along the top (Sat), the date in the middle, the month along the bottom */
+  .ln-due .ln-wd{position:absolute; left:0; right:0; top:4px; text-align:center; font:normal 700 .48rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   /* days left: green with plenty of time, yellow inside a week, orange inside 3 days (and due today), red once late */
   .ln-due.ok{background:var(--cb2e6b4a, #2e6b4a); color:#fff;}
   .ln-due.week{background:var(--cba88a12, #a88a12); color:#fff;}
@@ -13160,7 +13162,7 @@ closeRowDD = function(dd){
         });
       } else {
         rows.forEach(([b, i]) => { const d = new Date(b.loan.returned);
-          html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}${LN_LIB(b)}<button type="button" class="ln-due ret" data-li="${i}"><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></button></div>` + ddHTML(b, i); });
+          html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}${LN_LIB(b)}<button type="button" class="ln-due ret" data-li="${i}"><em class="ln-wd">${d.toLocaleDateString('en-US', { weekday: 'short' })}</em><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></button></div>` + ddHTML(b, i); });
       }
       if(!html && (s || F !== 'all')) html = '<div id="wl-empty">No matches</div>';
       view.innerHTML = html;
@@ -13326,7 +13328,7 @@ closeRowDD = function(dd){
       const dueCard = b => { const d = new Date(b.loan.due); d.setHours(0, 0, 0, 0); const n = Math.round((d.getTime() - t0) / DAY);
         const [big, small, cls] = n < 0 ? [-n, -n === 1 ? 'Day Late' : 'Days Late', 'late'] : n === 0 ? ['Today', '', 'soon'] : [n, n === 1 ? 'Day Left' : 'Days Left', n <= 3 ? 'soon' : n <= 7 ? 'week' : 'ok'];
         return `<span class="ln-due ${cls}"><b${typeof big === 'string' ? ' class="w"' : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</span>`; };
-      const backCard = b => { const d = new Date(b.loan.returned); return `<span class="ln-due ret"><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></span>`; };
+      const backCard = b => { const d = new Date(b.loan.returned); return `<span class="ln-due ret"><em class="ln-wd">${d.toLocaleDateString('en-US', { weekday: 'short' })}</em><b>${d.getDate()}</b><i>${d.toLocaleDateString(undefined, { month: 'short' })}</i></span>`; };
       const group = (name, list, card) => list.length ? `<div class="list-divider"><span class="ld-name">${name}</span></div>` + list.map(b => `<div class="wl-row">${cardHTML(b, -1)}${card(b)}</div>`).join('') : '';
       lgList.innerHTML = mine.length ? group('Checked Out', out, dueCard) + group('Returned', back, backCard) : '<div class="lp-empty">No books from this library yet</div>';
       lgPage.classList.add('active'); lgPage.setAttribute('aria-hidden', 'false');
