@@ -1826,7 +1826,27 @@
     background:linear-gradient(to top, rgba(0,0,0,.45), rgba(0,0,0,.15) 45%, rgba(0,0,0,0));}
   .wl-row.open > .ln-lib::after, .wl-row.open > .ln-due::after{opacity:1;}
   .ln-dd .dd-acts .rt{color:var(--cf2e6b4a, #2e6b4a);}
-  .ln-dd .dd-acts[hidden], .ln-back[hidden]{display:none;}
+  .ln-dd .dd-acts[hidden], .ln-back[hidden], .ln-rnset[hidden]{display:none;}
+  /* renewing: the new due date on wheels | + days (a wheel) and its day's name, kept in step; then Cancel | Renew */
+  .ln-rnset{display:flex; flex-direction:column; gap:6px;}
+  .ln-rnrow{display:flex; gap:4px; height:45px;}
+  .ln-rnrow .ld-set{border-width:2.5px; border-radius:6px; background:var(--cbffffff, #ffffff);}
+  .ln-rnrow .ld-set{flex:1 1 0;}   /* (the date and the days: the same width, and each of their three parts the same) */
+  .ln-rnrow .ld-set > *{flex:1 1 0 !important; min-width:0;}
+  .ln-rnrow .lw-wheel + .lw-wheel, .ln-rnrow .lw-wheel + .lw-st, .ln-rnrow .lw-st + .lw-wheel{border-left:2.5px solid var(--cb000000, #000000);}
+  .ln-rnrow .lw-wheel div{font-size:13px;}
+  .lw-st{flex:1 1 0; min-width:0; display:flex; align-items:center; justify-content:center; font:700 13px/1 Arial, sans-serif; color:var(--ink); background:var(--cbf3efe6, #f3efe6); user-select:none;}
+  .lw-st.pl{font-size:17px;} .lw-st.wd{text-transform:uppercase; letter-spacing:.3px;}
+  .ln-rnset .dd-acts .rnok{color:var(--cf2e6b4a, #2e6b4a);}
+  /* a loan's renewals, one card each: when, how many days and the due date it gave; Edit | ✕ */
+  .ln-rn{display:flex; align-items:stretch; height:38px; box-sizing:border-box; border:2.5px solid var(--cb000000, #000000); border-radius:6px; background:var(--cbffffff, #ffffff); overflow:hidden;}
+  .ln-rn .rt-t{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; justify-content:center; padding:0 10px; gap:3px; white-space:nowrap; overflow:hidden;}
+  .ln-rn .rt-t i{font:normal 700 .5rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted);}
+  .ln-rn .rt-t b{font:700 .72rem/1 Arial, sans-serif; color:var(--ink);} .ln-rn .rt-t b em{font-style:normal; color:var(--muted); font-weight:700;}
+  .ln-rn button, .ln-rn button:active{flex:none; width:58px; margin:0; padding:0; border:0; border-left:2.5px solid var(--cb000000, #000000); border-radius:0; box-shadow:none; background:var(--cbffffff, #ffffff);
+    font:700 min(.7rem, 2.9vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink); cursor:pointer;}
+  .ln-rn button.rnx, .ln-rn button.rnx:active{width:40px; color:var(--cfaa3333, #aa3333); display:flex; align-items:center; justify-content:center;}
+  .ln-rn button.rnx svg{width:12px; height:12px;}
   .ln-back{display:flex; gap:4px; height:45px;}
   .ln-back .ld-set{border-width:2.5px; border-radius:6px; background:var(--cbffffff, #ffffff);}
   .ln-back .lw-wheel + .lw-wheel{border-left-width:2.5px;}
@@ -2446,17 +2466,19 @@
   #rl-pos i{font-style:normal; font-size:.5rem; color:var(--cfb4ab9b, #b4ab9b);}
   #rl-pos i.on{color:var(--ink);}
   #rl-line.many #rl-pos{display:flex;}
-  /* the line card's right end: a check for showing the wishlist's books (the magenta dots) */
-  /* (All Time only: the other spans have no wishlist dots) */
-  #rl-line.wishy #rl-wheel > div{padding:0 82px 0 10px;}   /* centred in the space left of the check */
-  #rl-wish{display:none !important;} #rl-line.wishy #rl-wish{display:flex !important;}
-  #rl-wish, #rl-wish:active{position:absolute; right:0; top:0; bottom:0; width:72px; margin:0; padding:0; box-sizing:border-box; border:0; border-left:3px solid var(--cb000000, #000000); border-radius:0; box-shadow:none;
-    background:var(--cbffffff, #ffffff); flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer;}
-  #rl-wish i{width:15px; height:15px; box-sizing:border-box; border:2.5px solid var(--cb000000, #000000); border-radius:4px; background:var(--cbffffff, #ffffff); display:flex; align-items:center; justify-content:center;}
-  #rl-wish[aria-pressed="true"] i{background:var(--cbc2278f, #c2278f);}
-  #rl-wish[aria-pressed="true"] i::after{content:''; width:6px; height:3px; margin-top:-2px; border:solid #fff; border-width:0 0 2.2px 2.2px; transform:rotate(-45deg);}
-  #rl-wish span{font:700 .5rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink);}
-  #rl-wish[aria-pressed="false"] span{color:var(--muted);}
+  /* the line card's right end, All Time only: Books | Audiobooks | Wishlist, each shown or not (at least one always on);
+     on, each has its own colour */
+  /* (All Time, with no dot picked, the line card is the three of them; a dot picked, it's the book again) */
+  #rl-show{display:none; position:absolute; inset:0; z-index:2; background:var(--cbffffff, #ffffff);}
+  #rl-line:not(.picked) #rl-show{display:flex;}   /* the switcher by default, every span; the book's card once a dot is picked */
+  body:not(.tl-all) #rl-show [data-k="wish"]{display:none;}   /* (the wishlist's dots are All Time's only) */
+  #rl-show button, #rl-show button:active{flex:1 1 0; min-width:0; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none; background:var(--cbffffff, #ffffff); cursor:pointer;
+    font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); text-align:center; transition:background .18s, color .18s;}
+  #rl-show button + button, #rl-show button + button:active{border-left:3px solid var(--cb000000, #000000);}   /* (kept while pressed too) */
+  #rl-show button[aria-pressed="true"]{color:#fff;}
+  #rl-show [data-k="book"][aria-pressed="true"]{background:var(--cb2f5f8a, #2f5f8a);}   /* blue */
+  #rl-show [data-k="tape"][aria-pressed="true"]{background:var(--cb8a4a24, #8a4a24);}   /* brown, as the audiobooks' bars */
+  #rl-show [data-k="wish"][aria-pressed="true"]{background:var(--cbc2278f, #c2278f);}   /* magenta, as the wishlist's dots */
 </style>
 <script>
   window.CSS_HEXES = ["b000000", "b2e4636", "b2f3136", "b2fb84a", "b3a2213", "b3d2513", "b3f2b1d", "b4a2e18", "b4f3019", "b5a4c40", "b5b6633", "b63401f", "b6b4a32", "b6b6560", "b6e4724", "b77502e", "b7a2f2b", "b845530", "b865a34", "b8a6a4f", "b8c5229", "b996439", "b9a6a42", "ba9825f", "baa3333", "bb07a4b", "bb5342a", "bc9b98f", "bc9c0ad", "bcbc4b1", "bd6d2c8", "bd9a514", "be3dccd", "be4ded2", "bece7dc", "befe6d3", "bf4efe3", "bf6dcd8", "bf6e3df", "bfaf7f0", "bffffff", "f000000", "f2fb84a", "f5c4a2e", "f8a8378", "f8f8a80", "faa3333", "fb4ab9b", "fb5342a", "fc4bdb0", "fcfc8ba", "fd6cfc2", "fd6d0c4", "fe5322b", "ff4ead2", "fffffff"];
@@ -3310,7 +3332,7 @@
   </div>
   <div id="timeline-body">
     <div class="tl-page"><div class="tl-card"><div id="tl-head"></div><div id="tl-canvas"></div></div></div>
-    <div id="rl-line"><div id="rl-wheel"></div><div id="rl-pos"></div><button type="button" id="rl-wish" aria-pressed="true" aria-label="Show wishlist books"><i></i><span>Wishlist</span></button></div>
+    <div id="rl-line"><div id="rl-wheel"></div><div id="rl-pos"></div><div id="rl-show" role="group" aria-label="Show"><button type="button" data-k="book" aria-pressed="true">Books</button><button type="button" data-k="tape" aria-pressed="true">Audiobooks</button><button type="button" data-k="wish" aria-pressed="true">Wishlist</button></div></div>
     <button type="button" id="tl-full">Tap for full window view</button>
     <div class="tl-foot"><div id="tl-info"><span class="hint">Tap a book to see it here</span></div></div>
   </div>
@@ -9407,7 +9429,7 @@
       dateWheel(W('y'), { count: () => yn, wrap: false, text: i => yr ? String(y0 + i) : '’' + String(i).padStart(2, '0'), get: () => st().y - y0, set: i => { const o = st(); if(o.y === y0 + i) return; o.y = y0 + i; put(o, true); } })];
     return () => syncs.forEach(f => f());
   }
-  window.__dateSet = dateSet;
+  window.__dateSet = dateSet; window.__dateWheel = dateWheel;
   // Returned: optional; shown once there's library data. A due date already past fills it in with that date (until you take it off)
   const retCard = document.querySelector('#loan-card .ld-set[data-f="back"]'), retAdd = document.getElementById('ret-add'), loanBack = document.getElementById('loan-back');
   let retAuto = false, retDropped = false;
@@ -9493,7 +9515,7 @@
         if(audio) b.audioSeconds = secs; else delete b.audioSeconds;
         if(rel != null) b.released = rel; else delete b.released;
         if(words) b.words = words; else delete b.words;
-        if(loan){ const { back, ...L0 } = loan; b.loan = loanSettle(Object.assign(b.loan || {}, L0), back); }
+        if(loan){ const { back, ...L0 } = loan; b.loan = loanSettle(Object.assign(b.loan || {}, L0), back); if(window.__rnRebase) window.__rnRebase(b.loan); }
         else if(loanDropped) delete b.loan;
         b.tags = customizeTags.slice();
         applyOptions(b, true);
@@ -11391,7 +11413,7 @@
   // the time covered — Homer, then nothing till the 1800s) gives the right column just the old books on its far side,
   // cropped tight; otherwise the right column runs from the oldest up to a split year. Splits are tried at round years
   // and the one where the busiest row is least crowded wins, with the books shared out as evenly as that allows.
-  const RL = { picked: null, wheelI: 0, placed: [], shown: [], key: '' }, RL_DOT = [4, 4, 2], RL_LW = 34, RL_NOTCH = 39;
+  const RL = { picked: null, wheelI: 0, placed: [], shown: [], key: '', show: { book: true, tape: true, wish: true } }, RL_DOT = [4, 4, 2], RL_LW = 34, RL_NOTCH = 39;
   const rlNow = () => new Date().getFullYear();
   const rlYr = y => y < 0 ? (-y).toLocaleString() + ' BC' : String(y);
   const rlTick = y => y < 0 ? (-y) + '<small>BC</small>' : y === 0 ? '1<small>AD</small>' : String(y);
@@ -11444,15 +11466,20 @@
       return false; });
     // All Time also has the books not started yet (black dots); the spans only what was read in them
     const started = b => (b.reads || []).length > 0 || (b.days || []).some(v => v > 0);
-    const read = books.filter(b => touched(b) || (all && !started(b))), has = b => typeof b.released === 'number' && !isNaN(b.released);
-    // All Time: the wishlist too, any with a year (magenta) — unless its check on the line card is off
-    const wish = all && !RL.noWish && window.wishState ? window.wishState().filter(has).map(w => Object.assign(w, { _wish: true })) : [];
+    // (All Time: books and audiobooks each only when shown on the line card)
+    if(!all && !RL.show.book && !RL.show.tape){ RL.show.book = RL.show.tape = true;   // (only the wishlist on, then a span without it: books back on)
+      document.querySelectorAll('#rl-show button').forEach(x => x.setAttribute('aria-pressed', String(!!RL.show[x.dataset.k]))); }
+    const shown = b => b.format === 'audio' ? RL.show.tape : RL.show.book;
+    const read = books.filter(b => (touched(b) || (all && !started(b))) && shown(b)), has = b => typeof b.released === 'number' && !isNaN(b.released);
+    // All Time: the wishlist too, any with a year (magenta) — when it's shown on the line card
+    const wish = all && RL.show.wish && window.wishState ? window.wishState().filter(has).map(w => Object.assign(w, { _wish: true })) : [];
     return { list: read.filter(has).concat(wish).sort((a, b) => a.released - b.released), without: read.filter(b => !has(b)).length };
   }
   // a dot's colour: dark gold read, green being read now, black not started; an audiobook's is a square
   const rlKey = b => (b._wish ? 'w|' : 'b|') + b.title + '|' + b.released;   // one book's dot (a wishlist copy is made fresh each draw)
   const rlState = b => b._wish ? 'wish' : bookFinished(b) ? 'read' : (b.days || []).some(v => v > 0) ? 'now' : (b.reads || []).length ? 'read' : 'unread';
   function relDraw(){
+    document.getElementById('rl-line').classList.toggle('picked', !!RL.picked);
     const today = tlDay(new Date()), R = tlRange(today), key = TL.view + '|' + TL.off;
     if(key !== RL.key){ RL.key = key; RL.picked = null; RL.wheelI = 0; }
     if(document.body.classList.contains('tl-full')) RL.picked = null;
@@ -11509,7 +11536,7 @@
     // no tag on the card: the picked dots just get their rings, and the line card under the card names the book
     if(!list.length && without) html += `<div class="rl-empty">Add a year to a book (Edit) to see it here</div>`;
     tlCanvas.innerHTML = html;
-    document.getElementById('rl-line').classList.toggle('wishy', TL.view === 'all');   // the Wishlist check: All Time only
+    document.body.classList.toggle('tl-all', TL.view === 'all');   // Books | Audiobooks | Wishlist: All Time only
     rlLine(); rlFoot(R, list, without);
   }
   // the line card: the picked book — title, author, year (years ago); several from one year make it a wheel, opening on 1 of n
@@ -11556,14 +11583,21 @@
       return;
     }
   }
-  // the line card's Wishlist check: show the wishlist's dots or not (kept between visits)
-  { const w = document.getElementById('rl-wish');
-    try{ RL.noWish = localStorage.getItem('stack-tracker-rl-wish') === '0'; }catch(e){}
-    w.setAttribute('aria-pressed', String(!RL.noWish));
-    w.addEventListener('click', e => { e.stopPropagation(); RL.noWish = !RL.noWish; w.setAttribute('aria-pressed', String(!RL.noWish));
-      try{ localStorage.setItem('stack-tracker-rl-wish', RL.noWish ? '0' : '1'); }catch(e){}
-      if(RL.noWish && RL.picked && RL.picked.startsWith('w|')) RL.picked = null;
-      if(window.hapticTick) window.hapticTick(); relDraw(); }); }
+  // the line card's Books | Audiobooks | Wishlist: each shown or not, at least one always (kept between visits)
+  { const box = document.getElementById('rl-show');
+    RL.show = { book: true, tape: true, wish: true };
+    try{ const v = JSON.parse(localStorage.getItem('stack-tracker-rl-show') || 'null');
+      if(v) Object.assign(RL.show, v); else if(localStorage.getItem('stack-tracker-rl-wish') === '0') RL.show.wish = false; }catch(e){}   // (the old Wishlist check)
+    if(!RL.show.book && !RL.show.tape && !RL.show.wish) RL.show.book = true;
+    const sync = () => box.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(!!RL.show[b.dataset.k])));
+    sync();
+    box.querySelectorAll('button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); const k = b.dataset.k;
+      const live = TL.view === 'all' ? ['book', 'tape', 'wish'] : ['book', 'tape'];   // (the ones showing)
+      if(RL.show[k] && live.filter(x => RL.show[x]).length === 1) return;   // the last one on stays on
+      RL.show[k] = !RL.show[k]; sync();
+      try{ localStorage.setItem('stack-tracker-rl-show', JSON.stringify(RL.show)); }catch(e){}
+      if(RL.picked){ const w = RL.picked.startsWith('w|'); if(w ? !RL.show.wish : !(RL.show.book || RL.show.tape)) RL.picked = null; }
+      if(window.hapticTick) window.hapticTick(); relDraw(); })); }
   // a tap picks the dot nearest the finger — just that book, even with others from the same year beside it; tap it again to let go
   tlCanvas.addEventListener('click', e => {
     if(TL.mode !== 'released') return;
@@ -13106,6 +13140,14 @@ closeRowDD = function(dd){
     const md = t => new Date(t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     function cardHTML(b, i){ const hex = bookColor(b);   // its own cover colour, as on the shelf
       return `<div class="wl-card" data-li="${i}" data-hex="${hex}" style="--cloth:${hex}"><canvas aria-hidden="true"></canvas><span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>`; }
+    // ---- renewals: kept as the days each added ({ at, n }) on top of the due date before the first (due0),
+    // so the due date is always due0 plus them all, and changing or taking one out moves the ones after with it ----
+    const addDays = (t, n) => { const d = new Date(t); d.setDate(d.getDate() + n); return d.getTime(); };
+    const rnDue = (L, k) => addDays(L.due0, (L.renewals || []).slice(0, k).reduce((a, r) => a + r.n, 0));   // the due date after the first k
+    const rnStart = L => { if(!L.renewals){ L.renewals = []; L.due0 = L.due; L.rnOld = L.renewed || 0; } };   // (renewals counted before these were kept stay counted)
+    const rnSettle = L => { L.due = rnDue(L, L.renewals.length); L.renewed = (L.rnOld || 0) + L.renewals.length;
+      if(!L.renewals.length && !L.rnOld){ delete L.renewals; delete L.due0; delete L.rnOld; delete L.renewed; } };
+    window.__rnRebase = L => { if(L && L.renewals && L.renewals.length) L.due0 = addDays(L.due, -L.renewals.reduce((a, r) => a + r.n, 0)); };   // (the due date changed in Edit)
     // the dropdown under a loan: out / due (or back) and renewals, then days read and pages, then its actions
     function ddHTML(b, i){
       const L = b.loan, a = new Date(L.out); a.setHours(0, 0, 0, 0);
@@ -13121,7 +13163,14 @@ closeRowDD = function(dd){
         `<div class="dd-stats ds-ret"><div class="ds-col"><span>Out <b>${md(L.out)}</b></span><span>Due <b>${md(L.due)}</b></span>` +
           (L.returned ? `<span>Returned <b>${md(L.returned)}</b></span>` : L.renewed ? `<span>Renewed <b>${L.renewed}×</b></span>` : '') + `</div>` +
           `<div class="ds-col r"><span>${amt}</span><span>Read on <b>${rd}</b> ${rd === 1 ? 'day' : 'days'}</span></div></div>` +
+        // each renewal: when it was made, the days it added, the due date it gave
+        (L.renewals || []).map((r, k) => `<div class="ln-rn" data-k="${k}"><span class="rt-t"><i>Renewal ${(L.rnOld || 0) + k + 1} · ${md(r.at)}</i><b>+${r.n} ${r.n === 1 ? 'day' : 'days'} <em>→</em> Due ${md(rnDue(L, k + 1))}</b></span>` +
+          `<button type="button" class="rne">Edit</button><button type="button" class="rnx" aria-label="Delete renewal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`).join('') +
         `<div class="dd-acts">${acts}</div>` +
+        `<div class="ln-rnset" hidden><div class="ln-rnrow"><input type="hidden"><div class="field-card ld-set rn-date" aria-label="New due date">` +
+          `<div class="lw-wheel" data-k="m">${'<div></div>'.repeat(7)}</div><div class="lw-wheel" data-k="d">${'<div></div>'.repeat(7)}<span class="tw-tag">DUE</span></div><div class="lw-wheel" data-k="y">${'<div></div>'.repeat(7)}</div></div>` +
+          `<div class="field-card ld-set rn-days" aria-label="Days added"><b class="lw-st pl" aria-hidden="true">+</b><div class="lw-wheel" data-k="n">${'<div></div>'.repeat(7)}<span class="tw-tag">DAYS</span></div><b class="lw-st wd"></b></div></div>` +
+          `<div class="dd-acts"><button type="button" class="rnc">Cancel</button><button type="button" class="rnok">Renew</button></div></div>` +
         (L.returned ? '' : `<div class="ln-back" hidden><input type="hidden"><div class="field-card ld-set" aria-label="Returned"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">BACK</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ln-ok">Done</button></div>`) +
         `</div></div>`;
     }
@@ -13186,7 +13235,36 @@ closeRowDD = function(dd){
         row.addEventListener('click', () => ddOpen(row, !row.classList.contains('open')));
         if(+row.dataset.li === openLoan) ddOpen(row, true); });
       const after = (x, f) => x.addEventListener('click', e => { e.stopPropagation(); const b = loans[+x.closest('.ln-dd').dataset.li]; if(b) f(b); });
-      view.querySelectorAll('.ln-dd .rn').forEach(x => after(x, b => { b.loan.due += 21 * DAY; b.loan.renewed = (b.loan.renewed || 0) + 1; saveBooks(); renderLoans(); }));
+      // Renew (or Edit on a renewal): the new due date on wheels, and beside it + days on a wheel with the day's name, kept in step
+      const rnOpen = (x, b, k) => {   // k: the renewal being changed, or -1 for a new one
+        const dd = x.closest('.ln-dd'), set = dd.querySelector('.ln-rnset'), inp = set.querySelector('input'), L = b.loan;
+        const base = k >= 0 ? rnDue(L, k) : L.due, n0 = k >= 0 ? L.renewals[k].n : 21;   // from: the due date before it; to start: its days, or 21
+        const dOf = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+        const b0 = new Date(base); b0.setHours(12, 0, 0, 0);
+        const daysTo = v => { const [y, m, d] = v.split('-').map(Number); return Math.round((new Date(y, m - 1, d, 12) - b0) / DAY); };
+        let n = n0; inp.value = dOf(addDays(base, n));
+        const wd = set.querySelector('.lw-st.wd'), showWd = () => { wd.textContent = new Date(addDays(base, n)).toLocaleDateString('en-US', { weekday: 'short' }); };
+        const N = 365;   // + 1 to 365 days
+        set._k = k; set._n = () => n;
+        let dateSync, nSync;
+        dateSync = window.__dateSet(set.querySelector('.rn-date'), inp, () => {   // the date turned: the days follow (a day after the old due date at the least)
+          let v = daysTo(inp.value); if(v < 1 || v > N){ v = Math.max(1, Math.min(N, v)); inp.value = dOf(addDays(base, v)); requestAnimationFrame(dateSync); }
+          if(v !== n){ n = v; nSync(); } showWd(); });
+        nSync = window.__dateWheel(set.querySelector('.lw-wheel[data-k="n"]'), { cut: true, count: () => N, wrap: false, text: i => String(i + 1), get: () => n - 1,
+          set: i => { if(i + 1 === n) return; n = i + 1; inp.value = dOf(addDays(base, n)); dateSync(); showWd(); } });   // the days turned: the date follows
+        set.querySelector('.rnok').textContent = k >= 0 ? 'Save' : 'Renew';
+        dd.querySelector('.dd-acts:not(.ln-rnset .dd-acts)').hidden = true; dd.querySelectorAll('.ln-rn').forEach(r => r.hidden = true);
+        set.hidden = false; dateSync(); nSync(); showWd();
+        dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px'; };
+      view.querySelectorAll('.ln-dd .rn').forEach(x => after(x, b => rnOpen(x, b, -1)));
+      view.querySelectorAll('.ln-dd .rne').forEach(x => after(x, b => rnOpen(x, b, +x.closest('.ln-rn').dataset.k)));
+      view.querySelectorAll('.ln-dd .ln-rnset').forEach(r => r.addEventListener('click', e => e.stopPropagation()));
+      view.querySelectorAll('.ln-dd .rnc').forEach(x => after(x, () => renderLoans()));
+      view.querySelectorAll('.ln-dd .rnok').forEach(x => after(x, b => { const set = x.closest('.ln-rnset'), k = set._k, n = set._n(), L = b.loan;
+        rnStart(L); if(k >= 0 && L.renewals[k]) L.renewals[k].n = n; else L.renewals.push({ at: Date.now(), n });
+        rnSettle(L); saveBooks(); renderLoans(); if(window.hapticTick) window.hapticTick(); }));
+      view.querySelectorAll('.ln-dd .rnx').forEach(x => after(x, b => { const L = b.loan, k = +x.closest('.ln-rn').dataset.k;
+        if(!L.renewals) return; L.renewals.splice(k, 1); rnSettle(L); saveBooks(); renderLoans(); }));
       // Returned: the day it went back on wheels (today to start with), then Done
       view.querySelectorAll('.ln-dd .rt').forEach(x => after(x, b => {
         const dd = x.closest('.ln-dd'), row = dd.querySelector('.ln-back'), inp = row.querySelector('input');
@@ -13198,7 +13276,7 @@ closeRowDD = function(dd){
       view.querySelectorAll('.ln-dd .ln-ok').forEach(x => after(x, b => {
         const [y, m, d] = x.closest('.ln-back').querySelector('input').value.split('-').map(Number);
         b.loan.returned = Math.max(b.loan.out, new Date(y, m - 1, d, 12).getTime()); openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
-      view.querySelectorAll('.ln-dd .ag').forEach(x => after(x, b => { delete b.loan.returned; delete b.loan.renewed; b.loan.out = Date.now(); b.loan.due = Date.now() + 21 * DAY; openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
+      view.querySelectorAll('.ln-dd .ag').forEach(x => after(x, b => { delete b.loan.returned; delete b.loan.renewed; delete b.loan.renewals; delete b.loan.due0; delete b.loan.rnOld; b.loan.out = Date.now(); b.loan.due = Date.now() + 21 * DAY; openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
       view.querySelectorAll('.ln-dd .ed').forEach(x => after(x, b => { closeAll(); openLoan = -1; openCustomizeModal(b, 'edit'); }));   // the same Edit a Book window as Home
     }
     const closeAll = () => view.querySelectorAll('.ln-dd.open').forEach(closeRowDD);
