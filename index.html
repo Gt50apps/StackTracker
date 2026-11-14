@@ -1790,6 +1790,9 @@
   .ln-due, .ln-due:active{flex:none; width:62px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none; background:var(--panel); color:var(--ink);
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer;}
   .ln-due b{font:700 1.15rem/1 Arial, sans-serif;} .ln-due b.w{font-size:.78rem; letter-spacing:.3px; text-transform:uppercase;} .ln-due i{font:normal 700 .48rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  /* the number sits in the middle of the card; the words under it along the bottom */
+  .ln-due i{position:absolute; left:0; right:0; bottom:4px; text-align:center;}
+  .ln-due b{position:relative; top:-1px;}
   /* days left: green with plenty of time, yellow inside a week, orange inside 3 days (and due today), red once late */
   .ln-due.ok{background:var(--cb2e6b4a, #2e6b4a); color:#fff;}
   .ln-due.week{background:var(--cba88a12, #a88a12); color:#fff;}
@@ -1798,6 +1801,20 @@
   .ln-due.ret{color:var(--muted);}
   .ln-due{position:relative;}
   .ln-due b.n3{font-size:.9rem;} .ln-due b.n4{font-size:.66rem;}   /* with the star: 3 or 4 digits made a little smaller, so they clear it */
+  /* the finished star: now and then a smooth fifth of a turn, a little past and settling back (turned about its own centre,
+     its points' middle, so it lands exactly on itself); each card a little out of step with the next */
+  .ln-star path{animation:ln-star 5s infinite; transform-box:view-box; transform-origin:12px 12.24px;}
+  @keyframes ln-star{
+    0%, 62%{transform:rotate(0); animation-timing-function:cubic-bezier(.45,.05,.25,1);}
+    84%{transform:rotate(81deg); animation-timing-function:cubic-bezier(.4,0,.3,1);}
+    94%{transform:rotate(70deg); animation-timing-function:cubic-bezier(.4,0,.4,1);}
+    100%{transform:rotate(72deg);}
+  }
+  @media (prefers-reduced-motion: reduce){ .ln-star path{animation:none;} }
+  .ln-due .ln-dots{position:absolute; top:2px; left:3px; width:15px; height:8px; pointer-events:none; fill:currentColor; overflow:visible; filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));}
+  .ln-dots circle{opacity:.35; animation:ln-dots 1.4s ease-in-out infinite;} .ln-dots circle:nth-child(2){animation-delay:.18s;} .ln-dots circle:nth-child(3){animation-delay:.36s;}
+  @keyframes ln-dots{0%, 60%, 100%{opacity:.35;} 25%{opacity:1;}}
+  @media (prefers-reduced-motion: reduce){ .ln-dots circle{animation:none; opacity:1;} }
   .ln-due .ln-star{position:absolute; top:3px; right:3px; width:11px; height:11px; pointer-events:none; filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));}
   /* a loan's dropdown (tap its card): the dates and what was read, then Renew | Returned | Edit (Returned: Check Out Again | Edit) */
   body.dd-on .wl-row.open{position:relative; z-index:8;}
@@ -2383,7 +2400,8 @@
   body.off-typefilter #fmt-row{display:none !important;}
   body.off-ends .wl-card .wl-yr, body.off-ends .br-spine > i{display:none !important;}
   body.off-lnstar .ln-due .ln-star{display:none;} body.off-lnstar .ln-due b.n3, body.off-lnstar .ln-due b.n4{font-size:1.15rem;}
-  body.off-motion .cm-dots i{animation:none !important;}
+  body.off-motion .cm-dots i, body.off-motion .ln-dots circle, body.off-motion .ln-star path{animation:none !important;} body.off-motion .ln-dots circle{opacity:1;}
+  body.off-lndots .ln-due .ln-dots{display:none;}
   body.off-motion .so-dir polygon, body.off-motion .bar-dir polygon{transition:none !important;}
   .dv-themes.dv-splash{grid-template-columns:repeat(2, 1fr);}   /* ten: two across, no empty cells */
   .dv-splash button{color:var(--ink) !important; background:var(--cbffffff, #ffffff) !important;} .dv-splash button.on{background:var(--ink) !important; color:var(--cbffffff, #ffffff) !important;}
@@ -12818,8 +12836,9 @@ Object.assign(ART, {
     { id: 'mythic', g: 'home', name: 'Mythic lengths', note: 'Leviathan to Ouroboros past Epic Novel (off: Epic is the longest)' },
     { id: 'tapetop', g: 'look', name: 'Tape top', note: 'Audiobooks\' cards and list ends look like a tape (off: like a book)' },
     { id: 'lnstar', g: 'library', name: 'Finished star', note: 'On checked-out books you\'ve finished' },
+    { id: 'lndots', g: 'library', name: 'Reading dots', note: 'On checked-out books you\'ve started and not finished' },
     { id: 'wlcount', g: 'library', name: 'Wishlist counts', note: 'The (*n*) after authors in the Author List' },
-    { id: 'motion', g: 'look', name: 'Animations', note: 'The in-progress dots, and the sort arrows turning' },
+    { id: 'motion', g: 'look', name: 'Animations', note: 'The in-progress dots, the finished star turning, and the sort arrows turning' },
     { id: 'haptics', g: 'look', name: 'Haptics', note: 'A small buzz as a wheel clicks past each number' }
   ];
   // defaults: Medium shelves, tapes on the right, Shelf and List both, Badges and Haptics off, everything else on (saved choices override these)
@@ -13115,6 +13134,9 @@ closeRowDD = function(dd){
       const left = b => { const d = new Date(b.loan.due); d.setHours(0, 0, 0, 0); return Math.round((d.getTime() - t0) / DAY); };
       const dayOf = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
       // finished reading it (still checked out): a white star, rounded points, in the days card's top right corner
+      // still reading (started, not finished): three dots, top left, lighting up one after another
+      const LN_DOTS = '<svg class="ln-dots" viewBox="1 6 22 12" aria-label="Reading"><circle cx="4.5" cy="12" r="2.6"/><circle cx="12" cy="12" r="2.6"/><circle cx="19.5" cy="12" r="2.6"/></svg>';
+      const reading = b => !bookFinished(b) && bookRead(b) > 0;
       const LN_STAR = '<svg class="ln-star" viewBox="0 0 24 24" aria-label="Finished"><path d="M12 3.2l2.6 5.5 6 .8-4.4 4.1 1.1 5.9L12 16.6l-5.3 2.9 1.1-5.9-4.4-4.1 6-.8z" fill="#fff" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/></svg>';
       const F = lbSel[mode].f, S = lbSel[mode].s;
       const pass = b => F === 'all' ? true : mode === 'out' ? (F === 'late' ? left(b) < 0 : F === 'week' ? left(b) >= 0 && left(b) <= 7 : (b.loan.renewed || 0) > 0)
@@ -13133,7 +13155,7 @@ closeRowDD = function(dd){
           if(S === 'due') html += `<div class="list-divider"><span class="ld-name">${name}</span></div>`;
           g.forEach(([b, i]) => { const n = left(b);
             const [big, small, cls] = n < 0 ? [-n, -n === 1 ? 'Day Late' : 'Days Late', 'late'] : n === 0 ? ['Today', '', 'soon'] : [n, n === 1 ? 'Day Left' : 'Days Left', n <= 3 ? 'soon' : n <= 7 ? 'week' : 'ok'];
-            html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}${LN_LIB(b)}<button type="button" class="ln-due ${cls}" data-li="${i}">${bookFinished(b) ? LN_STAR : ''}<b${typeof big === 'string' ? ' class="w"' : bookFinished(b) && String(big).length >= 3 ? ` class="n${Math.min(4, String(big).length)}"` : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</button></div>` + ddHTML(b, i);
+            html += `<div class="wl-row" data-li="${i}">${cardHTML(b, i)}${LN_LIB(b)}<button type="button" class="ln-due ${cls}" data-li="${i}">${bookFinished(b) ? LN_STAR.replace('<path ', `<path style="animation-delay:${-((i * .45) % 5).toFixed(2)}s" `) : reading(b) ? LN_DOTS : ''}<b${typeof big === 'string' ? ' class="w"' : bookFinished(b) && String(big).length >= 3 ? ` class="n${Math.min(4, String(big).length)}"` : ''}>${big}</b>${small ? `<i>${small}</i>` : ''}</button></div>` + ddHTML(b, i);
           });
         });
       } else {
