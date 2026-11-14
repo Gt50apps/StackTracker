@@ -1829,7 +1829,7 @@
   .ln-dd .dd-acts[hidden], .ln-back[hidden], .ln-rnset[hidden]{display:none;}
   /* renewing: the new due date on wheels | + days (a wheel) and its day's name, kept in step; then Cancel | Renew */
   .ln-rnset{display:flex; flex-direction:column; gap:6px;}
-  .ln-rnrow{display:flex; gap:4px; height:45px;}
+  .ln-rnrow{display:flex; gap:6px; height:45px;}
   .ln-rnrow .ld-set{border-width:2.5px; border-radius:6px; background:var(--cbffffff, #ffffff);}
   .ln-rnrow .ld-set{flex:1 1 0;}   /* (the date and the days: the same width, and each of their three parts the same) */
   .ln-rnrow .ld-set > *{flex:1 1 0 !important; min-width:0;}
@@ -1847,10 +1847,14 @@
     font:700 min(.7rem, 2.9vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink); cursor:pointer;}
   .ln-rn button.rnx, .ln-rn button.rnx:active{width:40px; color:var(--cfaa3333, #aa3333); display:flex; align-items:center; justify-content:center;}
   .ln-rn button.rnx svg{width:12px; height:12px;}
-  .ln-back{display:flex; gap:4px; height:45px;}
+  .ln-back{display:flex; gap:6px; height:45px;}   /* (the same 6px between its cards as between the dropdown's) */
   .ln-back .ld-set{border-width:2.5px; border-radius:6px; background:var(--cbffffff, #ffffff);}
   .ln-back .lw-wheel + .lw-wheel{border-left-width:2.5px;}
-  .ln-back .ln-ok, .ln-back .ln-ok:active{flex:none; width:96px; grid-column:auto; height:auto; margin:0; padding:0; box-shadow:none; border-width:2.5px; border-radius:6px;
+  /* ✕ (cancel) on the left, ✓ (returned) on the right: square cards either side of the wheels */
+  .ln-back .ln-no, .ln-back .ln-no:active{flex:none; width:45px; height:auto; margin:0; padding:0; box-shadow:none; border-width:2.5px; border-radius:6px; background:var(--cbaa3333, #aa3333);
+    color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+  .ln-back .ln-no svg, .ln-back .ln-ok svg{width:18px; height:18px;}
+  .ln-back .ln-ok, .ln-back .ln-ok:active{display:flex; align-items:center; justify-content:center; flex:none; width:45px; grid-column:auto; height:auto; margin:0; padding:0; box-shadow:none; border-width:2.5px; border-radius:6px;
     background:var(--cb2e6b4a, #2e6b4a); color:#fff; font:700 .78rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
   /* the same 2.5px borders as the loan's own cards, all round: the dropdown's edges, its two cards, the lines between buttons */
   .row-dd.ln-dd{border-width:0 2.5px;} .row-dd.ln-dd.open{border-bottom-width:2.5px;}
@@ -13171,7 +13175,7 @@ closeRowDD = function(dd){
           `<div class="lw-wheel" data-k="m">${'<div></div>'.repeat(7)}</div><div class="lw-wheel" data-k="d">${'<div></div>'.repeat(7)}<span class="tw-tag">DUE</span></div><div class="lw-wheel" data-k="y">${'<div></div>'.repeat(7)}</div></div>` +
           `<div class="field-card ld-set rn-days" aria-label="Days added"><b class="lw-st pl" aria-hidden="true">+</b><div class="lw-wheel" data-k="n">${'<div></div>'.repeat(7)}<span class="tw-tag">DAYS</span></div><b class="lw-st wd"></b></div></div>` +
           `<div class="dd-acts"><button type="button" class="rnc">Cancel</button><button type="button" class="rnok">Renew</button></div></div>` +
-        (L.returned ? '' : `<div class="ln-back" hidden><input type="hidden"><div class="field-card ld-set" aria-label="Returned"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">BACK</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ln-ok">Done</button></div>`) +
+        (L.returned ? '' : `<div class="ln-back" hidden><input type="hidden"><button type="button" class="field-card ln-no" aria-label="Cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="field-card ld-set" aria-label="Returned"><div class="lw-wheel" data-k="m"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="lw-wheel" data-k="d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">BACK</span></div><div class="lw-wheel" data-k="y"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div><button type="button" class="field-card ln-ok" aria-label="Returned on this date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.5l5 5 10-11"/></svg></button></div>`) +
         `</div></div>`;
     }
     // a loan's library card, on end, between the book and its days (or returned-date) card (white with a black mark when it has none)
@@ -13273,6 +13277,8 @@ closeRowDD = function(dd){
         dd.querySelector('.dd-acts').hidden = true; row.hidden = false; row._sync();
         dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px'; }));
       view.querySelectorAll('.ln-dd .ln-back').forEach(r => r.addEventListener('click', e => e.stopPropagation()));
+      view.querySelectorAll('.ln-dd .ln-no').forEach(x => x.addEventListener('click', e => { e.stopPropagation(); const dd = x.closest('.ln-dd');   // not returned after all: back to the buttons
+        x.closest('.ln-back').hidden = true; dd.querySelector('.dd-acts').hidden = false; dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px'; }));
       view.querySelectorAll('.ln-dd .ln-ok').forEach(x => after(x, b => {
         const [y, m, d] = x.closest('.ln-back').querySelector('input').value.split('-').map(Number);
         b.loan.returned = Math.max(b.loan.out, new Date(y, m - 1, d, 12).getTime()); openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
