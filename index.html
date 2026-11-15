@@ -1744,11 +1744,14 @@
   .wl-card .t, .wl-card .a{padding-bottom:3px; margin-bottom:-3px;}
   .wl-card .t{margin-top:auto; margin-bottom:auto;}
   .wl-card .t + .a{margin-top:-3px;}
+  .wl-card{padding-bottom:0;}   /* (the author's line sits low, its descenders still clear of the edge) */
   /* a library card's years: a third line along the bottom */
   .wl-card .lc-yrs{font:700 .5rem/1 Arial, sans-serif; letter-spacing:.06em; text-transform:uppercase; color:rgba(255,255,255,.78); margin-top:3px; white-space:nowrap;}
   .wl-card.lite .lc-yrs{color:rgba(0,0,0,.6);}
   .wl-card.two .t{white-space:normal; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; flex:none;}
   .wl-card.two .a{flex:none;}
+  .wl-card.three .t{white-space:normal; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; flex:none; line-height:1;}
+  .wl-card.three .a{flex:none;}
   /* at the library? a ✓ (found it), ! (waiting on it) and ✗ (not there) card to the right of each book (the ones not picked faint; none is fine) */
   .wl-row{display:flex; gap:4px; align-items:stretch;}
   /* the Library's search | filter | sort card: the same as Home's */
@@ -4910,10 +4913,21 @@
     });
     cardContainer.innerHTML = html;
     cardContainer.querySelectorAll('.wl-card').forEach(c => { const cv = c.querySelector('canvas'), hex = c.dataset.hex, t = c.querySelector('.t');
-      const fit = () => { c.classList.remove('two'); if(t && t.scrollWidth > t.clientWidth + 1) c.classList.add('two'); };
+      const fit = () => window.__fitCard(c);
       const go = () => { fit(); if(c.classList.contains('tape')) drawTapeTop(cv, hex, c.dataset.seed); else if(window.BOOKPAPER) BOOKPAPER.draw(cv, hex, c.dataset.seed, true, 16); };
       if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go); });
   }
+  // a book card's words: the title on one line, or two if it must, or three (smaller) if it must; the author always
+  // on its own bottom line at its usual size; the card never grows
+  window.__fitCard = c => { const t = c.querySelector('.t'), a = c.querySelector('.a'); if(!t) return;
+    t.style.fontSize = ''; c.classList.remove('two', 'three');
+    if(t.scrollWidth <= t.clientWidth + 1) return;
+    const room = () => { const cs = getComputedStyle(c); return c.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom); };
+    const over = () => t.scrollHeight > t.clientHeight + 1 || (t.offsetHeight + (a ? a.offsetHeight : 0) - (a ? 6 : 3)) > room() + .5;
+    c.classList.add('two'); if(!over()) return;
+    c.classList.remove('two'); c.classList.add('three');
+    const ft = parseFloat(getComputedStyle(t).fontSize);
+    for(let k = 1; k >= .5 && over(); k -= .04) t.style.fontSize = (ft * k).toFixed(2) + 'px'; };
   function renderList(ordered, target = listContainer, groups = null){
     requestAnimationFrame(() => fitListTitles(target));
     const listContainer = target;
@@ -13137,7 +13151,7 @@ closeRowDD = function(dd){
     const byAuthor = (a, b) => { const x = authorKeyOf(a), y = authorKeyOf(b); return lc2(x[0], y[0]) || lc2(x[1], y[1]) || lc2(a.title, b.title); };
     const GROUPS = [['', 'To Check'], ['yes', 'Found'], ['wait', 'Waiting'], ['no', 'Not There']];
     // a title too long for one line takes two
-    const fit = c => { const t = c.querySelector('.t'); c.classList.remove('two'); if(t && t.scrollWidth > t.clientWidth + 1) c.classList.add('two'); };
+    const fit = c => window.__fitCard(c);
     const MARK = (k, on, label, d) => `<button type="button" class="wl-mark ${k}${on ? ' on' : ''}" data-k="${k}" aria-label="${label}" aria-pressed="${on}">` +
       `<svg viewBox="0 0 24 24" fill="none" stroke-width="${k === 'wait' ? 4 : 3.6}" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg></button>`;
     // ---- the Library tab: Wishlist | Checked Out | Returned (loans are the books with library data) ----
