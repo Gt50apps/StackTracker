@@ -13862,23 +13862,23 @@ closeRowDD = function(dd){
 </script>
 
 <script>
-  // every header's left and right buttons: as wide as the longer of their two labels, 4px either end of it, both the same
-  // (a header with no right button keeps that much room empty, so its title still centres on the window)
+  // every header's left and right buttons: one width everywhere, set by the widest label any of them can ever show
+  // (4px either end of it), so no button changes size; a header with no right button keeps that much room empty,
+  // so its title still centres on the window
   (function(){
+    const LABELS = ['Cancel', 'Back', 'Done', 'Add', 'Save', 'Update'];   // (every label a header button can have)
     const cx = document.createElement('canvas').getContext('2d');
-    const textW = el => { const c = getComputedStyle(el); cx.font = `${c.fontWeight} ${c.fontSize} ${c.fontFamily}`;
-      const t = c.textTransform === 'uppercase' ? el.textContent.trim().toUpperCase() : el.textContent.trim(); return cx.measureText(t).width; };
-    function size(h){ const bs = [...h.children].filter(x => x.tagName === 'BUTTON'); if(!bs.length) return;
-      const vis = bs.filter(b => getComputedStyle(b).display !== 'none'); if(!vis.length) return;
-      const bd = b => { const c = getComputedStyle(b); return parseFloat(c.borderLeftWidth) + parseFloat(c.borderRightWidth); };
-      const w = Math.ceil(Math.max(...vis.map(b => textW(b) + 8 + bd(b))));
+    const heads = () => [...document.querySelectorAll('.lg-head, .sh-head, .wl-head, .customize-header')];
+    function size(){
+      const bs = heads().flatMap(h => [...h.children].filter(x => x.tagName === 'BUTTON')); if(!bs.length) return;
+      const c = getComputedStyle(bs[0]); cx.font = `${c.fontWeight} ${c.fontSize} ${c.fontFamily}`;
+      const words = new Set(LABELS.concat(bs.map(b => b.textContent.trim())).map(t => t.toUpperCase()));
+      const bd = Math.max(...bs.map(b => { const k = getComputedStyle(b); return parseFloat(k.borderLeftWidth) + parseFloat(k.borderRightWidth); }));
+      const w = Math.ceil(Math.max(...[...words].map(t => cx.measureText(t).width)) + 8 + bd);
       bs.forEach(b => { b.style.flex = `0 0 ${w}px`; b.style.width = w + 'px'; });
-      h.style.setProperty('--hw', w + 'px'); }
-    const heads = () => document.querySelectorAll('.lg-head, .sh-head, .wl-head, .customize-header');
-    const all = () => heads().forEach(size);
-    const go = () => { all(); heads().forEach(h => new MutationObserver(() => size(h)).observe(h, { subtree: true, childList: true, characterData: true })); };
-    if(document.fonts && document.fonts.ready) document.fonts.ready.then(go); else window.addEventListener('load', go);
-    window.addEventListener('resize', () => requestAnimationFrame(all));
+      heads().forEach(h => h.style.setProperty('--hw', w + 'px')); }
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(size); else window.addEventListener('load', size);
+    window.addEventListener('resize', () => requestAnimationFrame(size));   // (the labels' size follows the screen's width)
   })();
 </script>
 </body>
