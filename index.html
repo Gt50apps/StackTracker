@@ -1501,7 +1501,11 @@
   .lg-head h2{flex:1 1 0; min-width:0; height:42px; margin:0; padding:0 6px; display:flex; align-items:center; justify-content:center; background:var(--bg);
     font:700 min(.74rem, 2.95vw)/1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; color:var(--ink); white-space:nowrap;}
   .lg-head > span{display:none;}
-  .lg-head > h2:has(+ span){padding-right:25%;}   /* no right cell: the title still centres on the window */
+  /* every header's title: centred on the window (with no right cell, its place is kept empty), wrapping within the middle's width */
+  .lg-head h2, .sh-head h2, .wl-head h2, .customize-header h2{white-space:normal !important; text-overflow:clip !important; overflow:hidden; display:flex !important; align-items:center; justify-content:center;
+    text-align:center; line-height:1.1 !important; padding:0 6px !important; box-sizing:border-box;}
+  .lg-head > h2:has(+ span), .wl-head > h2:has(+ span), .sh-head > h2:last-child{padding-right:calc(var(--hw, 25%) + 6px) !important;}
+  .wl-head > span{display:none;}
   .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done), .lg-head > :is(#log-done, #log-add, #tags-done, #authors-done, #timeline-back, #data-done):active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
     background:var(--cb7a2f2b, #7a2f2b); background-clip:padding-box; color:var(--cfffffff, #ffffff); border-right:3px solid var(--cb000000, #000000);
     font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
@@ -1830,37 +1834,36 @@
   /* renewing: the new due date on wheels | + days (a wheel) and its day's name, kept in step; then Cancel | Renew */
   .ln-rnset{display:flex; flex-direction:column; gap:6px;}
   .ln-rnrow{display:flex; gap:6px; height:45px;}
-  .ln-rnrow .ld-set{border-width:2.5px; border-radius:6px; background:var(--cbffffff, #ffffff);}
+  .ln-rnrow .ld-set{border-width:3px; border-radius:8px; background:var(--cbffffff, #ffffff);}
   .ln-rnrow .ld-set{flex:1 1 0;}   /* (the date and the days: the same width, and each of their three parts the same) */
   .ln-rnrow .ld-set > *{flex:1 1 0 !important; min-width:0;}
-  .ln-rnrow .lw-wheel + .lw-wheel, .ln-rnrow .lw-wheel + .lw-st, .ln-rnrow .lw-st + .lw-wheel{border-left:2.5px solid var(--cb000000, #000000);}
+  .ln-rnrow .lw-wheel + .lw-wheel, .ln-rnrow .lw-wheel + .lw-st, .ln-rnrow .lw-st + .lw-wheel{border-left:3px solid var(--cb000000, #000000);}
   .ln-rnrow .lw-wheel div{font-size:13px;}
   .lw-st{flex:1 1 0; min-width:0; display:flex; align-items:center; justify-content:center; font:700 13px/1 Arial, sans-serif; color:var(--ink); background:var(--cbf3efe6, #f3efe6); user-select:none;}
   .lw-st.pl{font-size:17px;} .lw-st.wd{text-transform:uppercase; letter-spacing:.3px;}
   .ln-rnset .dd-acts .rnok{color:var(--cf2e6b4a, #2e6b4a);}
   /* a loan's renewals, one card each: when, how many days and the due date it gave; Edit | ✕ */
-  .ln-rn{display:flex; align-items:stretch; height:38px; box-sizing:border-box; border:2.5px solid var(--cb000000, #000000); border-radius:6px; background:var(--cbffffff, #ffffff); overflow:hidden;}
+  .ln-rn{display:flex; align-items:stretch; height:45px; box-sizing:border-box; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); overflow:hidden;}
   .ln-rn .rt-t{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; justify-content:center; padding:0 10px; gap:3px; white-space:nowrap; overflow:hidden;}
   .ln-rn .rt-t i{font:normal 700 .5rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--muted);}
   .ln-rn .rt-t b{font:700 .72rem/1 Arial, sans-serif; color:var(--ink);} .ln-rn .rt-t b em{font-style:normal; color:var(--muted); font-weight:700;}
-  .ln-rn button, .ln-rn button:active{flex:none; width:58px; margin:0; padding:0; border:0; border-left:2.5px solid var(--cb000000, #000000); border-radius:0; box-shadow:none; background:var(--cbffffff, #ffffff);
+  .ln-rn button, .ln-rn button:active{flex:none; width:58px; margin:0; padding:0; border:0; border-left:3px solid var(--cb000000, #000000); border-radius:0; box-shadow:none; background:var(--cbffffff, #ffffff);
     font:700 min(.7rem, 2.9vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink); cursor:pointer;}
   .ln-rn button.rnx, .ln-rn button.rnx:active{width:40px; color:var(--cfaa3333, #aa3333); display:flex; align-items:center; justify-content:center;}
   .ln-rn button.rnx svg{width:12px; height:12px;}
   .ln-back{display:flex; gap:6px; height:45px;}   /* (the same 6px between its cards as between the dropdown's) */
-  .ln-back .ld-set{border-width:2.5px; border-radius:6px; background:var(--cbffffff, #ffffff);}
-  .ln-back .lw-wheel + .lw-wheel{border-left-width:2.5px;}
+  .ln-back .ld-set{border-width:3px; border-radius:8px; background:var(--cbffffff, #ffffff);}
+  .ln-back .lw-wheel + .lw-wheel{border-left-width:3px;}
   /* ✕ (cancel) on the left, ✓ (returned) on the right: square cards either side of the wheels */
-  .ln-back .ln-no, .ln-back .ln-no:active{flex:none; width:45px; height:auto; margin:0; padding:0; box-shadow:none; border-width:2.5px; border-radius:6px; background:var(--cbaa3333, #aa3333);
+  .ln-back .ln-no, .ln-back .ln-no:active{flex:none; width:45px; height:auto; margin:0; padding:0; box-shadow:none; border-width:3px; border-radius:8px; background:var(--cbaa3333, #aa3333);
     color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;}
   .ln-back .ln-no svg, .ln-back .ln-ok svg{width:18px; height:18px;}
-  .ln-back .ln-ok, .ln-back .ln-ok:active{display:flex; align-items:center; justify-content:center; flex:none; width:45px; grid-column:auto; height:auto; margin:0; padding:0; box-shadow:none; border-width:2.5px; border-radius:6px;
+  .ln-back .ln-ok, .ln-back .ln-ok:active{display:flex; align-items:center; justify-content:center; flex:none; width:45px; grid-column:auto; height:auto; margin:0; padding:0; box-shadow:none; border-width:3px; border-radius:8px;
     background:var(--cb2e6b4a, #2e6b4a); color:#fff; font:700 .78rem/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
-  /* the same 2.5px borders as the loan's own cards, all round: the dropdown's edges, its two cards, the lines between buttons */
-  .row-dd.ln-dd{border-width:0 2.5px;} .row-dd.ln-dd.open{border-bottom-width:2.5px;}
-  .ln-dd .dd-stats, .ln-dd .dd-acts{border-width:2.5px; border-radius:6px;}
-  .ln-dd .dd-acts button + button{border-left-width:2.5px;}
-  .row-dd.ln-dd{border-radius:0 0 6px 6px;}
+  /* Checked Out and Returned: 3px borders and 8px corners, as everywhere else */
+  body.lb-loans #wishlist-view .wl-card, #lib-log .wl-card, .ln-due, .ln-due:active, .ln-lib{border-width:3px !important; border-radius:8px;}
+  body.lb-loans #wishlist-view .wl-row.open > .wl-card, #lib-log .wl-row.open > .wl-card, .wl-row.open > .ln-due, .wl-row.open > .ln-lib{border-bottom-left-radius:0; border-bottom-right-radius:0;}
+  .ln-lib{width:30px;}
   .wl-row > .wl-card{flex:1 1 auto; min-width:0;}
   #wishlist-view > .list-divider, #lib-log .list-divider{height:24px;}   /* Status (and a library's Log): a slim divider over each group */
   .wl-mark, .wl-mark:active{flex:none; width:34px; margin:0; padding:0; border:2.5px solid var(--cb000000, #000000); border-radius:6px; box-shadow:none; background:var(--panel);
@@ -1877,7 +1880,7 @@
   .wl-head{flex:none; display:flex; background:var(--cb000000, #000000); padding-top:env(safe-area-inset-top); border-top:3px solid var(--cb000000, #000000); border-bottom:3px solid var(--cb000000, #000000);}
   .wl-head button, .wl-head button:active{flex:0 0 25%; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none; color:var(--cfffffff, #ffffff);
     font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase; background-clip:padding-box;}
-  #wl-cancel, #wl-cancel:active, #lc-cancel, #lc-cancel:active{background:var(--cb7a2f2b, #7a2f2b); border-right:3px solid var(--cb000000, #000000);}
+  #wl-cancel, #wl-cancel:active, #lc-cancel, #lc-cancel:active, #lg-back, #lg-back:active, #lp-cancel, #lp-cancel:active{background:var(--cb7a2f2b, #7a2f2b); border-right:3px solid var(--cb000000, #000000);}
   #wl-save, #wl-save:active, #lc-save, #lc-save:active{background:var(--cb2e4636, #2e4636); border-left:3px solid var(--cb000000, #000000);}
   #wl-save:disabled, #lc-save:disabled{color:rgba(255,255,255,.4); cursor:default;}
   .wl-head h2{flex:1 1 0; min-width:0; height:42px; margin:0; padding:0 6px; background:var(--hdr-cell); color:var(--ink); text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
@@ -1887,7 +1890,7 @@
   #wl-prev .ph{opacity:.55;}
   .wl-fields{display:flex; flex-direction:column; gap:4px; padding:0 4px;}
   .wl-fields .field-card{height:45px; flex:none;}
-  .wl-fields .field-card input{height:auto; font-size:.95rem;}
+  .wl-fields .field-card input{height:auto; font-size:.95rem; text-align:center;}   /* (centred, as in Add a Book) */
   .wl-pair{display:flex; gap:4px;} .wl-pair > .field-card{flex:0 0 calc(50% - 2px); min-width:0; box-sizing:border-box;}   /* halves, whatever is inside */
   .wl-names{position:relative;}
   .wl-names::before, .wl-names::after{content:''; position:absolute; left:33.333%; top:0; bottom:0; width:3px; margin-left:-1.5px; background:var(--cb000000, #000000); pointer-events:none; z-index:2;}
@@ -2393,7 +2396,7 @@
   /* choosing it: the library cards as in My Card, and No Library */
   #lib-log{position:fixed; inset:0; z-index:40; background:var(--bg); display:flex; flex-direction:column; opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s 180ms;}
   #lib-log.active{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
-  #lib-log .wl-head h2{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
   #lib-log .lp-list{flex:1; overflow-y:auto; padding:6px 4px calc(10px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px;}
   #lib-log .lp-empty{padding:30px 10px; text-align:center; font:700 .72rem Arial, sans-serif; text-transform:uppercase; color:var(--muted);}
   #lib-log .ln-due{cursor:default;}
@@ -4080,7 +4083,7 @@
       group: b => STATUS_NAMES[statusRank(b)] },
     { id:'read',     name:'Read order',     desc:'By the day you started reading; unstarted last', rdesc:'Unstarted first, then latest started',
       fn: (a,b)=> cmp(readDaySpan(a).first, readDaySpan(b).first) || cmp(titleKey(a.title), titleKey(b.title)) },
-    { id:'done',     name:'Completed order', desc:'In progress by last read, then latest finished, then unread as added', rdesc:'Unread newest added first, then earliest finished, then in progress',
+    { id:'done',     name:'Completed order', desc:'In progress by last read, latest finished, then unread', rdesc:'Unread newest first, earliest finished, then in progress',
       // in progress first (most recently read first), then finished (most recently finished first), then unread (as added: left as they are)
       fn: (a,b)=>{ const r = x => bookFinished(x) ? 1 : bookRead(x) > 0 ? 0 : 2, ra = r(a), rb = r(b);
                    if(ra !== rb) return ra - rb;
@@ -13233,7 +13236,7 @@ closeRowDD = function(dd){
       const ddOpen = (row, on) => { const dd = row.nextElementSibling; if(!dd || !dd.classList.contains('ln-dd')) return;
         if(!on){ closeRowDD(dd); return; }
         view.querySelectorAll('.ln-dd.open').forEach(o => { if(o !== dd) closeRowDD(o); });
-        dd.classList.add('open'); row.classList.add('open'); dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px';
+        dd.classList.add('open'); row.classList.add('open'); dd.style.height = (dd.firstElementChild.offsetHeight + 3) + 'px';
         openLoan = +row.dataset.li; };
       view.querySelectorAll('.wl-row').forEach(row => {
         row.addEventListener('click', () => ddOpen(row, !row.classList.contains('open')));
@@ -13259,7 +13262,7 @@ closeRowDD = function(dd){
         set.querySelector('.rnok').textContent = k >= 0 ? 'Save' : 'Renew';
         dd.querySelector('.dd-acts:not(.ln-rnset .dd-acts)').hidden = true; dd.querySelectorAll('.ln-rn').forEach(r => r.hidden = true);
         set.hidden = false; dateSync(); nSync(); showWd();
-        dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px'; };
+        dd.style.height = (dd.firstElementChild.offsetHeight + 3) + 'px'; };
       view.querySelectorAll('.ln-dd .rn').forEach(x => after(x, b => rnOpen(x, b, -1)));
       view.querySelectorAll('.ln-dd .rne').forEach(x => after(x, b => rnOpen(x, b, +x.closest('.ln-rn').dataset.k)));
       view.querySelectorAll('.ln-dd .ln-rnset').forEach(r => r.addEventListener('click', e => e.stopPropagation()));
@@ -13275,10 +13278,10 @@ closeRowDD = function(dd){
         const d = new Date(); inp.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         if(!row._sync) row._sync = window.__dateSet(row.querySelector('.ld-set'), inp, null);
         dd.querySelector('.dd-acts').hidden = true; row.hidden = false; row._sync();
-        dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px'; }));
+        dd.style.height = (dd.firstElementChild.offsetHeight + 3) + 'px'; }));
       view.querySelectorAll('.ln-dd .ln-back').forEach(r => r.addEventListener('click', e => e.stopPropagation()));
       view.querySelectorAll('.ln-dd .ln-no').forEach(x => x.addEventListener('click', e => { e.stopPropagation(); const dd = x.closest('.ln-dd');   // not returned after all: back to the buttons
-        x.closest('.ln-back').hidden = true; dd.querySelector('.dd-acts').hidden = false; dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px'; }));
+        x.closest('.ln-back').hidden = true; dd.querySelector('.dd-acts').hidden = false; dd.style.height = (dd.firstElementChild.offsetHeight + 3) + 'px'; }));
       view.querySelectorAll('.ln-dd .ln-ok').forEach(x => after(x, b => {
         const [y, m, d] = x.closest('.ln-back').querySelector('input').value.split('-').map(Number);
         b.loan.returned = Math.max(b.loan.out, new Date(y, m - 1, d, 12).getTime()); openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
@@ -13394,7 +13397,7 @@ closeRowDD = function(dd){
         const step = now => { st.p = Math.min(1, (now - st.t0) / LC_DUR); lcPairDraw(pair); st.raf = st.p < 1 ? requestAnimationFrame(step) : 0; if(!st.raf) st.from = null; };
         if(!st.raf) st.raf = requestAnimationFrame(step); }
       else if(!st.raf) lcPairDraw(pair);
-      const dd = pair.closest('.lc-dd'); if(dd && dd.classList.contains('open')) dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px';
+      const dd = pair.closest('.lc-dd'); if(dd && dd.classList.contains('open')) dd.style.height = (dd.firstElementChild.offsetHeight + 3) + 'px';
     }
     // the front's paper, drawn at the card's full size (it's shown scaled), then copied in
     const lcPaintCv = document.createElement('canvas');
@@ -13467,7 +13470,7 @@ closeRowDD = function(dd){
       const ddOpen = (row, on) => { const dd = row.nextElementSibling; if(!dd || !dd.classList.contains('lc-dd')) return;
         if(!on){ closeRowDD(dd); row.classList.remove('open'); if(openCard === +row.dataset.ci) openCard = -1; return; }
         view.querySelectorAll('.lc-dd.open').forEach(o => { if(o !== dd){ closeRowDD(o); if(o.previousElementSibling) o.previousElementSibling.classList.remove('open'); } });
-        dd.classList.add('open'); row.classList.add('open'); dd.style.height = (dd.firstElementChild.offsetHeight + 2.5) + 'px'; openCard = +row.dataset.ci; };
+        dd.classList.add('open'); row.classList.add('open'); dd.style.height = (dd.firstElementChild.offsetHeight + 3) + 'px'; openCard = +row.dataset.ci; };
       view.querySelectorAll('.lc-row').forEach(row => { row.addEventListener('click', () => ddOpen(row, !row.classList.contains('open')));
         if(+row.dataset.ci === openCard) ddOpen(row, true); });
       view.querySelectorAll('.lc-dd').forEach(dd => dd.addEventListener('click', e => e.stopPropagation()));
@@ -13858,5 +13861,25 @@ closeRowDD = function(dd){
   }
 </script>
 
+<script>
+  // every header's left and right buttons: as wide as the longer of their two labels, 4px either end of it, both the same
+  // (a header with no right button keeps that much room empty, so its title still centres on the window)
+  (function(){
+    const cx = document.createElement('canvas').getContext('2d');
+    const textW = el => { const c = getComputedStyle(el); cx.font = `${c.fontWeight} ${c.fontSize} ${c.fontFamily}`;
+      const t = c.textTransform === 'uppercase' ? el.textContent.trim().toUpperCase() : el.textContent.trim(); return cx.measureText(t).width; };
+    function size(h){ const bs = [...h.children].filter(x => x.tagName === 'BUTTON'); if(!bs.length) return;
+      const vis = bs.filter(b => getComputedStyle(b).display !== 'none'); if(!vis.length) return;
+      const bd = b => { const c = getComputedStyle(b); return parseFloat(c.borderLeftWidth) + parseFloat(c.borderRightWidth); };
+      const w = Math.ceil(Math.max(...vis.map(b => textW(b) + 8 + bd(b))));
+      bs.forEach(b => { b.style.flex = `0 0 ${w}px`; b.style.width = w + 'px'; });
+      h.style.setProperty('--hw', w + 'px'); }
+    const heads = () => document.querySelectorAll('.lg-head, .sh-head, .wl-head, .customize-header');
+    const all = () => heads().forEach(size);
+    const go = () => { all(); heads().forEach(h => new MutationObserver(() => size(h)).observe(h, { subtree: true, childList: true, characterData: true })); };
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(go); else window.addEventListener('load', go);
+    window.addEventListener('resize', () => requestAnimationFrame(all));
+  })();
+</script>
 </body>
 </html>
