@@ -1914,8 +1914,8 @@
   .lc-num{font:700 min(1.3rem, 5.6vw)/1.2 Arial, Helvetica, sans-serif; color:#333; white-space:pre; margin-top:3px; letter-spacing:.5px;}
   .lc-dd .lc-bar{margin:0;}
   /* the PIN: "PIN" small on top, the numbers large and bold below */
-  .lc-pin{flex-direction:column !important; align-items:center; justify-content:center; gap:0; height:auto !important; min-height:45px; padding:5px 10px !important; font-size:.58rem !important;}
-  .lc-pin b{display:block; font:700 min(1.6rem, 7vw)/1.1 Arial, Helvetica, sans-serif; letter-spacing:3px; color:var(--ink);}
+  .lc-pin{flex-direction:column !important; align-items:center; justify-content:center; gap:2px; height:45px !important; min-height:0; padding:0 10px !important; font-size:.5rem !important; line-height:1;}   /* (the standard 45px) */
+  .lc-pin b{display:block; font:700 1.2rem/1 Arial, Helvetica, sans-serif; letter-spacing:3px; color:var(--ink);}
   .lc-pin, .lc-pin:active{width:100%; margin:0; box-shadow:none; cursor:pointer; text-transform:uppercase;}
   .lc-pin b[hidden]{display:none;}
   .lc-dd .lc-bar{cursor:pointer;}
@@ -2017,7 +2017,7 @@
   .lcf-stripe{position:absolute; left:0; right:0; top:20px; height:34px; background:#1c1c1e;}
   .lc-cb svg{width:100%; height:auto; display:block; margin-top:76px;}
   .lc-cb .lc-num{font:700 18px/1.2 Arial, Helvetica, sans-serif; color:#333; white-space:pre; margin-top:4px;}
-  .lc-pin .lc-mask{display:flex; gap:min(.5rem, 2vw); height:min(1.76rem, 7.7vw); align-items:center;}
+  .lc-pin .lc-mask{display:flex; gap:.4rem; height:1.2rem; align-items:center;}
   .lc-ast{width:min(1.15rem, 5vw); height:min(1.15rem, 5vw); display:block;}
   #lc-num-card .cnt-lbl, #lc-pin-card .cnt-lbl{left:4px; right:4px; text-align:center; line-height:1;}
   #lc-pin-card.has .cnt-lbl .opt, #lc-pin-card:focus-within .cnt-lbl .opt{display:none;}
@@ -13188,7 +13188,7 @@ closeRowDD = function(dd){
           (L.returned ? `<span>Returned <b>${md(L.returned)}</b></span>` : L.renewed ? `<span>Renewed <b>${L.renewed}×</b></span>` : '') + `</div>` +
           `<div class="ds-col r"><span>${amt}</span><span>Read on <b>${rd}</b> ${rd === 1 ? 'day' : 'days'}</span></div></div>` +
         // each renewal: when it was made, the days it added, the due date it gave
-        (L.renewals || []).map((r, k) => `<div class="ln-rn" data-k="${k}"><span class="rt-t"><i>Renewal ${(L.rnOld || 0) + k + 1} · ${md(r.at)}</i><b>+${r.n} ${r.n === 1 ? 'day' : 'days'} <em>→</em> Due ${md(rnDue(L, k + 1))}</b></span>` +
+        (L.renewals || []).map((r, k) => `<div class="ln-rn" data-k="${k}"><span class="rt-t"><i>Renewal ${k + 1}${r.at ? ` · ${md(r.at)}` : ''}</i><b>+${r.n} ${r.n === 1 ? 'day' : 'days'} <em>→</em> Due ${md(rnDue(L, k + 1))}</b></span>` +
           `<button type="button" class="rne">Edit</button><button type="button" class="rnx" aria-label="Delete renewal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`).join('') +
         `<div class="dd-acts">${acts}</div>` +
         `<div class="ln-rnset" hidden><div class="ln-rnrow"><input type="hidden"><div class="field-card ld-set rn-date" aria-label="New due date">` +
@@ -13201,7 +13201,16 @@ closeRowDD = function(dd){
     // a loan's library card, on end, between the book and its days (or returned-date) card (white with a black mark when it has none)
     const LN_LIB = b => `<span class="ln-lib" data-lib="${esc(b.loan && b.loan.lib || '')}" aria-label="No library"><canvas aria-hidden="true"></canvas><i class="ll-ph" aria-hidden="true"></i>` +
       `<svg class="ll-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.2L12 4l9 5.2M4.5 9.5h15M6.5 11v6.5M10 11v6.5M14 11v6.5M17.5 11v6.5M4 18.8h16M3 21h18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+    // renewals made before they were kept one by one: only a count, each having added 21 days. Each becomes its own
+    // renewal of 21 days (when it was made isn't known), so it can be seen, changed or taken off like any other
+    function rnMigrate(){ let any = false;
+      books.forEach(b => { const L = b.loan; if(!L) return; const old = L.renewals ? (L.rnOld || 0) : (L.renewed || 0); if(!old) return;
+        if(!L.renewals){ L.renewals = []; L.due0 = L.due; }
+        L.due0 = addDays(L.due0, -21 * old); L.renewals.unshift(...Array.from({ length: old }, () => ({ at: null, n: 21 })));
+        L.rnOld = 0; L.renewed = L.renewals.length; any = true; });
+      if(any) saveBooks(); }
     function renderLoans(){
+      rnMigrate();
       if(view.dataset.lm === mode){ const was = view.querySelector('.ln-dd.open'); openLoan = was ? +was.dataset.li : -1; }   // keep the open one open (unless it was closed)
       view.dataset.lm = mode;
       const s = q.value.trim().toLowerCase(), t0 = today();
