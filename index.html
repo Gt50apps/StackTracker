@@ -13168,9 +13168,9 @@ closeRowDD = function(dd){
     // so the due date is always due0 plus them all, and changing or taking one out moves the ones after with it ----
     const addDays = (t, n) => { const d = new Date(t); d.setDate(d.getDate() + n); return d.getTime(); };
     const rnDue = (L, k) => addDays(L.due0, (L.renewals || []).slice(0, k).reduce((a, r) => a + r.n, 0));   // the due date after the first k
-    const rnStart = L => { if(!L.renewals){ L.renewals = []; L.due0 = L.due; L.rnOld = L.renewed || 0; } };   // (renewals counted before these were kept stay counted)
-    const rnSettle = L => { L.due = rnDue(L, L.renewals.length); L.renewed = (L.rnOld || 0) + L.renewals.length;
-      if(!L.renewals.length && !L.rnOld){ delete L.renewals; delete L.due0; delete L.rnOld; delete L.renewed; } };
+    const rnStart = L => { if(!L.renewals){ L.renewals = []; L.due0 = L.due; } };
+    const rnSettle = L => { L.due = rnDue(L, L.renewals.length); L.renewed = L.renewals.length;
+      if(!L.renewals.length){ delete L.renewals; delete L.due0; delete L.renewed; } };
     window.__rnRebase = L => { if(L && L.renewals && L.renewals.length) L.due0 = addDays(L.due, -L.renewals.reduce((a, r) => a + r.n, 0)); };   // (the due date changed in Edit)
     // the dropdown under a loan: out / due (or back) and renewals, then days read and pages, then its actions
     function ddHTML(b, i){
@@ -13185,7 +13185,7 @@ closeRowDD = function(dd){
       return `<div class="row-dd book-dd ln-dd" data-li="${i}"><div class="dd-in">` +
         // the dates down the left (Out, Due, then Returned or how many renewals), what was read down the right (pages, days)
         `<div class="dd-stats ds-ret"><div class="ds-col"><span>Out <b>${md(L.out)}</b></span><span>Due <b>${md(L.due)}</b></span>` +
-          (L.returned ? `<span>Returned <b>${md(L.returned)}</b></span>` : L.renewed ? `<span>Renewed <b>${L.renewed}×</b></span>` : '') + `</div>` +
+          (L.returned ? `<span>Returned <b>${md(L.returned)}</b></span>` : (L.renewals || []).length ? `<span>Renewed <b>${L.renewals.length}×</b></span>` : '') + `</div>` +
           `<div class="ds-col r"><span>${amt}</span><span>Read on <b>${rd}</b> ${rd === 1 ? 'day' : 'days'}</span></div></div>` +
         // each renewal: when it was made, the days it added, the due date it gave
         (L.renewals || []).map((r, k) => `<div class="ln-rn" data-k="${k}"><span class="rt-t"><i>Renewal ${k + 1}${r.at ? ` · ${md(r.at)}` : ''}</i><b>+${r.n} ${r.n === 1 ? 'day' : 'days'} <em>→</em> Due ${md(rnDue(L, k + 1))}</b></span>` +
@@ -13201,13 +13201,13 @@ closeRowDD = function(dd){
     // a loan's library card, on end, between the book and its days (or returned-date) card (white with a black mark when it has none)
     const LN_LIB = b => `<span class="ln-lib" data-lib="${esc(b.loan && b.loan.lib || '')}" aria-label="No library"><canvas aria-hidden="true"></canvas><i class="ll-ph" aria-hidden="true"></i>` +
       `<svg class="ll-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.2L12 4l9 5.2M4.5 9.5h15M6.5 11v6.5M10 11v6.5M14 11v6.5M17.5 11v6.5M4 18.8h16M3 21h18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
-    // renewals made before they were kept one by one: only a count, each having added 21 days. Each becomes its own
-    // renewal of 21 days (when it was made isn't known), so it can be seen, changed or taken off like any other
+    // the old renewal count (from before renewals were kept one by one) is dropped: only kept renewals count
     function rnMigrate(){ let any = false;
-      books.forEach(b => { const L = b.loan; if(!L) return; const old = L.renewals ? (L.rnOld || 0) : (L.renewed || 0); if(!old) return;
-        if(!L.renewals){ L.renewals = []; L.due0 = L.due; }
-        L.due0 = addDays(L.due0, -21 * old); L.renewals.unshift(...Array.from({ length: old }, () => ({ at: null, n: 21 })));
-        L.rnOld = 0; L.renewed = L.renewals.length; any = true; });
+      books.forEach(b => { const L = b.loan; if(!L) return;
+        if('rnOld' in L){ delete L.rnOld; any = true; }
+        const n = (L.renewals || []).length;
+        if(n){ if(L.renewed !== n){ L.renewed = n; any = true; } }
+        else if('renewed' in L || 'renewals' in L || 'due0' in L){ delete L.renewed; delete L.renewals; delete L.due0; any = true; } });   // (the due date stays as it is)
       if(any) saveBooks(); }
     function renderLoans(){
       rnMigrate();
@@ -13314,7 +13314,7 @@ closeRowDD = function(dd){
       view.querySelectorAll('.ln-dd .ln-ok').forEach(x => after(x, b => {
         const [y, m, d] = x.closest('.ln-back').querySelector('input').value.split('-').map(Number);
         b.loan.returned = Math.max(b.loan.out, new Date(y, m - 1, d, 12).getTime()); openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
-      view.querySelectorAll('.ln-dd .ag').forEach(x => after(x, b => { delete b.loan.returned; delete b.loan.renewed; delete b.loan.renewals; delete b.loan.due0; delete b.loan.rnOld; b.loan.out = Date.now(); b.loan.due = Date.now() + 21 * DAY; openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
+      view.querySelectorAll('.ln-dd .ag').forEach(x => after(x, b => { delete b.loan.returned; delete b.loan.renewed; delete b.loan.renewals; delete b.loan.due0; b.loan.out = Date.now(); b.loan.due = Date.now() + 21 * DAY; openLoan = -1; saveBooks(); closeAll(); renderLoans(); }));
       view.querySelectorAll('.ln-dd .ed').forEach(x => after(x, b => { closeAll(); openLoan = -1; openCustomizeModal(b, 'edit'); }));   // the same Edit a Book window as Home
     }
     const closeAll = () => view.querySelectorAll('.ln-dd.open').forEach(closeRowDD);
