@@ -236,6 +236,9 @@
   .lt-ends b{font:700 .95rem/1 Arial, sans-serif; color:var(--ink); white-space:nowrap;}
   .lt-ends .red i, .lt-ends .red b{color:var(--cbaa3333, #aa3333);}
   .lt-foot{margin-top:7px; padding-top:6px; border-top:2px dashed #d0c8b6; display:flex; justify-content:space-between; gap:8px; font:.62rem/1 Arial, sans-serif; text-transform:uppercase; color:var(--muted);}
+  .lt-foot.lt-st{margin-top:3px; padding-top:0; border:0; justify-content:flex-end;}
+  .lt-band{position:absolute; top:1.5px; height:12px; border-radius:6px; opacity:.42;}
+  .lt-band.open{-webkit-mask-image:linear-gradient(90deg, #000 70%, transparent); mask-image:linear-gradient(90deg, #000 70%, transparent);}
   .lt-foot b{color:var(--ink);} .lt-foot .red, .lt-foot .red b{color:var(--cbaa3333, #aa3333);} .lt-foot .grn, .lt-foot .grn b{color:var(--cb2e6b4a, #2e6b4a);}
   .dd-stats.ds-ret{flex-direction:row; justify-content:space-between; align-items:center; height:auto; min-height:45px; padding:5px 10px; gap:8px;}
   .ds-col{display:flex; flex-direction:column; gap:1px; min-width:0; white-space:nowrap;} .ds-col.r{text-align:right; align-items:flex-end;}
@@ -13191,12 +13194,15 @@ closeRowDD = function(dd){
     // the loan as a line: Out to Due (or on to today / the day it came back, when that's later), to scale. Today's bulb
     // takes the days card's colour; late days run red past Due. Under it: Out | Today (or Due, once late) | Due (or Today /
     // Returned, once late); then what was read, and renewals, how late, or how early it went back
-    function lnTimeline(L, amt, rd){
+    function lnTimeline(L, amt, rd, rdg){
       const day = t => { const d = new Date(t); d.setHours(12, 0, 0, 0); return d; }, dn = (x, y) => Math.round((day(y) - day(x)) / DAY);
       const ret = !!L.returned, endT = ret ? L.returned : Date.now(), due = Math.max(0, dn(L.out, L.due)), end = Math.max(0, dn(L.out, endT)), span = Math.max(due, end, 1);
       const at = d => (d / span * 100).toFixed(2) + '%', late = end - due, n = Math.abs(late), dd = n === 1 ? 'day' : 'days';
       const tone = ret ? (late > 0 ? ' red' : '') : late >= 0 ? ' red' : -late <= 3 ? ' soon' : -late <= 7 ? ' week' : ' ok';
-      const line = `<i class="lt-seg" style="width:${at(Math.min(end, due))}"></i>` + (late > 0 ? `<i class="lt-seg red" style="left:${at(due)};width:${at(late)}"></i>` : '') +
+      // the reading: a soft band in the book's colour, first day read to last (fading off while still being read, to today)
+      const band = !rdg ? '' : (() => { const s0 = Math.max(0, dn(L.out, rdg.s)), e0 = rdg.done || ret ? Math.max(s0, dn(L.out, rdg.e)) : Math.max(s0, end);
+        return `<i class="lt-band${rdg.done || ret ? '' : ' open'}" style="left:${at(s0)};width:${at(Math.max(span * .012, e0 - s0))};background:${rdg.hex}"></i>`; })();
+      const line = band + `<i class="lt-seg" style="width:${at(Math.min(end, due))}"></i>` + (late > 0 ? `<i class="lt-seg red" style="left:${at(due)};width:${at(late)}"></i>` : '') +
         `<i class="lt-dot" style="left:0"></i><i class="lt-dot${late > 0 ? ' red' : ''}" style="left:${at(due)}"></i><i class="lt-dot now${tone}" style="left:${at(end)}"></i>`;
       const word = ret ? 'Returned' : 'Today';
       const mid = late > 0 ? ['Due', md(L.due), ''] : [word, ret ? md(L.returned) : late === 0 ? 'Due today' : `${n} ${dd} left`, ''];
@@ -13204,22 +13210,26 @@ closeRowDD = function(dd){
       const nr = (L.renewals || []).length;
       const status = ret ? (late > 0 ? `<span class="red"><b>${n}</b> ${dd} late</span>` : late < 0 ? `<span class="grn"><b>${n}</b> ${dd} early</span>` : '<span class="grn">On the day</span>')
         : late > 0 ? `<span class="red"><b>${n}</b> ${dd} overdue</span>` : nr ? `<span>Renewed <b>${nr}×</b></span>` : '';
+      const rtxt = !rdg ? 'Not started' : rdg.done || ret ? `Read <b>${md(rdg.s)}</b> – <b>${md(rdg.e)}</b>` : `Reading since <b>${md(rdg.s)}</b>`;
       return `<div class="dd-stats ln-tl"><div class="lt-line">${line}</div><div class="lt-ends"><div><i>Out</i><b>${md(L.out)}</b></div>` +
         `<div${mid[2]}><i>${mid[0]}</i><b>${mid[1]}</b></div><div${right[2]}><i>${right[0]}</i><b>${right[1]}</b></div></div>` +
-        `<div class="lt-foot"><span>${amt} · <b>${rd}</b> ${rd === 1 ? 'day' : 'days'}</span>${status}</div></div>`;
+        `<div class="lt-foot"><span>${rtxt}</span><span>${amt} · <b>${rd}</b> ${rd === 1 ? 'day' : 'days'}</span></div>` +
+        (status ? `<div class="lt-foot lt-st">${status}</div>` : '') + `</div>`;
     }
     // the dropdown under a loan: out / due (or back) and renewals, then days read and pages, then its actions
     function ddHTML(b, i){
       const L = b.loan, a = new Date(L.out); a.setHours(0, 0, 0, 0);
       const z = L.returned ? new Date(L.returned) : new Date(); z.setHours(0, 0, 0, 0);
       const end = keyDate(lastLogKey(b)), start = new Date(end); start.setDate(start.getDate() - ((b.days || []).length - 1));
-      let rd = 0, pages = 0; (b.days || []).forEach((v, j) => { if(!(v > 0)) return; const d = new Date(start); d.setDate(d.getDate() + j); if(d >= a && d <= z){ rd++; pages += v; } });
+      let rd = 0, pages = 0, r0 = null, r1 = null; (b.days || []).forEach((v, j) => { if(!(v > 0)) return; const d = new Date(start); d.setDate(d.getDate() + j);
+        if(d >= a && d <= z){ rd++; pages += v; const t = d.getTime(); if(r0 == null) r0 = t; r1 = t; } });
+      const rdg = r0 == null ? null : { s: r0, e: r1, done: bookFinished(b), hex: bookColor(b) };   // (the reading, within this loan)
       const audio = b.format === 'audio' && b.audioSeconds > 0 && b.pages > 0;
       const amt = audio ? `<b>${Math.round(pages)}</b> min` : `<b>${Math.round(pages)}</b> ${Math.round(pages) === 1 ? 'page' : 'pages'}`;
       const acts = L.returned ? `<button type="button" class="ag">Check Out Again</button><button type="button" class="ed">Edit</button>`
                               : `<button type="button" class="rn">Renew</button><button type="button" class="rt">Returned</button><button type="button" class="ed">Edit</button>`;
       return `<div class="row-dd book-dd ln-dd" data-li="${i}"><div class="dd-in">` +
-        lnTimeline(L, amt, rd) +
+        lnTimeline(L, amt, rd, rdg) +
         // each renewal: when it was made, the days it added, the due date it gave
         (L.renewals || []).map((r, k) => `<div class="ln-rn" data-k="${k}"><span class="rt-t"><i>Renewal ${k + 1}${r.at ? ` · ${md(r.at)}` : ''}</i><b>+${r.n} ${r.n === 1 ? 'day' : 'days'} <em>→</em> Due ${md(rnDue(L, k + 1))}</b></span>` +
           `<button type="button" class="rne">Edit</button><button type="button" class="rnx" aria-label="Delete renewal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`).join('') +
