@@ -147,7 +147,7 @@
   .book-row.done .br-title, .book-row.done .br-author, .book-row.done .br-pages, .book-row.done .br-pct{color:var(--cfffffff, #ffffff) !important;}
   #combined-card.locked #combined-count, #combined-card.locked #combined-pct{color:var(--cfffffff, #ffffff);}
   #play-pct.done #play-pct-text{color:var(--cfffffff, #ffffff);}
-  .dd-play{display:flex; gap:6px;}
+  .dd-play{display:flex; gap:4px;}
   .dd-play .pick{flex:1 1 0;}
   .dd-play.dual .pick{flex:5 1 0;}                      /* played | Update | remaining = 5/12, 1/6, 5/12 */
   .dd-play.dual .dd-confirm{flex:2 1 0; font-size:.74rem; letter-spacing:0;}
@@ -193,7 +193,7 @@
   body.dd-on #dd-dim{opacity:1; pointer-events:auto;}
   body.dd-on .book-row.open, body.dd-on .row-dd.open, .dd-lift{position:relative; z-index:8;}   /* .dd-lift: a card just closed stays above the dim while it fades out */
   .book-row.open{border-radius:8px 8px 0 0;}
-  .dd-in{display:flex; flex-direction:column; gap:6px; padding:6px;}
+  .dd-in{display:flex; flex-direction:column; gap:4px; padding:4px;}   /* every dropdown: 4px in from its edges and between its cards */
   .tape-dd{background:var(--cb2f3136, #2f3136);}
   .book-dd{background:var(--unread);}
   .tape-dd .pick, .book-dd .pick{min-width:0; height:45px; box-sizing:border-box; display:flex;
@@ -1875,8 +1875,8 @@
   .ln-dd .dd-acts .rt{color:var(--cf2e6b4a, #2e6b4a);}
   .ln-dd .dd-acts[hidden], .ln-back[hidden], .ln-rnset[hidden]{display:none;}
   /* renewing: the new due date on wheels | + days (a wheel) and its day's name, kept in step; then Cancel | Renew */
-  .ln-rnset{display:flex; flex-direction:column; gap:6px;}
-  .ln-rnrow{display:flex; gap:6px; height:45px;}
+  .ln-rnset{display:flex; flex-direction:column; gap:4px;}
+  .ln-rnrow{display:flex; gap:4px; height:45px;}
   .ln-rnrow .ld-set{border-width:3px; border-radius:8px; background:var(--cbffffff, #ffffff);}
   .ln-rnrow .ld-set{flex:1 1 0;}   /* (the date and the days: the same width, and each of their three parts the same) */
   .ln-rnrow .ld-set > *{flex:1 1 0 !important; min-width:0;}
@@ -1894,7 +1894,7 @@
     font:700 min(.7rem, 2.9vw)/1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase; color:var(--ink); cursor:pointer;}
   .ln-rn button.rnx, .ln-rn button.rnx:active{width:40px; color:var(--cfaa3333, #aa3333); display:flex; align-items:center; justify-content:center;}
   .ln-rn button.rnx svg{width:12px; height:12px;}
-  .ln-back{display:flex; gap:6px; height:45px;}   /* (the same 6px between its cards as between the dropdown's) */
+  .ln-back{display:flex; gap:4px; height:45px;}   /* (the same 4px between its cards as between the dropdown's) */
   .ln-back .ld-set{border-width:3px; border-radius:8px; background:var(--cbffffff, #ffffff);}
   .ln-back .lw-wheel + .lw-wheel{border-left-width:3px;}
   /* ✕ (cancel) on the left, ✓ (returned) on the right: square cards either side of the wheels */
@@ -1915,6 +1915,34 @@
   .wl-mark.on{opacity:1;}
   .wl-mark.yes.on{background:var(--cb2e6b4a, #2e6b4a);} .wl-mark.no.on{background:var(--cbaa3333, #aa3333);} .wl-mark.wait.on{background:var(--cbb07a1e, #b07a1e);}
   .wl-mark.on svg{stroke:var(--cfffffff, #ffffff);}
+  /* the wishlist: 3px edges and 8px corners, as everywhere else (so its dropdown meets them edge to edge) */
+  #wishlist-view .wl-card, #wishlist-view .wl-mark, #wishlist-view .wl-mark:active{border-width:3px; border-radius:8px;}
+  /* a wishlist book's dropdown: the card and ✓ ! ✕ square off at the bottom and stand on it; its 3px top edge lies on theirs,
+     one line under them all and across the gaps between them. Unpicked marks get black edges (their icon stays faint) and a soft shadow */
+  .wl-dd.open{border-top-width:3px; margin-top:-7px;}
+  #wishlist-view .wl-row.open > .wl-card{border-bottom-left-radius:0; border-bottom-right-radius:0;}
+  #wishlist-view .wl-row > .wl-mark{position:relative; overflow:hidden;}
+  #wishlist-view .wl-row.open > .wl-mark{opacity:1; border-bottom-width:0; padding-bottom:3px; border-bottom-left-radius:0; border-bottom-right-radius:0;}   /* (3px in for the edge it gives up: the icon stays put) */
+  #wishlist-view .wl-row.open > .wl-mark:not(.on) svg{opacity:.35;}
+  #wishlist-view .wl-row > .wl-mark::after{content:''; position:absolute; left:0; right:0; bottom:0; height:12px; pointer-events:none; opacity:0;
+    background:linear-gradient(to top, rgba(0,0,0,.45), rgba(0,0,0,.15) 45%, rgba(0,0,0,0));}
+  #wishlist-view .wl-row.open > .wl-mark:not(.on)::after{opacity:1;}
+  /* inside: Check Out | Add to My Books, cloth buttons */
+  .wd-go{display:flex; gap:4px; height:45px;}
+  .wd-go button, .wd-go button:active{position:relative; overflow:hidden; flex:1 1 0; min-width:0; height:100%; margin:0; padding:0; border:3px solid var(--cb000000, #000000); border-radius:8px; box-sizing:border-box; box-shadow:none;
+    display:flex; align-items:center; justify-content:center; color:var(--cfffffff, #ffffff); cursor:pointer;}
+  .wd-go .wd-out{background:var(--cb303d66, #303d66);} .wd-go .wd-add{background:var(--cb5b6633, #5b6633);}   /* the same cloths as the wishlist window's Check Out from Library | Add to My Library */
+  .wd-go button > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
+  .wd-go button > span{position:relative; font:700 min(.78rem, 3.3vw)/1 Georgia, 'Times New Roman', serif; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; color:#f4ead2;}
+  /* Edit | Delete: the dropdown's own floor, edge to edge, split off by one 3px line with a soft shadow under it (as if what's above lies over it) */
+  .wd-base{position:relative; display:flex; height:45px; margin:0 -4px -4px; border-top:3px solid var(--cb000000, #000000); background:var(--cbffffff, #ffffff);}
+  .wd-base::before{content:''; position:absolute; left:0; right:0; top:0; height:12px; pointer-events:none; z-index:1;
+    background:linear-gradient(to bottom, rgba(0,0,0,.4), rgba(0,0,0,.12) 45%, rgba(0,0,0,0));}
+  .wd-base button, .wd-base button:active{flex:1 1 0; min-width:0; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:var(--cbffffff, #ffffff);
+    font:700 min(.74rem, 3.1vw)/1 Arial, sans-serif; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink); cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .wd-base button + button{border-left:3px solid var(--cb000000, #000000);}
+  .wd-base .wd-del{color:var(--cfaa3333, #aa3333);}
+  .wd-base .wd-del.sure, .wd-base .wd-del.sure:active{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff); letter-spacing:.6px;}
   #wl-empty{margin:40px 16px; text-align:center; font:700 min(.74rem, 2.95vw)/1.4 Arial, sans-serif; text-transform:uppercase; color:var(--muted);}
   /* the wishlist window: the Add a Book header, then Title and Author (Delete when editing); Add to My Library in its footer */
   #wl-page, #lc-page{position:fixed; inset:0; z-index:30; background:var(--bg); display:flex; flex-direction:column; gap:4px;
@@ -2142,7 +2170,7 @@
   .dd-acts button, .dd-acts button + button{min-width:0; padding:0 4px; border-left:none;}
   .dd-acts .dd-cmp-btn.on{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
   /* on: the graph card with − / + gives way to one stretched graph card per read, newest at the top */
-  .dd-cmp{display:none; flex-direction:column; gap:6px;}
+  .dd-cmp{display:none; flex-direction:column; gap:4px;}
   .row-dd.cmp .dd-pm-row{display:none;}
   .row-dd.cmp .dd-cmp{display:flex;}
   .dd-cmp .dd-chart{-webkit-user-select:none; user-select:none;}
@@ -13823,7 +13851,11 @@ closeRowDD = function(dd){
       if(lbDescs[mode]) grouped = grouped.reverse();
       view.innerHTML = grouped.map(([name, rs]) => (name ? `<div class="list-divider"><span class="ld-name">${name}</span></div>` : '') + rs.map(([b, i]) => `<div class="wl-row" data-i="${i}"><div class="wl-card wl-wish" data-i="${i}" style="--cloth:${shown(b.color)}"><canvas aria-hidden="true"></canvas>${b.released != null ? `<i class="wl-yr">${wlYr(b.released)}</i>` : ''}${b.words ? `<i class="wl-yr wl-wd">${wlWords(b.words)}</i>` : ''}` +
         `<span class="t">${esc(b.title)}</span>${b.author ? `<span class="a">${esc(b.author)}</span>` : ''}</div>` +
-        MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('wait', b.lib === 'wait', 'Waiting on it', 'M12 4v10M12 19.8v.01') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>').join('')).join('');
+        MARK('yes', b.lib === 'yes', 'Found it at the library', 'M4 12.5l5 5L20 6') + MARK('wait', b.lib === 'wait', 'Waiting on it', 'M12 4v10M12 19.8v.01') + MARK('no', b.lib === 'no', 'Not at the library', 'M6 6l12 12M18 6L6 18') + '</div>' +
+        // its dropdown: Check Out | Add to My Books as cloth buttons, then Edit | Delete as the dropdown's own floor
+        `<div class="row-dd book-dd wl-dd" data-i="${i}"><div class="dd-in"><div class="wd-go"><button type="button" class="wd-out"><canvas aria-hidden="true"></canvas><span>Check Out</span></button>` +
+        `<button type="button" class="wd-add"><canvas aria-hidden="true"></canvas><span>Add to My Books</span></button></div>` +
+        `<div class="wd-base"><button type="button" class="wd-ed">Edit</button><button type="button" class="wd-del">Delete</button></div></div></div>`).join('')).join('');
       view.querySelectorAll('.wl-mark').forEach(m => m.addEventListener('click', () => {
         const row = m.parentNode, b = list[+row.dataset.i]; if(!b) return;
         b.lib = b.lib === m.dataset.k ? '' : m.dataset.k; save();
@@ -13835,8 +13867,32 @@ closeRowDD = function(dd){
         fit(c);
         const go = () => { fit(c); if(window.BOOKPAPER){ c.classList.toggle('lite', BOOKPAPER.lite(shown(hex))); BOOKPAPER.draw(cv, shown(hex), ((c.querySelector('.t') || {}).textContent || '') + '|' + ((c.querySelector('.a') || {}).textContent || ''), true, 16); } };   // bands in a little, the year (if any) in the left end
         if(window.ResizeObserver) new ResizeObserver(go).observe(cv); else requestAnimationFrame(go);
-        c.addEventListener('click', () => open(+c.dataset.i));
+        c.addEventListener('click', () => wdOpen(c.parentNode, !c.parentNode.classList.contains('open')));
       });
+      view.querySelectorAll('.wl-dd').forEach(dd => {
+        const i = +dd.dataset.i, b = list[i];
+        dd.addEventListener('click', e => e.stopPropagation());
+        dd.querySelector('.wd-out').addEventListener('click', () => { wdOpen(dd.previousElementSibling, false); pending = b; openCustomizeModal(toBook(b, true), 'add'); });
+        dd.querySelector('.wd-add').addEventListener('click', () => { wdOpen(dd.previousElementSibling, false); pending = b; openCustomizeModal(toBook(b, false), 'add'); });
+        dd.querySelector('.wd-ed').addEventListener('click', () => { wdOpen(dd.previousElementSibling, false); open(i); });
+        const del = dd.querySelector('.wd-del');   // asks twice: the first tap turns it red, a second within 3 s deletes
+        del.addEventListener('click', () => {
+          if(!del.classList.contains('sure')){ del.classList.add('sure'); del.textContent = 'Tap again to delete'; clearTimeout(del._t);
+            del._t = setTimeout(() => { del.classList.remove('sure'); del.textContent = 'Delete'; }, 3000); return; }
+          clearTimeout(del._t); wdOpen(dd.previousElementSibling, false); const k = list.indexOf(b); if(k >= 0){ list.splice(k, 1); save(); } render(); });
+      });
+      if(openWish >= 0){ const row = view.querySelector(`.wl-row[data-i="${openWish}"]`); if(row) wdOpen(row, true); else openWish = -1; }
+    }
+    // a wishlist dropdown: one open at a time; its top edge lies on the row's bottom edge (one line under the card and ✓ ! ✕)
+    let openWish = -1;
+    function wdOpen(row, on){
+      const dd = row && row.nextElementSibling; if(!dd || !dd.classList.contains('wl-dd')) return;
+      const del = dd.querySelector('.wd-del'); if(del){ clearTimeout(del._t); del.classList.remove('sure'); del.textContent = 'Delete'; }
+      if(!on){ closeRowDD(dd); if(openWish === +row.dataset.i) openWish = -1; return; }
+      view.querySelectorAll('.wl-dd.open').forEach(o => { if(o !== dd) closeRowDD(o); });
+      dd.classList.add('open'); row.classList.add('open'); dd.style.height = (dd.firstElementChild.offsetHeight + 6) + 'px';   // + its top and bottom edges
+      openWish = +row.dataset.i;
+      if(window.CLOTH){ CLOTH.draw(dd.querySelector('.wd-out > canvas'), CLOTH.rgb(shown('#303d66'))); CLOTH.draw(dd.querySelector('.wd-add > canvas'), CLOTH.rgb(shown('#5b6633'))); }
     }
     document.querySelectorAll('#wl-sort button').forEach(b => b.addEventListener('click', () => {
       sortBy = b.dataset.s; document.querySelectorAll('#wl-sort button').forEach(x => x.classList.toggle('on', x === b)); render(); }));
