@@ -1920,6 +1920,9 @@
   /* a wishlist book's dropdown: the card and ✓ ! ✕ square off at the bottom and stand on it; its 3px top edge lies on theirs,
      one line under them all and across the gaps between them. Unpicked marks get black edges (their icon stays faint) and a soft shadow */
   .wl-dd.open{border-top-width:3px; margin-top:-7px;}
+  /* its outline is drawn by its two parts: the body (full width), and Edit | Delete below it as a tab 12px narrower at each end */
+  .wl-dd, .wl-dd.open{border-left-width:0; border-right-width:0; border-bottom-width:0; border-radius:0; background:none;}
+  .wl-dd > .dd-in{background:var(--hdr-cell); border:3px solid var(--cb000000, #000000); border-top:0; border-radius:0 0 6px 6px;}
   #wishlist-view .wl-row.open > .wl-card{border-bottom-left-radius:0; border-bottom-right-radius:0;}
   #wishlist-view .wl-row > .wl-mark{position:relative; overflow:hidden;}
   #wishlist-view .wl-row.open > .wl-mark{opacity:1; border-bottom-width:0; padding-bottom:3px; border-bottom-left-radius:0; border-bottom-right-radius:0;}   /* (3px in for the edge it gives up: the icon stays put) */
@@ -1934,13 +1937,13 @@
   .wd-go .wd-out{background:var(--cb303d66, #303d66);} .wd-go .wd-add{background:var(--cb5b6633, #5b6633);}   /* the same cloths as the wishlist window's Check Out from Library | Add to My Library */
   .wd-go button > canvas{position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;}
   .wd-go button > span{position:relative; font:700 min(.78rem, 3.3vw)/1 Georgia, 'Times New Roman', serif; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; color:#f4ead2;}
-  /* Edit | Delete: the dropdown's own floor, edge to edge, split off by one 3px line with a soft shadow under it (as if what's above lies over it) */
-  .wd-base{position:relative; display:flex; height:45px; margin:0 -4px -4px; border-top:3px solid var(--cb000000, #000000); background:var(--cbffffff, #ffffff);}
-  .wd-base::before{content:''; position:absolute; left:0; right:0; top:0; height:12px; pointer-events:none; z-index:1;
+  /* Edit | Delete: a tab hanging from the dropdown, 12px in at each end, with a soft shadow along its top (as if the body lies over it) */
+  .wd-base{position:relative; display:flex; height:24px; margin:-3px 12px 0; overflow:hidden; border:3px solid var(--cb000000, #000000); border-radius:0 0 8px 8px; background:var(--cbffffff, #ffffff);}   /* (its top edge on the body's bottom one) */
+  .wd-base::before{content:''; position:absolute; left:0; right:0; top:0; height:7px; pointer-events:none; z-index:1;
     background:linear-gradient(to bottom, rgba(0,0,0,.4), rgba(0,0,0,.12) 45%, rgba(0,0,0,0));}
   .wd-base button, .wd-base button:active{flex:1 1 0; min-width:0; margin:0; padding:0; border:0; border-radius:0; box-shadow:none; background:var(--cbffffff, #ffffff);
-    font:700 min(.74rem, 3.1vw)/1 Arial, sans-serif; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink); cursor:pointer; -webkit-tap-highlight-color:transparent;}
-  .wd-base button + button{border-left:3px solid var(--cb000000, #000000);}
+    font:700 min(.6rem, 2.6vw)/1 Arial, sans-serif; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink); cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .wd-base button + button, .wd-base button + button:active, .wd-base button + button:focus{border-left:3px solid var(--cb000000, #000000);}   /* the divider stays through a press and through Delete's red */
   .wd-base .wd-del{color:var(--cfaa3333, #aa3333);}
   .wd-base .wd-del.sure, .wd-base .wd-del.sure:active{background:var(--cbaa3333, #aa3333); color:var(--cfffffff, #ffffff); letter-spacing:.6px;}
   #wl-empty{margin:40px 16px; text-align:center; font:700 min(.74rem, 2.95vw)/1.4 Arial, sans-serif; text-transform:uppercase; color:var(--muted);}
@@ -13855,7 +13858,7 @@ closeRowDD = function(dd){
         // its dropdown: Check Out | Add to My Books as cloth buttons, then Edit | Delete as the dropdown's own floor
         `<div class="row-dd book-dd wl-dd" data-i="${i}"><div class="dd-in"><div class="wd-go"><button type="button" class="wd-out"><canvas aria-hidden="true"></canvas><span>Check Out</span></button>` +
         `<button type="button" class="wd-add"><canvas aria-hidden="true"></canvas><span>Add to My Books</span></button></div>` +
-        `<div class="wd-base"><button type="button" class="wd-ed">Edit</button><button type="button" class="wd-del">Delete</button></div></div></div>`).join('')).join('');
+        `</div><div class="wd-base"><button type="button" class="wd-ed">Edit</button><button type="button" class="wd-del">Delete</button></div></div>`).join('')).join('');
       view.querySelectorAll('.wl-mark').forEach(m => m.addEventListener('click', () => {
         const row = m.parentNode, b = list[+row.dataset.i]; if(!b) return;
         b.lib = b.lib === m.dataset.k ? '' : m.dataset.k; save();
@@ -13890,7 +13893,7 @@ closeRowDD = function(dd){
       const del = dd.querySelector('.wd-del'); if(del){ clearTimeout(del._t); del.classList.remove('sure'); del.textContent = 'Delete'; }
       if(!on){ closeRowDD(dd); if(openWish === +row.dataset.i) openWish = -1; return; }
       view.querySelectorAll('.wl-dd.open').forEach(o => { if(o !== dd) closeRowDD(o); });
-      dd.classList.add('open'); row.classList.add('open'); dd.style.height = (dd.firstElementChild.offsetHeight + 6) + 'px';   // + its top and bottom edges
+      dd.classList.add('open'); row.classList.add('open'); dd.style.height = [...dd.children].reduce((h, c) => h + c.offsetHeight, 0) + 'px';   // its body and its tab (+ its top edge, less the 3px they share)
       openWish = +row.dataset.i;
       if(window.CLOTH){ CLOTH.draw(dd.querySelector('.wd-out > canvas'), CLOTH.rgb(shown('#303d66'))); CLOTH.draw(dd.querySelector('.wd-add > canvas'), CLOTH.rgb(shown('#5b6633'))); }
     }
