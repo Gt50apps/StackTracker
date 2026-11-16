@@ -13863,7 +13863,12 @@ closeRowDD = function(dd){
         const row = m.parentNode, b = list[+row.dataset.i]; if(!b) return;
         b.lib = b.lib === m.dataset.k ? '' : m.dataset.k; save();
         row.querySelectorAll('.wl-mark').forEach(x => { const on = x.dataset.k === b.lib; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
-        if(sortBy === 'status' || lbSel.wish.f !== 'all'){ clearTimeout(regroupT); regroupT = setTimeout(render, 650); }   // moves to its group (or out of the filter) once the taps settle
+        if(sortBy === 'status' || lbSel.wish.f !== 'all'){ clearTimeout(regroupT); const i = +row.dataset.i;   // moves to its group (or out of the filter) once the taps settle;
+          regroupT = setTimeout(() => {   // its dropdown open, the page follows it there: it stays where it was on screen
+            const was = view.querySelector(`.wl-row.open[data-i="${i}"]`), y = was ? was.getBoundingClientRect().top : null;
+            render();
+            const now = y != null && view.querySelector(`.wl-row[data-i="${i}"]`); if(now) window.scrollBy(0, now.getBoundingClientRect().top - y);
+          }, 650); }
       }));
       view.querySelectorAll('.wl-card').forEach(c => {
         const cv = c.querySelector('canvas'), hex = list[+c.dataset.i].color;
