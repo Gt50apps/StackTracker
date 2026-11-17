@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>/* Tablets: lay the page out narrower so everything (cards, borders, dividers, margins, text) scales up by the same amount.
+   Phones held sideways: lay it out wider, so everything shrinks by the same amount and the short screen fits. Upright phones are untouched. */
+(function(){ const TAB_SCALE = 1.35, PHONE_LAND_SCALE = 0.6, vp = document.querySelector('meta[name="viewport"]');
+  const fit = () => { const a = screen.width, b = screen.height, land = matchMedia('(orientation: landscape)').matches, w = land ? Math.max(a, b) : Math.min(a, b),
+      k = Math.min(a, b) >= 700 ? TAB_SCALE : land ? Math.min(PHONE_LAND_SCALE, (Math.min(a, b) - 50) / 620) : 0;   // sideways phones get at least ~620px of layout height (50 = browser bars)
+    vp.setAttribute('content', k ? `width=${Math.round(w / k)}` : 'width=device-width, initial-scale=1'); document.documentElement.classList.toggle('phone-land', k > 0 && k < 1); };
+  fit(); addEventListener('orientationchange', () => setTimeout(fit, 50)); matchMedia('(orientation: landscape)').addEventListener('change', fit); })();
+</script>
 <title>Stack Tracker</title>
 <!-- installable, works offline: manifest + icons + service worker (sw.js) -->
 <link rel="manifest" href="app.webmanifest">
@@ -1386,6 +1394,8 @@
   }
 
   .view{display:none;width:100%;max-width:900px;}
+  /* Phones held sideways: no 900px cap, so everything runs full width */
+  html.phone-land .view, html.phone-land .shelf-wrap{max-width:none;}
   .view.active{display:block;}
 
   .library-shelf-block{
@@ -4146,7 +4156,7 @@
     // 980px desktop default while the page first loads, which built shelves too
     // wide for the screen until the next re-render
     const vw = document.documentElement.clientWidth || window.innerWidth;
-    const outer = Math.min(900, vw - 8);
+    const outer = Math.min(document.documentElement.classList.contains('phone-land') ? Infinity : 900, vw - 8);   // sideways phones use the full width
     return Math.max(160, outer - 8);
   }
 
