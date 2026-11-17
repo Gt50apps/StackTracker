@@ -2392,6 +2392,238 @@
     45%{transform:translate(-1px, -7px) skewX(10deg) scaleY(.8); opacity:0;} 46%{transform:translate(0, 3px) scaleY(.6); opacity:0;} 75%{transform:none; opacity:1;}}
   .bb.anim-weekend .bb-art svg > :nth-child(-n+2){transform-box:view-box; transform-origin:32px 56px; animation:wk-settle 2.4s ease-in-out infinite;}
   @keyframes wk-settle{0%, 70%, 100%{transform:none;} 78%{transform:rotate(-4deg);} 86%{transform:rotate(2deg);} 93%{transform:rotate(-.5deg);}}
+
+  /* ---- the rest of the badges: each loops gently and rests on its still icon ---- */
+  @keyframes bd-bob{0%, 100%{transform:none;} 50%{transform:translateY(-2px);}}
+  @keyframes bd-hop{0%, 45%, 100%{transform:none;} 15%{transform:translateY(-5px);} 27%{transform:translateY(0) scale(1.08, .92);} 35%{transform:none;}}
+  @keyframes bd-pulse{0%, 100%{transform:none;} 50%{transform:scale(1.12);}}
+  @keyframes bd-beat{0%, 40%, 100%{transform:none;} 10%{transform:scale(1.18);} 20%{transform:scale(.96);} 30%{transform:scale(1.1);}}
+  @keyframes bd-sway{0%, 100%{transform:rotate(-5deg);} 50%{transform:rotate(5deg);}}
+  @keyframes bd-spin{to{transform:rotate(360deg);}}
+  @keyframes bd-blink{0%, 42%, 50%, 100%{transform:none;} 46%{transform:scaleY(.1);}}
+  @keyframes bd-twinkle{0%, 100%{transform:none; opacity:1;} 50%{transform:scale(.55) rotate(25deg); opacity:.55;}}
+  @keyframes bd-flicker{0%, 100%{transform:none;} 25%{transform:scale(.94, 1.08) skewX(-3deg);} 50%{transform:scale(1.03, .95) skewX(2deg);} 75%{transform:scale(.97, 1.06) skewX(-1deg);}}
+  @keyframes bd-wave{0%{transform:scale(.7); opacity:0;} 30%{opacity:1;} 100%{transform:scale(1.15); opacity:0;}}
+  @keyframes bd-zfloat{0%{transform:none; opacity:1;} 60%{transform:translate(4px, -8px); opacity:0;} 61%{transform:translateY(3px); opacity:0;} 100%{transform:none; opacity:1;}}
+  @keyframes bd-peek{0%, 40%, 100%{transform:none;} 15%, 27%{transform:translateY(-6px);}}
+  @keyframes bd-glitch{0%, 60%, 100%{transform:none; opacity:1;} 62%{transform:translateX(-2px); opacity:.5;} 64%{transform:translateX(2px) skewX(-8deg);} 66%{transform:translateX(-1px); opacity:1;} 68%{transform:none;}}
+  @keyframes bd-dart{0%, 8%{transform:translate(8px, -8px); opacity:0;} 18%{transform:none; opacity:1;} 21%{transform:translate(-1px, 1px);} 25%, 100%{transform:none; opacity:1;}}
+  @keyframes bd-draw{0%, 10%{stroke-dashoffset:24;} 30%, 100%{stroke-dashoffset:0;}}
+  @keyframes bd-shake{0%, 70%, 100%{transform:none;} 74%{transform:translateX(-1.5px) rotate(-3deg);} 78%{transform:translateX(1.5px) rotate(3deg);} 82%{transform:translateX(-1px) rotate(-2deg);} 86%{transform:none;}}
+  @keyframes bd-float{0%, 100%{transform:none;} 50%{transform:translateY(-3px) rotate(2deg);}}
+  @keyframes bd-pgturn{0%, 30%, 100%{transform:none;} 45%{transform:scaleX(0); filter:brightness(1.1);} 46%{transform:scaleX(0);} 60%{transform:none;}}
+  @keyframes bd-strike{0%, 55%, 100%{transform:none; filter:none;} 60%{transform:translateY(-2px) scale(1.1); filter:brightness(1.4);} 66%{transform:translateY(1px) scale(.96);} 72%{transform:none; filter:none;}}
+  @keyframes bd-rays{0%, 55%, 85%, 100%{opacity:1;} 62%{opacity:.2;} 70%{opacity:1;}}
+  @keyframes bd-flag{0%, 100%{transform:none;} 25%{transform:scaleX(.82) skewY(-6deg);} 50%{transform:scaleX(1.04) skewY(3deg);} 75%{transform:scaleX(.9) skewY(-3deg);}}
+  @keyframes bd-tick{0%, 100%{transform:rotate(26deg);} 50%{transform:rotate(-26deg);}}
+  @keyframes bd-turn{0%, 38%{transform:none;} 50%, 88%{transform:rotate(180deg);} 100%{transform:rotate(360deg);}}
+  @keyframes bd-sand{to{stroke-dashoffset:-6;}}
+  @keyframes bd-teeter{0%, 100%{transform:none;} 25%{transform:rotate(-4deg);} 55%{transform:rotate(3deg);} 80%{transform:rotate(-1deg);}}
+  @keyframes bd-windl{0%, 100%{transform:none;} 50%{transform:scale(.7);}}
+  @keyframes bd-windr{0%, 100%{transform:none;} 50%{transform:scale(1.35);}}
+  @keyframes bd-run{0%, 100%{transform:none;} 50%{transform:translateY(-3px) rotate(-4deg);}}
+  @keyframes bd-streak{0%{transform:translateX(4px); opacity:0;} 30%{opacity:1;} 100%{transform:translateX(-6px); opacity:0;}}
+  @keyframes bd-loopa{0%, 60%, 100%{transform:none; opacity:1;} 20%{transform:translateX(3px); opacity:.4;} 40%{transform:translateX(-1px); opacity:1;}}
+  @keyframes bd-shuffle{0%, 40%, 100%{transform:rotate(-6deg);} 55%, 70%{transform:translate(5px, -3px) rotate(4deg);}}
+  @keyframes bd-arc{0%, 40%, 100%{transform:none; filter:none;} 15%{transform:scale(1.07); filter:brightness(1.25);}}
+  @keyframes bd-toss{0%, 100%{transform:none;} 40%{transform:translateY(-7px);} 70%{transform:none;}}
+  @keyframes bd-rise{0%, 100%{transform:none;} 15%{transform:translateY(12px);} 20%{transform:translateY(12px);} 55%{transform:none;}}
+  @keyframes bd-rayson{0%, 10%, 55%, 100%{opacity:1;} 15%, 40%{opacity:0;}}
+  @keyframes bd-thud{0%, 17%, 40%, 100%{transform:none;} 20%{transform:scale(.97);} 27%{transform:scale(1.02);} 33%{transform:none;}}
+  @keyframes bd-boom{0%, 20%, 100%{transform:none;} 50%{transform:translate(-4px, -10px) rotate(-200deg) scale(.8);} 80%{transform:rotate(-360deg);}}
+  @keyframes bd-candle{0%, 100%{opacity:1; filter:brightness(1.15);} 20%{opacity:.75; filter:none;} 35%{opacity:1; filter:brightness(1.3);} 60%{opacity:.85;} 80%{opacity:1;}}
+  @keyframes bd-jig{0%, 30%, 100%{transform:none;} 8%{transform:rotate(-3deg) translateY(-1px);} 16%{transform:rotate(3deg);} 24%{transform:rotate(-1deg);}}
+  @keyframes bd-tail{0%, 100%{transform:none;} 30%{transform:rotate(-14deg);} 60%{transform:rotate(6deg);}}
+  @keyframes bd-rock{0%, 100%{transform:none;} 50%{transform:rotate(-3deg) translateY(-1px);}}
+  @keyframes bd-squish{0%, 100%{transform:none;} 50%{transform:scale(1.04, .7);}}
+  @keyframes bd-glint{0%, 100%{filter:none; opacity:1;} 50%{filter:brightness(1.5); opacity:.7;}}
+  @keyframes bd-tip{0%, 100%{transform:rotate(-14deg);} 30%{transform:rotate(-26deg);} 45%{transform:rotate(-8deg);} 55%{transform:rotate(-14deg);}}
+  @keyframes bd-knock{0%, 42%, 70%, 100%{transform:none;} 50%{transform:rotate(5deg);} 60%{transform:rotate(-1.5deg);}}
+  @keyframes bd-lean{0%, 40%, 100%{transform:none;} 15%{transform:rotate(-6deg);} 28%{transform:rotate(3deg);}}
+  @keyframes bd-slice{0%, 25%, 80%, 100%{transform:none;} 45%, 60%{transform:translate(3px, -3px);}}
+  @keyframes bd-fold{0%, 50%, 100%{transform:none;} 70%{transform:scale(1.25);}}
+  @keyframes bd-say{0%, 40%, 100%{transform:none;} 10%{transform:scale(1.08) rotate(-3deg);} 22%{transform:scale(.97) rotate(1deg);} 30%{transform:none;}}
+  @keyframes bd-same{0%, 100%{transform:none;} 40%{transform:scaleY(.6);} 70%{transform:none;}}
+  @keyframes bd-press{0%, 90%, 100%{transform:none;} 95%{transform:translateY(2px);}}
+  @keyframes bd-clock{0%, 100%{transform:rotate(-24deg);} 60%, 90%{transform:none;}}
+  @keyframes bd-door{0%, 25%, 85%, 100%{transform:none;} 45%, 65%{transform:scaleX(.55) skewY(-6deg);}}
+  @keyframes bd-globe{0%, 100%{transform:none;} 50%{transform:scaleX(-1);}}
+  @keyframes bd-stab{0%, 50%, 100%{transform:none;} 60%{transform:translateY(-4px);} 66%{transform:translateY(3px);} 75%{transform:none;}}
+  @keyframes bd-pop{0%, 70%, 100%{transform:none;} 76%, 88%{transform:translateY(6px);}}
+  @keyframes bd-droop{0%, 30%, 100%{transform:none;} 50%, 75%{transform:rotate(12deg) translateY(2px);}}
+  @keyframes bd-breathe{0%, 100%{transform:none;} 50%{transform:scale(1.05);}}
+  @keyframes bd-wiggle{0%, 100%{transform:none;} 50%{transform:skewX(-10deg) scaleY(1.12);}}
+  .bb.anim-pages .bb-art svg > g > :nth-child(2){transform-box:fill-box; transform-origin:0% 50%; animation:bd-pgturn 3.2s ease-in-out infinite;}
+  .bb.anim-pages .bb-art svg > g > :nth-child(4){transform-box:fill-box; transform-origin:50% 0%; animation:bd-sway 3.2s ease-in-out infinite;}
+  .bb.anim-bigday .bb-art svg > :nth-child(10){transform-box:fill-box; transform-origin:50% 50%; animation:bd-strike 2.4s ease-in-out infinite;}
+  .bb.anim-bigday .bb-art svg > :nth-child(n+2):nth-child(-n+9){animation:bd-rays 2.4s ease-in-out infinite;}
+  .bb.anim-bigday .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 50%; animation:bd-beat 2.4s ease-in-out infinite; animation-delay:1.4s;}
+  .bb.anim-summit .bb-art svg > :nth-child(5){transform-box:fill-box; transform-origin:0% 50%; animation:bd-flag 1.4s ease-in-out infinite;}
+  .bb.anim-steady .bb-art svg > :nth-child(4){transform-box:view-box; transform-origin:32px 50px; animation:bd-tick 1.6s cubic-bezier(.45,0,.55,1) infinite;}
+  .bb.anim-steady .bb-art svg > :nth-child(n+5){animation:bd-rays 1.6s ease-in-out infinite;}
+  .bb.anim-finished .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 100%; animation:bd-hop 2.8s ease-in-out infinite; animation-delay:0.00s;}
+  .bb.anim-finished .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:50% 100%; animation:bd-hop 2.8s ease-in-out infinite; animation-delay:0.12s;}
+  .bb.anim-finished .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 100%; animation:bd-hop 2.8s ease-in-out infinite; animation-delay:0.24s;}
+  .bb.anim-finished .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 100%; animation:bd-hop 2.8s ease-in-out infinite; animation-delay:0.36s;}
+  .bb.anim-finished .bb-art svg > :nth-child(5){transform-box:fill-box; transform-origin:50% 100%; animation:bd-hop 2.8s ease-in-out infinite; animation-delay:0.48s;}
+  .bb.anim-year .bb-art svg > :nth-child(5){transform-box:fill-box; transform-origin:50% 50%; animation:bd-twinkle 2s ease-in-out infinite;}
+  .bb.anim-year .bb-art svg{transform-origin:50% 90%; animation:bd-shake 3s ease-in-out infinite;}
+  .bb.anim-quick .bb-art svg{animation:bd-turn 5s cubic-bezier(.6,0,.3,1) infinite;}
+  .bb.anim-quick .bb-art svg > :nth-child(4){stroke-dasharray:3 3; animation:bd-sand .5s linear infinite;}
+  .bb.anim-authors .bb-art svg > :nth-child(n+2){transform-box:view-box; transform-origin:32px 24px; animation:bd-beat 2.6s ease-in-out infinite;}
+  .bb.anim-authors .bb-art svg > :nth-child(1){transform-box:view-box; transform-origin:32px 34px; animation:bd-sway 2.6s ease-in-out infinite;}
+  .bb.anim-busy .bb-art svg{transform-origin:50% 88%; animation:bd-teeter 2.6s ease-in-out infinite;}
+  .bb.anim-tapes .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 50%; animation:bd-windl 2.4s ease-in-out infinite;}
+  .bb.anim-tapes .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 50%; animation:bd-windr 2.4s ease-in-out infinite;}
+  .bb.anim-hours .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:100% 50%; animation:bd-bass 1.2s ease-in-out infinite;}
+  .bb.anim-hours .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:0% 50%; animation:bd-bass 1.2s ease-in-out infinite; animation-delay:.6s;}
+  .bb.anim-hours .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 100%; animation:bd-band 1.2s ease-in-out infinite;}
+  @keyframes bd-bass{0%, 50%, 100%{transform:none;} 12%{transform:scale(1.14, 1.08);} 25%{transform:scale(.97);}}
+  @keyframes bd-band{0%, 100%{transform:none;} 25%, 75%{transform:scaleY(.95);}}
+  .bb.anim-marathon .bb-art svg > :nth-child(-n+3){transform-box:view-box; transform-origin:36px 50px; animation:bd-run .7s ease-in-out infinite;}
+  .bb.anim-marathon .bb-art svg > :nth-child(4){animation:bd-streak .7s linear infinite; animation-delay:0s;}
+  .bb.anim-marathon .bb-art svg > :nth-child(5){animation:bd-streak .7s linear infinite; animation-delay:0.15s;}
+  .bb.anim-marathon .bb-art svg > :nth-child(6){animation:bd-streak .7s linear infinite; animation-delay:0.3s;}
+  .bb.anim-rereads .bb-art svg > :nth-child(-n+5){transform-box:view-box; transform-origin:32px 32px; animation:bd-spin 4s linear infinite;}
+  .bb.anim-friend .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 50%; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-friend .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:50% 50%; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-friend .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 50%; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0.15s;}
+  .bb.anim-friend .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 50%; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0.15s;}
+  .bb.anim-friend .bb-art svg > :nth-child(5){transform-box:fill-box; transform-origin:50% 50%; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0.3s;}
+  .bb.anim-friend .bb-art svg > :nth-child(6){transform-box:fill-box; transform-origin:50% 50%; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0.3s;}
+  .bb.anim-relisten .bb-art svg > :nth-child(5){animation:bd-loopa 2s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-relisten .bb-art svg > :nth-child(6){animation:bd-loopa 2s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-relisten .bb-art svg > :nth-child(7){animation:bd-loopa 2s ease-in-out infinite; animation-delay:0.2s;}
+  .bb.anim-relisten .bb-art svg > :nth-child(8){animation:bd-loopa 2s ease-in-out infinite; animation-delay:0.2s;}
+  .bb.anim-relisten .bb-art svg > :nth-child(9){animation:bd-loopa 2s ease-in-out infinite; animation-delay:0.4s;}
+  .bb.anim-relisten .bb-art svg > :nth-child(10){animation:bd-loopa 2s ease-in-out infinite; animation-delay:0.4s;}
+  .bb.anim-relisten .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 50%; animation:bd-windl 2s ease-in-out infinite;}
+  .bb.anim-relisten .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 50%; animation:bd-windr 2s ease-in-out infinite;}
+  .bb.anim-decade .bb-art svg > :nth-child(1){transform-box:view-box; transform-origin:35px 31px; animation:bd-shuffle 3s ease-in-out infinite;}
+  .bb.anim-decade .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 50%; animation:bd-beat 3s ease-in-out infinite; animation-delay:.8s;}
+  .bb.anim-alpha .bb-art svg > :nth-child(1){transform-box:view-box; transform-origin:32px 54px; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-alpha .bb-art svg > :nth-child(2){transform-box:view-box; transform-origin:32px 54px; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-alpha .bb-art svg > :nth-child(3){transform-box:view-box; transform-origin:32px 54px; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0.25s;}
+  .bb.anim-alpha .bb-art svg > :nth-child(4){transform-box:view-box; transform-origin:32px 54px; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0.25s;}
+  .bb.anim-alpha .bb-art svg > :nth-child(5){transform-box:view-box; transform-origin:32px 54px; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0.5s;}
+  .bb.anim-alpha .bb-art svg > :nth-child(6){transform-box:view-box; transform-origin:32px 54px; animation:bd-hop 2.4s ease-in-out infinite; animation-delay:0.5s;}
+  .bb.anim-rainbow .bb-art svg > :nth-child(1){transform-box:view-box; transform-origin:32px 48px; animation:bd-arc 2.8s ease-in-out infinite; animation-delay:0.00s;}
+  .bb.anim-rainbow .bb-art svg > :nth-child(2){transform-box:view-box; transform-origin:32px 48px; animation:bd-arc 2.8s ease-in-out infinite; animation-delay:0.15s;}
+  .bb.anim-rainbow .bb-art svg > :nth-child(3){transform-box:view-box; transform-origin:32px 48px; animation:bd-arc 2.8s ease-in-out infinite; animation-delay:0.30s;}
+  .bb.anim-rainbow .bb-art svg > :nth-child(4){transform-box:view-box; transform-origin:32px 48px; animation:bd-arc 2.8s ease-in-out infinite; animation-delay:0.45s;}
+  .bb.anim-juggle .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:50% 50%; animation:bd-toss 1.6s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-juggle .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 50%; animation:bd-toss 1.6s ease-in-out infinite; animation-delay:0.2s;}
+  .bb.anim-juggle .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 50%; animation:bd-toss 1.6s ease-in-out infinite; animation-delay:0.4s;}
+  .bb.anim-juggle .bb-art svg > :nth-child(5){transform-box:fill-box; transform-origin:50% 50%; animation:bd-toss 1.6s ease-in-out infinite; animation-delay:0.6s;}
+  .bb.anim-dawn .bb-art svg > g > circle{animation:bd-rise 3.2s ease-in-out infinite;}
+  .bb.anim-dawn .bb-art svg > :nth-child(4){animation:bd-rayson 3.2s ease-in-out infinite;}
+  .bb.anim-bull .bb-art svg > :nth-child(4){animation:bd-dart 3s ease-out infinite; animation-delay:0s;}
+  .bb.anim-bull .bb-art svg > :nth-child(5){animation:bd-dart 3s ease-out infinite; animation-delay:0s;}
+  .bb.anim-bull .bb-art svg > :nth-child(6){animation:bd-dart 3s ease-out infinite; animation-delay:0.3s;}
+  .bb.anim-bull .bb-art svg > :nth-child(7){animation:bd-dart 3s ease-out infinite; animation-delay:0.3s;}
+  .bb.anim-bull .bb-art svg > :nth-child(8){animation:bd-dart 3s ease-out infinite; animation-delay:0.6s;}
+  .bb.anim-bull .bb-art svg > :nth-child(9){animation:bd-dart 3s ease-out infinite; animation-delay:0.6s;}
+  .bb.anim-bull .bb-art svg > :nth-child(-n+3){transform-box:view-box; transform-origin:26px 38px; animation:bd-thud 3s ease-out infinite;}
+  .bb.anim-pocket .bb-art svg > :nth-child(1){animation:bd-peek 2.6s ease-in-out infinite; animation-delay:0.3s;}
+  .bb.anim-pocket .bb-art svg > :nth-child(2){animation:bd-peek 2.6s ease-in-out infinite; animation-delay:0.6s;}
+  .bb.anim-pocket .bb-art svg > :nth-child(3){animation:bd-peek 2.6s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-comeback .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 50%; animation:bd-boom 3s cubic-bezier(.45,0,.55,1) infinite;}
+  .bb.anim-comeback .bb-art svg > :nth-child(2){animation:bd-sand 1s linear infinite;}
+  .bb.anim-spooky .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 50%; animation:bd-candle 1.4s steps(1) infinite;}
+  .bb.anim-spooky .bb-art svg{transform-origin:50% 90%; animation:bd-shake 3s ease-in-out infinite;}
+  .bb.anim-holiday .bb-art svg > :nth-child(1){transform-box:view-box; transform-origin:32px 54px; animation:bd-jig 2.4s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-holiday .bb-art svg > :nth-child(2){transform-box:view-box; transform-origin:32px 54px; animation:bd-jig 2.4s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-holiday .bb-art svg > :nth-child(3){transform-box:view-box; transform-origin:32px 54px; animation:bd-jig 2.4s ease-in-out infinite; animation-delay:0.25s;}
+  .bb.anim-holiday .bb-art svg > :nth-child(4){transform-box:view-box; transform-origin:32px 54px; animation:bd-jig 2.4s ease-in-out infinite; animation-delay:0.25s;}
+  .bb.anim-holiday .bb-art svg > :nth-child(5){transform-box:view-box; transform-origin:32px 54px; animation:bd-jig 2.4s ease-in-out infinite; animation-delay:0.5s;}
+  .bb.anim-holiday .bb-art svg > :nth-child(6){transform-box:view-box; transform-origin:32px 54px; animation:bd-jig 2.4s ease-in-out infinite; animation-delay:0.5s;}
+  .bb.anim-holiday .bb-art svg > :nth-child(7){transform-box:fill-box; transform-origin:50% 100%; animation:bd-beat 2.4s ease-in-out infinite; animation-delay:.9s;}
+  .bb.anim-cat .bb-art svg > :nth-child(2){transform-box:view-box; transform-origin:46px 52px; animation:bd-tail 2.2s ease-in-out infinite;}
+  .bb.anim-cat .bb-art svg > :nth-child(6), .bb.anim-cat .bb-art svg > :nth-child(7){transform-box:fill-box; transform-origin:50% 50%; animation:bd-blink 3.4s ease-in-out infinite;}
+  .bb.anim-cat .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 50%; animation:bd-pulse 3.4s ease-in-out infinite;}
+  .bb.anim-cat13 .bb-art svg > :nth-child(2){transform-box:view-box; transform-origin:46px 52px; animation:bd-tail 2.2s ease-in-out infinite;}
+  .bb.anim-cat13 .bb-art svg > :nth-child(6), .bb.anim-cat13 .bb-art svg > :nth-child(7){transform-box:fill-box; transform-origin:50% 50%; animation:bd-blink 3.4s ease-in-out infinite;}
+  .bb.anim-cat13 .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 50%; animation:bd-pulse 3.4s ease-in-out infinite;}
+  .bb.anim-cat13 .bb-art svg > :nth-child(11), .bb.anim-cat13 .bb-art svg > :nth-child(12){transform-box:view-box; transform-origin:32px 36px; animation:bd-sway 2.2s ease-in-out infinite;}
+  .bb.anim-leap .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 100%; animation:bd-hop 1.8s ease-in-out infinite;}
+  .bb.anim-404 .bb-art svg > :nth-child(3){animation:bd-glitch 2.6s steps(1) infinite;}
+  .bb.anim-circle .bb-art svg > :nth-child(2){transform-box:view-box; transform-origin:32px 32px; animation:bd-spin 3s linear infinite;}
+  .bb.anim-circle .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 50%; animation:bd-twinkle 3s ease-in-out infinite;}
+  .bb.anim-sitting .bb-art svg{transform-origin:50% 90%; animation:bd-rock 2.6s ease-in-out infinite;}
+  .bb.anim-sitting .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 100%; animation:bd-squish 2.6s ease-in-out infinite;}
+  .bb.anim-fresh .bb-art svg > :nth-child(2){transform-box:view-box; transform-origin:32px 26px; animation:bd-wave 1.6s ease-out infinite;}
+  .bb.anim-fresh .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 50%; animation:bd-beat 1.6s ease-in-out infinite;}
+  .bb.anim-fresh .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 100%; animation:bd-flicker .8s ease-in-out infinite;}
+  .bb.anim-double .bb-art svg > :nth-child(4){animation:bd-glint 2.4s ease-in-out infinite;}
+  .bb.anim-double .bb-art svg{animation:bd-bob 2.4s ease-in-out infinite;}
+  .bb.anim-b2b .bb-art svg > :nth-child(1){transform-box:view-box; transform-origin:18px 52px; animation:bd-tip 2.6s ease-in-out infinite;}
+  .bb.anim-b2b .bb-art svg > :nth-child(n+2){transform-box:view-box; transform-origin:56px 52px; animation:bd-knock 2.6s ease-in-out infinite;}
+  .bb.anim-firsts .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 50%; animation:bd-beat 2.2s ease-in-out infinite;}
+  .bb.anim-bday .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 100%; animation:bd-flicker 1s ease-in-out infinite;}
+  .bb.anim-bookends .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 100%; animation:bd-lean 2.6s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-bookends .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:50% 100%; animation:bd-lean 2.6s ease-in-out infinite; animation-delay:0.15s;}
+  .bb.anim-bookends .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 100%; animation:bd-lean 2.6s ease-in-out infinite; animation-delay:0.3s;}
+  .bb.anim-pi .bb-art svg > :nth-child(2){animation:bd-slice 2.8s ease-in-out infinite;}
+  .bb.anim-one .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 100%; animation:bd-hop 2s ease-in-out infinite;}
+  .bb.anim-one .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:0% 100%; animation:bd-fold 2s ease-in-out infinite;}
+  .bb.anim-seven .bb-art svg{animation:bd-sway 3s ease-in-out infinite;}
+  .bb.anim-seven .bb-art svg > :nth-child(6), .bb.anim-seven .bb-art svg > :nth-child(7){transform-box:view-box; transform-origin:32px 32px; animation:bd-beat 3s ease-in-out infinite;}
+  .bb.anim-answer .bb-art svg{transform-origin:20% 90%; animation:bd-say 2.6s ease-in-out infinite;}
+  .bb.anim-count .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:50% 100%; animation:bd-hop 2.2s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-count .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 100%; animation:bd-hop 2.2s ease-in-out infinite; animation-delay:0.2s;}
+  .bb.anim-count .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 100%; animation:bd-hop 2.2s ease-in-out infinite; animation-delay:0.4s;}
+  .bb.anim-half .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:0% 50%; animation:bd-pgturn 3.2s ease-in-out infinite;}
+  .bb.anim-half .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 0%; animation:bd-sway 3.2s ease-in-out infinite;}
+  .bb.anim-pace .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 100%; animation:bd-same 1.8s ease-in-out infinite;}
+  .bb.anim-pace .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:50% 100%; animation:bd-same 1.8s ease-in-out infinite;}
+  .bb.anim-pace .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 100%; animation:bd-same 1.8s ease-in-out infinite;}
+  .bb.anim-week .bb-art svg > :nth-child(4){stroke-dasharray:24; animation:bd-draw 3.2s ease-out infinite; animation-delay:0.00s;}
+  .bb.anim-week .bb-art svg > :nth-child(5){stroke-dasharray:24; animation:bd-draw 3.2s ease-out infinite; animation-delay:0.12s;}
+  .bb.anim-week .bb-art svg > :nth-child(6){stroke-dasharray:24; animation:bd-draw 3.2s ease-out infinite; animation-delay:0.24s;}
+  .bb.anim-week .bb-art svg > :nth-child(7){stroke-dasharray:24; animation:bd-draw 3.2s ease-out infinite; animation-delay:0.36s;}
+  .bb.anim-week .bb-art svg > :nth-child(8){stroke-dasharray:24; animation:bd-draw 3.2s ease-out infinite; animation-delay:0.48s;}
+  .bb.anim-week .bb-art svg > :nth-child(9){stroke-dasharray:24; animation:bd-draw 3.2s ease-out infinite; animation-delay:0.60s;}
+  .bb.anim-week .bb-art svg > :nth-child(10){transform-box:fill-box; transform-origin:50% 50%; animation:bd-beat 3.2s ease-in-out infinite; animation-delay:1s;}
+  .bb.anim-hour .bb-art svg > :nth-child(4){transform-box:view-box; transform-origin:32px 36px; animation:bd-spin 2.4s linear infinite;}
+  .bb.anim-hour .bb-art svg > :nth-child(1){animation:bd-press 2.4s ease-in-out infinite;}
+  .bb.anim-boo .bb-art svg{animation:bd-float 2.4s ease-in-out infinite;}
+  .bb.anim-boo .bb-art svg > :nth-child(2), .bb.anim-boo .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 50%; animation:bd-blink 3s ease-in-out infinite;}
+  .bb.anim-boo .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 50%; animation:bd-pulse 2.4s ease-in-out infinite;}
+  .bb.anim-nye .bb-art svg > :nth-child(3){transform-box:view-box; transform-origin:30px 36px; animation:bd-clock 3s ease-in-out infinite;}
+  .bb.anim-nye .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:50% 50%; animation:bd-twinkle 1.5s ease-in-out infinite;}
+  .bb.anim-f451 .bb-art svg > :nth-child(1){transform-box:fill-box; transform-origin:50% 100%; animation:bd-flicker 1.2s ease-in-out infinite;}
+  .bb.anim-room101 .bb-art svg > :nth-child(1){transform-box:view-box; transform-origin:16px 31px; animation:bd-door 3s ease-in-out infinite;}
+  .bb.anim-room101 .bb-art svg > :nth-child(3){transform-box:view-box; transform-origin:16px 31px; animation:bd-door 3s ease-in-out infinite;}
+  .bb.anim-room101 .bb-art svg > :nth-child(4){transform-box:view-box; transform-origin:16px 31px; animation:bd-door 3s ease-in-out infinite;}
+  .bb.anim-room101 .bb-art svg > :nth-child(5){transform-box:view-box; transform-origin:16px 31px; animation:bd-door 3s ease-in-out infinite;}
+  .bb.anim-catch22 .bb-art svg > :nth-child(-n+3){transform-box:view-box; transform-origin:32px 32px; animation:bd-spin 3.6s linear infinite;}
+  .bb.anim-world80 .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:50% 50%; animation:bd-globe 2.4s ease-in-out infinite;}
+  .bb.anim-world80 .bb-art svg > :nth-child(3){animation:bd-float 2.4s ease-in-out infinite;}
+  .bb.anim-world80 .bb-art svg > :nth-child(4){animation:bd-float 2.4s ease-in-out infinite;}
+  .bb.anim-world80 .bb-art svg > :nth-child(5){animation:bd-float 2.4s ease-in-out infinite;}
+  .bb.anim-may4 .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 50%; animation:bd-twinkle 1.6s ease-in-out infinite;}
+  .bb.anim-may4 .bb-art svg > :nth-child(-n+2){transform-box:view-box; transform-origin:32px 32px; animation:bd-pulse 3.2s ease-in-out infinite;}
+  .bb.anim-ides .bb-art svg{animation:bd-stab 2.4s ease-in-out infinite;}
+  .bb.anim-ides .bb-art svg > :nth-child(1){animation:bd-glint 2.4s ease-in-out infinite;}
+  .bb.anim-love .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 50%; animation:bd-beat 1.6s ease-in-out infinite;}
+  .bb.anim-groundhog .bb-art svg > :nth-child(1){animation:bd-pop 3s ease-in-out infinite;}
+  .bb.anim-groundhog .bb-art svg > :nth-child(2){animation:bd-pop 3s ease-in-out infinite;}
+  .bb.anim-groundhog .bb-art svg > :nth-child(3){animation:bd-pop 3s ease-in-out infinite;}
+  .bb.anim-groundhog .bb-art svg > :nth-child(4){animation:bd-pop 3s ease-in-out infinite;}
+  .bb.anim-groundhog .bb-art svg > :nth-child(5){animation:bd-pop 3s ease-in-out infinite;}
+  .bb.anim-groundhog .bb-art svg > :nth-child(6){animation:bd-pop 3s ease-in-out infinite;}
+  .bb.anim-mondays .bb-art svg > :nth-child(4){transform-box:fill-box; transform-origin:0% 100%; animation:bd-droop 3s ease-in-out infinite;}
+  .bb.anim-hattrick .bb-art svg > :nth-child(1){animation:bd-peek 2.4s ease-in-out infinite; animation-delay:0s;}
+  .bb.anim-hattrick .bb-art svg > :nth-child(2){animation:bd-peek 2.4s ease-in-out infinite; animation-delay:0.2s;}
+  .bb.anim-hattrick .bb-art svg > :nth-child(3){animation:bd-peek 2.4s ease-in-out infinite; animation-delay:0.4s;}
+  .bb.anim-lazysun .bb-art svg > :nth-child(3){animation:bd-zfloat 2.4s ease-out infinite;}
+  .bb.anim-lazysun .bb-art svg > :nth-child(4){animation:bd-zfloat 2.4s ease-out infinite; animation-delay:.8s;}
+  .bb.anim-lazysun .bb-art svg > :nth-child(-n+2){transform-box:view-box; transform-origin:28px 36px; animation:bd-breathe 2.4s ease-in-out infinite;}
+  .bb.anim-peas .bb-art svg > :nth-child(2){transform-box:fill-box; transform-origin:50% 50%; animation:bd-hop 1.8s ease-in-out infinite;}
+  .bb.anim-peas .bb-art svg > :nth-child(3){transform-box:fill-box; transform-origin:50% 50%; animation:bd-hop 1.8s ease-in-out infinite; animation-delay:.25s;}
+  .bb.anim-twelve .bb-art svg{transform-origin:50% 6%; animation:bd-sway 2.4s ease-in-out infinite;}
+  .bb.anim-earworm .bb-art svg > :nth-child(-n+2){transform-box:fill-box; transform-origin:0% 100%; animation:bd-wiggle 1.2s ease-in-out infinite;}
+  .bb.anim-earworm .bb-art svg > :nth-child(n+3){animation:bd-bob 1.2s ease-in-out infinite;}
   @media (prefers-reduced-motion: reduce){ .bb[class*="anim-"] .bb-art svg, .bb[class*="anim-"] .bb-art svg *{animation:none !important;} }
   /* ===== Developer options: a full window like the Log ===== */
   #dev-page{position:fixed; inset:0; z-index:45; background:var(--bg); display:flex; flex-direction:column; opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
@@ -13081,7 +13313,7 @@ Object.assign(ART, {
       a.goals.map((g, k) => { const done = !!a.dates[k], now = !done && k === L;
         return `<div class="tier${done ? ' done' : ''}" style="--lc:${bdCol(a, k + 1)}"><span class="t-ck">${done ? '✓' : now ? '●' : ''}</span>` +
           `<span class="t-tx">${one ? '' : `<b>${k + 1}</b>`}${a.ask(g)}</span><span class="t-v">${done ? bdDay(a.dates[k]) : '—'}</span></div>`; }).join('')) + `</div>`;
-    card.classList.add('open', 'anim-' + id); dd.classList.add('open'); bdOpenId = id; bdWrap.classList.add('bd-on');
+    card.classList.add('open'); if(!secret) card.classList.add('anim-' + id); dd.classList.add('open'); bdOpenId = id; bdWrap.classList.add('bd-on');   // a hidden badge's ? stays still
     if(scroll !== false){ const r = card.getBoundingClientRect(), w = bdWrap.getBoundingClientRect(), h = r.height + dd.offsetHeight;
       if(r.top < w.top + 4 || r.top + h > w.bottom - 4) bdWrap.scrollTop += r.top - w.top - Math.max(4, (w.height - h) / 2); }
   }
