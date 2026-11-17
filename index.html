@@ -2321,6 +2321,10 @@
   .bd-foot{position:sticky; bottom:0; z-index:2; margin:auto -4px -4px; padding:4px; background:var(--band); border-top:3px solid var(--cb000000, #000000); display:flex; flex-direction:column; gap:4px;}
   .bd-fname{text-align:center; font:700 min(.72rem, 3vw)/1 Georgia, serif; letter-spacing:.06em; text-transform:uppercase; color:var(--cfffffff, #ffffff);}
   .tier.big{height:45px;}
+  .bd-abc{flex:none; display:flex; height:28px; background:var(--cbffffff, #ffffff); border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;}
+  .bd-abc i{flex:1; min-width:0; display:flex; align-items:center; justify-content:center; font:normal 700 .6rem/1 Arial, sans-serif; color:var(--ink);}
+  .bd-abc i + i{border-left:1px solid var(--cb000000, #000000);}
+  .bd-abc i.on{background:var(--bd-gold);}
   .tier .t-tx{position:relative;}
   .tier .t-tx > *{position:relative;}
   .tier .t-fill{position:absolute !important; left:0; top:0; bottom:0; background:color-mix(in srgb, var(--lc) 42%, #fff);}
@@ -12801,7 +12805,7 @@ Object.assign(ART, {
     { id: 'friend', c: 4, art: 'infinity', name: 'Old Friend', ask: n => `Finish the same book ${n} times`, goals: [2, 3, 5] },
     { id: 'relisten', c: 4, art: 'tapeagain', name: 'Relistens', ask: n => `Finish ${n} ${n === 1 ? 'relisten' : 'relistens'}`, goals: [1, 5, 10] },
     { id: 'decade', c: 4, art: 'decade', name: 'Long Time No See', ask: n => `Reread a book ${n} ${n === 1 ? 'year' : 'years'} after first finishing it`, goals: [1, 5, 10] },
-    { id: 'alpha', c: 5, art: 'blocks', name: 'Alphabet Soup', ask: n => `Finish books starting with ${n} different letters`, goals: [5, 13, 26] },
+    { id: 'alpha', c: 5, art: 'blocks', name: 'Alphabet Soup', ask: n => `Finish books starting with ${n} different letters`, goals: [3, 6, 10, 15, 20, 26] },
     { id: 'rainbow', c: 5, art: 'rainbow', name: 'Rainbow Shelf', ask: n => `Finish books in ${n} different cover colours`, goals: [3, 6, 12] },
     { id: 'juggle', c: 5, art: 'juggle', name: 'Juggler', ask: n => `Log ${n} different books on the same day`, goals: [2, 3, 4] },
     { id: 'dawn', c: 5, art: 'sunrise', name: 'Dawn to Dusk', ask: n => `Start and finish a book on the same day${n > 1 ? ', ' + n + ' times' : ''}`, goals: [1, 3, 5] },
@@ -12921,7 +12925,8 @@ Object.assign(ART, {
       R.relisten = reached(tapeAgain, BD[17].goals, 'sum'); R.decade = reached(gap, BD[18].goals, 'max');
       R.circle = reached(fin.filter(r => first.get(r.bi) !== r.end && first.get(r.bi) && first.get(r.bi).slice(5) === r.end.slice(5)).map(r => [r.end, 1]), [1], 'sum'); }
     // Fun
-    R.alpha = reached(distinct(fin, r => { const c = titleKey(r.b.title).charAt(0).toUpperCase(); return /[A-Z]/.test(c) ? c : null; }), BD[19].goals, 'sum');
+    bdLetters = new Set();
+    R.alpha = reached(distinct(fin, r => { const c = titleKey(r.b.title).charAt(0).toUpperCase(); if(/[A-Z]/.test(c)){ bdLetters.add(c); return c; } return null; }), BD[19].goals, 'sum');
     R.rainbow = reached(distinct(fin, r => bookColor(r.b)), BD[20].goals, 'sum');
     R.juggle = reached(dayList.map(([k, o]) => [k, o.books.size]), BD[21].goals, 'max');
     R.dawn = reached(fin.filter(r => r.start === r.end).map(r => [r.end, 1]), BD[22].goals, 'sum');
@@ -12977,7 +12982,7 @@ Object.assign(ART, {
   // earned dates are kept: a level earned stays earned, with the day it was first reached. They're kept by each level's
   // amount (not its place in the list), so a badge given new levels keeps what was earned; v3 kept them by place: moved over once
   const BD_STORE = 'stack-tracker-badges-v4', BD_OLD = 'stack-tracker-badges-v3';
-  const BD_WAS = {'bigday': [50, 100, 200, 300], 'summit': [400, 600, 800, 1000], 'steady': [10, 50, 100, 250], 'finished': [1, 10, 25, 50, 100], 'quick': [14, 7, 3], 'busy': [2, 3, 5], 'pocket': [1, 5, 10], 'spooky': [1, 3], 'holiday': [1, 3, 5]};   // the levels these had before v608 (to read v3's dates)
+  const BD_WAS = {'bigday': [50, 100, 200, 300], 'summit': [400, 600, 800, 1000], 'steady': [10, 50, 100, 250], 'finished': [1, 10, 25, 50, 100], 'quick': [14, 7, 3], 'busy': [2, 3, 5], 'pocket': [1, 5, 10], 'spooky': [1, 3], 'holiday': [1, 3, 5], 'alpha': [5, 13, 26]};   // the levels these had before v608 (to read v3's dates)
   function bdState(){
     let saved = null; try{ saved = JSON.parse(localStorage.getItem(BD_STORE) || 'null'); }catch(e){}
     if(!saved || typeof saved !== 'object'){ saved = {};
@@ -13014,6 +13019,7 @@ Object.assign(ART, {
   const bdFmt = (v, a) => v == null ? '—' : a.unit === 'min' ? `${Math.floor(v / 60)}h ${String(Math.round(v % 60)).padStart(2, '0')}m` : Math.round(v).toLocaleString('en-US');
   const bdNext = a => { const L = a.level; if(bdMax(a)) return 1; if(a.down) return a.value != null ? Math.min(.99, a.goals[L] / a.value) : 0;
     const lo = L ? a.goals[L - 1] : 0; return Math.max(0, Math.min(1, ((a.value || 0) - lo) / (a.goals[L] - lo))); };
+  var bdLetters = new Set();   // first letters of finished titles, for the Alphabet Soup strip
   let bdView = 'all', bdList = [], bdOpenId = null, bdSel = null;   // bdSel: the badge picked in Icons
   const bdWrap = document.getElementById('dt-view-badges');
   function bdCard(a){
@@ -13061,7 +13067,7 @@ Object.assign(ART, {
       c.nextElementSibling.classList.remove('open'); c.nextElementSibling.innerHTML = ''; });
     if(!dd || bdOpenId === id){ bdOpenId = null; bdWrap.classList.remove('bd-on'); return; }
     const a = bdList.find(x => x.id === id), L = a.level, M = bdMax(a), one = a.goals.length === 1, secret = a.hidden && !L;
-    dd.innerHTML = `<div class="bdd-in">` + (secret ? `<div class="bdd-note">A hidden badge. Keep reading to find out what it asks.</div>` :
+    dd.innerHTML = `<div class="bdd-in">` + (id === 'alpha' && !secret ? `<div class="bd-abc">${[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].map(c => `<i${bdLetters.has(c) ? ' class="on"' : ''}>${c}</i>`).join('')}</div>` : '') + (secret ? `<div class="bdd-note">A hidden badge. Keep reading to find out what it asks.</div>` :
       a.goals.map((g, k) => { const done = !!a.dates[k], now = !done && k === L;
         return `<div class="tier${done ? ' done' : ''}" style="--lc:${bdCol(a, k + 1)}"><span class="t-ck">${done ? '✓' : now ? '●' : ''}</span>` +
           `<span class="t-tx">${one ? '' : `<b>${k + 1}</b>`}${a.ask(g)}</span><span class="t-v">${done ? bdDay(a.dates[k]) : '—'}</span></div>`; }).join('')) + `</div>`;
