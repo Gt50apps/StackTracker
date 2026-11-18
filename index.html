@@ -12199,7 +12199,11 @@
   if(!prefs.backupSince){ prefs.backupSince = Date.now(); savePrefs(); }   // first run: count from now, not "overdue"
   // every backup is logged (the newest 40), for the shelf on the Backup tab; older data starts the log from its last backup
   if(!Array.isArray(prefs.backupLog)){ prefs.backupLog = prefs.lastBackup ? [prefs.lastBackup] : []; savePrefs(); }
-  function markBackedUp(){ prefs.lastBackup = Date.now(); prefs.backupLog = [prefs.lastBackup].concat(prefs.backupLog || []).slice(0, 40); prefs.backupSnooze = 0; savePrefs(); paintBackupTab(); }
+  // one entry per day: a second backup on the same day replaces that day's entry (as it replaces that day's file)
+  const bkDay = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
+  const bkOnePerDay = log => { const seen = new Set(); return log.slice().sort((a, b) => b - a).filter(t => { const k = bkDay(t); if(seen.has(k)) return false; seen.add(k); return true; }); };
+  if(bkOnePerDay(prefs.backupLog).length !== prefs.backupLog.length){ prefs.backupLog = bkOnePerDay(prefs.backupLog); savePrefs(); }   // tidy logs that already stacked
+  function markBackedUp(){ prefs.lastBackup = Date.now(); prefs.backupLog = bkOnePerDay([prefs.lastBackup].concat(prefs.backupLog || [])).slice(0, 40); prefs.backupSnooze = 0; savePrefs(); paintBackupTab(); }
   const fmtWhen = t => { const d = new Date(t); return d.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'}) + ', ' + d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'}); };
   function backupDueAt(){
     const every = BACKUP_EVERY[prefs.backupEvery];
