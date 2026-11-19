@@ -5047,7 +5047,7 @@
   function wireDDActions(dd, row, b){
     dd.querySelector('.dd-edit').addEventListener('click', e=>{ e.stopPropagation(); openEditModal(b); });
     const wb = dd.querySelector('.dd-words');
-    if(wb){ wdCount(wb, b); wb.addEventListener('click', e=>{ e.stopPropagation(); openWordsPage(b, () => wdCount(wb, b)); }); }
+    if(wb){ wb._book = b; try{ wdCount(wb, b); }catch(err){} }   // the tap itself is caught for the whole page, below
     dd.querySelector('.dd-log').addEventListener('click', e=>{
       e.stopPropagation();
       activeBookCtx = { book: b, fromList: true,
@@ -5072,15 +5072,30 @@
   function wdCount(btn, b){ const n = (b.words || []).length; btn.innerHTML = 'Words' + (n ? `<i class="wd-n">${n}</i>` : ''); }
   const wdPage = document.getElementById('words-page'), wdSave = document.getElementById('wd-save'), wdQ = document.getElementById('wd-q'), wdPg = document.getElementById('wd-page');
   let wdBook = null, wdFound = null, wdAt = 'mid', wdAfter = null;
+  // the window opens first; filling it in comes after, so nothing in a book's data can keep it from opening
   function openWordsPage(b, after){
     wdBook = b; wdAfter = after; wdFound = null; wdAt = 'mid';
-    document.getElementById('wd-title').textContent = b.title || 'Untitled';
-    document.getElementById('wd-author').textContent = b.author || '';
-    const read = Math.max(1, Math.min(bookRead(b) || 1, b.pages || 9999));
-    wdQ.value = ''; wdPg.value = read; wdFields();
-    wdPage.querySelectorAll('#wd-at .tab').forEach(x => x.classList.toggle('active', x.dataset.at === wdAt));
-    wdResult(); wdList(); wdPage.classList.add('open');
+    wdPage.classList.add('open');
+    try{
+      if(!Array.isArray(b.words)) delete b.words;
+      document.getElementById('wd-title').textContent = b.title || 'Untitled';
+      document.getElementById('wd-author').textContent = b.author || '';
+      let read = 1; try{ read = Math.max(1, Math.min(Math.round(bookRead(b)) || 1, b.pages || 99999)); }catch(e){}
+      wdQ.value = ''; wdPg.value = read; wdFields();
+      wdPage.querySelectorAll('#wd-at .tab').forEach(x => x.classList.toggle('active', x.dataset.at === wdAt));
+      wdResult(); wdList();
+    }catch(err){
+      document.getElementById('wd-res').innerHTML = `<div class="wd-note">Something went wrong opening Words: <b>${wdEsc(err && err.message || err)}</b></div>`;
+    }
   }
+  // any Words button in a book's dropdown, however that dropdown was built: caught here, before anything else can take the tap
+  document.addEventListener('click', e => {
+    const wb = e.target.closest && e.target.closest('.dd-words'); if(!wb) return;
+    const dd = wb.closest('.row-dd'), row = dd && dd.previousElementSibling, b = wb._book || (row && row._book);
+    if(!b) return;
+    e.stopPropagation(); e.preventDefault();
+    openWordsPage(b, () => { try{ wdCount(wb, b); }catch(err){} });
+  }, true);
   function closeWordsPage(){ wdPage.classList.remove('open'); if(wdAfter) wdAfter(); wdBook = null; }
   function wdFields(){ [wdQ, wdPg].forEach(i => i.closest('.cnt-card').classList.toggle('has', !!i.value)); }
   [wdQ, wdPg].forEach(i => i.addEventListener('input', wdFields));
