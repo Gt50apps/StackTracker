@@ -1065,6 +1065,70 @@
   }
   .lg-warn.show{display:block;}
   .lg-list{flex:1; overflow-y:auto; padding:0 4px 4px;}   /* the footer below takes the safe area */
+  /* ---- Words: the Reading Log's frame, the Edit window's fields ---- */
+  #words-page{position:fixed; inset:0; z-index:40; background:var(--bg); display:flex; flex-direction:column;
+    opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
+  #words-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
+  .lg-head > :is(#wd-done, #wd-save), .lg-head > :is(#wd-done, #wd-save):active{flex:0 0 25%; width:auto; height:42px; margin:0; padding:0 2px; border:0; border-radius:0; box-shadow:none;
+    background:var(--cb7a2f2b, #7a2f2b); background-clip:padding-box; color:var(--cfffffff, #ffffff); border-right:3px solid var(--cb000000, #000000);
+    font:700 min(.74rem, 2.95vw)/1.1 Arial, sans-serif; letter-spacing:0; text-transform:uppercase;}
+  .lg-head > h2 + #wd-save, .lg-head > h2 + #wd-save:active{background:var(--cb2e4636, #2e4636); border-right:0; border-left:3px solid var(--cb000000, #000000);}
+  #wd-save:disabled{opacity:1; color:rgba(255,255,255,.4); cursor:default;}
+  #wd-sum{padding:0;}
+  #wd-sum .lg-mid{flex:1; min-width:0; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:0 6px; text-align:center; line-height:1.05;}
+  #wd-sum .lg-mid > span{display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  #wd-sum .lg-range{font-size:.66rem; color:var(--ink);}
+  #wd-sum .lg-range > span:not(:empty)::before{content:' · '; white-space:pre; color:var(--muted);}
+  #wd-sum #wd-author{color:var(--muted);}
+  #wd-sum .lg-tot{font-size:.62rem;}
+  #wd-sum .lg-tot > span + span:not(:empty)::before{content:' · '; white-space:pre;}
+  #wd-body{display:flex; flex-direction:column; gap:4px; padding:4px;}
+  #wd-fields{flex:none; height:45px; grid-template-columns:minmax(0, 2fr) minmax(0, 1fr);}
+  #wd-fields .fc-half + .fc-half{border-left:3px solid var(--cb000000, #000000);}
+  #wd-body .cnt-card .cnt-lbl{left:4px; right:4px; text-align:center;}
+  #wd-body .cnt-card input{text-align:center; -moz-appearance:textfield; appearance:textfield;}
+  #wd-body .cnt-card input::-webkit-inner-spin-button, #wd-body .cnt-card input::-webkit-outer-spin-button{-webkit-appearance:none; margin:0;}
+  #wd-at{flex:none; height:31px;}
+  #wd-at .tab{padding:0; font-weight:700; font-size:min(.66rem, 2.7vw); text-transform:uppercase;}
+  #wd-res, #wd-saved{display:flex; flex-direction:column; gap:4px;}
+  #wd-saved:not(:empty){margin-top:6px;}
+  .wd-note{padding:10px 8px; text-align:center; font:400 .72rem/1.35 Arial, sans-serif; color:var(--muted);}
+  .wd-note b{color:var(--ink);}
+  #words-page .bd-strip{text-transform:uppercase; font:700 .6rem/1 Arial, sans-serif; letter-spacing:1px;}
+  #words-page .wd-strip{height:31px; gap:8px; text-transform:none; letter-spacing:0;}
+  .wd-strip span{font:700 .95rem/1 Georgia, serif;}
+  .wd-strip i{font:400 .7rem/1 Arial, sans-serif; font-style:normal; opacity:.85;}
+  .wd-say, .wd-say:active{width:20px; height:20px; min-width:0; margin:0; padding:0 0 0 2px; display:flex; align-items:center; justify-content:center; border:2px solid var(--cb000000, #000000); border-radius:50%;
+    background:var(--cbffffff, #ffffff); color:var(--cf000000, #000000); font:700 .5rem/1 Arial, sans-serif; box-shadow:none;}
+  .wd-own{flex:none; height:45px;}
+  /* rows: Log rows, their boxes Log's day boxes; the column headers match */
+  .wd-cols, .lg-list .lg-heads.wd-cols{display:grid; height:21px; box-sizing:border-box; margin:0; padding:0; border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;
+    grid-template-columns:96.5px minmax(0, 1fr) 51px 44.5px; gap:3px; background:var(--cb000000, #000000);}
+  .wd-cols span, .lg-list .lg-heads.wd-cols span{display:flex; align-items:center; justify-content:center; min-width:0; overflow:hidden; white-space:nowrap; background:var(--cbffffff, #ffffff);
+    font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; color:var(--ink); text-transform:uppercase;}
+  .wd-mcols, .lg-list .lg-heads.wd-mcols{grid-template-columns:80.5px minmax(0, 1fr);}
+  .lg-row.wd-row{grid-template-columns:92px minmax(0, 1fr) 50px 40px; cursor:pointer;}
+  .lg-row.wd-sense, .lg-row.wd-sense:active{grid-template-columns:76px minmax(0, 1fr); width:100%; height:auto; margin:0; text-align:left; text-transform:none; letter-spacing:0; box-shadow:none; color:var(--ink); font:inherit;}
+  .lg-row.wd-sense.on{background:var(--bg);}
+  .lg-row.wd-sense.on .lg-day.wd-pos{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
+  .wd-sense.on .wd-pos small{color:rgba(255,255,255,.8);}
+  .lg-day.wd-def{height:auto; min-height:40px; align-items:flex-start; text-align:left; padding:4px 8px; font:400 .74rem/1.3 Georgia, serif;}
+  .wd-def > span{display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+  .wd-def em{display:none; font:italic .7rem/1.3 Georgia, serif; color:var(--muted); margin-top:2px;}
+  .wd-sense .wd-def > span, .wd-row.open .wd-def > span{-webkit-line-clamp:unset;}
+  .wd-sense .wd-def em, .wd-row.open .wd-def em{display:block;}
+  .lg-row.wd-row.open{background:var(--bg);}
+  .wd-row.new{animation:wd-new 1.2s ease-out;}
+  @keyframes wd-new{0%{background:#fff3c4;} 100%{background:var(--cbffffff, #ffffff);}}
+  .lg-day.wd-word, .lg-day.wd-pg, .lg-day.wd-pos, .wd-row .lg-del{align-self:stretch; height:auto; min-height:40px;}
+  .wd-word b{font:700 .84rem/1.15 Georgia, serif; max-width:100%;}
+  .wd-pg b{font:600 .78rem/1.15 Georgia, serif;}
+  .wd-pos b{font:600 .9rem/1 Georgia, serif;}
+  :is(.wd-word, .wd-pg, .wd-pos) small{text-transform:uppercase; letter-spacing:.4px; font-size:.5rem; max-width:100%; overflow:hidden; text-overflow:ellipsis;}
+  /* the dropdown's Words button, with how many are saved */
+  .dd-words .wd-n{display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px; margin-left:4px; padding:0 3px; border-radius:8px; box-sizing:border-box;
+    background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff); font:700 .55rem/1 Arial, sans-serif; font-style:normal; vertical-align:1px;}
+
   .lg-heads{
     display:grid; grid-template-columns:62px minmax(0, 1fr) minmax(0, 1fr) 40px; gap:4px; padding:0 6px 4px 26px;
     font-family:Arial, sans-serif; font-size:.6rem; letter-spacing:.4px; text-transform:uppercase; color:var(--muted);
@@ -3835,6 +3899,26 @@
   <div class="tl-foot lg-foot"><button type="button" id="log-add-day" class="cloth-btn" data-cloth="#2b5752" style="--cloth:#2b5752"><canvas aria-hidden="true"></canvas><span class="lbl">Add Day</span></button></div>
 </div>
 
+<!-- Words: look up a word from a book and save it with the page and where on it (opened from a book's dropdown) -->
+<div id="words-page" role="dialog" aria-label="Words">
+  <div class="lg-head" style="--hw:25%">
+    <button type="button" id="wd-done">Close</button>
+    <h2>Words</h2>
+    <button type="button" id="wd-save" disabled>Save</button>
+  </div>
+  <div class="lg-top"><div class="lg-summary" id="wd-sum"><div class="lg-mid">
+    <span class="lg-range"><b id="wd-title"></b><span id="wd-author"></span></span>
+    <span class="lg-tot"><span id="wd-count"></span><span id="wd-last"></span></span>
+  </div></div></div>
+  <div class="lg-list" id="wd-body">
+    <div class="field-card split" id="wd-fields"><div class="fc-half cnt-card"><span class="cnt-lbl"><b>Word</b></span><input id="wd-q" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Word"></div><div class="fc-half cnt-card"><span class="cnt-lbl"><b>Page</b></span><input id="wd-page" type="number" inputmode="numeric" min="1" aria-label="Page"></div></div>
+    <div class="tabs" id="wd-at"><div class="tab" data-at="top">Top of page</div><div class="tab" data-at="mid">Middle</div><div class="tab" data-at="bot">Bottom</div></div>
+    <div id="wd-res"></div>
+    <div id="wd-saved"></div>
+  </div>
+  <div class="tl-foot lg-foot"><button type="button" id="wd-look" class="cloth-btn" data-cloth="#2b5752" style="--cloth:#2b5752"><canvas aria-hidden="true"></canvas><span class="lbl">Look Up</span></button></div>
+</div>
+
 <script type="text/st-later" data-src="three.min.js"></script>   <!-- Three.js r128, bundled so the app works offline -->
 <script type="text/st-later" data-fallback="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -4958,10 +5042,12 @@
   }
 
   // ---------- list dropdowns (one open at a time) ----------
-  const DD_ACTIONS = '<div class="dd-acts"><button type="button" class="dd-edit">Edit</button><button type="button" class="dd-log">Log</button><button type="button" class="dd-del">Delete</button></div>';
+  const DD_ACTIONS = '<div class="dd-acts"><button type="button" class="dd-edit">Edit</button><button type="button" class="dd-log">Log</button><button type="button" class="dd-words">Words</button><button type="button" class="dd-del">Delete</button></div>';
   // Edit / Log / Delete from a list dropdown, same as the open book's toolbar
   function wireDDActions(dd, row, b){
     dd.querySelector('.dd-edit').addEventListener('click', e=>{ e.stopPropagation(); openEditModal(b); });
+    const wb = dd.querySelector('.dd-words');
+    if(wb){ wdCount(wb, b); wb.addEventListener('click', e=>{ e.stopPropagation(); openWordsPage(b, () => wdCount(wb, b)); }); }
     dd.querySelector('.dd-log').addEventListener('click', e=>{
       e.stopPropagation();
       activeBookCtx = { book: b, fromList: true,
@@ -4976,6 +5062,91 @@
       clearTimeout(t);
       const i = books.indexOf(b); if(i > -1) books.splice(i, 1);
       renderAll();
+    });
+  }
+  // ---------- Words: look up a word from a book, save it with the page and where on it ----------
+  // saved on the book as b.words = [{ w, p, at:'top'|'mid'|'bot', t, ph, pos, def, ex }], so it goes into backups with the book;
+  // the meaning is kept with the word, so the list works offline. Meanings come from the free dictionary at dictionaryapi.dev.
+  const WD_AT = { top:'Top', mid:'Middle', bot:'Bottom' };
+  const wdEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]);
+  function wdCount(btn, b){ const n = (b.words || []).length; btn.innerHTML = 'Words' + (n ? `<i class="wd-n">${n}</i>` : ''); }
+  const wdPage = document.getElementById('words-page'), wdSave = document.getElementById('wd-save'), wdQ = document.getElementById('wd-q'), wdPg = document.getElementById('wd-page');
+  let wdBook = null, wdFound = null, wdAt = 'mid', wdAfter = null;
+  function openWordsPage(b, after){
+    wdBook = b; wdAfter = after; wdFound = null; wdAt = 'mid';
+    document.getElementById('wd-title').textContent = b.title || 'Untitled';
+    document.getElementById('wd-author').textContent = b.author || '';
+    const read = Math.max(1, Math.min(bookRead(b) || 1, b.pages || 9999));
+    wdQ.value = ''; wdPg.value = read; wdFields();
+    wdPage.querySelectorAll('#wd-at .tab').forEach(x => x.classList.toggle('active', x.dataset.at === wdAt));
+    wdResult(); wdList(); wdPage.classList.add('open');
+  }
+  function closeWordsPage(){ wdPage.classList.remove('open'); if(wdAfter) wdAfter(); wdBook = null; }
+  function wdFields(){ [wdQ, wdPg].forEach(i => i.closest('.cnt-card').classList.toggle('has', !!i.value)); }
+  [wdQ, wdPg].forEach(i => i.addEventListener('input', wdFields));
+  document.getElementById('wd-done').addEventListener('click', closeWordsPage);
+  document.getElementById('wd-look').addEventListener('click', () => { if(wdQ.value.trim()) wdLookUp(wdQ.value); else wdQ.focus(); });
+  wdQ.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); wdQ.blur(); wdLookUp(wdQ.value); } });
+  wdPage.querySelectorAll('#wd-at .tab').forEach(x => x.addEventListener('click', () => { wdAt = x.dataset.at; wdPage.querySelectorAll('#wd-at .tab').forEach(y => y.classList.toggle('active', y === x)); }));
+  async function wdLookUp(q){
+    q = q.trim().toLowerCase(); if(!q) return;
+    const res = document.getElementById('wd-res'); res.innerHTML = `<div class="wd-note">Looking up <b>${wdEsc(q)}</b>…</div>`;
+    try{
+      const r = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(q));
+      if(r.status === 404) wdFound = { w:q, miss:true };
+      else if(!r.ok) throw new Error(r.status);
+      else {
+        const e = (await r.json())[0], ph = e.phonetic || ((e.phonetics || []).find(p => p.text) || {}).text || '', au = ((e.phonetics || []).find(p => p.audio) || {}).audio || '';
+        wdFound = { w:e.word || q, ph, au, pick:0,
+          senses:(e.meanings || []).flatMap(m => (m.definitions || []).slice(0, 2).map(d => ({ pos:m.partOfSpeech || '', def:d.definition || '', ex:d.example || '' }))).slice(0, 4) };
+        if(!wdFound.senses.length) wdFound = { w:q, miss:true };
+      }
+    }catch(err){ wdFound = { w:q, miss:true, offline:true }; }
+    if(wdQ.value.trim().toLowerCase() === q) wdResult();
+  }
+  function wdResult(){
+    const res = document.getElementById('wd-res'), f = wdFound; wdSave.disabled = !f;
+    if(!f){ res.innerHTML = `<div class="wd-note">Type a word and tap <b>Look Up</b>. Pick its meaning, then <b>Save</b>.</div>`; return; }
+    const strip = `<div class="bd-strip wd-strip"><span>${wdEsc(f.w)}</span>${f.ph ? `<i>${wdEsc(f.ph)}</i>` : ''}${f.au ? `<button type="button" class="wd-say" aria-label="Say it">▶</button>` : ''}</div>`;
+    if(f.miss){
+      res.innerHTML = strip + `<div class="wd-note">${f.offline ? "The dictionary can't be reached right now." : 'No dictionary entry for this word.'} Save it with your own meaning:</div>` +
+        `<div class="field-card cnt-card wd-own"><span class="cnt-lbl"><b>Meaning</b></span><input id="wd-own-in" autocomplete="off" aria-label="Meaning"></div>`;
+      const oi = document.getElementById('wd-own-in'); oi.addEventListener('input', () => oi.closest('.cnt-card').classList.toggle('has', !!oi.value)); return;
+    }
+    res.innerHTML = strip + `<div class="lg-heads wd-cols wd-mcols"><span>Type</span><span>Meaning</span></div><div class="lg-rows">` +
+      f.senses.map((x, i) => `<button type="button" class="lg-row wd-sense${i === f.pick ? ' on' : ''}" data-i="${i}"><span class="lg-day wd-pos"><b>${i + 1}</b><small>${wdEsc(x.pos)}</small></span>` +
+        `<span class="lg-day wd-def"><span>${wdEsc(x.def)}</span>${x.ex ? `<em>“${wdEsc(x.ex)}”</em>` : ''}</span></button>`).join('') + `</div>`;
+    res.querySelectorAll('.wd-sense').forEach(x => x.addEventListener('click', () => { f.pick = +x.dataset.i; res.querySelectorAll('.wd-sense').forEach(y => y.classList.toggle('on', y === x)); }));
+    const say = res.querySelector('.wd-say'); if(say) say.addEventListener('click', () => { try{ new Audio(f.au).play(); }catch(e){} });
+  }
+  wdSave.addEventListener('click', () => {
+    const b = wdBook, f = wdFound; if(!b || !f) return;
+    const p = Math.max(1, Math.min(b.pages || 99999, parseInt(wdPg.value, 10) || 1));
+    let w;
+    if(f.miss){ const own = ((document.getElementById('wd-own-in') || {}).value || '').trim(); w = { w:f.w, p, at:wdAt, t:Date.now(), ph:'', pos:'', def:own || 'No meaning saved.' }; }
+    else { const x = f.senses[f.pick]; w = { w:f.w, p, at:wdAt, t:Date.now(), ph:f.ph || '', pos:x.pos, def:x.def, ex:x.ex || '' }; }
+    if(!w.ex) delete w.ex; if(!w.ph) delete w.ph; if(!w.pos) delete w.pos;
+    b.words = (b.words || []).filter(x => !(x.w === w.w && x.p === w.p)).concat(w);
+    saveBooks();
+    wdFound = null; wdQ.value = ''; wdFields(); wdResult(); wdList(w.w);
+  });
+  // the book's words, in page order: Log-style rows — word | meaning | page | delete; tap one to read all of it
+  function wdList(flash){
+    const b = wdBook, list = (b.words || []).slice().sort((x, y) => x.p - y.p || x.t - y.t), el = document.getElementById('wd-saved');
+    document.getElementById('wd-count').innerHTML = list.length ? `<b>${list.length}</b> ${list.length === 1 ? 'word' : 'words'} saved` : 'No words saved yet';
+    const last = list.length ? list.slice().sort((x, y) => y.t - x.t)[0].p : null;
+    document.getElementById('wd-last').innerHTML = last ? `latest on <b>p. ${last}</b>` : '';
+    el.innerHTML = list.length ? `<div class="bd-strip">Saved from this book</div><div class="lg-heads wd-cols"><span>Word</span><span>Meaning</span><span>Page</span><span>Delete</span></div><div class="lg-rows">` +
+      list.map(x => `<div class="lg-row wd-row" data-t="${x.t}"><span class="lg-day wd-word"><b>${wdEsc(x.w)}</b><small>${wdEsc(x.pos || '—')}</small></span>` +
+        `<span class="lg-day wd-def"><span>${wdEsc(x.def)}</span>${x.ex ? `<em>“${wdEsc(x.ex)}”</em>` : ''}</span>` +
+        `<span class="lg-day wd-pg"><b>p. ${x.p}</b><small>${WD_AT[x.at] || ''}</small></span><button type="button" class="lg-del" title="Delete word">✕</button></div>`).join('') + `</div>` : '';
+    el.querySelectorAll('.wd-row').forEach(r => {
+      r.addEventListener('click', e => { if(!e.target.closest('.lg-del')) r.classList.toggle('open'); });
+      const del = r.querySelector('.lg-del'); let armed = false, t = 0;
+      del.addEventListener('click', e => { e.stopPropagation();
+        if(!armed){ armed = true; del.classList.add('armed'); t = setTimeout(() => { armed = false; del.classList.remove('armed'); }, 3000); return; }
+        clearTimeout(t); b.words = (b.words || []).filter(x => String(x.t) !== r.dataset.t); if(!b.words.length) delete b.words; saveBooks(); wdList(); });
+      if(flash && r.querySelector('.wd-word b').textContent === flash){ r.classList.add('new'); r.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
     });
   }
   // while a dropdown is open, everything but the header, the footer and that card (with its dropdown) is dimmed;
