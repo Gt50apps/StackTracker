@@ -1065,7 +1065,7 @@
   }
   .lg-warn.show{display:block;}
   .lg-list{flex:1; overflow-y:auto; padding:0 4px 4px;}   /* the footer below takes the safe area */
-  /* ---- Words: the Reading Log's frame, the Edit window's fields ---- */
+  /* ---- Words: the Reading Log's frame, the Edit window's fields, each word a card ---- */
   #words-page{position:fixed; inset:0; z-index:40; background:var(--bg); display:flex; flex-direction:column;
     opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 0s linear 180ms;}
   #words-page.open{opacity:1; visibility:visible; transition:opacity 180ms ease, visibility 0s;}
@@ -1082,49 +1082,52 @@
   #wd-sum #wd-author{color:var(--muted);}
   #wd-sum .lg-tot{font-size:.62rem;}
   #wd-sum .lg-tot > span + span:not(:empty)::before{content:' · '; white-space:pre;}
-  #wd-body{display:flex; flex-direction:column; gap:4px; padding:4px;}
-  #wd-fields{flex:none; height:45px; grid-template-columns:minmax(0, 2fr) minmax(0, 1fr);}
-  #wd-fields .fc-half + .fc-half{border-left:3px solid var(--cb000000, #000000);}
-  #wd-body .cnt-card .cnt-lbl{left:4px; right:4px; text-align:center;}
-  #wd-body .cnt-card input{text-align:center; -moz-appearance:textfield; appearance:textfield;}
-  #wd-body .cnt-card input::-webkit-inner-spin-button, #wd-body .cnt-card input::-webkit-outer-spin-button{-webkit-appearance:none; margin:0;}
-  #wd-at{flex:none; height:31px;}
+  #wd-body{display:flex; flex-direction:column; gap:4px; padding:4px 4px calc(8px + env(safe-area-inset-bottom));}
+  #wd-body > *, #wd-res > *, #wd-saved > *{flex:none;}
+  /* the search card: the word (3/4) | Look Up (1/4) */
+  #wd-find.field-card{display:grid !important; grid-template-columns:minmax(0, 3fr) minmax(0, 1fr) !important; grid-template-rows:100% !important; flex-direction:row; height:45px; padding:0; overflow:hidden;}
+  #wd-find > *{grid-row:1;} #wd-find > .cnt-card{grid-column:1;} #wd-find > #wd-look{grid-column:2;}
+  #wd-find .cnt-card{position:relative; border:0; border-radius:0; height:100%; min-width:0;}
+  #wd-find .cnt-lbl{left:4px; right:4px; text-align:center;}
+  #wd-find input{text-align:center;}
+  #wd-look, #wd-look:active{height:100%; width:auto; min-width:0; margin:0; padding:0 2px; border:0; border-left:3px solid var(--cb000000, #000000); border-radius:0; box-shadow:none;
+    background:var(--cb2e4636, #2e4636); color:var(--cfffffff, #ffffff); font:700 min(.7rem, 2.8vw)/1.1 Arial, sans-serif; letter-spacing:.3px; text-transform:uppercase;}
+  /* Top | Middle | Bottom (3/4) and the page wheel (1/4), on one line */
+  #wd-where{display:flex; gap:4px; height:45px;}
+  #wd-at{flex:3 1 0; min-width:0; height:100%;}
   #wd-at .tab{padding:0; font-weight:700; font-size:min(.66rem, 2.7vw); text-transform:uppercase;}
-  #wd-res, #wd-saved{display:flex; flex-direction:column; gap:4px;}
-  #wd-saved:not(:empty){margin-top:6px;}
+  #wd-pgset{flex:1 1 0; min-width:0; height:100%; box-sizing:border-box; border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff);}
   .wd-note{padding:10px 8px; text-align:center; font:400 .72rem/1.35 Arial, sans-serif; color:var(--muted);}
   .wd-note b{color:var(--ink);}
   #words-page .bd-strip{text-transform:uppercase; font:700 .6rem/1 Arial, sans-serif; letter-spacing:1px;}
   #words-page .wd-strip{height:31px; gap:8px; text-transform:none; letter-spacing:0;}
   .wd-strip span{font:700 .95rem/1 Georgia, serif;}
-  .wd-strip i{font:400 .7rem/1 Arial, sans-serif; font-style:normal; opacity:.85;}
-  .wd-say, .wd-say:active{width:20px; height:20px; min-width:0; margin:0; padding:0 0 0 2px; display:flex; align-items:center; justify-content:center; border:2px solid var(--cb000000, #000000); border-radius:50%;
-    background:var(--cbffffff, #ffffff); color:var(--cf000000, #000000); font:700 .5rem/1 Arial, sans-serif; box-shadow:none;}
-  .wd-own{flex:none; height:45px;}
-  /* rows: Log rows, their boxes Log's day boxes; the column headers match */
-  .wd-cols, .lg-list .lg-heads.wd-cols{display:grid; height:21px; box-sizing:border-box; margin:0; padding:0; border:3px solid var(--cb000000, #000000); border-radius:8px; overflow:hidden;
-    grid-template-columns:96.5px minmax(0, 1fr) 51px 44.5px; gap:3px; background:var(--cb000000, #000000);}
-  .wd-cols span, .lg-list .lg-heads.wd-cols span{display:flex; align-items:center; justify-content:center; min-width:0; overflow:hidden; white-space:nowrap; background:var(--cbffffff, #ffffff);
-    font:700 min(.6rem, 2.5vw)/1 Arial, sans-serif; letter-spacing:.3px; color:var(--ink); text-transform:uppercase;}
-  .wd-mcols, .lg-list .lg-heads.wd-mcols{grid-template-columns:80.5px minmax(0, 1fr);}
-  .lg-row.wd-row{grid-template-columns:92px minmax(0, 1fr) 50px 40px; cursor:pointer;}
-  .lg-row.wd-sense, .lg-row.wd-sense:active{grid-template-columns:76px minmax(0, 1fr); width:100%; height:auto; margin:0; text-align:left; text-transform:none; letter-spacing:0; box-shadow:none; color:var(--ink); font:inherit;}
-  .lg-row.wd-sense.on{background:var(--bg);}
-  .lg-row.wd-sense.on .lg-day.wd-pos{background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff);}
-  .wd-sense.on .wd-pos small{color:rgba(255,255,255,.8);}
-  .lg-day.wd-def{height:auto; min-height:40px; align-items:flex-start; text-align:left; padding:4px 8px; font:400 .74rem/1.3 Georgia, serif;}
-  .wd-def > span{display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
-  .wd-def em{display:none; font:italic .7rem/1.3 Georgia, serif; color:var(--muted); margin-top:2px;}
-  .wd-sense .wd-def > span, .wd-row.open .wd-def > span{-webkit-line-clamp:unset;}
-  .wd-sense .wd-def em, .wd-row.open .wd-def em{display:block;}
-  .lg-row.wd-row.open{background:var(--bg);}
-  .wd-row.new{animation:wd-new 1.2s ease-out;}
+  .wd-own{height:45px;}
+  #wd-saved{display:flex; flex-direction:column; gap:4px;}
+  #wd-saved:not(:empty){margin-top:6px;}
+  .wd-pick{grid-template-columns:repeat(var(--n, 3), 1fr) !important;}
+  .wd-pick button{text-transform:uppercase;}
+  /* a word's card */
+  .wd-cards{display:flex; flex-direction:column; gap:4px;}
+  .wd-card{border:3px solid var(--cb000000, #000000); border-radius:8px; background:var(--cbffffff, #ffffff); overflow:hidden;}
+  .wd-card.new{animation:wd-new 1.2s ease-out;}
   @keyframes wd-new{0%{background:#fff3c4;} 100%{background:var(--cbffffff, #ffffff);}}
-  .lg-day.wd-word, .lg-day.wd-pg, .lg-day.wd-pos, .wd-row .lg-del{align-self:stretch; height:auto; min-height:40px;}
-  .wd-word b{font:700 .84rem/1.15 Georgia, serif; max-width:100%;}
-  .wd-pg b{font:600 .78rem/1.15 Georgia, serif;}
-  .wd-pos b{font:600 .9rem/1 Georgia, serif;}
-  :is(.wd-word, .wd-pg, .wd-pos) small{text-transform:uppercase; letter-spacing:.4px; font-size:.5rem; max-width:100%; overflow:hidden; text-overflow:ellipsis;}
+  .wd-c-top{display:flex; align-items:baseline; gap:8px; padding:7px 10px 3px;}
+  .wd-c-top b{font:700 1.05rem/1.1 Georgia, serif; color:var(--ink);}
+  .wd-c-top i{font:400 .68rem/1 Arial, sans-serif; font-style:normal; color:var(--muted);}
+  .wd-c-pos{margin-left:auto; font:700 .52rem/1 Arial, sans-serif; letter-spacing:.8px; text-transform:uppercase; color:var(--muted);}
+  .wd-c-def{padding:0 10px 8px; font:400 .8rem/1.35 Georgia, serif; color:var(--ink);}
+  .wd-c-def em{display:block; margin-top:3px; font:italic .72rem/1.3 Georgia, serif; color:var(--muted);}
+  .wd-card .wd-c-bot{display:grid; grid-template-columns:1fr 1fr 1fr; border-top:3px solid var(--cb000000, #000000); height:34px;}
+  .wd-c-bot > *{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-width:0;}
+  .wd-c-bot > * + *{border-left:3px solid var(--cb000000, #000000);}
+  .wd-c-bot small{font:700 .48rem/1 Arial, sans-serif; letter-spacing:.6px; text-transform:uppercase; color:var(--muted);}
+  .wd-c-bot b{font:600 .8rem/1 Georgia, serif; color:var(--ink);}
+  .wd-c-bot > .wd-c-del, .wd-c-bot > .wd-c-del:active{grid-column:3; grid-row:1; position:static; height:100%; width:auto; min-width:0; margin:0; padding:0; border:0; border-left:3px solid var(--cb000000, #000000);
+    border-radius:0; box-shadow:none; background:var(--cbffffff, #ffffff); color:var(--cfb3261e, #b3261e); font:700 .6rem/1 Arial, sans-serif; letter-spacing:.6px; text-transform:uppercase;}
+  .wd-c-bot > .wd-c-del.armed{background:var(--cbb3261e, #b3261e); color:var(--cfffffff, #ffffff);}
+  .wd-say, .wd-say:active{align-self:center; width:20px; height:20px; min-width:0; margin:0; padding:0 0 0 2px; display:flex; align-items:center; justify-content:center; border:2px solid var(--cb000000, #000000); border-radius:50%;
+    background:var(--cbffffff, #ffffff); color:var(--cf000000, #000000); font:700 .5rem/1 Arial, sans-serif; box-shadow:none;}
   /* the dropdown's Words button, with how many are saved */
   .dd-words .wd-n{display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px; margin-left:4px; padding:0 3px; border-radius:8px; box-sizing:border-box;
     background:var(--ink-bg, var(--ink)); color:var(--cfffffff, #ffffff); font:700 .55rem/1 Arial, sans-serif; font-style:normal; vertical-align:1px;}
@@ -3911,12 +3914,12 @@
     <span class="lg-tot"><span id="wd-count"></span><span id="wd-last"></span></span>
   </div></div></div>
   <div class="lg-list" id="wd-body">
-    <div class="field-card split" id="wd-fields"><div class="fc-half cnt-card"><span class="cnt-lbl"><b>Word</b></span><input id="wd-q" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Word"></div><div class="fc-half cnt-card"><span class="cnt-lbl"><b>Page</b></span><input id="wd-page" type="number" inputmode="numeric" min="1" aria-label="Page"></div></div>
-    <div class="tabs" id="wd-at"><div class="tab" data-at="top">Top of page</div><div class="tab" data-at="mid">Middle</div><div class="tab" data-at="bot">Bottom</div></div>
+    <div class="field-card" id="wd-find"><div class="cnt-card"><span class="cnt-lbl"><b>Word</b></span><input id="wd-q" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Word"></div><button type="button" id="wd-look">Look Up</button></div>
+    <div id="wd-where"><div class="tabs" id="wd-at"><div class="tab" data-at="top">Top</div><div class="tab" data-at="mid">Middle</div><div class="tab" data-at="bot">Bottom</div></div>
+      <div class="field-card ld-set" id="wd-pgset" aria-label="Page"><div class="lw-wheel" id="wd-pgw"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><span class="tw-tag">PAGE</span></div></div></div>
     <div id="wd-res"></div>
     <div id="wd-saved"></div>
   </div>
-  <div class="tl-foot lg-foot"><button type="button" id="wd-look" class="cloth-btn" data-cloth="#2b5752" style="--cloth:#2b5752"><canvas aria-hidden="true"></canvas><span class="lbl">Look Up</span></button></div>
 </div>
 
 <script type="text/st-later" data-src="three.min.js"></script>   <!-- Three.js r128, bundled so the app works offline -->
@@ -5067,22 +5070,53 @@
   // ---------- Words: look up a word from a book, save it with the page and where on it ----------
   // saved on the book as b.words = [{ w, p, at:'top'|'mid'|'bot', t, ph, pos, def, ex }], so it goes into backups with the book;
   // the meaning is kept with the word, so the list works offline. Meanings come from the free dictionary at dictionaryapi.dev.
+  // Each word shows as a card; the list runs from the latest page in the book to the first.
   const WD_AT = { top:'Top', mid:'Middle', bot:'Bottom' };
   const wdEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]);
   function wdCount(btn, b){ const n = (b.words || []).length; btn.innerHTML = 'Words' + (n ? `<i class="wd-n">${n}</i>` : ''); }
-  const wdPage = document.getElementById('words-page'), wdSave = document.getElementById('wd-save'), wdQ = document.getElementById('wd-q'), wdPg = document.getElementById('wd-page');
-  let wdBook = null, wdFound = null, wdAt = 'mid', wdAfter = null;
+  const wdPage = document.getElementById('words-page'), wdSave = document.getElementById('wd-save'), wdQ = document.getElementById('wd-q');
+  let wdBook = null, wdFound = null, wdAt = 'mid', wdAfter = null, wdPg = 1, wdBusy = false;
+  // the page wheel: the app's drum wheel, from page 1 to the book's last page
+  const wdWheel = (function(w){
+    const rows = [...w.querySelectorAll('div')]; let pos = 0, af = 0, hc = null, drag = null;
+    const n = () => Math.max(1, (wdBook && wdBook.pages) || 1);
+    function render(){ const c = Math.round(pos);
+      if(hc !== c){ if(hc != null && window.hapticTick) window.hapticTick(); hc = c; }
+      rows.forEach((row, i) => { const idx = c - 3 + i, txt = idx >= 0 && idx < n() ? String(idx + 1) : '';
+        if(row._t !== txt){ row.textContent = txt; row._t = txt; }
+        const y = (idx - pos) * 16; row.style.transform = 'translateY(' + (11.5 + y).toFixed(2) + 'px)';
+        const t = Math.min(1, Math.abs(y) / 20); let op = 1 - 0.8 * t * t * (3 - 2 * t);
+        const q = Math.max(0, Math.min(1, (y + 16 * .45) / (16 * .25))); op *= q * q * (3 - 2 * q);   // cut off under the PAGE tag
+        row.style.opacity = op.toFixed(3); }); }
+    const clamp = () => { const m = n() - 1, c = Math.max(0, Math.min(m, pos)), hit = c !== pos; pos = c; wdPg = Math.round(pos) + 1; render(); return hit; };
+    function snap(){ const from = pos, to = Math.round(from); let st = null;
+      const f = ts => { if(st === null) st = ts; const t = Math.min(1, (ts - st) / 110); pos = from + (to - from) * (1 - Math.pow(1 - t, 3)); clamp(); if(t < 1) af = requestAnimationFrame(f); };
+      af = requestAnimationFrame(f); }
+    function glide(v){ if(Math.abs(v) < 2){ snap(); return; } let last = null;
+      const step = ts => { if(last === null){ last = ts; af = requestAnimationFrame(step); return; }
+        const dt = Math.min(.04, (ts - last) / 1000); last = ts; pos += v * dt; v *= Math.exp(-5 * dt); if(clamp()) v = 0;
+        if(Math.abs(v) < 2){ snap(); return; } af = requestAnimationFrame(step); };
+      af = requestAnimationFrame(step); }
+    w.addEventListener('pointerdown', e => { cancelAnimationFrame(af); drag = { y: e.clientY, pos, s: [{ t: e.timeStamp, y: e.clientY }] }; w.setPointerCapture(e.pointerId); e.preventDefault(); });
+    w.addEventListener('pointermove', e => { if(!drag) return; pos = drag.pos - (e.clientY - drag.y) / 16; clamp();
+      drag.s.push({ t: e.timeStamp, y: e.clientY }); while(drag.s.length > 1 && e.timeStamp - drag.s[0].t > 100) drag.s.shift(); });
+    const up = () => { if(!drag) return; const a = drag.s[0], b = drag.s[drag.s.length - 1];
+      const v = b.t > a.t ? -((b.y - a.y) / (b.t - a.t)) * 1000 / 16 : 0; drag = null; glide(v); };
+    w.addEventListener('pointerup', up); w.addEventListener('pointercancel', up);
+    w.addEventListener('wheel', e => { e.preventDefault(); cancelAnimationFrame(af); pos = Math.round(pos) + (e.deltaY > 0 ? 1 : -1); clamp(); }, { passive: false });
+    return { set(p){ cancelAnimationFrame(af); pos = p - 1; clamp(); } };
+  })(document.getElementById('wd-pgw'));
   // the window opens first; filling it in comes after, so nothing in a book's data can keep it from opening
   function openWordsPage(b, after){
-    wdBook = b; wdAfter = after; wdFound = null; wdAt = 'mid';
+    wdBook = b; wdAfter = after; wdFound = null; wdBusy = false; wdAt = 'mid';
     wdPage.classList.add('open');
     try{
       if(!Array.isArray(b.words)) delete b.words;
       document.getElementById('wd-title').textContent = b.title || 'Untitled';
       document.getElementById('wd-author').textContent = b.author || '';
-      let read = 1; try{ read = Math.max(1, Math.min(Math.round(bookRead(b)) || 1, b.pages || 99999)); }catch(e){}
-      wdQ.value = ''; wdPg.value = read; wdFields();
-      wdPage.querySelectorAll('#wd-at .tab').forEach(x => x.classList.toggle('active', x.dataset.at === wdAt));
+      let read = 1; try{ read = Math.max(1, Math.min(Math.round(bookRead(b)) || 1, b.pages || 1)); }catch(e){}
+      wdQ.value = ''; wdFields(); wdWheel.set(read); wdAtPaint();
+      document.getElementById('wd-body').scrollTop = 0;
       wdResult(); wdList();
     }catch(err){
       document.getElementById('wd-res').innerHTML = `<div class="wd-note">Something went wrong opening Words: <b>${wdEsc(err && err.message || err)}</b></div>`;
@@ -5097,15 +5131,16 @@
     openWordsPage(b, () => { try{ wdCount(wb, b); }catch(err){} });
   }, true);
   function closeWordsPage(){ wdPage.classList.remove('open'); if(wdAfter) wdAfter(); wdBook = null; }
-  function wdFields(){ [wdQ, wdPg].forEach(i => i.closest('.cnt-card').classList.toggle('has', !!i.value)); }
-  [wdQ, wdPg].forEach(i => i.addEventListener('input', wdFields));
+  function wdFields(){ wdQ.closest('.cnt-card').classList.toggle('has', !!wdQ.value); }
+  const wdAtPaint = () => wdPage.querySelectorAll('#wd-at .tab').forEach(x => x.classList.toggle('active', x.dataset.at === wdAt));
+  wdQ.addEventListener('input', wdFields);
   document.getElementById('wd-done').addEventListener('click', closeWordsPage);
-  document.getElementById('wd-look').addEventListener('click', () => { if(wdQ.value.trim()) wdLookUp(wdQ.value); else wdQ.focus(); });
+  document.getElementById('wd-look').addEventListener('click', () => { if(wdQ.value.trim()){ wdQ.blur(); wdLookUp(wdQ.value); } else wdQ.focus(); });
   wdQ.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); wdQ.blur(); wdLookUp(wdQ.value); } });
-  wdPage.querySelectorAll('#wd-at .tab').forEach(x => x.addEventListener('click', () => { wdAt = x.dataset.at; wdPage.querySelectorAll('#wd-at .tab').forEach(y => y.classList.toggle('active', y === x)); }));
+  wdPage.querySelectorAll('#wd-at .tab').forEach(x => x.addEventListener('click', () => { wdAt = x.dataset.at; wdAtPaint(); }));
   async function wdLookUp(q){
     q = q.trim().toLowerCase(); if(!q) return;
-    const res = document.getElementById('wd-res'); res.innerHTML = `<div class="wd-note">Looking up <b>${wdEsc(q)}</b>…</div>`;
+    wdBusy = true; wdFound = null; wdResult(q);
     try{
       const r = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(q));
       if(r.status === 404) wdFound = { w:q, miss:true };
@@ -5117,51 +5152,52 @@
         if(!wdFound.senses.length) wdFound = { w:q, miss:true };
       }
     }catch(err){ wdFound = { w:q, miss:true, offline:true }; }
-    if(wdQ.value.trim().toLowerCase() === q) wdResult();
+    wdBusy = false;
+    if(wdQ.value.trim().toLowerCase() === q) wdResult(); else wdFound = null;
   }
-  function wdResult(){
+  // a word as a card: the word, how it sounds and its type; its meaning and example; page | where | delete
+  const wdCard = (x, live) => `<div class="wd-card${live ? ' live' : ''}"${live ? '' : ` data-t="${x.t}"`}>` +
+    `<div class="wd-c-top"><b>${wdEsc(x.w)}</b>${x.ph ? `<i>${wdEsc(x.ph)}</i>` : ''}${live && x.au ? `<button type="button" class="wd-say" aria-label="Say it">▶</button>` : ''}<span class="wd-c-pos">${wdEsc(x.pos || '')}</span></div>` +
+    `<div class="wd-c-def">${wdEsc(x.def)}${x.ex ? `<em>“${wdEsc(x.ex)}”</em>` : ''}</div>` +
+    (live ? '' : `<div class="wd-c-bot"><span><small>Page</small><b>${x.p}</b></span><span><small>On page</small><b>${WD_AT[x.at] || ''}</b></span><button type="button" class="wd-c-del">Delete</button></div>`) + `</div>`;
+  function wdResult(q){
     const res = document.getElementById('wd-res'), f = wdFound; wdSave.disabled = !f;
+    if(wdBusy){ res.innerHTML = `<div class="wd-note">Looking up <b>${wdEsc(q || '')}</b>…</div>`; return; }
     if(!f){ res.innerHTML = `<div class="wd-note">Type a word and tap <b>Look Up</b>. Pick its meaning, then <b>Save</b>.</div>`; return; }
-    const strip = `<div class="bd-strip wd-strip"><span>${wdEsc(f.w)}</span>${f.ph ? `<i>${wdEsc(f.ph)}</i>` : ''}${f.au ? `<button type="button" class="wd-say" aria-label="Say it">▶</button>` : ''}</div>`;
     if(f.miss){
-      res.innerHTML = strip + `<div class="wd-note">${f.offline ? "The dictionary can't be reached right now." : 'No dictionary entry for this word.'} Save it with your own meaning:</div>` +
+      res.innerHTML = `<div class="bd-strip wd-strip"><span>${wdEsc(f.w)}</span></div><div class="wd-note">${f.offline ? "The dictionary can't be reached right now." : 'No dictionary entry for this word.'} Save it with your own meaning:</div>` +
         `<div class="field-card cnt-card wd-own"><span class="cnt-lbl"><b>Meaning</b></span><input id="wd-own-in" autocomplete="off" aria-label="Meaning"></div>`;
       const oi = document.getElementById('wd-own-in'); oi.addEventListener('input', () => oi.closest('.cnt-card').classList.toggle('has', !!oi.value)); return;
     }
-    res.innerHTML = strip + `<div class="lg-heads wd-cols wd-mcols"><span>Type</span><span>Meaning</span></div><div class="lg-rows">` +
-      f.senses.map((x, i) => `<button type="button" class="lg-row wd-sense${i === f.pick ? ' on' : ''}" data-i="${i}"><span class="lg-day wd-pos"><b>${i + 1}</b><small>${wdEsc(x.pos)}</small></span>` +
-        `<span class="lg-day wd-def"><span>${wdEsc(x.def)}</span>${x.ex ? `<em>“${wdEsc(x.ex)}”</em>` : ''}</span></button>`).join('') + `</div>`;
-    res.querySelectorAll('.wd-sense').forEach(x => x.addEventListener('click', () => { f.pick = +x.dataset.i; res.querySelectorAll('.wd-sense').forEach(y => y.classList.toggle('on', y === x)); }));
+    const x = f.senses[f.pick];
+    res.innerHTML = (f.senses.length > 1 ? `<div class="bd-seg wd-pick" style="--n:${f.senses.length}">${f.senses.map((s, i) => `<button type="button" class="${i === f.pick ? 'on' : ''}" data-i="${i}">${i + 1} · ${wdEsc(s.pos)}</button>`).join('')}</div>` : '') +
+      wdCard({ w:f.w, ph:f.ph, au:f.au, pos:x.pos, def:x.def, ex:x.ex }, true);
+    res.querySelectorAll('.wd-pick button').forEach(btn => btn.addEventListener('click', () => { f.pick = +btn.dataset.i; wdResult(); }));
     const say = res.querySelector('.wd-say'); if(say) say.addEventListener('click', () => { try{ new Audio(f.au).play(); }catch(e){} });
   }
   wdSave.addEventListener('click', () => {
     const b = wdBook, f = wdFound; if(!b || !f) return;
-    const p = Math.max(1, Math.min(b.pages || 99999, parseInt(wdPg.value, 10) || 1));
+    const p = Math.max(1, Math.min(b.pages || 99999, wdPg || 1));
     let w;
-    if(f.miss){ const own = ((document.getElementById('wd-own-in') || {}).value || '').trim(); w = { w:f.w, p, at:wdAt, t:Date.now(), ph:'', pos:'', def:own || 'No meaning saved.' }; }
+    if(f.miss){ const own = ((document.getElementById('wd-own-in') || {}).value || '').trim(); w = { w:f.w, p, at:wdAt, t:Date.now(), def:own || 'No meaning saved.' }; }
     else { const x = f.senses[f.pick]; w = { w:f.w, p, at:wdAt, t:Date.now(), ph:f.ph || '', pos:x.pos, def:x.def, ex:x.ex || '' }; }
     if(!w.ex) delete w.ex; if(!w.ph) delete w.ph; if(!w.pos) delete w.pos;
     b.words = (b.words || []).filter(x => !(x.w === w.w && x.p === w.p)).concat(w);
     saveBooks();
-    wdFound = null; wdQ.value = ''; wdFields(); wdResult(); wdList(w.w);
+    wdFound = null; wdQ.value = ''; wdFields(); wdResult(); wdList(w.t);
   });
-  // the book's words, in page order: Log-style rows — word | meaning | page | delete; tap one to read all of it
+  // the book's words as cards, the latest page first (then the newest on a page first)
   function wdList(flash){
-    const b = wdBook, list = (b.words || []).slice().sort((x, y) => x.p - y.p || x.t - y.t), el = document.getElementById('wd-saved');
+    const b = wdBook, list = (b.words || []).slice().sort((x, y) => y.p - x.p || y.t - x.t), el = document.getElementById('wd-saved');
     document.getElementById('wd-count').innerHTML = list.length ? `<b>${list.length}</b> ${list.length === 1 ? 'word' : 'words'} saved` : 'No words saved yet';
-    const last = list.length ? list.slice().sort((x, y) => y.t - x.t)[0].p : null;
-    document.getElementById('wd-last').innerHTML = last ? `latest on <b>p. ${last}</b>` : '';
-    el.innerHTML = list.length ? `<div class="bd-strip">Saved from this book</div><div class="lg-heads wd-cols"><span>Word</span><span>Meaning</span><span>Page</span><span>Delete</span></div><div class="lg-rows">` +
-      list.map(x => `<div class="lg-row wd-row" data-t="${x.t}"><span class="lg-day wd-word"><b>${wdEsc(x.w)}</b><small>${wdEsc(x.pos || '—')}</small></span>` +
-        `<span class="lg-day wd-def"><span>${wdEsc(x.def)}</span>${x.ex ? `<em>“${wdEsc(x.ex)}”</em>` : ''}</span>` +
-        `<span class="lg-day wd-pg"><b>p. ${x.p}</b><small>${WD_AT[x.at] || ''}</small></span><button type="button" class="lg-del" title="Delete word">✕</button></div>`).join('') + `</div>` : '';
-    el.querySelectorAll('.wd-row').forEach(r => {
-      r.addEventListener('click', e => { if(!e.target.closest('.lg-del')) r.classList.toggle('open'); });
-      const del = r.querySelector('.lg-del'); let armed = false, t = 0;
+    document.getElementById('wd-last').innerHTML = list.length ? `latest on <b>p. ${list[0].p}</b>` : '';
+    el.innerHTML = list.length ? `<div class="bd-strip">Saved from this book</div><div class="wd-cards">${list.map(x => wdCard(x)).join('')}</div>` : '';
+    el.querySelectorAll('.wd-card').forEach(c => {
+      const del = c.querySelector('.wd-c-del'); let armed = false, t = 0;
       del.addEventListener('click', e => { e.stopPropagation();
-        if(!armed){ armed = true; del.classList.add('armed'); t = setTimeout(() => { armed = false; del.classList.remove('armed'); }, 3000); return; }
-        clearTimeout(t); b.words = (b.words || []).filter(x => String(x.t) !== r.dataset.t); if(!b.words.length) delete b.words; saveBooks(); wdList(); });
-      if(flash && r.querySelector('.wd-word b').textContent === flash){ r.classList.add('new'); r.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
+        if(!armed){ armed = true; del.classList.add('armed'); del.textContent = 'Sure?'; t = setTimeout(() => { armed = false; del.classList.remove('armed'); del.textContent = 'Delete'; }, 3000); return; }
+        clearTimeout(t); b.words = (b.words || []).filter(x => String(x.t) !== c.dataset.t); if(!b.words.length) delete b.words; saveBooks(); wdList(); });
+      if(flash && c.dataset.t === String(flash)){ c.classList.add('new'); c.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
     });
   }
   // while a dropdown is open, everything but the header, the footer and that card (with its dropdown) is dimmed;
